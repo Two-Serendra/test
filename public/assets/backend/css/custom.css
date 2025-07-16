@@ -1,0 +1,85 @@
+.brand-logo {
+    height: 70px !important;
+    /* Adjust height as needed */
+    width: auto !important;
+    object-fit: contain !important;
+    display: block !important;
+    max-width: 100% !important;
+
+}
+
+.colored-toast {
+    background-color: #28a745 !important;
+    margin-top: 30px;
+    color: white;
+    font-family: 'Arial', sans-serif !important;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.colored-toast-error {
+    background-color: #dc3545 !important;
+    color: white;
+    font-family: 'Arial', sans-serif !important;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#serviceTable tbody tr {
+    height: 120px;
+    /* Adjust to your preferred height */
+    vertical-align: middle;
+    /* Ensures content is vertically centered */
+}
+
+#serviceTable tbody tr {
+    height: 120px !important;
+    /* Adjust to your preferred height */
+
+}
+
+#serviceTable img {
+    max-height: 100px !important;
+    object-fit: contain;
+}
+
+.swal2-container {
+    z-index: 10600 !important;
+
+}
+
+.swal2-toast {
+    z-index: 10610 !important;
+
+}
+
+.progress,
+.progress-bar {
+    border-radius: 0 !important;
+}
+
+#update_work_permit_booking_date,
+#work_permit_booking_date {
+    background-color: transparent !important;
+}
+
+.custom-dl-btn {
+    color: #fff !important;
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+}
+
+.btn-activate {
+    color: #fff !important;
+    background-color: #3399ff !important;
+    border-color: #3399ff !important;
+}
+
+.form-check .form-check-input {
+    float: left;
+    margin-left: -1.7em !important;
+}
+
+.justify-text {
+    text-align: justify !important;
+}

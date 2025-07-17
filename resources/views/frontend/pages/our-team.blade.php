@@ -37,7 +37,7 @@
     <div class="container py-5" style="font-family: 'Poppins', sans-serif;">
 
         <div class="w-100 mb-3">
-            <img src="{{ asset('assets/images/our-team/managers2.jpg') }}" alt="Team Banner" class="img-fluid w-100"
+            <img src="{{ asset('assets/images/our-team/2smanagers.jpg') }}" alt="Team Banner" class="img-fluid w-100"
                 style="height: 100%; object-fit: cover;">
         </div>
 

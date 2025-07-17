@@ -66,66 +66,38 @@
     /* Optional: remove Bootstrap focus shadows */
 }
 
-.timeline {
-    position: relative;
-    margin: 0 auto;
-    padding: 2rem 0;
-    width: 90%;
-}
-
-.timeline::after {
-    content: '';
-    position: absolute;
-    width: 4px;
-    background-color: #ddd;
-    top: 0;
-    bottom: 0;
-    left: 50%;
-    margin-left: -2px;
-}
-
-.timeline-item {
-    position: relative;
-    width: 50%;
-    padding: 2rem;
-    box-sizing: border-box;
-}
-
-.timeline-item.left {
-    left: 0;
-}
-
-.timeline-item.right {
-    left: 50%;
-    text-align: left;
-}
-
 .timeline-content {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    /* Stretch content vertically */
     background: #fff;
     padding: 1rem;
     border-radius: 10px;
     border: 1px solid #ddd;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
     gap: 1rem;
-}
-
-.timeline-item.left .timeline-content {
-    flex-direction: row-reverse;
+    height: 100%;
 }
 
 .timeline-img {
-    width: 120px;
-    height: 120px;
+    width: 150px;
+    height: 100%;
     object-fit: cover;
+    /* ensures image fills the left side vertically */
     border-radius: 10px;
     flex-shrink: 0;
 }
 
+.timeline-item {
+    height: 100%;
+}
+
 .timeline-text {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .timeline-text h5 {
@@ -134,6 +106,7 @@
 }
 
 .timeline-text p {
+    flex-grow: 1;
     margin-bottom: 0.5rem;
 }
 
@@ -143,32 +116,33 @@
     display: inline-flex;
     align-items: center;
     color: #000;
+    margin-top: auto;
 }
 
+/* Responsive */
 @media (max-width: 767px) {
-    .timeline::after {
-        left: 8px;
-    }
-
-    .timeline-item {
-        width: 100%;
-        padding-left: 30px;
-    }
-
-    .timeline-item.right,
-    .timeline-item.left {
-        left: 0;
-        text-align: left;
-    }
-
     .timeline-content {
-        flex-direction: row;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        height: auto;
     }
 
-    .timeline-item.left .timeline-content {
-        flex-direction: row;
+    .timeline-img {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+        object-fit: contain;
+        margin-bottom: 1rem;
+    }
+
+    .timeline-text {
+        align-items: center;
     }
 }
+
+
+
 
 .read-more-link {
     position: relative;

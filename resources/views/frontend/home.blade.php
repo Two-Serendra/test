@@ -5,7 +5,7 @@
     <div class="row m-0 p-0">
         <section class="hero-section position-relative d-flex align-items-center justify-content-center text-white"
             style="background: url('{{ asset('assets/images/twoserendra3.jpg') }}') center center / cover no-repeat; 
-                                                                                                                                                                                                                                                                                        height: 100vh; width: 100vw;">
+                                                                                                                                                                                                                                                                                                    height: 100vh; width: 100vw;">
 
             <!-- Dark overlay -->
             <div class="position-absolute top-0 start-0 w-100 h-100"
@@ -117,77 +117,39 @@
 
 
         <div class="container py-5">
-            <div class="timeline">
-                <!-- Item 1 -->
-                <div class="timeline-item left">
-                    <div class="timeline-content">
-                        <img src="{{ asset('assets/images/sections.avif') }}" class="timeline-img" alt="Sections">
-                        <div class="timeline-text">
-                            <h5>SECTIONS</h5>
-                            <p>Our belief is that communities are built when people work together. Two Serendra is formed of
-                                sections from low-rise to high-rise.</p>
-                            <a class="read-more-link text-decoration-none d-inline-flex align-items-center mt-3"
-                                href="{{ route('sections') }}">
-                                Read More
-                                <i class="bi bi-arrow-right ms-2"></i>
-                            </a>
+            <div class="row g-4">
+                <!-- Reusable Card -->
+                @php
+                    $items = [
+                        ['img' => 'sections.avif', 'title' => 'SECTIONS', 'text' => 'Our belief is that communities are built when people work together. Two Serendra is formed of sections from low-rise to high-rise.', 'route' => route('sections')],
+                        ['img' => 'facilities.avif', 'title' => 'Gallery', 'text' => 'Check here for a list of amenities, function spaces and community spaces.', 'route' => route('gallery')],
+                        ['img' => 'events.avif', 'title' => 'EVENTS', 'text' => 'Community events bring people together. Check here for a list of upcoming events. Remember to RSVP with ADMIN.', 'route' => route('events')],
+                        ['img' => 'maps of the area.avif', 'title' => 'MAPS OF THE AREA', 'text' => "Find out what's available in the local area.", 'route' => route('maps')],
+                    ];
+                @endphp
+
+                @foreach ($items as $item)
+                    <div class="col-md-6">
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <img src="{{ asset('assets/images/' . $item['img']) }}" class="timeline-img"
+                                    alt="{{ $item['title'] }}">
+                                <div class="timeline-text">
+                                    <h5>{{ $item['title'] }}</h5>
+                                    <p class="text-justify">{{ $item['text'] }}</p>
+                                    <a class="read-more-link text-decoration-none d-inline-flex align-items-center mt-2"
+                                        href="{{ $item['route'] }}">
+                                        Read More
+                                        <i class="bi bi-arrow-right ms-2"></i>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Item 2 -->
-                <div class="timeline-item right">
-                    <div class="timeline-content">
-                        <img src="{{ asset('assets/images/facilities.avif') }}" class="timeline-img" alt="Facilities">
-                        <div class="timeline-text">
-                            <h5>Gallery</h5>
-                            <p>Check here for a list of amenities, function spaces and community spaces.</p>
-                            <a class="read-more-link text-decoration-none d-inline-flex align-items-center mt-3"
-                                href="{{ route('gallery') }}">
-                                Read More
-                                <i class="bi bi-arrow-right ms-2"></i>
-                            </a>
-
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Item 3 -->
-                <div class="timeline-item left">
-                    <div class="timeline-content">
-                        <img src="{{ asset('assets/images/events.avif') }}" class="timeline-img" alt="Events">
-                        <div class="timeline-text">
-                            <h5>EVENTS</h5>
-                            <p>Community events bring people together. Check here for a list of upcoming events. Remember to
-                                RSVP with ADMIN.</p>
-                            <a class="read-more-link text-decoration-none d-inline-flex align-items-center mt-3"
-                                href="{{ route('events') }}">
-                                Read More
-                                <i class="bi bi-arrow-right ms-2"></i>
-                            </a>
-
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Item 4 -->
-                <div class="timeline-item right">
-                    <div class="timeline-content">
-                        <img src="{{ asset('assets/images/maps of the area.avif') }}" class="timeline-img" alt="Maps">
-                        <div class="timeline-text">
-                            <h5>MAPS OF THE AREA</h5>
-                            <p>Find out what's available in the local area.</p>
-                            <a class="read-more-link text-decoration-none d-inline-flex align-items-center mt-3"
-                                href="{{ route('maps') }}">
-                                Read More
-                                <i class="bi bi-arrow-right ms-2"></i>
-                            </a>
-
-                        </div>
-                    </div>
-                </div>
-
+                @endforeach
             </div>
         </div>
+
+
         @include('frontend.modal.360-modal-view')
 @endsection

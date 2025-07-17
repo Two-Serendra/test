@@ -141,8 +141,12 @@
     }
 }
 
-
-
+@media (max-width: 768px) {
+    .our-team-img {
+        height: 250px !important;
+        /* Adjust height for smaller screens */
+    }
+}
 
 .read-more-link {
     position: relative;

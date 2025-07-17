@@ -93,8 +93,11 @@
             <!-- Image -->
             <div class="col-md-6 mb-4 mb-md-0">
                 <div class="overflow-hidden rounded-4 shadow-sm">
-                    <img src="{{ asset('assets/images/our-team/engr2.webp') }}" class="img-fluid w-100" alt="IT Specialist"
+                    <img src="{{ asset('assets/images/our-team/engr2.webp') }}" class="img-fluid w-100 our-team-img"
+                        alt="Engineering"
                         style="object-fit: cover; height: 350px; border: 2px solid #dee2e6; border-radius: 0.5rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
+
+
 
                 </div>
             </div>

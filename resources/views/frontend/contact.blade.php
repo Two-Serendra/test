@@ -121,6 +121,7 @@
                             <form class="contact-form" method="POST" action="{{ route('contact.send') }}">
                                 @csrf
                                 <div class="row g-3">
+                                    <!-- Name -->
                                     <div class="col-sm-6">
                                         <div class="form-floating">
                                             <input type="text" class="form-control" id="name" name="name"
@@ -128,6 +129,8 @@
                                             <label for="name">Your Name</label>
                                         </div>
                                     </div>
+
+                                    <!-- Email -->
                                     <div class="col-sm-6">
                                         <div class="form-floating">
                                             <input type="email" class="form-control" id="mail" name="email"
@@ -135,6 +138,8 @@
                                             <label for="mail">Your Email</label>
                                         </div>
                                     </div>
+
+                                    <!-- Mobile -->
                                     <div class="col-sm-6">
                                         <div class="form-floating">
                                             <input type="text" class="form-control" id="mobile" name="mobile"
@@ -142,6 +147,8 @@
                                             <label for="mobile">Your Mobile</label>
                                         </div>
                                     </div>
+
+                                    <!-- Subject -->
                                     <div class="col-sm-6">
                                         <div class="form-floating">
                                             <input type="text" class="form-control" id="subject" name="subject"
@@ -149,6 +156,8 @@
                                             <label for="subject">Subject</label>
                                         </div>
                                     </div>
+
+                                    <!-- Message -->
                                     <div class="col-12">
                                         <div class="form-floating">
                                             <textarea class="form-control" placeholder="Leave a message here" id="message"
@@ -156,15 +165,20 @@
                                             <label for="message">Message</label>
                                         </div>
                                     </div>
-                                    <button id="submitBtn"
-                                        class="btn btn-primary w-100 py-3 d-flex justify-content-center align-items-center"
-                                        type="submit">
-                                        <span class="spinner-border spinner-border-sm me-2 d-none" role="status"
-                                            id="spinner" aria-hidden="true"></span>
-                                        <span id="btnText">Submit Now</span>
-                                    </button>
+
+                                    <!-- Submit Button with Spinner -->
+                                    <div class="col-12">
+                                        <button id="submitBtnContactUs"
+                                            class="btn btn-primary w-100 py-3 d-flex justify-content-center align-items-center"
+                                            type="submit">
+                                            <span class="spinner-border spinner-border-sm me-2 d-none text-light"
+                                                role="status" id="spinner" aria-hidden="true"></span>
+                                            <span id="btnText">Submit Now</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </form>
+
                         </div>
                     </div>
                 </div> <!-- end row -->
@@ -264,9 +278,9 @@
     <script>
         $(document).ready(function () {
             $('.contact-form').on('submit', function () {
-                $('#submitBtn').prop('disabled', true);
-                $('#spinner').removeClass('d-none');
-                $('#btnText').text('Sending...');
+                $('#submitBtn').prop('disabled', true); // Disable button
+                $('#spinner').removeClass('d-none'); // Show spinner
+                $('#btnText').text('Sending...'); // Change text
             });
 
             @if(session('success'))
@@ -286,6 +300,6 @@
                     confirmButtonColor: '#d33'
                 });
             @endif
-                });
+                                });
     </script>
 @endsection

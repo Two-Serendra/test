@@ -322,3 +322,11 @@
 .text-justify {
     text-align: justify !important;
 }
+
+#submitBtnContactUs:disabled {
+    background-color: #0d6efd !important;
+    /* same as .btn-primary */
+    color: #fff !important;
+    opacity: 1 !important;
+    cursor: not-allowed;
+}

@@ -9,7 +9,7 @@
 <body style="font-family: Arial, sans-serif; color: #333;">
     <div style="max-width: 600px; margin: auto; border: 1px solid #eee; padding: 30px; background-color: #f9f9f9;">
         <div style="text-align: center; margin-bottom: 20px;">
-            <img src="{{ asset('assets/images/TWO SERENDRA LOGO PNG.png') }}" alt="Two Serendra Logo" style="max-width: 180px;">
+            <img src="{{ asset('https://test.twoserendra.com/assets/images/TWO SERENDRA LOGO PNG.png') }}" alt="Two Serendra Logo" style="max-width: 180px;">
         </div>
 
         <h2 style="color: #0056b3;">Hi {{ $name }},</h2>

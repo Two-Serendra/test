@@ -7,7 +7,7 @@
             inset: 0;
             background: linear-gradient(rgba(4, 61, 19, 0.5), rgba(8, 131, 41, 0.5)),
                 url("{{ asset('assets/images/2S DAHON.png') }}");
-            background-size: cover;
+            background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
             opacity: 0;
@@ -53,82 +53,135 @@
             <div class="text-center mx-auto" style="max-width: 600px;">
                 <h1 class="display-6 text-uppercase mb-5">Reliable & High-Quality Services</h1>
             </div>
-            <div class="row g-4">
+            <div class="row g-4 justify-content-center">
+
+                <!-- Service Card -->
                 <div class="col-lg-4 col-md-6 d-flex">
                     <div class="card border-0 shadow h-100 w-100">
-                        <div class="card-header bg-primary text-white text-uppercase fw-bold">
-                            Pest Control Services
+                        <div
+                            class="card-header bg-primary text-white text-uppercase fw-bold d-flex align-items-center gap-2">
+                            <i class="fas fa-bug-slash fa-lg"></i> Pest Control Services
                         </div>
                         <div class="card-body">
-                            <p class="text-justify">Two Serendra offers complimentary pest control services once a
-                                month,
+                            <p class="text-justify">Two Serendra offers complimentary pest control services once a month,
                                 including spraying, misting, baiting, rat trapping and caging, and larviciding. Additional
-                                cleaning services may be requested for a minimal recovery fee of PHP 300. To schedule a
-                                visit,
-                                please contact your lobby concierge.</p>
+                                cleaning services may be requested for PHP 300. Contact your lobby concierge to schedule.
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Card 2 -->
+                <!-- Grease Trap Cleaning -->
                 <div class="col-lg-4 col-md-6 d-flex">
                     <div class="card border-0 shadow h-100 w-100">
-                        <div class="card-header bg-primary text-white text-uppercase fw-bold">
-                            Grease Trap Cleaning
+                        <div
+                            class="card-header bg-primary text-white text-uppercase fw-bold d-flex align-items-center gap-2">
+                            <i class="fas fa-dumpster fa-lg"></i> Grease Trap Cleaning
                         </div>
                         <div class="card-body">
-                            <p class="text-justify">Available daily from 9:00 AM to 4:00 PM. Each unit gets two
-                                (2) free
-                                cleanings per year. Additional cleanings are PHP 448. Book via your lobby concierge.</p>
+                            <p class="text-justify">Available daily from 9:00 AM to 4:00 PM. Each unit gets two free
+                                cleanings
+                                per year. Additional cleanings are PHP 448. Book via your lobby concierge.</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Card 3 -->
+                <!-- Shuttle Services -->
                 <div class="col-lg-4 col-md-6 d-flex">
                     <div class="card border-0 shadow h-100 w-100">
-                        <div class="card-header bg-primary text-white text-uppercase fw-bold">
-                            Shuttle Services
+                        <div
+                            class="card-header bg-primary text-white text-uppercase fw-bold d-flex align-items-center gap-2">
+                            <i class="fas fa-van-shuttle fa-lg"></i> Shuttle Services
                         </div>
                         <div class="card-body">
-                            <p class="text-justify">Daily shuttle service to key locations in BGC. For schedules
-                                and seat
+                            <p class="text-justify">Daily shuttle service to key locations in BGC. For schedules and seat
                                 reservations, please contact your lobby concierge.</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Row 2: Wrap in a centered flex container -->
-                <div class="d-flex justify-content-center gap-3 flex-wrap">
-                    <div class="col-lg-4 col-md-6 d-flex">
-                        <div class="card border-0 shadow h-100 w-100">
-                            <div class="card-header bg-primary text-white text-uppercase fw-bold">
-                                In-Unit Services (IUS)
-                            </div>
-                            <div class="card-body">
-                                <p class="text-justify">In partnership with WilServ MPC, this service runs
-                                    Mon–Sat,
-                                    8:00 AM–5:00 PM. Contact the IUS Office for assistance.</p>
-                            </div>
+                <!-- In-Unit Services -->
+                <div class="col-lg-4 col-md-6 d-flex">
+                    <div class="card border-0 shadow h-100 w-100">
+                        <div
+                            class="card-header bg-primary text-white text-uppercase fw-bold d-flex align-items-center gap-2">
+                            <i class="fas fa-screwdriver-wrench fa-lg"></i> In-Unit Services (IUS)
+                        </div>
+                        <div class="card-body">
+                            <p class="text-justify">In partnership with WilServ MPC, this service runs Mon–Sat, 8:00 AM–5:00
+                                PM.
+                                Contact the IUS Office for assistance.</p>
                         </div>
                     </div>
+                </div>
 
-                    <div class="col-lg-4 col-md-6 d-flex">
-                        <div class="card border-0 shadow h-100 w-100">
-                            <div class="card-header bg-primary text-white text-uppercase fw-bold">
-                                Annual Unit Safety Inspection (AUSI)
-                            </div>
-                            <div class="card-body">
-                                <p class="text-justify">Inspections are Mon–Sat, 8:30 AM–4:30 PM. Scheduling is
-                                    required to avoid penalties. Coordinate with the lobby concierge or Engineering Office.
-                                </p>
-                            </div>
+                <!-- Annual Unit Safety Inspection -->
+                <div class="col-lg-4 col-md-6 d-flex">
+                    <div class="card border-0 shadow h-100 w-100">
+                        <div
+                            class="card-header bg-primary text-white text-uppercase fw-bold d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-shield"></i> Annual Unit Safety Inspection (AUSI)
                         </div>
+                        <div class="card-body">
+                            <p class="text-justify">Inspections are Mon–Sat, 8:30 AM–4:30 PM. Scheduling is required to
+                                avoid
+                                penalties. Coordinate with the lobby concierge or Engineering Office.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid service pt-6 pb-6" style="background-color: #f2f2f2;">
+        <div class="container">
+            <div class="text-center mx-auto" style="max-width: 600px;">
+                <h1 class="display-6 text-uppercase mb-5">Concessionaire</h1>
+            </div>
+
+            <!-- First Row: 3 Images -->
+            <div class="row g-4 justify-content-center">
+                <div class="col-lg-4 col-md-6 d-flex">
+                    <div class="card border-0 shadow w-100 overflow-hidden" style="height: 500px;">
+                        <img src="{{ asset('assets/images/concessionaire/soybueno.webp') }}" class="img-fluid w-100 h-100"
+                            style="width:100%, height: auto, object-fit: contain;" alt="Soybueno">
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 d-flex">
+                    <div class="card border-0 shadow w-100 overflow-hidden" style="height: 500px;">
+                        <img src="{{ asset('assets/images/concessionaire/farmersmarket.webp') }}"
+                            class="img-fluid w-100 h-100" style="width:100%, height: auto, object-fit: contain;"
+                            alt="Farmers Market">
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 d-flex">
+                    <div class="card border-0 shadow w-100 overflow-hidden" style="height: 500px;">
+                        <img src="{{ asset('assets/images/concessionaire/commune.webp') }}" class="img-fluid w-100 h-100"
+                            style="width:100%, height: auto, object-fit: contain;" alt="Commune">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Second Row: 2 Images -->
+            <div class="row g-4 justify-content-center mt-1">
+                <div class="col-lg-4 col-md-6 d-flex">
+                    <div class="card border-0 shadow w-100 overflow-hidden" style="height: 500px;">
+                        <img src="{{ asset('assets/images/concessionaire/wilserv.webp') }}" class="img-fluid w-100 h-100"
+                            style="width:100%, height: auto, object-fit: contain;" alt="Wilserv">
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 d-flex">
+                    <div class="card border-0 shadow w-100 overflow-hidden" style="height: 500px;">
+                        <img src="{{ asset('assets/images/concessionaire/pilates.webp') }}" class="img-fluid w-100 h-100"
+                            style="width:100%, height: auto, object-fit: contain;" alt="Pilates">
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+
 
 
 

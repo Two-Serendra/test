@@ -53,91 +53,101 @@
             <div class="text-center mx-auto" style="max-width: 600px;">
                 <h1 class="display-6 text-uppercase mb-5">Reliable & High-Quality Services</h1>
             </div>
-            <div class="row g-4 justify-content-center">
 
-                <!-- Service Card -->
-                <div class="col-lg-4 col-md-6 d-flex">
-                    <div class="card border-0 shadow h-100 w-100">
+            <!-- First row: 3 cards -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-4 d-flex">
+                    <div class="card card services border-0 shadow flex-fill d-flex flex-column h-100">
                         <div
-                            class="card-header bg-primary text-white text-uppercase fw-bold d-flex align-items-center gap-2">
-                            <i class="fas fa-bug-slash fa-lg"></i> Pest Control Services
+                            class="card-header services-header bg-primary text-white text-uppercase fw-bold d-flex align-items-center gap-2">
+                            Pest Control Services
                         </div>
-                        <div class="card-body">
-                            <p class="text-justify">Two Serendra offers complimentary pest control services once a month,
-                                including spraying, misting, baiting, rat trapping and caging, and larviciding. Additional
-                                cleaning services may be requested for PHP 300. Contact your lobby concierge to schedule.
+                        <div class="card-body services-body">
+                            <i class="fa-solid fa-bug-slash background-icon"></i>
+                            <p class="text-justify">
+                                Two Serendra offers complimentary pest control services once a month, including spraying,
+                                misting, baiting, rat trapping and caging, and larviciding. Additional cleaning services may
+                                be requested for PHP 300. Contact your lobby concierge to schedule.
                             </p>
                         </div>
                     </div>
                 </div>
-
-                <!-- Grease Trap Cleaning -->
-                <div class="col-lg-4 col-md-6 d-flex">
-                    <div class="card border-0 shadow h-100 w-100">
+                <div class="col-md-4 d-flex">
+                    <div class="card card services border-0 shadow flex-fill d-flex flex-column h-100">
                         <div
-                            class="card-header bg-primary text-white text-uppercase fw-bold d-flex align-items-center gap-2">
-                            <i class="fas fa-dumpster fa-lg"></i> Grease Trap Cleaning
+                            class="card-header services-header bg-primary text-white text-uppercase fw-bold d-flex align-items-center gap-2">
+                            Grease Trap Cleaning
                         </div>
-                        <div class="card-body">
-                            <p class="text-justify">Available daily from 9:00 AM to 4:00 PM. Each unit gets two free
-                                cleanings
-                                per year. Additional cleanings are PHP 448. Book via your lobby concierge.</p>
+                        <div class="card-body services-body">
+                            <i class="fa-solid fa-sink background-icon"></i>
+                            <p class="text-justify">
+                                Available daily from 9:00 AM to 4:00 PM. Each unit gets two free cleanings per year.
+                                Additional cleanings are PHP 448. Book via your lobby concierge.
+                            </p>
                         </div>
                     </div>
                 </div>
-
-                <!-- Shuttle Services -->
-                <div class="col-lg-4 col-md-6 d-flex">
-                    <div class="card border-0 shadow h-100 w-100">
+                <div class="col-md-4 d-flex">
+                    <div class="card card services border-0 shadow flex-fill d-flex flex-column h-100">
                         <div
-                            class="card-header bg-primary text-white text-uppercase fw-bold d-flex align-items-center gap-2">
-                            <i class="fas fa-van-shuttle fa-lg"></i> Shuttle Services
+                            class="card-header services-header bg-primary text-white text-uppercase fw-bold d-flex align-items-center gap-2">
+                            Shuttle Services
                         </div>
-                        <div class="card-body">
-                            <p class="text-justify">Daily shuttle service to key locations in BGC. For schedules and seat
-                                reservations, please contact your lobby concierge.</p>
+                        <div class="card-body services-body">
+                            <i class="fa-solid fa-shuttle-van background-icon"></i>
+
+                            <p class="text-justify">
+                                Daily shuttle service to key locations in BGC. For schedules and seat reservations, please
+                                contact your lobby concierge.
+                            </p>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- In-Unit Services -->
-                <div class="col-lg-4 col-md-6 d-flex">
-                    <div class="card border-0 shadow h-100 w-100">
+            <!-- Second row: 2 centered cards -->
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-4 d-flex">
+                    <div class="card card services border-0 shadow flex-fill d-flex flex-column h-100">
                         <div
-                            class="card-header bg-primary text-white text-uppercase fw-bold d-flex align-items-center gap-2">
-                            <i class="fas fa-screwdriver-wrench fa-lg"></i> In-Unit Services (IUS)
+                            class="card-header services-header bg-primary text-white text-uppercase fw-bold d-flex align-items-center gap-2">
+                            In-Unit Services (IUS)
                         </div>
-                        <div class="card-body">
-                            <p class="text-justify">In partnership with WilServ MPC, this service runs Mon–Sat, 8:00 AM–5:00
-                                PM.
-                                Contact the IUS Office for assistance.</p>
+                        <div class="card-body services-body">
+                            <i class="fa-solid fa-tools background-icon"></i>
+                            <p class="text-justify">
+                                In partnership with WilServ MPC, this service runs Mon–Sat, 8:00 AM–5:00 PM. Contact the IUS
+                                Office for assistance.
+                            </p>
                         </div>
                     </div>
                 </div>
-
-                <!-- Annual Unit Safety Inspection -->
-                <div class="col-lg-4 col-md-6 d-flex">
-                    <div class="card border-0 shadow h-100 w-100">
+                <div class="col-md-4 d-flex">
+                    <div class="card card services border-0 shadow flex-fill d-flex flex-column h-100">
                         <div
-                            class="card-header bg-primary text-white text-uppercase fw-bold d-flex align-items-center gap-2">
-                            <i class="fa-solid fa-shield"></i> Annual Unit Safety Inspection (AUSI)
+                            class="card-header services-header bg-primary text-white text-uppercase fw-bold d-flex align-items-center gap-2">
+                            Annual Unit Safety Inspection (AUSI)
                         </div>
-                        <div class="card-body">
-                            <p class="text-justify">Inspections are Mon–Sat, 8:30 AM–4:30 PM. Scheduling is required to
-                                avoid
-                                penalties. Coordinate with the lobby concierge or Engineering Office.</p>
+                        <div class="card-body services-body">
+                            <i class="fa-solid fa-helmet-safety background-icon"></i>
+                            <p class="text-justify">
+                                Inspections are Mon–Sat, 8:30 AM–4:30 PM. Scheduling is required to avoid penalties.
+                                Coordinate with the lobby concierge or Engineering Office.
+                            </p>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
 
+
+
+
     <div class="container-fluid service pt-6 pb-6" style="background-color: #f2f2f2;">
         <div class="container">
             <div class="text-center mx-auto" style="max-width: 600px;">
-                <h1 class="display-6 text-uppercase mb-5">Concessionaire</h1>
+                <h1 class="display-6 text-uppercase mb-5">Concessionaires</h1>
             </div>
 
             <!-- First Row: 3 Images -->

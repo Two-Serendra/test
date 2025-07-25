@@ -7,13 +7,16 @@
             padding: 10px !important;
         }
     </style>
-    <div class="container-fluid page-header py-5 my-5">
-        <div class="container text-center">
+    <div class="container-fluid page-header pt-5 mb-6">
+        <div class="container text-center pt-5">
             <div class="row justify-content-center">
                 <div class="col-lg-7">
                     <div class="p-5 text-dark"
                         style="background-color: rgba(255, 255, 255, 0.8); border-radius: 10px 10px 0 0;">
-                        <h1 class="display-6 text-uppercase mb-3 text-dark">OUR TEAM</h1>
+
+                        <!-- Enhanced Title -->
+                        <h1 class="display-6 text-uppercase mb-3 text-dark">Our Team</h1>
+                        <!-- Breadcrumb -->
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb justify-content-center mb-0">
                                 <li class="breadcrumb-item">

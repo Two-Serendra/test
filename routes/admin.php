@@ -47,7 +47,7 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/admin-store-user', [UsersController::class, 'storeUser'])->name('admin.store.user');
     Route::get('/admin-fetch-user/{id}', [UsersController::class, 'fetchUser'])->name('admin.fetch.user');
     Route::post('/admin-update-user/{id}', [UsersController::class, 'updateUser'])->name('admin.update.user');
-    Route::delete('/admin-delete-user', [UsersController::class, 'deleteUser'])->name('delete.services');
+    Route::delete('/admin-delete-user', [UsersController::class, 'deleteUser'])->name('delete.user');
     Route::get('/get-updated-users-table', [UsersController::class, 'getUpdatedUserTable'])->name('admin.get.updated.usertable');
 
     //EMAILS

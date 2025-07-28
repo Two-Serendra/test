@@ -9,8 +9,8 @@ use App\Http\Controllers\Backend\EventsController;
 use App\Http\Controllers\Backend\FunctionRoomsController;
 use App\Http\Controllers\Backend\GalleryController;
 use App\Http\Controllers\Backend\ServicesController;
-use App\Http\Controllers\backend\UsersController;
-use App\Http\Controllers\backend\WorkPermitController;
+use App\Http\Controllers\Backend\UsersController;
+use App\Http\Controllers\Backend\WorkPermitController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest:admin')->group(function () {

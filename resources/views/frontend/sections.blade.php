@@ -93,7 +93,7 @@
                                     <tbody class="text-dark">
                                         <tr>
                                             <td class="text-start">Section Head</td>
-                                            <td class="fw-bold">Vencer Viray</td>
+                                            <!-- <td class="fw-bold">Vencer</td> -->
                                         </tr>
                                         <tr>
                                             <td class="text-start">Asst. Section Head</td>

@@ -4,7 +4,7 @@
 
     <div class="row m-0 p-0">
         <section class="hero-section position-relative d-flex align-items-center justify-content-center text-white"
-            style="background: url('{{ asset('assets/images/twoserendra3.jpg') }}') center center / cover no-repeat; 
+            style="background: url('{{ asset('assets/images/hero.webp') }}') center center / cover no-repeat; 
                                                                                                                                                                                                                                                                                                     height: 100vh; width: 100vw;">
 
             <!-- Dark overlay -->

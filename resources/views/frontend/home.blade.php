@@ -9,7 +9,7 @@
 
             <!-- Dark overlay -->
             <div class="position-absolute top-0 start-0 w-100 h-100"
-                style="background-color: rgba(0, 0, 0, 0.5); z-index: 1;"></div>
+                style="background-color: rgba(0, 0, 0, 0.29); z-index: 1;"></div>
 
             <!-- Animated text -->
             <div class="text-center position-relative" style="z-index: 2;">

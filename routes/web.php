@@ -7,9 +7,12 @@ use App\Http\Controllers\Frontend\UserWorkPermitController;
 use App\Http\Controllers\ProfileController;
 
 use App\Http\Controllers\Frontend\NavbarController;
+use App\Http\Controllers\Frontend\UserProfileController;
+
 use App\Http\Controllers\Backend\AdminAuthController;
 use App\Http\Controllers\Backend\DashboardController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+
 
 use Illuminate\Support\Facades\Route;
 
@@ -25,7 +28,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('auth.login');
+    return view('home');
 });
 
 Route::get('/register', [RegisteredUserController::class, 'create'])
@@ -58,14 +61,21 @@ Route::get('/minor-work-permit', [NavbarController::class, 'minorWorkPermit'])->
 Route::post('/submit-minor-work-permit', [UserWorkPermitController::class, 'submitMinorWorkPermit'])->middleware(['auth'])->name('submit.minor.work.permit');
 Route::get('/downloads', [NavbarController::class, 'getAllDownloads'])->name('downloads');
 
-// Route::get('/downloads', [NavbarController::class, 'getAllDownloads'])->middleware(['auth'])->name('downloads');
+// Route::get('/downloads', [NavbarController::class, 'getAllDownloads'])->middleware(['auth'])->name('downloads');Residence
 
 Route::post('/contact/send', [ContactController::class, 'send'])->name('contact.send');
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+
+    // Use a unique path for editing
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Use a unique path for residence addition
+    Route::post('/profile/add-residence', [UserProfileController::class, 'addResidenceRequests'])->name('profile.add.residence');
+    Route::get('/profile/get-updated-residence-table', [UserProfileController::class, 'getUpdatedUserResidenceTable'])->name('profile.get.updated.residence.table');
+
 });
 
 

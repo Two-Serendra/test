@@ -44,7 +44,7 @@ Route::get('/home', [NavbarController::class, 'home'])->name('home');
 Route::get('/about', [NavbarController::class, 'about'])->name('about');
 Route::get('/services', [NavbarController::class, 'services'])->name('services');
 Route::get('/contact', [NavbarController::class, 'contact'])->name('contact');
-Route::get('/dowbloadables', [NavbarController::class, 'downloadables'])->name('downloadables');
+Route::get('/downloadables', [NavbarController::class, 'downloadables'])->name('downloadables');
 Route::get('/sections', [NavbarController::class, 'sections'])->name('sections');
 Route::get('/maps', [NavbarController::class, 'maps'])->name('maps');
 Route::get('/events', [NavbarController::class, 'events'])->name('events');
@@ -59,7 +59,7 @@ Route::get('/minor-work-permit', [NavbarController::class, 'minorWorkPermit'])->
 
 //Work Permit
 Route::post('/submit-minor-work-permit', [UserWorkPermitController::class, 'submitMinorWorkPermit'])->middleware(['auth'])->name('submit.minor.work.permit');
-Route::get('/downloads', [NavbarController::class, 'getAllDownloads'])->name('downloads');
+Route::get('/forms', [NavbarController::class, 'getAllDownloads'])->name('downloads');
 
 // Route::get('/downloads', [NavbarController::class, 'getAllDownloads'])->middleware(['auth'])->name('downloads');Residence
 

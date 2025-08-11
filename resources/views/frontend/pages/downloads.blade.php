@@ -8,7 +8,7 @@
                         style="background-color: rgba(255, 255, 255, 0.8); border-radius: 10px 10px 0 0;">
 
                         <!-- Enhanced Title -->
-                        <h1 class="display-6 text-uppercase mb-3 text-dark">DOWNLOADS</h1>
+                        <h1 class="display-6 text-uppercase mb-3 text-dark">Forms</h1>
                         <!-- Breadcrumb -->
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb justify-content-center mb-0">
@@ -17,7 +17,7 @@
                                         style="color: #00c440 !important; font-weight: 600;">Home</a>
                                 </li>
                                 <li class="breadcrumb-item" aria-current="page" style="color: #222; font-weight: 600;">
-                                    Downloads
+                                    Forms
                                 </li>
                             </ol>
                         </nav>
@@ -97,7 +97,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="row g-4">
             @forelse($groupedDownloads as $category => $downloads)
                 <div class="col-md-6">

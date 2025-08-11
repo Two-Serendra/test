@@ -33,14 +33,14 @@
                             <a href="{{ route('ourTeam') }}" class="dropdown-item">Our Team</a>
                             <a href="{{ route('gallery') }}" class="dropdown-item">Gallery</a>
                             <a href="{{ route('events') }}" class="dropdown-item">Events</a>
-                            <a href="{{ route('downloads') }}" class="dropdown-item">Downloads</a>
+                            <a href="{{ route('downloads') }}" class="dropdown-item">Forms</a>
                         </div>
                     </div>
                     <a href="{{ route('contact') }}"
                         class="nav-item nav-link {{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a>
                 </div>
 
-                <!-- <div class="ms-auto">
+                <div class="ms-auto">
                     <a href="" class="btn btn-primary custom-btn">Book Now</a>
                 </div>
 
@@ -67,7 +67,7 @@
                             </a>
                         @endauth
                     </div>
-                </div> -->
+                </div>
 
 
             </div>

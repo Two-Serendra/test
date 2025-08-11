@@ -26,7 +26,78 @@
             </div>
         </div>
     </div>
+
     <div class="container py-5">
+        <div class="row g-4 mt-4">
+            <!-- Engineering Forms -->
+            <div class="col-md-6">
+                <div class="card shadow mb-3 bg-body rounded">
+                    <div class="card-header bg-light text-dark">
+                        <h5 class="mb-0 text-uppercase">Online Engineering Forms</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <a href="https://forms.office.com/r/ufEtDk3SLb" target="_blank"
+                                    class="d-flex align-items-center fs-6 text-dark online-form-link">
+                                    <i class='bx bx-file-blank me-2 fs-4'></i>
+                                    Minor Work Permit Request
+                                </a>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="https://forms.office.com/r/rHbB0ic90U" target="_blank"
+                                    class="d-flex align-items-center fs-6 text-dark online-form-link">
+                                    <i class='bx bx-file-blank me-2 fs-4'></i>
+                                    Delivery Permit
+                                </a>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="https://forms.office.com/r/kcNym2WD9d" target="_blank"
+                                    class="d-flex align-items-center fs-6 text-dark online-form-link">
+                                    <i class='bx bx-file-blank me-2 fs-4'></i>
+                                    Pull Out Permit
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Forms -->
+            <div class="col-md-6">
+                <div class="card shadow mb-3 bg-body rounded">
+                    <div class="card-header bg-light text-dark">
+                        <h5 class="mb-0 text-uppercase">Online Admin Forms</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <a href="https://forms.office.com/r/UJCrPQTheb" target="_blank"
+                                    class="d-flex align-items-center fs-6 text-dark online-form-link">
+                                    <i class='bx bx-file-blank me-2 fs-4'></i>
+                                    Authorization Form
+                                </a>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="https://forms.office.com/r/gHLeGTUer0" target="_blank"
+                                    class="d-flex align-items-center fs-6 text-dark online-form-link">
+                                    <i class='bx bx-file-blank me-2 fs-4'></i>
+                                    Vehicle Sticker Application and Renewal
+                                </a>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="https://forms.office.com/r/UiPztP24ce" target="_blank"
+                                    class="d-flex align-items-center fs-6 text-dark online-form-link">
+                                    <i class='bx bx-file-blank me-2 fs-4'></i>
+                                    Pet ID Renewal
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <div class="row g-4">
             @forelse($groupedDownloads as $category => $downloads)
                 <div class="col-md-6">
@@ -55,6 +126,9 @@
                 </div>
             @endforelse
         </div>
+
+        <!-- Engineering Forms -->
+
     </div>
 
 @endsection

@@ -5,11 +5,13 @@
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <meta charset="utf-8">
+<meta charset="utf-8">
     <title>Two Serendra</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="" name="keywords">
-    <meta content="" name="description">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords"
+        content="Two Serendra, BGC condominiums, Bonifacio Global City condos, Taguig real estate, luxury condos Philippines, Ayala Land Premier">
+    <meta name="description"
+        content="Welcome to Two Serendra, a signature development by Ayala Land Inc., where the tranquility of resort-style living meets the dynamism of Bonifacio Global City (BGC).">
 
     <!-- Favicon -->
     <link href="{{ asset('assets/images/favicon-16x16.png') }}" rel="icon">
@@ -47,7 +49,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Poppins&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
-  
+
 
 
 
@@ -95,6 +97,8 @@
     <script src="{{ asset('assets/frontend/js/main.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/custom.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/work-permit.js') }}"></script>
+    <script src="{{ asset('assets/frontend/js/profile.js') }}"></script>
+
 
 
     <!-- Cookie Banner HTML -->

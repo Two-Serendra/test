@@ -40,7 +40,7 @@
                         class="nav-item nav-link {{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a>
                 </div>
 
-                <div class="ms-auto">
+                <!-- <div class="ms-auto">
                     <a href="" class="btn btn-primary custom-btn">Book Now</a>
                 </div>
 
@@ -67,7 +67,7 @@
                             </a>
                         @endauth
                     </div>
-                </div>
+                </div> -->
 
 
             </div>

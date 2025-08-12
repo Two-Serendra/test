@@ -18,8 +18,8 @@
 
                 <small class="ms-4 text-white d-block">
                     <i class="fa fa-envelope me-3 text-white"></i>
-                    <a href="mailto:lowriseadmin@twoserendraofficial.com" class="text-white text-decoration-none">
-                        lowriseadmin@twoserendraofficial.com
+                    <a href="mailto:lowriseadmin@twoserendra.com" class="text-white text-decoration-none">
+                        lowriseadmin@twoserendra.com
                     </a>
                 </small>
 

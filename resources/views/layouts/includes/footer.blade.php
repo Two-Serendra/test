@@ -61,8 +61,8 @@
 
                 <div class="d-flex flex-column align-items-start text-start text-light mb-3">
                     <i class="fa fa-envelope mb-2" style="font-size: 1.5rem;"></i>
-                    <a href="mailto:lowriseadmin@twoserendraofficial.com" class="text-light text-decoration-none">
-                        <p class="mb-0">lowriseadmin@twoserendraofficial.com</p>
+                    <a href="mailto:lowriseadmin@twoserendra.com" class="text-light text-decoration-none">
+                        <p class="mb-0">lowriseadmin@twoserendra.com</p>
                     </a>
                 </div>
 
@@ -103,7 +103,7 @@
                             <span>8:00 AM - 12:00 PM</span>
                         </div>
                         <div class="d-flex justify-content-between">
-                            <span>Sunday</span>
+                            <span>Sunday/Holidays</span>
                             <span>Closed</span>
                         </div>
                     </div>
@@ -124,7 +124,7 @@
                             <span>8:00 AM - 2:00 PM</span>
                         </div>
                         <div class="d-flex justify-content-between">
-                            <span>Sunday</span>
+                            <span>Sunday/Holidays</span>
                             <span>Closed</span>
                         </div>
                     </div>
@@ -145,7 +145,7 @@
                             <span>8:00 AM - 3:00 PM</span>
                         </div>
                         <div class="d-flex justify-content-between">
-                            <span>Sunday</span>
+                            <span>Sunday/Holidays</span>
                             <span>Closed</span>
                         </div>
                     </div>

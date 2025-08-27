@@ -239,7 +239,7 @@
                             <ul class="list-unstyled mb-0">
                                 <li><strong>Low-Rise Admin:</strong> (02) 8252-5063</li>
                                 <li><strong>High-Rise Admin:</strong> (02) 8256-2534</li>
-                                <li><strong>Engineering:</strong> (02) 8551-1964</li>
+                                <li><strong>Engineering:</strong> (02) 8567-7613</li>
                                 <li><strong>Finance:</strong> (02) 8256-2971</li>
                                 <li><strong>UMD Office:</strong> (02) 8715-5769</li>
                             </ul>

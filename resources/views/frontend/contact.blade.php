@@ -174,7 +174,7 @@
                                         <span class="text-danger">{{ $errors->first('g-recaptcha-response') }}</span>
                                     @endif
 
-                                    <!-- Submit Button with Spinner -->
+                                    <!-- Submit Button -->
                                     <div class="col-12">
                                         <button id="submitBtnContactUs"
                                             class="btn btn-primary w-100 py-3 d-flex justify-content-center align-items-center"
@@ -308,6 +308,6 @@
                     confirmButtonColor: '#d33'
                 });
             @endif
-                                                        });
+                                                            });
     </script>
 @endsection

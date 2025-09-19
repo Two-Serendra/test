@@ -188,7 +188,6 @@
                             </form>
                         </div>
                     </div>
-
                 </div> <!-- end row -->
             </div>
         </div>
@@ -272,7 +271,7 @@
                     </div>
                 </div>
             </div>
-  
+
         </div>
     </section>
     <script src="https://www.google.com/recaptcha/api.js?render={{ env('NOCAPTCHA_SITEKEY') }}"></script>
@@ -291,15 +290,16 @@
                 $('#spinner').removeClass('d-none');
                 $('#btnText').text('Sending...');
 
-                // Generate fresh token
+                // Generate fresh reCAPTCHA token on submit
                 grecaptcha.ready(function () {
-                    grecaptcha.execute("{{ env('NOCAPTCHA_SITEKEY') }}", { action: 'contact' }).then(function (token) {
-                        $('#recaptcha').val(token); // set token
+                    grecaptcha.execute("{{ env('NOCAPTCHA_SITEKEY') }}", { action: 'contact' })
+                        .then(function (token) {
+                            $('#recaptcha').val(token); // Set the fresh token
 
-                        // Remove handler to prevent recursion, then submit
-                        form.off('submit');
-                        form.submit();
-                    });
+                            // Submit the form
+                            form.off('submit'); // Remove the handler to prevent recursion
+                            form.submit();
+                        });
                 });
             });
 
@@ -321,7 +321,7 @@
                     confirmButtonColor: '#d33'
                 });
             @endif
-    });
+            });
     </script>
 
 @endsection

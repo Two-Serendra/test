@@ -36,6 +36,7 @@ class ContactController extends Controller
         $result = $response->json();
 
         \Log::info('reCAPTCHA verification result:', $result);
+        \Log::info('reCAPTCHA score:', ['score' => $result['score'] ?? null, 'success' => $result['success'] ?? false]);
 
         if (!($result['success'] ?? false) || ($result['score'] ?? 0) < 0.5) {
             return back()->withErrors([

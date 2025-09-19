@@ -166,8 +166,10 @@
                                         </div>
                                     </div>
 
-                                    {{-- Add the NoCaptcha widget --}}
-                                    {!! NoCaptcha::display() !!}
+                                    <!-- Hidden reCAPTCHA response -->
+                                    <input type="hidden" name="g-recaptcha-response" id="recaptcha">
+
+                                    <!-- Show validation error -->
                                     @if ($errors->has('g-recaptcha-response'))
                                         <span class="text-danger">{{ $errors->first('g-recaptcha-response') }}</span>
                                     @endif
@@ -184,12 +186,9 @@
                                     </div>
                                 </div>
                             </form>
-
-                            {{-- This renders the required JS --}}
-                            {!! NoCaptcha::renderJs() !!}
-
                         </div>
                     </div>
+
                 </div> <!-- end row -->
             </div>
         </div>
@@ -309,6 +308,6 @@
                     confirmButtonColor: '#d33'
                 });
             @endif
-                                                });
+                                                        });
     </script>
 @endsection

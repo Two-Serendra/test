@@ -188,6 +188,7 @@
                             </form>
                         </div>
                     </div>
+
                 </div> <!-- end row -->
             </div>
         </div>
@@ -283,21 +284,23 @@
             const form = $('.contact-form');
 
             form.on('submit', function (e) {
-                e.preventDefault(); // Stop normal submit
+                e.preventDefault();
 
-                // Disable button + show spinner
+                // Disable button & show spinner
                 $('#submitBtnContactUs').prop('disabled', true);
                 $('#spinner').removeClass('d-none');
                 $('#btnText').text('Sending...');
 
-                // Generate fresh reCAPTCHA token on submit
+                // Always generate fresh token
                 grecaptcha.ready(function () {
                     grecaptcha.execute("{{ env('NOCAPTCHA_SITEKEY') }}", { action: 'contact' })
                         .then(function (token) {
-                            $('#recaptcha').val(token); // Set the fresh token
+                            $('#recaptcha').val(token); // set token
 
-                            // Submit the form
-                            form.off('submit'); // Remove the handler to prevent recursion
+                            // Remove submit handler temporarily to avoid recursion
+                            form.off('submit');
+
+                            // Submit the form normally
                             form.submit();
                         });
                 });
@@ -321,7 +324,6 @@
                     confirmButtonColor: '#d33'
                 });
             @endif
-            });
+    });
     </script>
-
 @endsection

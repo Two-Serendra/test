@@ -74,7 +74,7 @@ Route::get('/check-auth', function () {
         'authenticated' => Auth::check()
     ]);
 });
-Route::post('/contact', [ContactController::class, 'send'])
+Route::post('/send', [ContactController::class, 'send'])
     ->name('contact.send')
     ->middleware('throttle:5,1');
 Route::middleware('auth')->group(function () {

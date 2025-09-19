@@ -23,7 +23,7 @@ class ContactController extends Controller
             'mobile' => 'nullable|string',
             'subject' => 'required|string',
             'inquiry' => 'required|string',
-            'g-recaptcha-response' => 'required|captcha',
+            'g-recaptcha-response' => 'required',
         ]);
 
         // Verify with Google
@@ -36,7 +36,6 @@ class ContactController extends Controller
         $result = $response->json();
 
         \Log::info('reCAPTCHA verification result:', $result);
-        \Log::info('reCAPTCHA score:', ['score' => $result['score'] ?? null, 'success' => $result['success'] ?? false]);
 
         if (!($result['success'] ?? false) || ($result['score'] ?? 0) < 0.5) {
             return back()->withErrors([
@@ -49,6 +48,7 @@ class ContactController extends Controller
         try {
             Mail::to('lowriseadmin@twoserendra.com')->send(new AdminContactNotification($data));
             Mail::to($data['email'])->send(new UserAutoReply($data));
+
             \Log::info('Contact form submitted & auto-reply sent:', $data);
 
             return back()->with('success', 'Your message has been sent successfully!');
@@ -57,4 +57,5 @@ class ContactController extends Controller
             return back()->with('error', 'Something went wrong while sending your message.');
         }
     }
+
 }

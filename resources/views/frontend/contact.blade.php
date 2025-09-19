@@ -188,8 +188,6 @@
                             </form>
                         </div>
                     </div>
-
-
                 </div> <!-- end row -->
             </div>
         </div>
@@ -277,40 +275,31 @@
         </div>
     </section>
     <script src="https://www.google.com/recaptcha/api.js?render={{ env('NOCAPTCHA_SITEKEY') }}"></script>
-
-    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Your custom script -->
     <script>
         $(document).ready(function () {
+            const form = $('.contact-form');
 
-            // Form submit handler
-            $('.contact-form').on('submit', function (e) {
-                e.preventDefault(); // prevent default form submit
+            form.on('submit', function (e) {
+                e.preventDefault();
 
-                let form = this;
-
-                // Disable button + show spinner
+                // Disable button + spinner
                 $('#submitBtnContactUs').prop('disabled', true);
                 $('#spinner').removeClass('d-none');
                 $('#btnText').text('Sending...');
 
-                // Generate fresh reCAPTCHA token
+                // Generate fresh token only once per submit
                 grecaptcha.ready(function () {
                     grecaptcha.execute("{{ env('NOCAPTCHA_SITEKEY') }}", { action: 'contact' }).then(function (token) {
-                        $('#recaptcha').val(token); // set token in hidden input
-
-                        // Submit the form
-                        form.submit();
+                        $('#recaptcha').val(token); // set hidden input
+                        form.off('submit'); // remove this handler to avoid recursion
+                        form.submit(); // submit immediately
                     });
                 });
             });
 
-            // SweetAlert notifications
             @if(session('success'))
                 Swal.fire({
                     icon: 'success',
@@ -330,4 +319,5 @@
             @endif
     });
     </script>
+
 @endsection

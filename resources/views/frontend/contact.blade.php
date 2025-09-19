@@ -122,7 +122,6 @@
                                 @csrf
                                 <div class="row g-3">
                                     <!-- Name -->
-                                    <input type="hidden" name="g-recaptcha-response" id="recaptcha">
                                     <div class="col-sm-6">
                                         <div class="form-floating">
                                             <input type="text" class="form-control" id="name" name="name"
@@ -167,6 +166,12 @@
                                         </div>
                                     </div>
 
+                                    {{-- Add the NoCaptcha widget --}}
+                                    {!! NoCaptcha::display() !!}
+                                    @if ($errors->has('g-recaptcha-response'))
+                                        <span class="text-danger">{{ $errors->first('g-recaptcha-response') }}</span>
+                                    @endif
+
                                     <!-- Submit Button with Spinner -->
                                     <div class="col-12">
                                         <button id="submitBtnContactUs"
@@ -179,6 +184,9 @@
                                     </div>
                                 </div>
                             </form>
+
+                            {{-- This renders the required JS --}}
+                            {!! NoCaptcha::renderJs() !!}
 
                         </div>
                     </div>
@@ -301,6 +309,6 @@
                     confirmButtonColor: '#d33'
                 });
             @endif
-                                        });
+                                                });
     </script>
 @endsection

@@ -3,12 +3,12 @@
 use App\Http\Controllers\Backend\ServicesController;
 use App\Http\Controllers\Frontend\ContactController;
 use App\Http\Controllers\Frontend\UserActionsController;
+use App\Http\Controllers\Frontend\UserNotificationController;
 use App\Http\Controllers\Frontend\UserWorkPermitController;
 use App\Http\Controllers\ProfileController;
-
 use App\Http\Controllers\Frontend\NavbarController;
 use App\Http\Controllers\Frontend\UserProfileController;
-
+use App\Http\Controllers\Frontend\FrontendFunctionRoomBookingController;
 use App\Http\Controllers\Backend\AdminAuthController;
 use App\Http\Controllers\Backend\DashboardController;
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-     return redirect()->route('home');
+    return redirect()->route('home');
 });
 
 Route::get('/register', [RegisteredUserController::class, 'create'])
@@ -61,20 +61,50 @@ Route::get('/minor-work-permit', [NavbarController::class, 'minorWorkPermit'])->
 Route::post('/submit-minor-work-permit', [UserWorkPermitController::class, 'submitMinorWorkPermit'])->middleware(['auth'])->name('submit.minor.work.permit');
 Route::get('/forms', [NavbarController::class, 'getAllDownloads'])->name('downloads');
 
-// Route::get('/downloads', [NavbarController::class, 'getAllDownloads'])->middleware(['auth'])->name('downloads');Residence
+//Booking
+Route::get('/booking/list', [FrontendFunctionRoomBookingController::class, 'list'])->name('booking.list');
+Route::get('/booking/{type}/{id}', [FrontendFunctionRoomBookingController::class, 'fullDetails'])
+    ->name('booking.full.details');
+Route::get('/check-unit-tenant/{unitNo}', [FrontendFunctionRoomBookingController::class, 'checkUnitTenant']);
 
-Route::post('/contact/send', [ContactController::class, 'send'])->name('contact.send');
+
+// Route::get('/downloads', [NavbarController::class, 'getAllDownloads'])->middleware(['auth'])->name('downloads');Residence
+Route::get('/check-auth', function () {
+    return response()->json([
+        'authenticated' => Auth::check()
+    ]);
+});
+Route::post('/contact', [ContactController::class, 'send'])
+    ->name('contact.send')
+    ->middleware('throttle:5,1');
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
-
-    // Use a unique path for editing
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Use a unique path for residence addition
-    Route::post('/profile/add-residence', [UserProfileController::class, 'addResidenceRequests'])->name('profile.add.residence');
-    Route::get('/profile/get-updated-residence-table', [UserProfileController::class, 'getUpdatedUserResidenceTable'])->name('profile.get.updated.residence.table');
+
+    // Function Room Booking
+    Route::post('/booking/store', [FrontendFunctionRoomBookingController::class, 'store'])->name('booking.store');
+    Route::get('/booking-details/{booking}', [FrontendFunctionRoomBookingController::class, 'showFunctionRoomBookingDetails'])
+        ->name('show.functionroom.booking.details');
+    Route::get('/function-room/{id}/booked-dates', [FrontendFunctionRoomBookingController::class, 'getFunctionRoomBookedDates']);
+    Route::get('/view-function-room-bookings/{id}/details', [FrontendFunctionRoomBookingController::class, 'getFunctionRoomBookingDetails'])
+        ->name('get.function.room.bookings.details');
+
+    Route::get('/notifications', [UserNotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/{id}', [UserNotificationController::class, 'show'])->name('notifications.show');
+    Route::post('/notifications/{id}/read', function ($id) {
+        $notification = auth()->user()->notifications()->where('id', $id)->first();
+
+        if ($notification) {
+            $notification->markAsRead();
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false], 404);
+    })->name('notifications.read')->middleware('auth');
+    Route::post('/booking/{id}/cancel', [FrontendFunctionRoomBookingController::class, 'cancel'])->name('booking.cancel');
 
 });
 

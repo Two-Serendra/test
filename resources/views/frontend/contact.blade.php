@@ -166,10 +166,10 @@
                                         </div>
                                     </div>
 
-                                    <!-- Hidden reCAPTCHA response -->
+                                    <!-- Hidden reCAPTCHA token -->
                                     <input type="hidden" name="g-recaptcha-response" id="recaptcha">
 
-                                    <!-- Show validation error -->
+                                    <!-- Validation error -->
                                     @if ($errors->has('g-recaptcha-response'))
                                         <span class="text-danger">{{ $errors->first('g-recaptcha-response') }}</span>
                                     @endif
@@ -188,6 +188,7 @@
                             </form>
                         </div>
                     </div>
+
 
                 </div> <!-- end row -->
             </div>
@@ -275,23 +276,41 @@
 
         </div>
     </section>
+    <script src="https://www.google.com/recaptcha/api.js?render={{ env('NOCAPTCHA_SITEKEY') }}"></script>
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://www.google.com/recaptcha/api.js?render={{ env('NOCAPTCHA_SITEKEY') }}"></script>
 
     <!-- Your custom script -->
     <script>
         $(document).ready(function () {
-            $('.contact-form').on('submit', function () {
-                $('#submitBtn').prop('disabled', true); // Disable button
-                $('#spinner').removeClass('d-none'); // Show spinner
-                $('#btnText').text('Sending...'); // Change text
+
+            // Form submit handler
+            $('.contact-form').on('submit', function (e) {
+                e.preventDefault(); // prevent default form submit
+
+                let form = this;
+
+                // Disable button + show spinner
+                $('#submitBtnContactUs').prop('disabled', true);
+                $('#spinner').removeClass('d-none');
+                $('#btnText').text('Sending...');
+
+                // Generate fresh reCAPTCHA token
+                grecaptcha.ready(function () {
+                    grecaptcha.execute("{{ env('NOCAPTCHA_SITEKEY') }}", { action: 'contact' }).then(function (token) {
+                        $('#recaptcha').val(token); // set token in hidden input
+
+                        // Submit the form
+                        form.submit();
+                    });
+                });
             });
 
+            // SweetAlert notifications
             @if(session('success'))
                 Swal.fire({
                     icon: 'success',
@@ -309,20 +328,6 @@
                     confirmButtonColor: '#d33'
                 });
             @endif
-
-            document.querySelector('.contact-form').addEventListener('submit', function (e) {
-                e.preventDefault(); // Stop normal submit
-
-                grecaptcha.ready(function () {
-                    grecaptcha.execute("{{ env('NOCAPTCHA_SITEKEY') }}", { action: 'contact' }).then(function (token) {
-                        // Insert fresh token
-                        document.getElementById('recaptcha').value = token;
-
-                        // Submit the form
-                        e.target.submit();
-                    });
-                });
-            });
-        });
+    });
     </script>
 @endsection

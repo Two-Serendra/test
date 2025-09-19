@@ -17,7 +17,7 @@ class ContactController extends Controller
 
     public function send(Request $request)
     {
-
+        // ✅ Step 1: Validate fields & captcha presence
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|email',
@@ -27,6 +27,7 @@ class ContactController extends Controller
             'g-recaptcha-response' => 'required|captcha',
         ]);
 
+        // ✅ Step 2: Verify with Google & check score
         $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
             'secret' => env('NOCAPTCHA_SECRET'),
             'response' => $request->input('g-recaptcha-response'),
@@ -35,10 +36,17 @@ class ContactController extends Controller
 
         $result = $response->json();
 
+        // 🔍 Log the result for debugging
+        \Log::info('reCAPTCHA verification result:', $result);
+
+        // ✅ Step 3: Enforce minimum score (default 0.5)
         if (!($result['success'] ?? false) || ($result['score'] ?? 0) < 0.5) {
-            return back()->withErrors(['g-recaptcha-response' => 'reCAPTCHA verification failed. Please try again.'])->withInput();
+            return back()->withErrors([
+                'g-recaptcha-response' => 'reCAPTCHA verification failed. Please try again.'
+            ])->withInput();
         }
-        
+
+        // ✅ Step 4: Continue normal process
         $data = $request->only(['name', 'email', 'mobile', 'subject', 'inquiry']);
 
         try {
@@ -60,5 +68,6 @@ class ContactController extends Controller
             return back()->with('error', 'Something went wrong while sending your message.');
         }
     }
+
 
 }

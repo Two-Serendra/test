@@ -122,6 +122,7 @@
                                 @csrf
                                 <div class="row g-3">
                                     <!-- Name -->
+                                    <input type="hidden" name="g-recaptcha-response" id="recaptcha">
                                     <div class="col-sm-6">
                                         <div class="form-floating">
                                             <input type="text" class="form-control" id="name" name="name"
@@ -300,6 +301,6 @@
                     confirmButtonColor: '#d33'
                 });
             @endif
-                                });
+                                        });
     </script>
 @endsection

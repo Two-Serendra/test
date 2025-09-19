@@ -5,7 +5,7 @@
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-<meta charset="utf-8">
+    <meta charset="utf-8">
     <title>Two Serendra</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="keywords"
@@ -49,13 +49,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Poppins&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
-
-
-
-
-
-
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 
 <body>
@@ -92,55 +86,124 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <script src="https://js.pusher.com/8.2/pusher.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/laravel-echo/1.15.2/echo.iife.js"></script>
+
 
     <!-- Template Javascript -->
     <script src="{{ asset('assets/frontend/js/main.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/custom.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/work-permit.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/profile.js') }}"></script>
+    <script src="{{ asset('assets/frontend/js/function-room.js') }}"></script>
 
 
+    <!-- <script>
+        Pusher.logToConsole = true;
 
-    <!-- Cookie Banner HTML -->
-    <!-- <div id="cookieConsentBanner" class="position-fixed bottom-0 start-0 end-0 bg-light shadow-lg py-3 d-none"
-        style="z-index: 1080;">
-        <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div class="d-flex align-items-center gap-3">
-                <img src="{{ asset('assets/images/dpo-dps.png') }}" alt="DPO/DPS" style="height: 80px;">
-                <div>
-                    <h6 class="fw-bold mb-1 text-dark">COOKIE POLICY</h6>
-                    <p class="mb-0 text-dark small">
-                        By using our site, you agree to Serendra Condominium Corporation's use of cookies to improve
-                        your
-                        browsing experience.
-                    </p>
-                </div>
-            </div>
-            <div class="d-flex align-items-start flex-column flex-md-row gap-2 ms-auto">
-                <button id="acceptCookiesBtn" class="btn btn-primary rounded-pill px-4 py-2">ACCEPT COOKIES</button>
-                <button class="btn btn-link text-dark p-0 m-0" id="closeCookieBanner"
-                    style="font-size: 1.5rem; line-height: 1;">&times;</button>
-            </div>
-        </div>
-    </div>
-
-
-    <script>
+        window.Echo = new Echo({
+            broadcaster: 'pusher',
+            key: "{{ env('PUSHER_APP_KEY') }}",
+            cluster: "{{ env('PUSHER_APP_CLUSTER') }}",
+            forceTLS: true
+        });
+    </script>
+     -->
+    <!-- <script>
         $(document).ready(function () {
-            if (!localStorage.getItem('cookieConsent')) {
-                $('#cookieConsentBanner').removeClass('d-none').hide().fadeIn();
+            if (localStorage.getItem("redirect_after_login")) {
+                const url = localStorage.getItem("redirect_after_login");
+                localStorage.removeItem("redirect_after_login");
+                window.location.href = url;
+            }
+            function addNotification(notification) {
+                const payload = notification.data || notification;
+
+                const notifId = notification.id || payload.notification_id;
+                const bookingId = payload.booking_id;
+
+                const notifShowUrl = notifId ? `/notifications/${notifId}` : '#';
+
+                const notifItem = `
+                    <a href="${notifShowUrl}" class="dropdown-item fw-bold">
+                        <i class="bx bx-bell me-2"></i> ${payload.message}
+                        <br><small class="text-muted">Just now</small>
+                    </a>
+                `;
+
+                const notifMenu = $('#notifDropdown').next('.dropdown-menu');
+                notifMenu.prepend('<div class="dropdown-divider"></div>' + notifItem);
+
+                const items = notifMenu.find('.dropdown-item');
+                if (items.length > 5) {
+                    items.slice(5).remove();
+                }
             }
 
-            $('#acceptCookiesBtn').click(function () {
-                localStorage.setItem('cookieConsent', 'true');
-                $('#cookieConsentBanner').fadeOut();
-            });
 
-            $('#closeCookieBanner').click(function () {
-                $('#cookieConsentBanner').fadeOut(); 
+            if (typeof window.Echo !== 'undefined') {
+                window.Echo.private(`App.Models.User.{{ auth()->id() }}`)
+                    .notification((notification) => {
+                        console.log('🔔 New Notification:', notification);
+
+                        let badge = $('#notifDropdown .badge');
+                        if (badge.length) {
+                            badge.text(parseInt(badge.text()) + 1);
+                        } else {
+                            $('#notifDropdown').append(`
+                            <span class="position-absolute top-0 start-100 badge rounded-pill bg-danger"
+                                  style="transform: translate(-60%, -35%);">1</span>
+                        `);
+                        }
+                        addNotification(notification);
+                        toastr.info(notification.data?.message || 'You have a new notification');
+                    });
+            } else {
+                console.warn('❌ Echo is not defined. Check your bootstrap.js/Vite setup.');
+            }
+        });
+        $(document).on('click', '.mark-as-read', function (e) {
+            e.preventDefault();
+
+            const notifId = $(this).data('id');
+            const url = $(this).data('url');
+
+            $.ajax({
+                url: `/notifications/${notifId}/read`,
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function (res) {
+                    if (res.success) {
+                        $(`.mark-as-read[data-id="${notifId}"]`).removeClass('fw-bold').addClass('notification-read');
+                        let badge = $('#notifDropdown .badge');
+                        if (badge.length) {
+                            let count = parseInt(badge.text());
+                            if (count > 1) {
+                                badge.text(count - 1);
+                            } else {
+                                badge.remove();
+                            }
+                            if (url && url !== '#') {
+                                window.location.href = url;
+                            }
+                        }
+                    }
+                }
             });
         });
+
     </script> -->
+
+    <script src="https://www.google.com/recaptcha/api.js?render={{ env('NOCAPTCHA_SITEKEY') }}"></script>
+    <script>
+        grecaptcha.ready(function () {
+            grecaptcha.execute("{{ env('NOCAPTCHA_SITEKEY') }}", { action: 'contact' }).then(function (token) {
+                document.getElementById('recaptcha').value = token;
+            });
+        });
+    </script>
 
 </body>
 

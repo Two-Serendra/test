@@ -10,18 +10,37 @@ use App\Mail\ContactAutoReply;
 use App\Mail\ContactFormToAdmin;
 use App\Mail\AdminContactNotification;
 use App\Mail\UserAutoReply;
+use Illuminate\Support\Facades\Http;
+
 class ContactController extends Controller
 {
 
     public function send(Request $request)
     {
+
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|email',
             'mobile' => 'nullable|string',
             'subject' => 'required|string',
             'inquiry' => 'required|string',
+            'g-recaptcha-response' => 'required|captcha',
         ]);
+
+        $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+            'secret' => env('NOCAPTCHA_SECRET'),
+            'response' => $request->input('g-recaptcha-response'),
+            'remoteip' => $request->ip(),
+        ]);
+
+        $result = $response->json();
+
+        \Log::info('reCAPTCHA verification result:', $result);
+
+        // Optional: check score threshold
+        if (!($result['success'] ?? false) || ($result['score'] ?? 0) < 0.5) {
+            return back()->with('error', 'Spam detected. Please try again.');
+        }
 
         $data = $request->only(['name', 'email', 'mobile', 'subject', 'inquiry']);
 

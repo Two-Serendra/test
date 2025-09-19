@@ -161,7 +161,7 @@
                                     <div class="col-12">
                                         <div class="form-floating">
                                             <textarea class="form-control" placeholder="Leave a message here" id="message"
-                                                name="inquiry" style="height: 130px" required></textarea>
+                                                name="inquiry" style="height:130px" required></textarea>
                                             <label for="message">Message</label>
                                         </div>
                                     </div>
@@ -180,7 +180,7 @@
                                             class="btn btn-primary w-100 py-3 d-flex justify-content-center align-items-center"
                                             type="submit">
                                             <span class="spinner-border spinner-border-sm me-2 d-none text-light"
-                                                role="status" id="spinner" aria-hidden="true"></span>
+                                                id="spinner" role="status" aria-hidden="true"></span>
                                             <span id="btnText">Submit Now</span>
                                         </button>
                                     </div>
@@ -188,6 +188,7 @@
                             </form>
                         </div>
                     </div>
+
                 </div> <!-- end row -->
             </div>
         </div>
@@ -271,7 +272,7 @@
                     </div>
                 </div>
             </div>
-
+  
         </div>
     </section>
     <script src="https://www.google.com/recaptcha/api.js?render={{ env('NOCAPTCHA_SITEKEY') }}"></script>
@@ -283,19 +284,19 @@
             const form = $('.contact-form');
 
             form.on('submit', function (e) {
-                e.preventDefault();
+                e.preventDefault(); // Stop normal submit
 
-                // Disable button and show spinner
+                // Disable button + show spinner
                 $('#submitBtnContactUs').prop('disabled', true);
                 $('#spinner').removeClass('d-none');
                 $('#btnText').text('Sending...');
 
-                // Generate fresh reCAPTCHA token
+                // Generate fresh token
                 grecaptcha.ready(function () {
                     grecaptcha.execute("{{ env('NOCAPTCHA_SITEKEY') }}", { action: 'contact' }).then(function (token) {
                         $('#recaptcha').val(token); // set token
 
-                        // Remove this handler to avoid recursion, then submit
+                        // Remove handler to prevent recursion, then submit
                         form.off('submit');
                         form.submit();
                     });

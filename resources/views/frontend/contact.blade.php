@@ -281,6 +281,7 @@
 
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render={{ env('NOCAPTCHA_SITEKEY') }}"></script>
 
     <!-- Your custom script -->
     <script>
@@ -308,6 +309,20 @@
                     confirmButtonColor: '#d33'
                 });
             @endif
-                                                            });
+
+            document.querySelector('.contact-form').addEventListener('submit', function (e) {
+                e.preventDefault(); // Stop normal submit
+
+                grecaptcha.ready(function () {
+                    grecaptcha.execute("{{ env('NOCAPTCHA_SITEKEY') }}", { action: 'contact' }).then(function (token) {
+                        // Insert fresh token
+                        document.getElementById('recaptcha').value = token;
+
+                        // Submit the form
+                        e.target.submit();
+                    });
+                });
+            });
+        });
     </script>
 @endsection

@@ -84,7 +84,7 @@
             });
         });
     </script>
-    
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -104,8 +104,8 @@
     <script src="{{ asset('assets/frontend/js/main.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/custom.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/work-permit.js') }}"></script>
-    <script src="{{ asset('assets/frontend/js/profile.js') }}"></script>
-    <script src="{{ asset('assets/frontend/js/function-room.js') }}"></script>
+    <!-- <script src="{{ asset('assets/frontend/js/profile.js') }}"></script>
+    <script src="{{ asset('assets/frontend/js/function-room.js') }}"></script> -->
 
 
     <!-- <script>

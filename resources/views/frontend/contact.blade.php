@@ -143,7 +143,7 @@
                                     <div class="col-sm-6">
                                         <div class="form-floating">
                                             <input type="text" class="form-control" id="mobile" name="mobile"
-                                                placeholder="Your Mobile" required>
+                                                placeholder="Your Mobile">
                                             <label for="mobile">Your Mobile</label>
                                         </div>
                                     </div>
@@ -285,21 +285,24 @@
             form.on('submit', function (e) {
                 e.preventDefault();
 
-                // Disable button + spinner
+                // Disable button and show spinner
                 $('#submitBtnContactUs').prop('disabled', true);
                 $('#spinner').removeClass('d-none');
                 $('#btnText').text('Sending...');
 
-                // Generate fresh token only once per submit
+                // Generate fresh reCAPTCHA token
                 grecaptcha.ready(function () {
                     grecaptcha.execute("{{ env('NOCAPTCHA_SITEKEY') }}", { action: 'contact' }).then(function (token) {
-                        $('#recaptcha').val(token); // set hidden input
-                        form.off('submit'); // remove this handler to avoid recursion
-                        form.submit(); // submit immediately
+                        $('#recaptcha').val(token); // set token
+
+                        // Remove this handler to avoid recursion, then submit
+                        form.off('submit');
+                        form.submit();
                     });
                 });
             });
 
+            // SweetAlert notifications
             @if(session('success'))
                 Swal.fire({
                     icon: 'success',

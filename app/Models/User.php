@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-
+use App\Models\ResidentDetails;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -49,8 +49,13 @@ class User extends Authenticatable
     {
         return $this->hasMany(MinorWorkPermit::class);
     }
-    public function residentDetails()
+    public function authorizedEmail()
     {
-        return $this->hasMany(ResidentDetails::class);
+        return $this->hasOne(ResidentDetails::class, 'email', 'email');
+    }
+
+    public function residentDetail()
+    {
+        return $this->hasOne(ResidentDetails::class, 'user_id', 'id');
     }
 }

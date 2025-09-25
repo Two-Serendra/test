@@ -11,7 +11,7 @@
     <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
 
         <p class="mb-0 fw-semibold fs-5 text-dark">
-            Welcome to Dashboard
+            Welcome {{ strtoupper(Auth::user()->name) }}!
         </p>
 
 

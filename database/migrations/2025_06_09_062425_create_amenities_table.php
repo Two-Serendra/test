@@ -13,7 +13,6 @@ return new class extends Migration {
         Schema::create('amenities', function (Blueprint $table) {
             $table->id();
             $table->string('amenity_name');
-            $table->string('amenity_image');
             $table->string('amenity_description');
             $table->string('amenity_remarks');
             $table->tinyInteger('amenity_status')->default('1');

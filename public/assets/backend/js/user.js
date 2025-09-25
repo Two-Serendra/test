@@ -11,11 +11,22 @@ $(document).ready(function () {
 
     $('#admin-new-user').submit(function (event) {
         event.preventDefault();
-        var formData = new FormData(this);
-        var form = this;
-        $('#saveUserBtn').attr('disabled', true);
-        $('#saveUserBtn .spinner-border').removeClass('d-none');
-        $('#saveUserBtn .btn-text').text('Creating...');
+
+        if (!this.checkValidity()) {
+            this.classList.add('was-validated');
+            return;
+        }
+        this.classList.remove('was-validated');
+
+        const $btn = $('#saveUserBtn');
+        const originalWidth = $btn.outerWidth();
+        $btn
+            .attr('disabled', true)
+            .html(`<div class="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></div>`)
+            .css('width', originalWidth + 'px');
+
+        const formData = new FormData(this);
+        const form = this;
 
         $.ajax({
             url: $(this).attr('action'),
@@ -71,6 +82,12 @@ $(document).ready(function () {
                     icon: 'error',
                     title: 'Failed to create user'
                 });
+            },
+            complete: function () {
+                $btn
+                    .attr('disabled', false)
+                    .html(`<span class="btn-text">Create</span>`)
+                    .css('width', '');
             }
         });
     });
@@ -164,14 +181,14 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/admin/admin-delete-user',  
-                    type: 'POST',                       
+                    url: '/admin/admin-delete-user',
+                    type: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')  // get token from meta tag
                     },
                     data: {
                         user_id: userId,
-                        _method: 'DELETE'       
+                        _method: 'DELETE'
                     },
                     success: function (response) {
                         const Toast = Swal.mixin({
@@ -213,7 +230,7 @@ $(document).ready(function () {
                         });
                         Toast.fire({
                             icon: 'error',
-                            title: 'Failed to delete service'
+                            title: 'Failed to delete user'
                         });
                     },
                 });
@@ -243,16 +260,19 @@ $(document).ready(function () {
                         <i class='bx bx-trash'></i>
                     </button>`;
 
-                    var name = user.name ? user.name.toUpperCase() : 'N/A';
+                    var name = user.name ? user.name : 'N/A';
                     var email = user.email ? user.email : 'N/A';
 
                     // Mirror backend roles logic
                     var roles = {
                         0: { label: 'User', class: 'bg-secondary border-secondary' },
                         1: { label: 'Super Admin', class: 'bg-dark border-dark' },
-                        2: { label: 'Admin', class: 'bg-success border-success' },
-                        3: { label: 'Engineering', class: 'bg-warning border-warning text-dark' },
-                        4: { label: 'Security', class: 'bg-danger border-danger' }
+                        2: { label: 'Admin', class: 'bg-primary border-primary' },
+                        3: { label: 'Engineering', class: 'bg-primary border-primary' },
+                        4: { label: 'Security', class: 'bg-danger border-danger' },
+                        5: { label: 'Finance', class: 'bg-primary border-primary' },
+                        6: { label: 'Concierge', class: 'bg-primary border-primary' },
+                        7: { label: 'Manager', class: 'bg-dark border-dark' }
                     };
 
                     var role = roles.hasOwnProperty(user.role_id)

@@ -46,6 +46,7 @@
                         <tr>
                             <th class="text-dark">Unit No</th>
                             <th class="text-dark">Email</th>
+                            <th class="text-dark">Resident Type</th>
                             <th class="text-dark">Created at</th>
                         </tr>
                     </thead>
@@ -59,6 +60,17 @@
                                 <tr>
                                     <td class="text-uppercase">{{($emailPaginationLink->unit_no ?? 'N/A') }}</td>
                                     <td>{{($emailPaginationLink->email ?? 'N/A') }}</td>
+                                    <td>
+                                        @if ($emailPaginationLink->resident_type === 'OWNER')
+                                            <span class="badge bg-primary text-uppercase">Owner</span>
+                                        @elseif ($emailPaginationLink->resident_type === 'TENANT')
+                                            <span class="badge bg-danger text-uppercase">Tenant</span>
+                                        @else
+                                            <span
+                                                class="badge bg-secondary text-uppercase">{{ $emailPaginationLink->resident_type ?? 'N/A' }}</span>
+                                        @endif
+                                    </td>
+
                                     <td>{{($emailPaginationLink->created_at ?? 'N/A') }}</td>
                                     <td>
                                         <button type="button" class="btn btn-sm btn-icon btn-primary edit_email"

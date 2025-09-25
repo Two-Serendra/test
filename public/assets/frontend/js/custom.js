@@ -129,55 +129,97 @@ $(document).ready(function () {
     });
 
 
-    let currentImages = [];
-    let currentIndexthumbnail = 0;
-    const $modal = new bootstrap.Modal($('#imageGalleryModal')[0]);
-    const $modalImg = $('#galleryModalImage');
+    // =====================
+    // GLOBAL GALLERY SCRIPT
+    // =====================
+    (function ($) {
+        $(function () {
 
-    // Open modal on thumbnail click
-    $('.thumbnail-gallery').on('click', function () {
-        const tower = $(this).data('tower');
-        currentIndexthumbnail = parseInt($(this).data('index'));
+            // Standard gallery (with #galleryModal)
+            if ($('#galleryModal').length) {
+                const images = window.galleryImageList || [];
+                let currentIndex = 0;
 
-        // Get all images for this tower
-        currentImages = $(`.thumbnail-gallery[data-tower="${tower}"]`).map(function () {
-            return this.src;
-        }).get();
+                function showImage(index) {
+                    if (index < 0) index = images.length - 1;
+                    if (index >= images.length) index = 0;
 
-        $modalImg.attr('src', currentImages[currentIndexthumbnail]);
-        $modal.show();
-    });
+                    currentIndex = index;
+                    const imageUrl = `/assets/images/gallery/${images[index]}`;
+                    $('#modalImage').attr('src', imageUrl);
+                    $('#galleryModal').modal('show');
+                }
 
-    // Previous button
-    $('#prevImageBtn').on('click', function () {
-        if (!currentImages.length) return;
-        currentIndexthumbnail = (currentIndexthumbnail - 1 + currentImages.length) % currentImages.length;
-        $modalImg.attr('src', currentImages[currentIndexthumbnail]);
-    });
+                $(document).on('click', '.open-gallery-modal', function () {
+                    const index = parseInt($(this).data('index'));
+                    showImage(index);
+                });
 
-    // Next button
-    $('#nextImageBtn').on('click', function () {
-        if (!currentImages.length) return;
-        currentIndexthumbnail = (currentIndexthumbnail + 1) % currentImages.length;
-        $modalImg.attr('src', currentImages[currentIndexthumbnail]);
-    });
+                $(document).on('click', '.prev-btn', function () {
+                    showImage(currentIndex - 1);
+                });
 
-    // Swipe support (touch devices)
-    let startX = 0;
-    $modalImg.on('touchstart', function (e) {
-        startX = e.originalEvent.touches[0].clientX;
-    });
+                $(document).on('click', '.next-btn', function () {
+                    showImage(currentIndex + 1);
+                });
+            }
 
-    $modalImg.on('touchend', function (e) {
-        const endX = e.originalEvent.changedTouches[0].clientX;
-        const diffX = startX - endX;
+            // Thumbnail gallery (with #imageGalleryModal)
+            if ($('#imageGalleryModal').length) {
+                let currentImages = [];
+                let currentIndexthumbnail = 0;
+                const modalEl = document.getElementById('imageGalleryModal');
+                const modalInstance = new bootstrap.Modal(modalEl);
+                const $modalImg = $('#galleryModalImage');
 
-        if (diffX > 50) {
-            $('#nextImageBtn').click(); // Swipe left
-        } else if (diffX < -50) {
-            $('#prevImageBtn').click(); // Swipe right
-        }
-    });
+                $(document).on('click', '.thumbnail-gallery', function () {
+                    const tower = $(this).data('tower');
+                    currentIndexthumbnail = parseInt($(this).data('index'));
+
+                    // Collect all images for this tower
+                    currentImages = $(`.thumbnail-gallery[data-tower="${tower}"]`).map(function () {
+                        return this.src;
+                    }).get();
+
+                    $modalImg.attr('src', currentImages[currentIndexthumbnail]);
+                    modalInstance.show();
+                });
+
+                // Previous button
+                $(document).on('click', '#prevImageBtn', function () {
+                    if (!currentImages.length) return;
+                    currentIndexthumbnail =
+                        (currentIndexthumbnail - 1 + currentImages.length) % currentImages.length;
+                    $modalImg.attr('src', currentImages[currentIndexthumbnail]);
+                });
+
+                // Next button
+                $(document).on('click', '#nextImageBtn', function () {
+                    if (!currentImages.length) return;
+                    currentIndexthumbnail =
+                        (currentIndexthumbnail + 1) % currentImages.length;
+                    $modalImg.attr('src', currentImages[currentIndexthumbnail]);
+                });
+
+                // Swipe support (touch devices)
+                let startX = 0;
+                $modalImg.on('touchstart', function (e) {
+                    startX = e.originalEvent.touches[0].clientX;
+                });
+
+                $modalImg.on('touchend', function (e) {
+                    const endX = e.originalEvent.changedTouches[0].clientX;
+                    const diffX = startX - endX;
+
+                    if (diffX > 50) {
+                        $('#nextImageBtn').click(); // Swipe left
+                    } else if (diffX < -50) {
+                        $('#prevImageBtn').click(); // Swipe right
+                    }
+                });
+            }
+        });
+    })(jQuery);
 
 
 

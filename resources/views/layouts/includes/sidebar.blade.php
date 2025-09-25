@@ -14,13 +14,16 @@
 
     <ul class="menu-inner py-1">
         <!-- Dashboard -->
+        @roles(1)
         <li class="menu-item">
-            <a href="index.html" class="menu-link">
+            <a href="{{ route('admin.dashboard') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div data-i18n="Analytics">Dashboard</div>
             </a>
         </li>
+        @endroles
 
+        @roles(1)
         <li class="menu-header small text-uppercase"><span class="menu-header-text">Booking</span></li>
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -41,7 +44,10 @@
                 </li>
             </ul>
         </li>
+        @endroles
 
+
+        @roles(1, 6)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-building"></i>
@@ -79,26 +85,60 @@
                 </li>
             </ul>
         </li>
+        @endroles
 
+        @roles(1, 2, 3, 5, 6, 7, 8)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-home-alt"></i>
-                <div data-i18n="Form Elements">Function Rooms</div>
+                <div data-i18n="Form Elements">
+                    Function Rooms
+                    <span id="function-room-counter" class="badge bg-danger d-none"
+                        style="min-width: 22px; text-align: center; display: inline-flex; justify-content: center; align-items: center;">
+                        0
+                    </span>
+
+                </div>
             </a>
             <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('admin.show.function.room.bookings') ? 'active' : '' }}">
+                    <a href="{{ route('admin.show.function.room.bookings') }}" class="menu-link">
+                        <div data-i18n="Typography">Booking</div>
+                    </a>
+                </li>
+
+                @roles(1, 6, 7, 8)
+                <li
+                    class="menu-item {{ request()->routeIs('admin.show.function.room.booking.records') ? 'active' : '' }}">
+                    <a href="{{ route('admin.show.function.room.booking.records') }}" class="menu-link">
+                        <div data-i18n="Typography">Records</div>
+                    </a>
+                </li>
+
+                <li
+                    class="menu-item {{ request()->routeIs('admin.show.function.rooms.date.blocking') ? 'active' : '' }}">
+                    <a href="{{ route('admin.show.function.rooms.date.blocking') }}" class="menu-link">
+                        <div data-i18n="Typography">Date Blocking</div>
+                    </a>
+                </li>
+
+                <li class="menu-item {{ request()->routeIs('admin.show.add.ons') ? 'active' : '' }}">
+                    <a href="{{ route('admin.show.add.ons') }}" class="menu-link">
+                        <div data-i18n="Typography">Add Ons</div>
+                    </a>
+                </li>
+
                 <li class="menu-item {{ request()->routeIs('admin.show.function.rooms') ? 'active' : '' }}">
                     <a href="{{ route('admin.show.function.rooms') }}" class="menu-link">
                         <div data-i18n="Typography">Setup</div>
                     </a>
                 </li>
 
-                <!-- <li class="menu-item {{ request()->routeIs('admin.show.walkin.work.permit') ? 'active' : '' }}">
-                    <a href="{{ route('admin.show.walkin.work.permit') }}" class="menu-link">
-                        <div data-i18n="Typography">Walk-in</div>
-                    </a>
-                </li> -->
+                @endroles
             </ul>
         </li>
+        @endroles
+
         <!-- <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-detail"></i>
@@ -138,23 +178,8 @@
 
 
         <!-- Manage -->
+        @roles(1)
         <li class="menu-header small text-uppercase"><span class="menu-header-text">Manage</span></li>
-        <!-- Cards -->
-        <li class="menu-item {{ request()->routeIs('admin.services') ? 'active' : '' }}">
-            <a href="{{ route('admin.services') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-user-pin"></i>
-                <div data-i18n="Basic">Services</div>
-            </a>
-        </li>
-
-
-        <li class="menu-item">
-            <a href="cards-basic.html" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-phone-call"></i>
-                <div data-i18n="Basic">Contact</div>
-            </a>
-        </li>
-
 
         <li class="menu-item {{ request()->routeIs('admin.show.user') ? 'active' : '' }}">
             <a href="{{ route('admin.show.user') }}" class="menu-link">
@@ -162,32 +187,35 @@
                 <div data-i18n="Basic">User</div>
             </a>
         </li>
+        @endroles
 
+        @roles(1, 2)
+        <li class="menu-item {{ request()->routeIs('admin.show.resident.details') ? 'active' : '' }}">
+            <a href="{{ route('admin.show.resident.details') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-book-content"></i>
+                <div data-i18n="Basic">Resident Details</div>
+            </a>
+        </li>
+        @endroles
+
+        @roles(1)
         <li class="menu-item {{ request()->routeIs('admin.show.events', 'admin.search.events') ? 'active' : '' }}">
             <a href="{{ route('admin.show.events') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-calendar-star"></i>
                 <div data-i18n="Basic">Events</div>
             </a>
         </li>
-
-        <li class="menu-item {{ request()->routeIs('admin.show.email') ? 'active' : '' }}">
-            <a href="{{ route('admin.show.email') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-mail-send"></i>
-                <div data-i18n="Basic">Emails</div>
-            </a>
-        </li>
-
         <li class="menu-item">
             <a href="javascript:void(0)" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-bookmarks"></i>
                 <div data-i18n="User interface">Pages</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item">
+                <!-- <li class="menu-item">
                     <a href="ui-toasts.html" class="menu-link">
                         <div data-i18n="Toasts">Our Team</div>
                     </a>
-                </li>
+                </li> -->
                 <li class="menu-item {{ request()->routeIs('admin.show.gallery') ? 'active' : '' }}">
                     <a href="{{ route('admin.show.gallery') }}" class="menu-link">
                         <div data-i18n="Tooltips & Popovers">Gallery</div>
@@ -200,6 +228,7 @@
                 </li>
             </ul>
         </li>
+        @endroles
         <!-- Misc -->
         <!-- <li class="menu-header small text-uppercase"><span class="menu-header-text">Misc</span></li>
         <li class="menu-item">

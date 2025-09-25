@@ -73,4 +73,6 @@
     <script>
         window.galleryImageList = @json($images->pluck('file_name'));
     </script>
+
+    
 @endsection

@@ -3,7 +3,7 @@
 @section('content')
     <div class="container py-5">
         {{-- Success alert for profile update --}}
-        <div class="card mb-3 shadow mb-5 bg-body rounded">
+        <div class="card mb-3 shadow-sm" style="border-radius: 4px;">
             <h5 class="card-header">Profile Information</h5>
             <div class="card-body">
                 @if (session('status') === 'profile-updated')
@@ -40,43 +40,48 @@
                         </div>
                     @endif
 
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <!-- <button type="submit" class="btn btn-primary">Save Changes</button> -->
                 </form>
             </div>
         </div>
 
-        <div class="card mb-3 shadow mb-5 bg-body rounded">
+
+        <div class="card mb-3 shadow-sm" style="border-radius: 4px;">
             <h5 class="card-header">Residence</h5>
             <div class="card-body">
-                @if (auth()->user()->residentDetails->count())
+                @if ($residences->count())
                     <div class="table-responsive">
-                        <table class="table table-bordered">
+                        <table class="table table-bordered" id="userResidenceTable">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Section</th>
-                                    <th>Resident Type</th>
                                     <th>Unit No</th>
-
+                                    <th>Resident Type</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (auth()->user()->residentDetails as $residence)
+                                @foreach ($residences as $residence)
                                     <tr>
-                                        <td>{{ $residence->section }}</td>
+                                        <td>{{ $residence->unit_no }}</td>
                                         <td>
                                             @if (strtolower($residence->resident_type) === 'owner')
-                                                <span class="badge bg-success">Owner</span>
+                                                <span
+                                                    class="badge bg-primary badge-forge">{{ ucfirst($residence->resident_type) }}</span>
                                             @elseif (strtolower($residence->resident_type) === 'tenant')
-                                                <span class="badge bg-danger">Tenant</span>
+                                                <span
+                                                    class="badge bg-danger badge-forge">{{ ucfirst($residence->resident_type) }}</span>
                                             @else
-                                                <span class="badge bg-secondary">{{ $residence->resident_type }}</span>
+                                                <span class="badge bg-secondary">{{ ucfirst($residence->resident_type) }}</span>
                                             @endif
                                         </td>
-                                        <td>{{ $residence->unit_no }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="d-flex justify-content-center mt-3">
+                       {{ $residences->links('pagination::bootstrap-5') }}
                     </div>
                 @else
                     <div class="text-muted">No residence records available.</div>
@@ -85,8 +90,78 @@
         </div>
 
 
+        <div class="card mb-3 shadow-sm" style="border-radius: 4px;">
+            <h5 class="card-header">My Bookings</h5>
+            <div class="card-body">
+
+                @if ($allResidences->count())
+                    <!-- Residence Dropdown -->
+                    <form method="GET" action="{{ route('profile.edit') }}" class="mb-3">
+                        <label for="unit_no" class="form-label">Select Unit</label>
+                        <select name="unit_no" id="unit_no" class="form-select" onchange="this.form.submit()">
+                            @foreach ($allResidences as $allResidence)
+                                <option value="{{ $allResidence->unit_no }}" {{ $selectedUnit == $allResidence->unit_no ? 'selected' : '' }}>
+                                    {{ $allResidence->unit_no }} ({{ ucfirst($allResidence->resident_type) }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
+                @endif
+
+                @if ($bookings->count())
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Function Room</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($bookings as $booking)
+                                    <tr>
+                                        <td>{{ $booking->transaction_no }}</td>
+                                        <td>{{ $booking->functionRoom->function_room_name ?? 'N/A' }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($booking->function_room_booking_date)->format('F d, Y') }}</td>
+                                        <td>
+                                            {{ \Carbon\Carbon::parse($booking->event_start_time)->format('g:i A') }} -
+                                            {{ \Carbon\Carbon::parse($booking->event_end_time)->format('g:i A') }}
+                                        </td>
+                                        <td>
+                                            @if ($booking->booking_status == 0)
+                                                <span class="badge bg-warning text-white badge-forge">Waiting</span>
+                                            @elseif ($booking->booking_status == 1)
+                                                <span class="badge bg-success badge-forge">Confirmed</span>
+                                            @else
+                                                <span class="badge bg-danger badge-forge">Cancelled</span>
+                                            @endif
+                                        </td>
+                                         <td>
+                                         <button class="btn btn-sm btn-info function-room-booking-details badge-forge text-white" data-id="{{ $booking->id }}">
+                                             View
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div> 
+                    <div class="pagination-container">
+                    {{ $bookings->appends(['unit_no' => $selectedUnit])->links('vendor.pagination.bootstrap-4') }}
+                    </div>
+                @else
+                    <div class="text-muted">No bookings found for this unit.</div>
+                @endif
+            </div>
+        </div>
+
+
         {{-- Password Update Section --}}
-        <div class="card shadow mb-5 bg-body rounded">
+        <div class="card shadow-sm" style="border-radius: 4px;">
             <h5 class="card-header">Update Password</h5>
             <div class="card-body">
                 <form method="POST" action="{{ route('password.update') }}">
@@ -120,7 +195,7 @@
                         @enderror
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Update Password</button>
+                    <button type="submit" class="btn btn-primary btn-forge">Update Password</button>
 
                     @if (session('status') === 'password-updated')
                         <div class="alert alert-success mt-3 mb-0">
@@ -131,9 +206,15 @@
             </div>
         </div>
 
-        {{-- Hidden form to resend email verification --}}
         <form id="send-verification" method="POST" action="{{ route('verification.send') }}">
             @csrf
         </form>
     </div>
+
+     <div id="global-loading">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    @include('frontend.modal.user-view-function-room-booking-details-modal')
 @endsection

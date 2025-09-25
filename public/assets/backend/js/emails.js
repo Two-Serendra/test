@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    let currentEmailPageUrl = '/admin/get-updated-emails-table';
+    let currentEmailPageUrl = '/admin/get-updated-resident-details-table';
     let currentEmailSearchTerm = '';
 
     function refreshTableEmails(url = currentEmailPageUrl) {
@@ -19,22 +19,33 @@ $(document).ready(function () {
                 tableBody.empty();
 
                 emails.forEach(function (email) {
+                    // 🟦 Badge logic for resident_type
+                    let residentBadge = '';
+                    if (email.resident_type === 'OWNER') {
+                        residentBadge = `<span class="badge bg-primary text-uppercase">Owner</span>`;
+                    } else if (email.resident_type === 'TENANT') {
+                        residentBadge = `<span class="badge bg-danger text-uppercase">Tenant</span>`;
+                    } else {
+                        residentBadge = `<span class="badge bg-secondary text-uppercase">${email.resident_type || 'N/A'}</span>`;
+                    }
+
                     const row = `
-                    <tr>
-                        <td class="text-uppercase">${email.unit_no || 'N/A'}</td>
-                        <td>${email.email || 'N/A'}</td>
-                        <td>${email.created_at || 'N/A'}</td>
-                        <td>
-                            <button type="button" class="btn btn-sm btn-icon btn-primary edit_email"
-                                data-bs-toggle="tooltip" title="Edit" data-id="${email.id}">
-                                <i class='bx bx-edit'></i>
-                            </button>
-                            <button type="button" class="btn btn-sm btn-icon btn-danger delete_email"
-                                data-bs-toggle="tooltip" title="Delete" data-id="${email.id}">
-                                <i class='bx bx-trash'></i>
-                            </button>
-                        </td>
-                    </tr>`;
+                <tr>
+                    <td class="text-uppercase">${email.unit_no || 'N/A'}</td>
+                    <td>${email.email || 'N/A'}</td>
+                    <td>${residentBadge}</td>
+                    <td>${email.created_at || 'N/A'}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-icon btn-primary edit_email"
+                            data-bs-toggle="tooltip" title="Edit" data-id="${email.id}">
+                            <i class='bx bx-edit'></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-icon btn-danger delete_email"
+                            data-bs-toggle="tooltip" title="Delete" data-id="${email.id}">
+                            <i class='bx bx-trash'></i>
+                        </button>
+                    </td>
+                </tr>`;
                     tableBody.append(row);
                 });
 
@@ -95,7 +106,7 @@ $(document).ready(function () {
                 });
                 return xhr;
             },
-            url: '/admin/admin-upload-email',
+            url: '/admin/admin-upload-resident-details',
             type: 'POST',
             data: formData,
             contentType: false,
@@ -155,8 +166,8 @@ $(document).ready(function () {
         var info_id = $(this).data("id");
         $.get('/admin/admin-fetch-email/' + info_id, function (data) {
             $('#emailUpdateModal').modal('show');
-
             $('#update_unit_no').val(data.unit_no);
+            $('#update_resident_type').val(data.resident_type);
             $('#update_email').val(data.email);
             $('#info_id').val(info_id);
         }).fail(function () {
@@ -173,10 +184,12 @@ $(document).ready(function () {
         }
         this.classList.remove('was-validated');
 
-        $('#updateEmailBtn').attr('disabled', true);
-        $('#updateEmailBtn .spinner-border').removeClass('d-none');
-        $('#updateEmailBtn .btn-text').text('Updating...');
-
+        const $btn = $('#updateEmailBtn');
+        const originalWidth = $btn.outerWidth();
+        $btn
+            .attr('disabled', true)
+            .html(`<div class="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></div>`)
+            .css('width', originalWidth + 'px');
         var formData = new FormData(this);
         var form = this;
 
@@ -237,9 +250,11 @@ $(document).ready(function () {
                 });
             },
             complete: function () {
-                $('#updateEmailBtn').attr('disabled', false);
-                $('#updateEmailBtn .spinner-border').addClass('d-none');
-                $('#updateEmailBtn .btn-text').text('Update');
+                // Restore button to original state
+                $btn
+                    .attr('disabled', false)
+                    .html(`<span class="btn-text">Update</span>`)
+                    .css('width', '');
             }
         });
     });

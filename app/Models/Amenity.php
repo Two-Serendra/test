@@ -11,10 +11,21 @@ class Amenity extends Model
     protected $table = 'amenities';
     protected $fillable = [
         'amenity_name',
-        'amenity_image',
         'amenity_description',
         'amenity_remarks',
         'amenity_status',
     ];
+
+
+    public function images()
+    {
+        return $this->hasMany(AmenityImages::class);
+    }
+
+    public function firstImage()
+    {
+        return $this->hasOne(AmenityImages::class, 'amenity_id')->oldest();
+    }
+
 
 }

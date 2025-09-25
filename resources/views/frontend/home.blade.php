@@ -5,7 +5,7 @@
     <div class="row m-0 p-0">
         <section class="hero-section position-relative d-flex align-items-center justify-content-center text-white"
             style="background: url('{{ asset('assets/images/hero.webp') }}') center center / cover no-repeat; 
-                                                                                                                                                                                                                                                                                                    height: 100vh; width: 100vw;">
+                                                                                                                                                                                                                                                                                                        height: 100vh; width: 100vw;">
 
             <!-- Dark overlay -->
             <div class="position-absolute top-0 start-0 w-100 h-100"
@@ -83,12 +83,13 @@
                         <div class="card shadow featured-card h-100" style="border-radius: 5px;">
                             <div class="card-body text-center">
                                 <div class="mb-3">
-                                    @if ($featuredFunctionRoom->function_room_image)
-                                        <img src="{{ asset('assets/images/function-rooms/' . $featuredFunctionRoom->function_room_image) }}"
+                                    @if ($featuredFunctionRoom->firstImage)
+                                        <img src="{{ asset('assets/images/uploads/function-rooms/images/' . $featuredFunctionRoom->firstImage->image) }}"
                                             alt="Amenity Image" class="featured-img" loading="lazy">
                                     @else
                                         <p class="text-muted">No Image</p>
                                     @endif
+
                                 </div>
 
                                 <h5 class="card-title fw-bold text-start mb-1 text-dark" style="font-size: 1.1rem;">
@@ -102,7 +103,7 @@
 
                                 <div class="d-flex align-items-start justify-content-start mt-2">
                                     <button type="button" class="btn btn-sm btn-primary 360View" style="border-radius: 5px;"
-                                        data-img="{{ asset('assets/images/function-rooms-360/' . $featuredFunctionRoom->function_room_360) }}"
+                                        data-img="{{ asset('assets/images/uploads/function-rooms/360/' . $featuredFunctionRoom->function_room_360) }}"
                                         data-name="{{ $featuredFunctionRoom->function_room_name }}">
                                         View 360 <i class='bx bx-refresh'></i>
                                     </button>

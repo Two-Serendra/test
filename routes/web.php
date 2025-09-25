@@ -91,6 +91,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/function-room/{id}/booked-dates', [FrontendFunctionRoomBookingController::class, 'getFunctionRoomBookedDates']);
     Route::get('/view-function-room-bookings/{id}/details', [FrontendFunctionRoomBookingController::class, 'getFunctionRoomBookingDetails'])
         ->name('get.function.room.bookings.details');
+    
+    // Add Ons
+    Route::get('/function-room/addons-availability', [FrontendFunctionRoomBookingController::class, 'getAddOnsAvailability']);
 
     Route::get('/notifications', [UserNotificationController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/{id}', [UserNotificationController::class, 'show'])->name('notifications.show');

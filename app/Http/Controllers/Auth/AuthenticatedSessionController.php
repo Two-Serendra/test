@@ -19,40 +19,25 @@ class AuthenticatedSessionController extends Controller
     {
         return view('auth.login');
     }
-
-    /**
-     * Handle an incoming authentication request.
-     */
     public function store(LoginRequest $request): RedirectResponse
     {
-        // dd('This should never run');
-        // $request->authenticate();
+        $request->authenticate();
 
-        // $request->session()->regenerate();
+        $user = Auth::user();
 
-        // return redirect()->intended(RouteServiceProvider::HOME);
-
-        $request->authenticate(); // Performs credential check
-
-        $user = Auth::user(); // Get the authenticated user
-
-        // ✅ Check if regular user
         if ($user->role_id === 0) {
-            $emailExists = \DB::table('emails')->where('email', $user->email)->exists();
+            $emailExists = \DB::table('resident_details')->where('email', $user->email)->exists();
 
             if (!$emailExists) {
-                Auth::logout(); // Logout the user immediately
-
+                Auth::logout();
                 return back()->withErrors([
                     'email' => 'Your account is no longer authorized to log in.',
                 ]);
             }
         }
 
-        // ✅ Optional: Check is_active flag as well
         if ($user->is_active === 0) {
             Auth::logout();
-
             return back()->withErrors([
                 'email' => 'Your account has been deactivated.',
             ]);
@@ -60,12 +45,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        // 🔑 This will redirect back to where the guest was before login,
+        // or fallback to `/` if nothing is stored
+        return redirect()->intended('/');
     }
 
-    /**
-     * Destroy an authenticated session.
-     */
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();

@@ -144,7 +144,7 @@
 
 
 
-    <div class="container-fluid service pt-6 pb-6" style="background-color: #f2f2f2;">
+    <div class="container-fluid service pt-6 pb-6" style="background-color: #f8f9fa;">
         <div class="container">
             <div class="text-center mx-auto" style="max-width: 600px;">
                 <h1 class="display-6 text-uppercase mb-5">Concessionaires</h1>

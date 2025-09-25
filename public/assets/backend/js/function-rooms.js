@@ -5,22 +5,74 @@ $(document).ready(function () {
         $('#adminCreateFunctionRooms').modal('show');
     });
 
+    $('#adminCreateFunctionRooms').on('hidden.bs.modal', function () {
+        const form = $('#admin-new-function-rooms')[0];
 
 
-    $('#functionRoomImage').change(function () {
-        var file = this.files[0];
-        if (file) {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                $('#imagePreview').attr('src', e.target.result).show();
-                $('#imagePlaceholderText').hide(); // Hide placeholder text
+        form.reset();
+        $(form).removeClass('was-validated');
+
+
+        $('#functionRoomImage').val('');
+        $('#functionRoom360').val('');
+
+        // Reset preview slots
+        $('.image-slot').each(function (index) {
+            $(this).empty().text(`Image ${index + 1}`);
+        });
+        $('#360Preview').hide();
+        $('#imagePreviewContainer360 span').show();
+    });
+
+    $('#functionRoomImage').on('change', function (e) {
+        const files = e.target.files;
+
+        if (files.length > 4) {
+            alert('You can only upload up to 4 images.');
+            $(this).val('');
+            return;
+        }
+
+
+        const dt = new DataTransfer();
+
+        $('.image-slot').each(function () {
+            $(this).empty().text('Empty');
+        });
+
+        $.each(files, function (index, file) {
+            if (!file.type.startsWith('image/')) return;
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const $slot = $('.image-slot').eq(index).empty();
+                const $img = $('<img>').attr('src', event.target.result);
+                const $removeBtn = $('<button>').addClass('remove-btn').html('&times;');
+
+                $removeBtn.on('click', function () {
+                    $slot.empty().text('Empty');
+                    dt.items.clear(); // reset
+                    $('.image-slot img').each(function () {
+                        const slotIndex = $(this).parent().data('slot');
+                        if (slotIndex !== index) {
+                            dt.items.add(files[slotIndex]);
+                        }
+                    });
+                    $('#functionRoomImage')[0].files = dt.files;
+                });
+
+                $slot.append($img).append($removeBtn);
             };
             reader.readAsDataURL(file);
-        } else {
-            $('#imagePreview').hide();
-            $('#imagePlaceholderText').show(); // Show placeholder if image removed
-        }
+            dt.items.add(file);
+        });
+
+        $('#functionRoomImage')[0].files = dt.files;
     });
+
+
+
+
 
     $('#functionRoom360').change(function () {
         var file = this.files[0];
@@ -49,9 +101,12 @@ $(document).ready(function () {
         }
         this.classList.remove('was-validated');
 
-        $('#saveFunctionRoomBtn').attr('disabled', true);
-        $('#saveFunctionRoomBtn .spinner-border').removeClass('d-none');
-        $('#saveFunctionRoomBtn .btn-text').text('Saving...');
+        const $btn = $('#saveFunctionRoomBtn');
+        const originalWidth = $btn.outerWidth();
+        $btn
+            .attr('disabled', true)
+            .html(`<div class="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></div>`)
+            .css('width', originalWidth + 'px');
 
         var formData = new FormData(this);
         var form = this;
@@ -122,70 +177,98 @@ $(document).ready(function () {
                     icon: 'error',
                     title: 'Failed to add'
                 });
+
+            },
+            complete: function () {
+                // Restore button to original state
+                $btn
+                    .attr('disabled', false)
+                    .html(`<span class="btn-text">Save</span>`)
+                    .css('width', '');
             }
         });
 
     });
 
-    $('#functionRoomTable').on('click', '.admin_edit_function_room', function () {
-        var info_id = $(this).data("id");
-        // $('#updateImagePreview').attr('src', '').hide();
-        // $('#updateImagePlaceholderText').show();
-        // $('#update_function_room_image').val('');
-        // $('#update_function_room_featured').prop('checked', false);
+    $(document).on('click', '.admin_edit_function_room', function () {
+        let info_id = $(this).data('id'); // get the ID from the button
 
         $.get('/admin/admin-fetch-function-rooms/' + info_id, function (data) {
             $('#adminUpdateFunctionRooms').modal('show');
 
+            $('#editFunctionRoomSection').val(data.function_room_section);
+            $('#editFunctionRoomName').val(data.function_room_name);
+            $('#editFunctionRoomRate').val(data.function_room_rate);
+            $('#editFunctionRoomDiscount').val(data.discount);
+            $('#editFunctionRoomCapacity').val(data.function_room_capacity);
+            $('#editFunctionRoomDescription').val(data.function_room_description);
+            $('#editFunctionRoomPolicy').val(data.function_room_policy);
+            $('#editFunctionRoomId').val(info_id);
 
-            $('#update_function_room_section').val(data.function_room_section);
-            $('#update_function_room_name').val(data.function_room_name);
-            $('#update_function_room_rate').val(data.function_room_rate);
-            $('#update_function_room_capacity').val(data.function_room_capacity);
-            $('#update_function_room_description').val(data.function_room_description);
-            $('#update_function_room_policy').val(data.function_room_policy);
-            $('#current_image_function_room').val(data.function_room_image);
-            $('#current_360_function_room').val(data.function_room_360);
-
-
-            $('#info_id').val(info_id);
-
-            if (data.function_room_image) {
-                const imagePath = '/assets/images/function-rooms/' + data.function_room_image;
-                $('#updateImagePreview').attr('src', imagePath).show();
-                $('#updateImagePlaceholderText').hide();
+            let container = $('#editImagePreviewContainer');
+            container.empty();
+            if (data.function_room_images && data.function_room_images.length > 0) {
+                data.function_room_images.forEach(function (img) {
+                    container.append(`
+                    <img src="/assets/images/uploads/function-rooms/images/${img}" 
+                         style="width:80px;height:80px;object-fit:cover;border-radius:5px;">
+                `);
+                });
+            } else {
+                container.append('<span>No images</span>');
             }
 
             if (data.function_room_360) {
-                const imagePath = '/assets/images/function-rooms-360/' + data.function_room_360;
-                $('#update360Preview').attr('src', imagePath).show();
-                $('#update360PlaceholderText').hide();
+                $('#edit360Preview').attr('src', '/assets/images/uploads/function-rooms/360/' + data.function_room_360).show();
+                $('#edit360Placeholder').hide();
+            } else {
+                $('#edit360Preview').hide();
+                $('#edit360Placeholder').show();
             }
 
-            if (data.featured == 1) {
-                $('#update_function_room_featured').prop('checked', true);
-            } else {
-                $('#update_function_room_featured').prop('checked', false);
-            }
-        }).fail(function () {
-            alert("Data not found");
+            $('#editFunctionRoomFeatured').prop('checked', data.featured == 1);
         });
     });
 
-    $('#update_function_room_image').on('change', function () {
-        const file = this.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                $('#updateImagePreview').attr('src', e.target.result).show();
-                $('#updateImagePlaceholderText').hide();
-            };
-            reader.readAsDataURL(file);
+
+
+    $('#editFunctionRoomImage').on('change', function () {
+        const files = this.files;
+        const previewContainer = $('#editImagePreviewContainer');
+
+        // Restrict to max 4 images
+        if (files.length > 4) {
+            alert('You can only select up to 4 images.');
+            $(this).val(''); // Clear selection
+            previewContainer.empty().html('<span style="color: #6c757d;">No Images Selected</span>');
+            return;
+        }
+
+        // Clear old previews
+        previewContainer.empty();
+
+        if (files.length > 0) {
+            Array.from(files).forEach(file => {
+                if (!file.type.startsWith('image/')) return; // Skip non-images
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = $('<img>').attr('src', e.target.result).css({
+                        width: '100px',
+                        height: '100px',
+                        objectFit: 'cover',
+                        borderRadius: '5px',
+                        border: '1px solid #ccc'
+                    });
+                    previewContainer.append(img);
+                };
+                reader.readAsDataURL(file);
+            });
         } else {
-            $('#updateImagePreview').hide();
-            $('#updateImagePlaceholderText').show();
+            previewContainer.html('<span style="color: #6c757d;">No Images Selected</span>');
         }
     });
+
 
     $('#update_function_room_360').on('change', function () {
         const file = this.files[0];
@@ -211,11 +294,12 @@ $(document).ready(function () {
             return;
         }
         this.classList.remove('was-validated');
-
-        $('#updateFunctionRoomBtn').attr('disabled', true);
-        $('#updateFunctionRoomBtn .spinner-border').removeClass('d-none');
-        $('#updateFunctionRoomBtn .btn-text').text('Updating...');
-
+        const $btn = $('#updateFunctionRoomBtn');
+        const originalWidth = $btn.outerWidth();
+        $btn
+            .attr('disabled', true)
+            .html(`<div class="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></div>`)
+            .css('width', originalWidth + 'px');
         var formData = new FormData(this);
         var form = this;
 
@@ -276,9 +360,10 @@ $(document).ready(function () {
                 });
             },
             complete: function () {
-                $('#updateFunctionRoomBtn').attr('disabled', false);
-                $('#updateFunctionRoomBtn .spinner-border').addClass('d-none');
-                $('#updateFunctionRoomBtn .btn-text').text('Update');
+                $btn
+                    .attr('disabled', false)
+                    .html(`<span class="btn-text">Update</span>`)
+                    .css('width', '');
             }
         });
     });
@@ -353,6 +438,73 @@ $(document).ready(function () {
         });
     });
 
+    $('#functionRoomTable').on('click', '.disable_function_room', function () {
+        let id = $(this).data('id');
+
+        Swal.fire({
+            title: 'Disable Function Room',
+            input: 'textarea',
+            inputPlaceholder: 'Enter remarks...',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Remarks are required!';
+                }
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Disable',
+            confirmButtonColor: '#d33',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/admin/admin-function-rooms/disable/' + id,
+                    method: 'POST',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        remarks: result.value
+                    },
+                    success: function (res) {
+                        Swal.fire('Disabled!', res.message, 'success');
+                        refreshTableFunctionRooms();
+                    },
+                    error: function () {
+                        Swal.fire('Error!', 'Unable to disable function room.', 'error');
+                    }
+                });
+            }
+        });
+    });
+
+    // Enable
+    $('#functionRoomTable').on('click', '.enable_function_room', function () {
+        let id = $(this).data('id');
+
+        Swal.fire({
+            title: 'Enable Function Room',
+            text: 'Are you sure you want to enable this function room?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Enable',
+            confirmButtonColor: '#28a745',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/admin/admin-function-rooms/enable/' + id,
+                    method: 'POST',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (res) {
+                        Swal.fire('Enabled!', res.message, 'success');
+                        refreshTableFunctionRooms();
+                    },
+                    error: function () {
+                        Swal.fire('Error!', 'Unable to enable function room.', 'error');
+                    }
+                });
+            }
+        });
+    });
+
     function refreshTableFunctionRooms() {
         $.ajax({
             url: '/admin/get-updated-function-rooms-table',
@@ -365,30 +517,60 @@ $(document).ready(function () {
                 tableBody.empty();
                 functionRooms.forEach(function (functionRoom) {
                     var actionButtons = `
-                    <button type="button" class="btn btn-sm btn-icon btn-primary admin_edit_function_room"
-                        data-bs-toggle="tooltip" data-bs-placement="left" title="Edit" data-id="${functionRoom.id}">
+                    <button type="button" class="btn btn-sm btn-icon btn-secondary admin_edit_function_room"
+                        data-bs-toggle="tooltip" data-bs-placement="left" title="Edit"
+                        data-id="${functionRoom.id}">
                         <i class='bx bx-edit'></i>
                     </button>
+                `;
+                    if (functionRoom.function_room_status == 1) {
+                        actionButtons += `
+                        <button type="button" class="btn btn-sm btn-warning btn-icon disable_function_room"
+                            data-id="${functionRoom.id}" data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="Disable">
+                            <i class='bx bx-block'></i> 
+                        </button>
+                    `;
+                    } else {
+                        actionButtons += `
+                        <button type="button" class="btn btn-sm btn-primary btn-icon enable_function_room"
+                            data-id="${functionRoom.id}" data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="Enable">
+                            <i class='bx bx-check'></i> 
+                        </button>
+                    `;
+                    }
 
+                    actionButtons += `
                     <button type="button" class="btn btn-sm btn-icon btn-danger delete_function_room"
-                        data-bs-toggle="tooltip" data-bs-placement="right" title="Delete" data-id="${functionRoom.id}">
+                        data-bs-toggle="tooltip" data-bs-placement="right" title="Delete"
+                        data-id="${functionRoom.id}">
                         <i class='bx bx-trash'></i>
-                    </button>`;
+                    </button>
+                `;
                     var function_room_section = functionRoom.function_room_section ? functionRoom.function_room_section.toUpperCase() : 'N/A';
                     var function_room_name = functionRoom.function_room_name ? functionRoom.function_room_name.toUpperCase() : 'N/A';
                     var function_room_rate = functionRoom.function_room_rate ? functionRoom.function_room_rate : 'N/A';
                     var function_room_capacity = functionRoom.function_room_capacity ? functionRoom.function_room_capacity : 'N/A';
                     var function_room_description = functionRoom.function_room_description ? functionRoom.function_room_description.toUpperCase() : 'N/A';
                     var function_room_policy = functionRoom.function_room_policy ? functionRoom.function_room_policy : 'N/A';
-                    var function_room_image = functionRoom.function_room_image
-                        ? `<img src="/assets/images/function-rooms/${functionRoom.function_room_image}" alt="Amenity Image"
+                    var function_room_360 = functionRoom.function_room_360
+                    var function_room_remarks = functionRoom.function_room_remarks ? functionRoom.function_room_remarks : 'N/A';
+                    var discountDisplay = 'N/A';
+                    if (functionRoom.discount > 0) {
+                        let formattedDiscount = parseFloat(functionRoom.discount)
+                            .toFixed(2)           // always 2 decimals
+                            .replace(/\.?0+$/, ""); // remove trailing .00 or .0
+                        discountDisplay = formattedDiscount + '%';
+                    }
+                    var function_room_360 = functionRoom.function_room_360
+                        ? `<img src="/assets/images/uploads/function-rooms/360/${functionRoom.function_room_360}" alt="Amenity Image 360"
          style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">`
                         : 'N/A';
 
-                    var function_room_360 = functionRoom.function_room_360
-                        ? `<img src="/assets/images/function-rooms-360/${functionRoom.function_room_360}" alt="Amenity Image 360"
-         style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">`
-                        : 'N/A';
+                    var statusDisplay = functionRoom.function_room_status == 1
+                        ? `<span class="badge bg-success">Active</span>`
+                        : `<span class="badge bg-danger">Disabled</span>`;
 
                     var is_featured = functionRoom.featured == 1
                         ? `<span class="badge bg-success">Yes</span>`
@@ -398,12 +580,14 @@ $(document).ready(function () {
                                     <td>${function_room_section}</td>
                                     <td>${function_room_name}</td>
                                     <td>${function_room_rate}</td>
+                                    <td>${discountDisplay}</td>
                                     <td>${function_room_capacity}</td>
                                     <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${function_room_description}</td>
                                     <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${function_room_policy}</td>
-                                    <td style="vertical-align: middle;">${function_room_image}</td>
                                     <td style="vertical-align: middle;">${function_room_360}</td>
                                     <td>${is_featured}</td>
+                                    <td>${statusDisplay}</td>
+                                    <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${function_room_remarks}</td>
                                     <td>${actionButtons}</td>
                                 </tr>
                             `);
@@ -417,4 +601,5 @@ $(document).ready(function () {
         });
     }
 
+  
 });

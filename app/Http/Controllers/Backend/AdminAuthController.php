@@ -13,25 +13,41 @@ class AdminAuthController extends Controller
     }
 
     public function login(Request $request)
-    {    
+    {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
-   
+
         if (Auth::guard('admin')->attempt($credentials)) {
-            // Ensure the logged in user has an admin role
             $user = Auth::guard('admin')->user();
-            if ($user->role_id >= 1) {
-                return redirect()->intended(route('admin.dashboard'));
-            } else {
+
+            // Route mapping for each role
+            $roleRoutes = [
+                1 => 'admin.dashboard',
+                2 => 'admin.show.function.room.bookings',
+                3 => 'admin.show.function.room.bookings',
+                4 => 'engineering.dashboard',
+                5 => 'admin.show.function.room.bookings',
+                6 => 'admin.show.function.room.bookings',
+                7 => 'admin.show.function.room.bookings',
+                8 => 'admin.show.function.room.bookings',
+            ];
+
+            // If role_id is 0 or not in the map, deny access
+            if (!isset($roleRoutes[$user->role_id])) {
                 Auth::guard('admin')->logout();
                 return back()->withErrors(['email' => 'Access denied.']);
             }
+
+            // Redirect based on role_id
+            return redirect()->intended(route($roleRoutes[$user->role_id]));
         }
 
         return back()->withErrors(['email' => 'Invalid credentials.']);
     }
+
+
 
     public function logout(Request $request)
     {

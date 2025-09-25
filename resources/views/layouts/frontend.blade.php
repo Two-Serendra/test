@@ -94,21 +94,27 @@
     <script src="{{ asset('assets/frontend/js/main.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/custom.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/work-permit.js') }}"></script>
-    <!-- <script src="{{ asset('assets/frontend/js/profile.js') }}"></script>
-    <script src="{{ asset('assets/frontend/js/function-room.js') }}"></script> -->
+    <script src="{{ asset('assets/frontend/js/profile.js') }}"></script>
+    <script src="{{ asset('assets/frontend/js/function-room.js') }}"></script>
 
 
-    <!-- <script>
+    <script>
         Pusher.logToConsole = true;
 
         window.Echo = new Echo({
             broadcaster: 'pusher',
             key: "{{ env('PUSHER_APP_KEY') }}",
             cluster: "{{ env('PUSHER_APP_CLUSTER') }}",
-            forceTLS: true
+            forceTLS: false, // local without SSL
+            authEndpoint: "/broadcasting/auth",
+            auth: {
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                }
+            }
         });
     </script>
-     -->
+
     <!-- <script>
         $(document).ready(function () {
             if (localStorage.getItem("redirect_after_login")) {
@@ -116,6 +122,7 @@
                 localStorage.removeItem("redirect_after_login");
                 window.location.href = url;
             }
+
             function addNotification(notification) {
                 const payload = notification.data || notification;
 
@@ -196,7 +203,114 @@
 
     </script> -->
 
+    <script>
+        $(document).ready(function () {
+            // Redirect after login if needed
+            if (localStorage.getItem("redirect_after_login")) {
+                const url = localStorage.getItem("redirect_after_login");
+                localStorage.removeItem("redirect_after_login");
+                window.location.href = url;
+            }
 
+            /**
+             * Add a notification to the dropdown
+             * @param {Object} notification
+             */
+            function addNotification(notification) {
+                const payload = notification.data || notification;
+                const notifId = notification.id || payload.notification_id;
+                const bookingId = payload.booking_id;
+                const notifShowUrl = notifId ? `/notifications/${notifId}` : '#';
+
+                const notifItem = `
+        <a href="${notifShowUrl}" 
+           class="dropdown-item text-start mark-as-read fw-bold"
+           data-id="${notifId}" data-url="${notifShowUrl}"
+           style="white-space: normal; text-wrap: wrap;">
+           <i class="bx bx-bell me-2"></i> ${payload.message}
+           <br>
+           <small class="text-muted">Just now</small>
+        </a>
+    `;
+
+                const notifMenu = $('#notifDropdownMenu');
+
+                // Only add divider if there are already items
+                if (notifMenu.find('.dropdown-item').length > 0) {
+                    notifMenu.prepend('<div class="dropdown-divider"></div>' + notifItem);
+                } else {
+                    notifMenu.prepend(notifItem);
+                }
+
+                // Limit dropdown to 5 notifications
+                const items = notifMenu.find('.dropdown-item');
+                if (items.length > 5) {
+                    items.slice(5).remove();
+                }
+
+                // Update badge
+                let badge = $('#notifDropdown .badge');
+                if (badge.length) {
+                    badge.text(parseInt(badge.text()) + 1);
+                } else {
+                    $('#notifDropdown').append(`
+            <span class="position-absolute top-0 start-100 badge rounded-pill bg-danger"
+                  style="transform: translate(-60%, -35%);">1</span>
+        `);
+                }
+            }
+
+
+            // Real-time notifications via Echo
+            if (typeof window.Echo !== 'undefined') {
+                window.Echo.private(`App.Models.User.{{ auth()->id() }}`)
+                    .notification((notification) => {
+                        console.log('🔔 New Notification:', notification);
+                        addNotification(notification);
+
+                        // Optional toast
+                        toastr.info(notification.data?.message || 'You have a new notification');
+                    });
+            } else {
+                console.warn('❌ Echo is not defined. Check your bootstrap.js/Vite setup.');
+            }
+
+            // Mark notification as read
+            $(document).on('click', '.mark-as-read', function (e) {
+                e.preventDefault();
+
+                const notifId = $(this).data('id');
+                const url = $(this).data('url');
+
+                $.ajax({
+                    url: `/notifications/${notifId}/read`,
+                    type: 'POST',
+                    data: { _token: '{{ csrf_token() }}' },
+                    success: function (res) {
+                        if (res.success) {
+                            $(`.mark-as-read[data-id="${notifId}"]`).removeClass('fw-bold').addClass('notification-read');
+
+                            // Update badge
+                            let badge = $('#notifDropdown .badge');
+                            if (badge.length) {
+                                let count = parseInt(badge.text());
+                                if (count > 1) {
+                                    badge.text(count - 1);
+                                } else {
+                                    badge.remove();
+                                }
+                            }
+
+                            // Redirect if URL is set
+                            if (url && url !== '#') {
+                                window.location.href = url;
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 
 </body>
 

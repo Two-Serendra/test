@@ -16,8 +16,19 @@
                             placeholder="Enter email name" required>
                         <div class="invalid-feedback">Required</div>
                     </div>
+
                     <div class="mb-3">
-                        <label class="form-label text-dark" for="update_email">Email Name</label>
+                        <label class="form-label text-dark" for="update_resident_type">Resident Type </label>
+                        <select name="resident_type" class="form-select" id="update_resident_type" required>
+                            <option value="" disabled selected>Select</option>
+                            <option value="OWNER">OWNER</option>
+                            <option value="TENANT">TENANT</option>
+                        </select>
+                        <div class="invalid-feedback">Required</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-dark" for="update_email">Email </label>
                         <input type="text" class="form-control" id="update_email" name="email"
                             placeholder="Enter email name" required>
                         <div class="invalid-feedback">Required</div>
@@ -27,9 +38,10 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" form="updateEmailForm" id="updateEmailBtn" class="btn btn-primary">
-                    <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
-                    <span class="btn-text">Update</span>
+                 <button type="submit" form="updateEmailForm" id="updateEmailBtn"
+                    class="btn btn-primary d-flex align-items-center justify-content-center"
+                    style="min-width: 100px; height: 38px;">
+                    <span class="btn-text">Update   </span>
                 </button>
             </div>
         </div>

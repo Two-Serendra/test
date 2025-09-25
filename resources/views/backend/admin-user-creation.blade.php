@@ -6,9 +6,13 @@
         $roles = [
             0 => ['label' => 'User', 'class' => 'bg-secondary border-secondary'],
             1 => ['label' => 'Super Admin', 'class' => 'bg-dark border-dark'],
-            2 => ['label' => 'Admin', 'class' => 'bg-success border-success'],
-            3 => ['label' => 'Engineering', 'class' => 'bg-warning border-warning text-dark'],
+            2 => ['label' => 'Admin', 'class' => 'bg-primary border-primary'],
+            3 => ['label' => 'Engineering', 'class' => 'bg-primary border-primary'],
             4 => ['label' => 'Security', 'class' => 'bg-danger border-danger'],
+            5 => ['label' => 'Finance', 'class' => 'bg-primary border-primary'],
+            6 => ['label' => 'Concierge', 'class' => 'bg-primary border-primary'],
+            7 => ['label' => 'Manager', 'class' => 'bg-dark border-dark'],
+            8 => ['label' => 'Concierge Supervisor', 'class' => 'bg-dark border-dark'],
         ];
     @endphp
 
@@ -30,7 +34,7 @@
 
                     <div class="mb-2 mb-md-0">
                         <button type="button" class="btn btn-primary badge AdminAddUser" id="addUser">
-                            <i class='bx bx-plus'></i> New User
+                            <i class='bx bx-plus'></i> User
                         </button>
                     </div>
 
@@ -55,7 +59,7 @@
                         @else
                             @foreach ($users as $user)
                                 <tr>
-                                    <td>{{ strtoupper($user->name ?? 'N/A') }}</td>
+                                    <td>{{$user->name ?? 'N/A' }}</td>
                                     <td>{{ $user->email ?? 'N/A' }}</td>
                                     <td>
                                         @if (isset($roles[$user->role_id]))

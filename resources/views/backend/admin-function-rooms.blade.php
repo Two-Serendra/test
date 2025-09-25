@@ -33,13 +33,14 @@
                             <th class="table-custom">Section</th>
                             <th class="table-custom">Function Room</th>
                             <th class="table-custom">Rate /hr</th>
+                            <th class="table-custom">Discount</th>
                             <th class="table-custom">Capacity</th>
                             <th class="table-custom">Description</th>
                             <th class="table-custom">Policy</th>
-                            <th class="table-custom">Image</th>
                             <th class="table-custom">360</th>
-
                             <th class="table-custom">Featured</th>
+                            <th class="table-custom">Status</th>
+                            <th class="table-custom">Remarks</th>
                             <th class="table-custom">Action</th>
                         </tr>
                     </thead>
@@ -54,6 +55,13 @@
                                     <td>{{ strtoupper($functionRoom->function_room_section ?: 'N/A') }}</td>
                                     <td>{{ strtoupper($functionRoom->function_room_name ?: 'N/A') }}</td>
                                     <td>{{ strtoupper($functionRoom->function_room_rate ?: 'N/A') }}</td>
+                                    <td> @if($functionRoom->discount > 0)
+                                        {{ rtrim(rtrim(number_format($functionRoom->discount, 2), '0'), '.') }}%
+                                    @else
+                                            N/A
+                                        @endif
+                                    </td>
+                                    </td>
                                     <td>{{ strtoupper($functionRoom->function_room_capacity ?: 'N/A') }}</td>
                                     <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                         {{ strtoupper($functionRoom->function_room_description ?: 'N/A') }}
@@ -62,19 +70,10 @@
                                         {{ strtoupper($functionRoom->function_room_policy ?: 'N/A') }}
                                     </td>
 
-                                    <td style="vertical-align: middle;">
-                                        @if ($functionRoom->function_room_image)
-                                            <img src="{{ asset('assets/images/function-rooms/' . $functionRoom->function_room_image) }}"
-                                                alt="Amenity Image"
-                                                style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
-                                        @else
-                                            N/A
-                                        @endif
-                                    </td>
 
                                     <td style="vertical-align: middle;">
                                         @if ($functionRoom->function_room_360)
-                                            <img src="{{ asset('assets/images/function-rooms-360/' . $functionRoom->function_room_360) }}"
+                                            <img src="{{ asset('assets/images/uploads/function-rooms/360/' . $functionRoom->function_room_360) }}"
                                                 alt="Amenity Image 360"
                                                 style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
                                         @else
@@ -92,11 +91,42 @@
                                     </td>
 
                                     <td>
-                                        <button type="button" class="btn btn-sm btn-icon btn-primary admin_edit_function_room"
+                                        @if($functionRoom->function_room_status == 1)
+                                            <span class="badge bg-success">Active</span>
+                                        @else
+                                            <span class="badge bg-danger">Disabled</span>
+                                        @endif
+                                    </td>
+
+
+                                    <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        {{ strtoupper($functionRoom->function_room_remarks ?: 'N/A') }}
+                                    </td>
+
+
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-icon btn-secondary admin_edit_function_room"
                                             data-bs-toggle="tooltip" data-bs-placement="left" title="Edit"
                                             data-id="{{ $functionRoom->id }}">
                                             <i class='bx bx-edit'></i>
                                         </button>
+
+                                        @if($functionRoom->function_room_status == 1)
+                                            <!-- Disable Button -->
+                                            <button type="button" class="btn btn-sm btn-warning btn-icon disable_function_room"
+                                                data-id="{{ $functionRoom->id }}" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                title="Disable">
+                                                <i class='bx bx-block'></i>
+                                            </button>
+                                        @else
+                                            <!-- Enable Button -->
+                                            <button type="button" class="btn btn-sm btn-primary btn-icon enable_function_room"
+                                                data-id="{{ $functionRoom->id }}" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                title="Enable">
+                                                <i class='bx bx-check'></i>
+                                            </button>
+                                        @endif
+
 
                                         <button type="button" class="btn btn-sm btn-icon btn-danger delete_function_room"
                                             data-bs-toggle="tooltip" data-bs-placement="right" title="Delete"
@@ -111,6 +141,8 @@
                 </table>
             </div>
         </div>
+
+
 
         <div class="pagination-container">
             {{ $functionRooms->links('vendor.pagination.bootstrap-5') }}

@@ -8,18 +8,49 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Models\ResidentDetails;
+use App\Models\FunctionRoomBooking;
+use Illuminate\Support\Facades\DB;
 
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile form.
+     * Display the user's profile form. 
      */
     public function edit(Request $request): View
     {
+        $residences = DB::table('resident_details')
+            ->where('email', $request->user()->email)
+            ->select('unit_no', 'resident_type')
+            ->orderBy('created_at', 'desc')
+            ->paginate(5);
+
+        $allResidences = DB::table('resident_details')
+            ->where('email', $request->user()->email)
+            ->select('unit_no', 'resident_type')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Currently selected unit (from query string or default first unit)
+        $selectedUnit = request('unit_no', $allResidences->first()->unit_no ?? null);
+
+        // Fetch bookings only for the selected unit
+        $bookings = FunctionRoomBooking::with('functionRoom')
+            ->when($selectedUnit, function ($query) use ($selectedUnit) {
+                $query->where('unit_no', $selectedUnit);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(5, ['*'], 'bookings_page');
+
         return view('profile.edit', [
             'user' => $request->user(),
+            'residences' => $residences,  
+            'allResidences' => $allResidences, 
+            'bookings' => $bookings,
+            'selectedUnit' => $selectedUnit,
         ]);
     }
+
 
     /**
      * Update the user's profile information.

@@ -43,10 +43,10 @@ class NavbarController extends Controller
       return view('frontend.contact');
    }
 
-   public function downloadables()
-   {
-      return view('frontend.pages.downloadables');
-   }
+   // public function downloadables()
+   // {
+   //    return view('frontend.pages.downloadables');
+   // }
    public function sections()
    {
       return view('frontend.sections');

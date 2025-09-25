@@ -23,7 +23,7 @@ class EventsController extends Controller
         $request->validate([
             'event_title' => 'required|string',
             'event_details' => 'required|string',
-            'event_image' => 'required|image|mimes:jpg,jpeg,png',
+            'event_image' => 'required|image|mimes:jpg,jpeg,png,webp',
             'event_date' => 'required|date|after_or_equal:today',
         ]);
 

@@ -43,6 +43,17 @@ class ContactController extends Controller
             ])->withInput();
         }
 
+        // if (
+        //     !($result['success'] ?? false)
+        //     || ($result['score'] ?? 0) < 0.7  // stricter threshold
+        //     || ($result['action'] ?? '') !== 'contact'
+        // ) {
+        //     return back()->withErrors([
+        //         'g-recaptcha-response' => 'reCAPTCHA verification failed. Please try again.'
+        //     ])->withInput();
+        // }
+
+
         $data = $request->only(['name', 'email', 'mobile', 'subject', 'inquiry']);
 
         try {

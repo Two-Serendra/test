@@ -7,9 +7,9 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="{{ route('admin.store.user') }}" method="POST" id="admin-new-user">
+                <form action="{{ route('admin.store.user') }}" method="POST" id="admin-new-user"
+                    enctype="multipart/form-data" class="needs-validation" novalidate>
                     @csrf
-
                     <div class="mb-3">
                         <label for="role" class="form-label">Role</label>
                         <select name="role" class="form-select" required>
@@ -18,27 +18,37 @@
                             <option value="2">Admin</option>
                             <option value="3">Engineering</option>
                             <option value="4">Security</option>
+                            <option value="5">Finance</option>
+                            <option value="6">Concierge</option>
+                            <option value="7">Manager</option>
+                            <option value="8">Concierge Supervisor</option>
+
                         </select>
+                        <div class="invalid-feedback">Required</div>
                     </div>
 
                     <div class="mb-3">
                         <label for="name" class="form-label">Name</label>
                         <input type="text" name="name" class="form-control" required>
+                        <div class="invalid-feedback">Required</div>
                     </div>
 
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" name="email" class="form-control" required>
+                        <div class="invalid-feedback">Required</div>
                     </div>
 
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
                         <input type="password" name="password" class="form-control" required>
+                        <div class="invalid-feedback">Required</div>
                     </div>
 
                     <div class="mb-3">
                         <label for="password_confirmation" class="form-label">Confirm Password</label>
                         <input type="password" name="password_confirmation" class="form-control" required>
+                        <div class="invalid-feedback">Required</div>
                     </div>
 
 
@@ -46,8 +56,9 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" form="admin-new-user" id="saveUserBtn" class="btn btn-primary">
-                    <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                <button type="submit" form="admin-new-user" id="saveUserBtn"
+                    class="btn btn-primary d-flex align-items-center justify-content-center"
+                    style="min-width: 100px; height: 38px;">
                     <span class="btn-text">Create</span>
                 </button>
             </div>

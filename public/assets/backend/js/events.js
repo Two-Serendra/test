@@ -11,7 +11,7 @@ $(document).ready(function () {
         altInput: true,
         altFormat: "F j, Y",
         dateFormat: "Y-m-d",
-        minDate: "today"
+        // minDate: "today"
     });
 
     let currentEventsPageUrl = '/admin/get-updated-events-table';
@@ -24,6 +24,7 @@ $(document).ready(function () {
         const trimmed = text.trim();
         return trimmed.length > maxLength ? trimmed.substring(0, maxLength) + "..." : trimmed;
     }
+    
     function refreshTableEvents(url = currentEventsPageUrl) {
         $.ajax({
             url: url,
@@ -43,7 +44,6 @@ $(document).ready(function () {
 
                 $('[data-bs-toggle="tooltip"]').tooltip('dispose');
                 tableBody.empty();
-
                 events.forEach(function (event) {
                     const event_title = event.event_title || 'N/A';
                     const event_details = event.event_details || 'N/A'
@@ -157,9 +157,7 @@ $(document).ready(function () {
         this.classList.remove('was-validated');
 
         const $btn = $('#saveEventBtn');
-        const originalWidth = $btn.outerWidth(); // Preserve width for consistency
-
-        // Replace button text with spinner, center it
+        const originalWidth = $btn.outerWidth(); 
         $btn
             .attr('disabled', true)
             .html(`<div class="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></div>`)
@@ -326,7 +324,6 @@ $(document).ready(function () {
                 refreshTableEvents();
             },
             error: function (xhr, status, error) {
-
                 const Toast = Swal.mixin({
                     toast: true,
                     position: "top-end",
@@ -343,7 +340,7 @@ $(document).ready(function () {
                 });
                 Toast.fire({
                     icon: 'error',
-                    title: 'Failed to add event'
+                    title: 'Failed to update event'
                 });
             },
             complete: function () {

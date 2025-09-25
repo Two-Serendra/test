@@ -5,7 +5,6 @@
         <div class="card-body">
             <div class="row mb-3">
                 <div class="d-flex justify-content-between align-items-center flex-wrap">
-
                     <form id="searchFormEvents" class="d-flex align-items-center" style="max-width: 250px;">
                         <div class="input-group text-dark w-100">
                             <span class="input-group-text">
@@ -51,7 +50,7 @@
                             @foreach ($events as $event)
                                 <tr>
                                     <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                        {{ strtoupper($event->event_title ?: 'N/A') }}
+                                        {{$event->event_title  }}
                                     </td>
                                     <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                         {!! Str::limit(strip_tags($event->event_details), 100, '...') !!}

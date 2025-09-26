@@ -178,6 +178,30 @@
                 </div>
 
                 <!-- Breakdown / Add-Ons -->
+
+                @php
+                    // Calculate duration in hours
+                    $start = Carbon::parse($booking->event_start_time);
+                    $end = Carbon::parse($booking->event_end_time);
+                    if ($end <= $start)
+                        $end->addDay();
+                    $hours = round($end->diffInMinutes($start) / 60, 2);
+                    if ($hours <= 0)
+                        $hours = 1;
+
+                    // Rates
+                    $ratePerHour = $booking->final_rate ?? $booking->functionRoom->function_room_rate ?? 0;
+                    $baseRate = $booking->functionRoom->function_room_rate ?? $ratePerHour;
+                    $roomTotal = round($hours * $ratePerHour, 2);
+
+                    // Add-ons
+                    $addOns = $booking->add_ons ?? [];
+                    $addonsTotal = 0;
+
+                    $breakdownTotal = $roomTotal;
+                @endphp
+
+                <h6 class="fw-bold">Breakdown</h6>
                 <div class="table-responsive mb-3">
                     <table class="table table-sm table-bordered">
                         <thead class="table-light">
@@ -188,106 +212,66 @@
                                 <th class="text-end">Total</th>
                             </tr>
                         </thead>
-                        @php
-                            // Calculate duration in hours
-                            $start = Carbon::parse($booking->event_start_time);
-                            $end = Carbon::parse($booking->event_end_time);
-                            if ($end <= $start)
-                                $end->addDay();
-                            $hours = round($end->diffInMinutes($start) / 60, 2);
-                            if ($hours <= 0)
-                                $hours = 1;
+                        <tbody>
+                            {{-- Function Room Rate --}}
+                            @if($ratePerHour > 0)
+                                <tr>
+                                    <td>
+                                        Function Room Rate ({{ $hours }} hr{{ $hours > 1 ? 's' : '' }})
+                                        <!-- @if($baseRate > $ratePerHour)
+                                                                                    <br>
+                                                                                    <small class="text-muted">
+                                                                                        <s>₱{{ number_format($baseRate, decimals: 2) }}/hr</s>
+                                                                                    </small>
+                                                                                    &nbsp;→&nbsp;
+                                                                                    <small class="text-success">₱{{ number_format($ratePerHour, 2) }}/hr</small>
+                                                                                @endif -->
+                                    </td>
+                                    <td class="text-center">{{ $hours }}</td>
+                                    <td class="text-end">₱{{ number_format($ratePerHour, 2) }}/hr</td>
+                                    <td class="text-end">₱{{ number_format($roomTotal, 2) }}</td>
+                                </tr>
+                            @endif
 
-                            // Rates
-                            $ratePerHour = $booking->final_rate ?? $booking->functionRoom->function_room_rate ?? 0;
-                            $baseRate = $booking->functionRoom->function_room_rate ?? $ratePerHour;
-                            $roomTotal = round($hours * $ratePerHour, 2);
-
-                            // Add-ons
-                            $addOns = $booking->add_ons ?? [];
-                            $addonsTotal = 0;
-
-                            $breakdownTotal = $roomTotal;
-                        @endphp
-
-                        <h6 class="fw-bold">Breakdown</h6>
-                        <div class="table-responsive mb-3">
-                            <table class="table table-sm table-bordered">
-                                <thead class="table-light">
+                            {{-- Add-ons --}}
+                            @if($booking->addOns?->count() > 0)
+                                @foreach($booking->addOns as $addon)
+                                    @php
+                                        $pivot = $addon->pivot ?? [];
+                                        $qty = $pivot->quantity ?? $pivot->qty ?? $addon->qty ?? 0;
+                                        $price = $pivot->price ?? $addon->price ?? 0;
+                                        $lineTotal = round($qty * $price, 2);
+                                        $addonsTotal += $lineTotal;
+                                        $breakdownTotal += $lineTotal;
+                                    @endphp
                                     <tr>
-                                        <th>Item</th>
-                                        <th class="text-center">Qty</th>
-                                        <th class="text-end">Price</th>
-                                        <th class="text-end">Total</th>
+                                        <td>{{ $addon->item ?? $addon->name ?? 'Add-on' }}</td>
+                                        <td class="text-center">{{ $qty }}</td>
+                                        <td class="text-end">₱{{ number_format($price, 2) }}</td>
+                                        <td class="text-end">₱{{ number_format($lineTotal, 2) }}</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {{-- Function Room Rate --}}
-                                    @if($ratePerHour > 0)
-                                        <tr>
-                                            <td>
-                                                Function Room Rate ({{ $hours }} hr{{ $hours > 1 ? 's' : '' }})
-                                                <!-- @if($baseRate > $ratePerHour)
-                                                                            <br>
-                                                                            <small class="text-muted">
-                                                                                <s>₱{{ number_format($baseRate, decimals: 2) }}/hr</s>
-                                                                            </small>
-                                                                            &nbsp;→&nbsp;
-                                                                            <small class="text-success">₱{{ number_format($ratePerHour, 2) }}/hr</small>
-                                                                        @endif -->
-                                            </td>
-                                            <td class="text-center">{{ $hours }}</td>
-                                            <td class="text-end">₱{{ number_format($ratePerHour, 2) }}/hr</td>
-                                            <td class="text-end">₱{{ number_format($roomTotal, 2) }}</td>
-                                        </tr>
-                                    @endif
+                                @endforeach
 
-                                    {{-- Add-ons --}}
-                                    @if($booking->addOns?->count() > 0)
-                                        @foreach($booking->addOns as $addon)
-                                            @php
-                                                $pivot = $addon->pivot ?? [];
-                                                $qty = $pivot->quantity ?? $pivot->qty ?? $addon->qty ?? 0;
-                                                $price = $pivot->price ?? $addon->price ?? 0;
-                                                $lineTotal = round($qty * $price, 2);
-                                                $addonsTotal += $lineTotal;
-                                                $breakdownTotal += $lineTotal;
-                                            @endphp
-                                            <tr>
-                                                <td>{{ $addon->item ?? $addon->name ?? 'Add-on' }}</td>
-                                                <td class="text-center">{{ $qty }}</td>
-                                                <td class="text-end">₱{{ number_format($price, 2) }}</td>
-                                                <td class="text-end">₱{{ number_format($lineTotal, 2) }}</td>
-                                            </tr>
-                                        @endforeach
+                                <tr class="table-light fw-bold">
+                                    <td colspan="3" class="text-end">Add-ons Subtotal</td>
+                                    <td class="text-end">₱{{ number_format($addonsTotal, 2) }}</td>
+                                </tr>
+                            @endif
 
-                                        <tr class="table-light fw-bold">
-                                            <td colspan="3" class="text-end">Add-ons Subtotal</td>
-                                            <td class="text-end">₱{{ number_format($addonsTotal, 2) }}</td>
-                                        </tr>
-                                    @endif
-
-                                    @if($breakdownTotal == 0)
-                                        <tr>
-                                            <td colspan="4" class="text-center text-muted">No charges</td>
-                                        </tr>
-                                    @endif
-                                </tbody>
-                            </table>
-                        </div>
-
-                        {{-- Grand Total --}}
-                        <div class="d-flex justify-content-end border-top pt-2">
-                            <div class="fw-bold me-2">Grand Total:</div>
-                            <div>₱{{ number_format($breakdownTotal, 2) }}</div>
-                        </div>
-
-
+                            @if($breakdownTotal == 0)
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">No charges</td>
+                                </tr>
+                            @endif
+                        </tbody>
                     </table>
+                </div>
+
+                {{-- Grand Total --}}
+                <div class="d-flex justify-content-end border-top pt-2">
+                    <div class="fw-bold me-2">Grand Total:</div>
+                    <div>₱{{ number_format($breakdownTotal, 2) }}</div>
                 </div>
             </div>
         </div>
-
-
-    </div>
 @endsection

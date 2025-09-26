@@ -21,7 +21,6 @@ use App\Http\Controllers\Frontend\FrontendFunctionRoomBookingController;
 Route::middleware('guest:admin')->group(function () {
     Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
     Route::post('/login', [AdminAuthController::class, 'login']);
-    Route::get('/admin-users', [UsersController::class, 'showUser'])->name('admin.show.user');
 });
 
 Route::middleware('auth:admin')->group(function () {
@@ -61,7 +60,7 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/get-updated-downloads-table', [DownloadsController::class, 'getUpdatedDownloadsTable'])->name('get.updated.downloads.table');
 
     //USERS
-
+    Route::get('/admin-users', [UsersController::class, 'showUser'])->name('admin.show.user');
     Route::get('/admin-search-user', [UsersController::class, 'searchUser'])->name('admin.search.user');
     Route::post('/admin-store-user', [UsersController::class, 'storeUser'])->name('admin.store.user');
     Route::get('/admin-fetch-user/{id}', [UsersController::class, 'fetchUser'])->name('admin.fetch.user');

@@ -137,7 +137,7 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/admin-function-room-bookings', [FunctionRoomBookingController::class, 'showFunctionRoomBookings'])->name('admin.show.function.room.bookings');
     Route::get('/admin-function-room-bookings-approval', [FunctionRoomBookingController::class, 'FunctionRoomBookingApproval'])->name('admin.function.room.booking.approvals');
     Route::get('/admin-function-room-bookings/{id}/details', [FunctionRoomBookingController::class, 'getFunctionRoomBookingDetails'])
-        ->name('get.function.room.bookings.details');
+        ->name('admin.get.function.room.bookings.details');
     Route::get('/admin-get-updated-function-room-bookings-table', [FunctionRoomBookingController::class, 'getUpdatedFunctionRoomBookingTable'])
         ->name('get.updated.function.room.bookings.table');
     Route::get('/admin-function-room/{id}/booked-dates', [FrontendFunctionRoomBookingController::class, 'getFunctionRoomBookedDates']);

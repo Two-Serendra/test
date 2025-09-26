@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('unit_no');
             $table->string('email');
-             $table->enum('resident_type', ['OWNER', 'TENANT']);
+            $table->enum('resident_type', ['OWNER', 'TENANT']);
             $table->timestamps();
         });
     }
@@ -24,6 +24,7 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('emails');
+        Schema::dropIfExists('resident_details');
     }
+
 };

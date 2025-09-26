@@ -67,6 +67,7 @@ class AddOnsController extends Controller
         return response()->json([
             'item' => $addOns->item,
             'qty' => $addOns->qty,
+            'price' => $addOns->price,
         ]);
     }
 

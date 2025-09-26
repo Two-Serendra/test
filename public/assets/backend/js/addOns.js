@@ -117,135 +117,135 @@ $(document).ready(function () {
         });
     });
 
-    $('#adminEditBookingForm').submit(function (event) {
-        event.preventDefault();
+    // $('#adminEditBookingForm').submit(function (event) {
+    //     event.preventDefault();
 
-        const form = this;
-        let isValid = true;
+    //     const form = this;
+    //     let isValid = true;
 
-        // Custom validation
-        const startTime = $('#editStartTime').val();
-        const endTime = $('#editEndTime').val();
-        const pax = parseInt($('#editPaxInput').val() || 0);
-        const roomCapacity = parseInt($('#editRoomCapacity').text() || 0);
+    //     // Custom validation
+    //     const startTime = $('#editStartTime').val();
+    //     const endTime = $('#editEndTime').val();
+    //     const pax = parseInt($('#editPaxInput').val() || 0);
+    //     const roomCapacity = parseInt($('#editRoomCapacity').text() || 0);
 
-        function convertToMinutes(time) {
-            if (!time) return null;
-            const [hours, minutes] = time.split(':').map(Number);
-            return hours * 60 + minutes;
-        }
+    //     function convertToMinutes(time) {
+    //         if (!time) return null;
+    //         const [hours, minutes] = time.split(':').map(Number);
+    //         return hours * 60 + minutes;
+    //     }
 
-        const startMinutes = convertToMinutes(startTime);
-        const endMinutes = convertToMinutes(endTime);
+    //     const startMinutes = convertToMinutes(startTime);
+    //     const endMinutes = convertToMinutes(endTime);
 
-        if (startMinutes !== null && endMinutes !== null && endMinutes <= startMinutes) {
-            $('#timeError').removeClass('d-none');
-            $('#editEndTime').addClass('is-invalid');
-            isValid = false;
-        } else {
-            $('#timeError').addClass('d-none');
-            $('#editEndTime').removeClass('is-invalid');
-        }
+    //     if (startMinutes !== null && endMinutes !== null && endMinutes <= startMinutes) {
+    //         $('#timeError').removeClass('d-none');
+    //         $('#editEndTime').addClass('is-invalid');
+    //         isValid = false;
+    //     } else {
+    //         $('#timeError').addClass('d-none');
+    //         $('#editEndTime').removeClass('is-invalid');
+    //     }
 
-        if (pax > roomCapacity) {
-            $('#capacityError').removeClass('d-none');
-            $('#editPaxInput').addClass('is-invalid');
-            isValid = false;
-        } else {
-            $('#capacityError').addClass('d-none');
-            $('#editPaxInput').removeClass('is-invalid');
-        }
+    //     if (pax > roomCapacity) {
+    //         $('#capacityError').removeClass('d-none');
+    //         $('#editPaxInput').addClass('is-invalid');
+    //         isValid = false;
+    //     } else {
+    //         $('#capacityError').addClass('d-none');
+    //         $('#editPaxInput').removeClass('is-invalid');
+    //     }
 
-        if (!isValid) return;
+    //     if (!isValid) return;
 
-        // Bootstrap form validation
-        if (!form.checkValidity()) {
-            form.classList.add('was-validated');
-            return;
-        }
-        form.classList.remove('was-validated');
+    //     // Bootstrap form validation
+    //     if (!form.checkValidity()) {
+    //         form.classList.add('was-validated');
+    //         return;
+    //     }
+    //     form.classList.remove('was-validated');
 
-        // Button spinner
-        const $btn = $('#updateFunctionRoomBookingBtn');
-        const originalWidth = $btn.outerWidth();
-        $btn
-            .attr('disabled', true)
-            .html(`<div class="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></div>`)
-            .css('width', originalWidth + 'px');
+    //     // Button spinner
+    //     const $btn = $('#updateFunctionRoomBookingBtn');
+    //     const originalWidth = $btn.outerWidth();
+    //     $btn
+    //         .attr('disabled', true)
+    //         .html(`<div class="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></div>`)
+    //         .css('width', originalWidth + 'px');
 
-        // FormData
-        const formData = new FormData(form);
+    //     // FormData
+    //     const formData = new FormData(form);
 
-        $.ajax({
-            url: $(form).attr('action'),
-            type: $(form).attr('method') || 'POST',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                $('#adminEditBookingModal').modal('hide');
-                form.reset();
-                $(form).removeClass('was-validated');
+    //     $.ajax({
+    //         url: $(form).attr('action'),
+    //         type: $(form).attr('method') || 'POST',
+    //         headers: {
+    //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    //         },
+    //         data: formData,
+    //         processData: false,
+    //         contentType: false,
+    //         success: function (response) {
+    //             $('#adminEditBookingModal').modal('hide');
+    //             form.reset();
+    //             $(form).removeClass('was-validated');
 
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: "top-end",
-                    showConfirmButton: false,
-                    timer: 2000,
-                    timerProgressBar: true,
-                    customClass: { popup: 'colored-toast' },
-                    didOpen: (toast) => {
-                        toast.onmouseenter = Swal.stopTimer;
-                        toast.onmouseleave = Swal.resumeTimer;
-                    }
-                });
+    //             const Toast = Swal.mixin({
+    //                 toast: true,
+    //                 position: "top-end",
+    //                 showConfirmButton: false,
+    //                 timer: 2000,
+    //                 timerProgressBar: true,
+    //                 customClass: { popup: 'colored-toast' },
+    //                 didOpen: (toast) => {
+    //                     toast.onmouseenter = Swal.stopTimer;
+    //                     toast.onmouseleave = Swal.resumeTimer;
+    //                 }
+    //             });
 
-                Toast.fire({
-                    icon: 'success',
-                    title: 'Updated Successfully'
-                });
+    //             Toast.fire({
+    //                 icon: 'success',
+    //                 title: 'Updated Successfully'
+    //             });
 
-                refreshTableAddOns();
-            },
-            error: function (xhr) {
-                if (xhr.status === 409) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Booking Conflict',
-                        text: xhr.responseJSON.message,
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: '#d33'
-                    });
-                } else if (xhr.status === 422) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Validation Error',
-                        text: xhr.responseJSON.message,
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: '#d33'
-                    });
-                } else {
-                    Swal.fire({
-                        toast: true,
-                        position: "top-end",
-                        icon: 'error',
-                        title: 'Something went wrong. Please try again later.',
-                        timer: 3000,
-                        showConfirmButton: false
-                    });
-                }
-            },
-            complete: function () {
-                $btn
-                    .attr('disabled', false)
-                    .html(`<span class="btn-text">Update</span>`)
-                    .css('width', '');
-            }
-        });
-    });
+    //             refreshTableAddOns();
+    //         },
+    //         error: function (xhr) {
+    //             if (xhr.status === 409) {
+    //                 Swal.fire({
+    //                     icon: 'error',
+    //                     title: 'Booking Conflict',
+    //                     text: xhr.responseJSON.message,
+    //                     confirmButtonText: 'OK',
+    //                     confirmButtonColor: '#d33'
+    //                 });
+    //             } else if (xhr.status === 422) {
+    //                 Swal.fire({
+    //                     icon: 'error',
+    //                     title: 'Validation Error',
+    //                     text: xhr.responseJSON.message,
+    //                     confirmButtonText: 'OK',
+    //                     confirmButtonColor: '#d33'
+    //                 });
+    //             } else {
+    //                 Swal.fire({
+    //                     toast: true,
+    //                     position: "top-end",
+    //                     icon: 'error',
+    //                     title: 'Something went wrong. Please try again later.',
+    //                     timer: 3000,
+    //                     showConfirmButton: false
+    //                 });
+    //             }
+    //         },
+    //         complete: function () {
+    //             $btn
+    //                 .attr('disabled', false)
+    //                 .html(`<span class="btn-text">Update</span>`)
+    //                 .css('width', '');
+    //         }
+    //     });
+    // });
 
 
     $('#searchFormAddOns').on('submit', function (e) {

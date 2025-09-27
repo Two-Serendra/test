@@ -28,7 +28,8 @@ class UserFunctionRoomBookingNotification extends Mailable implements ShouldQueu
      */
     public function build()
     {
-        return $this->subject('Your Function Room Booking is Being Processed')
+        return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra') // ✅ Verified domain
+            ->subject('Your Function Room Booking is Being Processed')
             ->view('emails.user-function-room-booking')
             ->with([
                 'name' => $this->booking->user->name,

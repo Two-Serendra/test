@@ -296,7 +296,7 @@ class FrontendFunctionRoomBookingController extends Controller
                     'user' => $booking->user->toArray()
                 ]);
                 $booking->load(['user', 'functionRoom']);
-                Mail::to($booking->user->email)->queue(new UserFunctionRoomBookingNotification($booking));
+                Mail::to($booking->user->email)->send(new UserFunctionRoomBookingNotification($booking));
                 Mail::to('itdept@twoserendra.com')->queue(new FinanceFunctionRoomBookingNotification($booking));
                 event(new FunctionRoomBookingCreated($booking));
                 $booking->user->notify(new UserFunctionRoomBookingBellNotification($booking));

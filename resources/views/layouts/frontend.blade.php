@@ -99,7 +99,7 @@
 
 
     <script>
-        Pusher.logToConsole = true;
+        Pusher.logToConsole = false;
 
         window.Echo = new Echo({
             broadcaster: 'pusher',

@@ -18,14 +18,14 @@
                     <a href="{{ route('services') }}"
                         class="nav-item nav-link {{ request()->routeIs('services') ? 'active' : '' }}">Services</a>
 
-                    <!-- <div class="nav-item dropdown">
+                    <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Online Forms</a>
                         <div class="dropdown-menu bg-light rounded-0 rounded-bottom m-0">
                             <a href="{{ route('minor.work.permit') }}" class="dropdown-item">Minor Work Permit</a>
                             <a href="testimonial.html" class="dropdown-item">Pull out Permit</a>
                             <a href="appoinment.html" class="dropdown-item">Delivery Permit</a>
                         </div>
-                    </div> -->
+                    </div>
 
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
@@ -40,7 +40,7 @@
                         class="nav-item nav-link {{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a>
                 </div>
 
-                <!-- <div class="ms-auto">
+                <div class="ms-auto">
                     <a href="{{ route('booking.list') }}" class="btn btn-primary custom-btn">Book Now</a>
                 </div>
 
@@ -113,7 +113,7 @@
                             @endforelse
                         </div>
                     </div>
-                @endauth -->
+                @endauth
 
             </div>
         </nav>

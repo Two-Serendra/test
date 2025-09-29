@@ -18,14 +18,14 @@
                     <a href="{{ route('services') }}"
                         class="nav-item nav-link {{ request()->routeIs('services') ? 'active' : '' }}">Services</a>
 
-                    <div class="nav-item dropdown">
+                    <!-- <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Online Forms</a>
                         <div class="dropdown-menu bg-light rounded-0 rounded-bottom m-0">
                             <a href="{{ route('minor.work.permit') }}" class="dropdown-item">Minor Work Permit</a>
                             <a href="testimonial.html" class="dropdown-item">Pull out Permit</a>
                             <a href="appoinment.html" class="dropdown-item">Delivery Permit</a>
                         </div>
-                    </div>
+                    </div> -->
 
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
@@ -42,9 +42,9 @@
 
                 <!-- <div class="ms-auto">
                     <a href="{{ route('booking.list') }}" class="btn btn-primary custom-btn">Book Now</a>
-                </div>
+                </div> -->
 
-                <div class="nav-item dropdown ms-3 mt-2 mt-lg-0">
+                <!-- <div class="nav-item dropdown ms-3 mt-2 mt-lg-0">
                     <a href="#" class="nav-link dropdown-toggle d-flex align-items-center justify-content-center"
                         id="userDropdown" role="button" data-bs-toggle="dropdown"
                         style="width: 40px; height: 40px; background-color: #008b26; border-radius: 50%; color: white;">

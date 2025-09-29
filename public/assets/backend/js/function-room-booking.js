@@ -347,12 +347,13 @@ $(document).ready(function () {
                 approveBtn.removeClass('d-none').prop('disabled', true).text('Waiting');
             }
 
-            // RATE + BREAKDOWN (same as user-side)
+            // === RATE + BREAKDOWN (same as user-side) ===
             const durationHoursBackend = parseFloat(booking.duration_hours ?? booking.duration_in_hours ?? NaN);
             const ratePerHourBackend = parseFloat(booking.final_rate ?? booking.function_room?.function_room_rate ?? NaN);
             const roomTotalBackend = parseFloat(booking.room_total ?? NaN);
-            let hours = !isNaN(durationHoursBackend) ? durationHoursBackend : 1;
 
+            // Compute duration (fallback to parsing)
+            let hours = !isNaN(durationHoursBackend) ? durationHoursBackend : 1;
             if (!durationHoursBackend) {
                 const startDate = parseTimeToDate(booking.event_start_time);
                 const endDate = parseTimeToDate(booking.event_end_time);
@@ -365,30 +366,53 @@ $(document).ready(function () {
 
             const ratePerHour = !isNaN(ratePerHourBackend) ? ratePerHourBackend : (parseFloat(booking.final_rate) || 0);
             const roomLineTotal = !isNaN(roomTotalBackend) ? roomTotalBackend : Math.round((ratePerHour * hours) * 100) / 100;
-            const baseRate = parseFloat(booking.function_room?.function_room_rate ?? ratePerHour);
 
-            if (baseRate > ratePerHour) {
-                $('#detail-rate').html(`
-                <span class="text-muted"><s>₱${Number(baseRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}</s></span>
+            if (ratePerHour && ratePerHour > 0) {
+                const baseRate = parseFloat(booking.function_room?.function_room_rate ?? ratePerHour);
+                if (baseRate > ratePerHour) {
+                    $('#detail-rate').html(`
+            <div>
+                <small class="text-muted"><s>₱${Number(baseRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</s></small>
                 &nbsp; → &nbsp;
-                <strong class="text-primary">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
-            `);
+                <small class="text-success">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</small>
+                &nbsp; × &nbsp;
+                <small>${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })} hr(s)</small>
+                &nbsp; = &nbsp;
+                <strong class="text-success">₱${Number(roomLineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
+            </div>
+        `);
+                } else {
+                    $('#detail-rate').html(`
+            <div>
+                <small class="text-muted">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</small>
+                &nbsp; × &nbsp;
+                <small>${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })} hr(s)</small>
+                &nbsp; = &nbsp;
+                <strong>₱${Number(roomLineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
+            </div>
+        `);
+                }
             } else {
-                $('#detail-rate').html(`<strong>₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>`);
+                $('#detail-rate').html('<span class="text-muted">N/A</span>');
             }
 
-            // Breakdown table
+            // === Breakdown Table ===
             let breakdownHtml = '';
             let addonsTotal = 0;
+
+            // Function Room row
             if (ratePerHour && ratePerHour > 0) {
-                breakdownHtml += `<tr>
-                <td>Function Room Rate (${hours} hr${hours > 1 ? 's' : ''})</td>
-                <td class="text-center">${hours}</td>
-                <td class="text-end">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</td>
-                <td class="text-end">₱${Number(roomLineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-            </tr>`;
+                breakdownHtml += `
+        <tr>
+            <td>Function Room Rate (${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })} hr${hours > 1 ? 's' : ''})</td>
+            <td class="text-center">${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })}</td>
+            <td class="text-end">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</td>
+            <td class="text-end">₱${Number(roomLineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+        </tr>
+    `;
             }
 
+            // Add-ons rows
             if (booking.add_ons && booking.add_ons.length > 0) {
                 booking.add_ons.forEach(addon => {
                     const pivot = addon.pivot || {};
@@ -397,25 +421,35 @@ $(document).ready(function () {
                     const lineTotal = Math.round(qty * price * 100) / 100;
                     addonsTotal += lineTotal;
 
-                    breakdownHtml += `<tr>
-                    <td>${addon.item ?? addon.name ?? 'Add-on'}</td>
-                    <td class="text-center">${qty}</td>
-                    <td class="text-end">₱${Number(price).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                    <td class="text-end">₱${Number(lineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                </tr>`;
+                    breakdownHtml += `
+            <tr>
+                <td>${addon.item ?? addon.name ?? 'Add-on'}</td>
+                <td class="text-center">${qty}</td>
+                <td class="text-end">₱${Number(price).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                <td class="text-end">₱${Number(lineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+            </tr>
+        `;
                 });
 
-                breakdownHtml += `<tr class="table-light fw-bold">
-                <td colspan="3" class="text-end">Add-ons Subtotal</td>
-                <td class="text-end">₱${Number(addonsTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-            </tr>`;
+                breakdownHtml += `
+        <tr class="table-light fw-bold">
+            <td colspan="3" class="text-end">Add-ons Subtotal</td>
+            <td class="text-end">₱${Number(addonsTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+        </tr>
+    `;
             }
 
-            if (!breakdownHtml) breakdownHtml = `<tr><td colspan="4" class="text-center text-muted">No charges</td></tr>`;
+            // No charges fallback
+            if (!breakdownHtml) {
+                breakdownHtml = `<tr><td colspan="4" class="text-center text-muted">No charges</td></tr>`;
+            }
+
             $('#detail-breakdown').html(breakdownHtml);
 
+            // Grand Total
             const grandTotal = Math.round((roomLineTotal + addonsTotal) * 100) / 100;
             $('#detail-grand-total').text("₱" + Number(grandTotal).toLocaleString(undefined, { minimumFractionDigits: 2 }));
+
 
             hideSpinner();
             $('#functionRoomBookingDetailsModal').modal('show');

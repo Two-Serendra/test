@@ -231,6 +231,9 @@
                                 <li><strong>Payment Submission:</strong><br>
                                     <a href="mailto:payments@twoserendra.com">payments@twoserendra.com</a>
                                 </li>
+                                  <li><strong>Concierge:</strong><br>
+                                    <a href="mailto:payments@twoserendra.com">concierge@twoserendra.com</a>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -262,7 +265,7 @@
                         <div class="card-body">
                             <ul class="list-unstyled mb-0">
                                 <li><strong>Resident Services:</strong><br>
-                                    <a href="mailto:resident.services@twoserendra.com">resident.services@twoserendra.com</a>
+                                    <a href="mailto:resident.services@twoserendra.com">residentservices.manager@twoserendra.com</a>
                                 </li>
                                 <li><strong>Circulars:</strong><br>
                                     <a href="mailto:circulars@twoserendra.com">circulars@twoserendra.com</a>

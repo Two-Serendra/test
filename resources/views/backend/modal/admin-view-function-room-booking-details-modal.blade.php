@@ -123,13 +123,19 @@
 
             <!-- Footer -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm customBtn text-white" data-bs-dismiss="modal">
-                    Close
+                <button type="button" class="btn btn-danger btn-sm customBtn reject-btn text-white">
+                    Reject
                 </button>
-                <button id="approveBookingBtn" type="button"
-                    class="btn btn-sm btn-primary d-none approve-btn">Approve</button>
-            </div>
+                <button type="button" id="approveBookingBtn" class="btn btn-sm btn-primary approve-btn"
+                   data-type="{{ auth()->user()->role_id == 6 ? 'Concierge' :
+    (auth()->user()->role_id == 2 ? 'Admin' :
+        (auth()->user()->role_id == 5 ? 'Finance' :
+            (auth()->user()->role_id == 3 ? 'Engineering' :
+                (auth()->user()->role_id == 7 ? 'Manager' : 'Unknown')))) }}">
+                    Approve
+                </button>
 
+            </div>
         </div>
     </div>
 </div>

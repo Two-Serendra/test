@@ -27,7 +27,7 @@ class FunctionRoomBookingController extends Controller
 
         $query = FunctionRoomBooking::with(['user', 'functionRoom', 'addOns']);
 
-        if (in_array($roleId, [1, 5, 7, 8])) {
+        if (in_array($roleId, [1, 5, 6, 7])) {
             // Role 1, 5, 7: Show pending and confirmed bookings
             $query->whereIn('booking_status', [0, 1,]);
 
@@ -147,39 +147,57 @@ class FunctionRoomBookingController extends Controller
         $user = auth()->user();
 
         switch ($user->role_id) {
-            case 2:
-                if ($booking->authorization_file) {
-                    $booking->update([
-                        'admin_approval' => true,
-                        'admin_approved_by' => $user->id,
-                        'admin_approved_at' => now(),
-                    ]);
-                }
-                break;
-
-            case 5:
+            case 6: // Concierge
                 $booking->update([
-                    'finance_approval' => true,
-                    'finance_approved_by' => $user->id,
-                    'finance_approved_at' => now(),
+                    'concierge_approval' => 1,
+                    'concierge_user_id' => $user->id,
+                    'concierge_action_at' => now(),
+                    'concierge_remarks' => null, // ✅ clear old remarks
                 ]);
                 break;
 
-            case 3:
+            case 2: // Admin
+                if ($booking->authorization_file && $booking->concierge_approval) {
+                    $booking->update([
+                        'admin_approval' => 1,
+                        'admin_user_id' => $user->id,
+                        'admin_action_at' => now(),
+                        'admin_remarks' => null, // ✅ clear old remarks
+                    ]);
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Cannot approve yet. Waiting for Concierge approval.',
+                    ], 422);
+                }
+                break;
+
+            case 5: // Finance
+                $booking->update([
+                    'finance_approval' => 1,
+                    'finance_user_id' => $user->id,
+                    'finance_action_at' => now(),
+                    'finance_remarks' => null, // ✅ clear old remarks
+                ]);
+                break;
+
+            case 3: // Engineering
                 if ($booking->suppliers && $booking->suppliers->count() > 0) {
                     $booking->update([
-                        'engineering_approval' => true,
-                        'engineering_approved_by' => $user->id,
-                        'engineering_approved_at' => now(),
+                        'engineering_approval' => 1,
+                        'engineering_user_id' => $user->id,
+                        'engineering_action_at' => now(),
+                        'engineering_remarks' => null, // ✅ clear old remarks
                     ]);
                 }
                 break;
 
-            case 7:
+            case 7: // Manager
                 $booking->update([
-                    'manager_approval' => true,
-                    'manager_approved_by' => $user->id,
-                    'manager_approved_at' => now(),
+                    'manager_approval' => 1,
+                    'manager_user_id' => $user->id,
+                    'manager_action_at' => now(),
+                    'manager_remarks' => null, // ✅ clear old remarks
                     'booking_status' => '1',
                 ]);
                 break;
@@ -196,7 +214,6 @@ class FunctionRoomBookingController extends Controller
 
             // Queue the notification
             $booking->user->notify((new UserFunctionRoomBookingBellNotification($booking))->delay(now()->addSeconds(1)));
-
         }
 
         return response()->json([
@@ -205,6 +222,420 @@ class FunctionRoomBookingController extends Controller
             'booking_status' => $booking->booking_status
         ]);
     }
+
+    // public function FunctionRoomBookingRejection(Request $request)
+    // {
+    //     $request->validate([
+    //         'booking_id' => 'required|exists:function_room_bookings,id',
+    //         'remarks' => 'required|string|max:500',
+    //     ]);
+
+    //     $bookingId = $request->booking_id;
+    //     $booking = FunctionRoomBooking::findOrFail($bookingId);
+    //     $user = auth()->user();
+
+    //     switch ($user->role_id) {
+    //         case 6: // Concierge
+    //             $booking->update([
+    //                 'concierge_approval' => false, // mark rejected
+    //                 'concierge_user_id' => $user->id,
+    //                 'concierge_action_at' => now(),
+    //                 'concierge_remarks' => $request->remarks,
+    //                 'booking_status' => '2', // rejected
+    //             ]);
+    //             break;
+
+    //         case 2: // Admin
+    //             $booking->update([
+    //                 'admin_approval' => false,
+    //                 'admin_user_id' => $user->id,
+    //                 'admin_action_at' => now(),
+    //                 'admin_remarks' => $request->remarks,
+    //                 'booking_status' => '2',
+    //             ]);
+    //             break;
+
+    //         case 5: // Finance
+    //             $booking->update([
+    //                 'finance_approval' => false,
+    //                 'finance_user_id' => $user->id,
+    //                 'finance_action_at' => now(),
+    //                 'finance_remarks' => $request->remarks,
+    //                 'booking_status' => '2',
+    //             ]);
+    //             break;
+
+    //         case 3: // Engineering
+    //             $booking->update([
+    //                 'engineering_approval' => false,
+    //                 'engineering_user_id' => $user->id,
+    //                 'engineering_action_at' => now(),
+    //                 'engineering_remarks' => $request->remarks,
+    //                 'booking_status' => '2',
+    //             ]);
+    //             break;
+
+    //         case 7: // Manager
+    //             $booking->update([
+    //                 'manager_approval' => false,
+    //                 'manager_user_id' => $user->id,
+    //                 'manager_action_at' => now(),
+    //                 'manager_remarks' => $request->remarks,
+    //                 'booking_status' => '2',
+    //             ]);
+    //             break;
+    //     }
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Booking rejected successfully',
+    //         'booking_status' => $booking->booking_status,
+    //     ]);
+    // }
+
+
+    public function FunctionRoomBookingReject(Request $request)
+    {
+        $request->validate([
+            'booking_id' => 'required|exists:function_room_bookings,id',
+            'remarks' => 'required|string|max:1000',
+        ]);
+
+        $booking = FunctionRoomBooking::findOrFail($request->booking_id);
+        $user = auth()->user();
+
+        switch ($user->role_id) {
+            case 6: // Concierge
+                $booking->update([
+                    'concierge_approval' => 2, // rejected
+                    'concierge_user_id' => $user->id,
+                    'concierge_action_at' => now(),
+                    'concierge_remarks' => $request->remarks,
+                ]);
+                break;
+
+            case 2: // Admin
+                $booking->update([
+                    'admin_approval' => 2,
+                    'admin_user_id' => $user->id,
+                    'admin_action_at' => now(),
+                    'admin_remarks' => $request->remarks,
+                ]);
+                break;
+
+            case 5: // Finance
+                $booking->update([
+                    'finance_approval' => 2,
+                    'finance_user_id' => $user->id,
+                    'finance_action_at' => now(),
+                    'finance_remarks' => $request->remarks,
+                ]);
+                break;
+
+            case 3: // Engineering
+                $booking->update([
+                    'engineering_approval' => 2,
+                    'engineering_user_id' => $user->id,
+                    'engineering_action_at' => now(),
+                    'engineering_remarks' => $request->remarks,
+                ]);
+                break;
+
+            case 7: // Manager
+                $booking->update([
+                    'manager_approval' => 2,
+                    'manager_user_id' => $user->id,
+                    'manager_action_at' => now(),
+                    'manager_remarks' => $request->remarks,
+                    'booking_status' => 2, // rejected (global)
+                ]);
+                break;
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Booking rejected successfully',
+            'booking_status' => $booking->booking_status,
+        ]);
+    }
+
+
+
+
+
+
+
+    // public function getFunctionRoomBookingDetails($id)
+    // {
+    //     $booking = FunctionRoomBooking::with(['user', 'functionRoom', 'suppliers', 'addOns'])->findOrFail($id);
+    //     $userRole = auth()->user()->role_id;
+    //     $booking->event_start_time = $booking->event_start_time
+    //         ? \Carbon\Carbon::parse($booking->event_start_time)->format('h:i A')
+    //         : null;
+    //     $booking->event_end_time = $booking->event_end_time
+    //         ? \Carbon\Carbon::parse($booking->event_end_time)->format('h:i A')
+    //         : null;
+
+    //     $authorizationFileUrl = $booking->authorization_file ? asset($booking->authorization_file) : null;
+    //     $booking->suppliers->transform(function ($supplier) {
+    //         $supplier->attachment_url = $supplier->attachment ? asset($supplier->attachment) : null;
+    //         return $supplier;
+    //     });
+
+    //     $booking->has_suppliers = $booking->suppliers->count() > 0;
+
+    //     $showViewButton = false;
+    //     $showApproveButton = false;
+    //     $waitingReason = null;
+    //     $isApproved = false;
+
+    //     if ($userRole == 6) { 
+    //         $showViewButton = true;
+    //         if (empty($booking->concierge_user_id)) {
+    //             $showApproveButton = true;
+    //         } else {
+    //             $isApproved = true;
+    //         }
+    //     }
+
+    //     if ($userRole == 2 && $booking->authorization_file) {
+    //         $showViewButton = true;
+
+    //         if (empty($booking->concierge_user_id)) {
+    //             $waitingReason = 'Waiting for Concierge';
+    //             $showApproveButton = false; 
+    //         } elseif (empty($booking->admin_user_id)) {
+    //             $showApproveButton = true;
+    //         } else {
+    //             $isApproved = true;
+    //         }
+    //     }
+
+    //     if ($userRole == 5) { 
+    //         $showViewButton = true;
+
+    //         if ($booking->authorization_file) {
+    //             if (empty($booking->admin_user_id)) {
+    //                 $waitingReason = 'Waiting for Admin';
+    //             } elseif (empty($booking->finance_user_id)) {
+    //                 $showApproveButton = true;
+    //             } else {
+    //                 $isApproved = true;
+    //             }
+    //         } else {
+    //             if (empty($booking->concierge_user_id)) {
+    //                 $waitingReason = 'Waiting for Concierge';
+    //             } elseif (empty($booking->finance_user_id)) {
+    //                 $showApproveButton = true;
+    //             } else {
+    //                 $isApproved = true;
+    //             }
+    //         }
+    //     }
+
+
+    //     if ($userRole == 3 && $booking->has_suppliers) {
+    //         $showViewButton = true;
+    //         if (empty($booking->finance_user_id)) {
+    //             $waitingReason = 'Waiting for Finance';
+    //         } elseif (empty($booking->engineering_user_id)) {
+    //             $showApproveButton = true;
+    //         } else {
+    //             $isApproved = true;
+    //         }
+    //     }
+
+    //     if ($userRole == 7) { 
+    //         $showViewButton = true;
+    //         if (empty($booking->concierge_user_id)) {
+    //             $waitingReason = 'Waiting for Concierge';
+    //         } elseif ($booking->authorization_file && empty($booking->admin_user_id)) {
+    //             $waitingReason = 'Waiting for Admin';
+    //         } elseif (empty($booking->finance_user_id)) {
+    //             $waitingReason = 'Waiting for Finance';
+    //         } elseif ($booking->has_suppliers && empty($booking->engineering_user_id)) {
+    //             $waitingReason = 'Waiting for Engineering';
+    //         } elseif (empty($booking->manager_user_id)) {
+    //             $showApproveButton = true;
+    //         } else {
+    //             $isApproved = true;
+    //         }
+    //     }
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'booking' => $booking,
+    //         'authorization_file_url' => $authorizationFileUrl,
+    //         'show_approve_button' => $showApproveButton,
+    //         'show_view_button' => $showViewButton,
+    //         'is_approved' => $isApproved,
+    //         'waiting_reason' => $waitingReason,
+    //     ]);
+    // }
+
+    // public function getFunctionRoomBookingDetails($id)
+    // {
+    //     $booking = FunctionRoomBooking::with(['user', 'functionRoom', 'suppliers', 'addOns'])->findOrFail($id);
+    //     $userRole = auth()->user()->role_id;
+
+    //     // Format times
+    //     $booking->event_start_time = $booking->event_start_time
+    //         ? \Carbon\Carbon::parse($booking->event_start_time)->format('h:i A')
+    //         : null;
+    //     $booking->event_end_time = $booking->event_end_time
+    //         ? \Carbon\Carbon::parse($booking->event_end_time)->format('h:i A')
+    //         : null;
+
+    //     // Authorization URL
+    //     $authorizationFileUrl = $booking->authorization_file ? asset($booking->authorization_file) : null;
+
+    //     // Add supplier URLs
+    //     $booking->suppliers->transform(function ($supplier) {
+    //         $supplier->attachment_url = $supplier->attachment ? asset($supplier->attachment) : null;
+    //         return $supplier;
+    //     });
+
+    //     $booking->has_suppliers = $booking->suppliers->count() > 0;
+
+    //     // Default states
+    //     $showViewButton = false;
+    //     $showApproveButton = false;
+    //     $waitingReason = null;
+    //     $isApproved = false;
+
+    //     // ----- Strict Approval Flow -----
+    //     if ($userRole == 6) { // Concierge first
+    //         $showViewButton = true;
+    //         if (empty($booking->concierge_user_id)) {
+    //             $showApproveButton = true;
+    //         } else {
+    //             $isApproved = true;
+    //         }
+    //     }
+
+    //     if ($userRole == 2 && $booking->authorization_file) {
+    //         $showViewButton = true;
+
+    //         if (empty($booking->concierge_user_id)) {
+    //             $waitingReason = 'Waiting for Concierge';
+    //             $showApproveButton = false;
+    //         } elseif (empty($booking->admin_user_id)) {
+    //             $showApproveButton = true;
+    //         } else {
+    //             $isApproved = true;
+    //         }
+    //     }
+
+    //     // ----- Strict Approval Flow -----
+    //     if ($userRole == 5) { // Finance
+    //         $showViewButton = true;
+
+    //         // If previous approver rejected
+    //         if ($booking->admin_approval == 2) {
+    //             $waitingReason = 'Waiting for Admin';
+    //             $showApproveButton = false;
+    //             $isApproved = false;
+    //         } else {
+    //             if ($booking->authorization_file) {
+    //                 if (empty($booking->admin_user_id)) {
+    //                     $waitingReason = 'Waiting for Admin';
+    //                 } elseif (empty($booking->finance_user_id)) {
+    //                     $showApproveButton = true;
+    //                 } else {
+    //                     $isApproved = true;
+    //                 }
+    //             } else {
+    //                 if (empty($booking->concierge_user_id)) {
+    //                     $waitingReason = 'Waiting for Concierge';
+    //                 } elseif (empty($booking->finance_user_id)) {
+    //                     $showApproveButton = true;
+    //                 } else {
+    //                     $isApproved = true;
+    //                 }
+    //             }
+    //         }
+    //     }
+
+
+    //     if ($userRole == 3) {
+    //         $showViewButton = true;
+
+    //         switch ($booking->engineering_approval ?? 0) {
+    //             case 0:
+    //                 if (empty($booking->finance_user_id)) {
+    //                     $waitingReason = 'Waiting for Finance';
+    //                 } else {
+    //                     $showApproveButton = true;
+    //                 }
+    //                 break;
+
+    //             case 1:
+    //                 $isApproved = true;
+    //                 break;
+
+    //             case 2: // rejected
+    //                 $rejected = true;
+    //                 break;
+    //         }
+    //     }
+
+
+    //     if ($userRole == 7) {
+    //         $showViewButton = true;
+    //         if (empty($booking->concierge_user_id)) {
+    //             $waitingReason = 'Waiting for Concierge';
+    //         } elseif ($booking->authorization_file && empty($booking->admin_user_id)) {
+    //             $waitingReason = 'Waiting for Admin';
+    //         } elseif (empty($booking->finance_user_id)) {
+    //             $waitingReason = 'Waiting for Finance';
+    //         } elseif ($booking->has_suppliers && empty($booking->engineering_user_id)) {
+    //             $waitingReason = 'Waiting for Engineering';
+    //         } elseif (empty($booking->manager_user_id)) {
+    //             $showApproveButton = true;
+    //         } else {
+    //             $isApproved = true;
+    //         }
+    //     }
+
+    //     $userApprovalStatus = 0; // 0 = waiting, 1 = approved, 2 = rejected
+
+    //     switch ($userRole) {
+    //         case 6:
+    //             $userApprovalStatus = $booking->concierge_approval ?? 0;
+    //             break;
+    //         case 2:
+    //             $userApprovalStatus = $booking->admin_approval ?? 0;
+    //             break;
+    //         case 5:
+    //             $userApprovalStatus = $booking->finance_approval ?? 0;
+    //             break;
+    //         case 3:
+    //             $userApprovalStatus = $booking->engineering_approval ?? 0;
+    //             break;
+    //         case 7:
+    //             $userApprovalStatus = $booking->manager_approval ?? 0;
+    //             break;
+    //     }
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'booking' => $booking,
+    //         'authorization_file_url' => $authorizationFileUrl,
+    //         'show_approve_button' => $showApproveButton,
+    //         'show_view_button' => $showViewButton,
+    //         'is_approved' => $isApproved,
+    //         'waiting_reason' => $waitingReason,
+    //         'status' => [
+    //             'concierge' => $booking->concierge_approval ?? 0,
+    //             'admin' => $booking->admin_approval ?? 0,
+    //             'finance' => $booking->finance_approval ?? 0,
+    //             'engineering' => $booking->engineering_approval ?? 0,
+    //             'manager' => $booking->manager_approval ?? 0,
+    //         ],
+    //         'current_user_status' => $userApprovalStatus,
+    //     ]);
+    // }
+
 
     public function getFunctionRoomBookingDetails($id)
     {
@@ -220,87 +651,131 @@ class FunctionRoomBookingController extends Controller
             : null;
 
         // Authorization URL
-        $authorizationFileUrl = $booking->authorization_file
-            ? asset($booking->authorization_file)
-            : null;
+        $authorizationFileUrl = $booking->authorization_file ? asset($booking->authorization_file) : null;
 
-        // Add supplier URLs
+        // Supplier attachments
         $booking->suppliers->transform(function ($supplier) {
             $supplier->attachment_url = $supplier->attachment ? asset($supplier->attachment) : null;
             return $supplier;
         });
-
         $booking->has_suppliers = $booking->suppliers->count() > 0;
 
-        // Default states
+        // Approval columns mapping
+        $approvalColumns = [
+            6 => 'concierge_approval',
+            2 => 'admin_approval',
+            5 => 'finance_approval',
+            3 => 'engineering_approval',
+            7 => 'manager_approval',
+        ];
+
+        $userApprovalColumn = $approvalColumns[$userRole] ?? null;
+        $userApprovalStatus = $booking->{$userApprovalColumn} ?? 0;
+
+        $approvalOrder = ['concierge', 'admin', 'finance', 'engineering', 'manager'];
+
+        $rejectedByPrevious = false;
+        $rejectedByRole = null;
+        $currentUserRejected = false;
+
+        foreach ($approvalOrder as $role) {
+            $status = $booking->{$role . '_approval'} ?? 0;
+
+            if ($status == 2) {
+                if ($role . '_approval' == $userApprovalColumn) {
+                    $currentUserRejected = true; // This user rejected
+                } else {
+                    $rejectedByPrevious = true;
+                    $rejectedByRole = ucfirst($role);
+                }
+                break;
+            }
+        }
+
+        // Initialize buttons
+        $showApproveButton = false;
         $showViewButton = false;
-        $showButton = false;
         $waitingReason = null;
-
-        // Role-specific approval status
         $isApproved = false;
-        if ($userRole == 2 && $booking->authorization_file) {
-            $showViewButton = true;
 
-            // Allow Admin to approve if not yet approved
-            if (empty($booking->admin_approved_by)) {
-                $showButton = true;
-            }
-        }
-        if ($userRole == 5)
-            $isApproved = !empty($booking->finance_approved_by);
-        if ($userRole == 3)
-            $isApproved = !empty($booking->engineering_approved_by);
-        if ($userRole == 7)
-            $isApproved = !empty($booking->manager_approved_by);
+        // Approval logic per role
+        switch ($userRole) {
+            case 6: // Concierge
+                $showViewButton = true;
+                if (!$booking->concierge_user_id && !$rejectedByPrevious)
+                    $showApproveButton = true;
+                elseif ($booking->concierge_approval == 1)
+                    $isApproved = true;
+                break;
 
-        $financeApproved = !empty($booking->finance_approved_by);
+            case 2: // Admin
+                $showViewButton = true;
+                if ($booking->authorization_file) {
+                    if (!$booking->concierge_user_id)
+                        $waitingReason = 'Waiting for Concierge';
+                    elseif (!$booking->admin_user_id && !$rejectedByPrevious)
+                        $showApproveButton = true;
+                    else
+                        $isApproved = true;
+                }
+                break;
 
-        /**
-         * Logic
-         */
+            case 5: // Finance
+                $showViewButton = true;
+                if ($booking->admin_approval == 2)
+                    $waitingReason = 'Waiting for Admin';
+                elseif ($booking->authorization_file && !$booking->finance_user_id && !$rejectedByPrevious)
+                    $showApproveButton = true;
+                elseif (!$booking->authorization_file && !$booking->finance_user_id && !$rejectedByPrevious)
+                    $showApproveButton = true;
+                else
+                    $isApproved = true;
+                break;
 
-        // Admin view button
-        if ($userRole == 2 && $booking->authorization_file) {
-            $showViewButton = true;
-        }
+            case 3: // Engineering
+                $showViewButton = true;
+                if (($booking->finance_approval ?? 0) != 1)
+                    $waitingReason = 'Waiting for Finance';
+                elseif (!$booking->engineering_user_id && !$rejectedByPrevious)
+                    $showApproveButton = true;
+                else
+                    $isApproved = true;
+                break;
 
-        // Engineering
-        if ($userRole == 3 && $booking->has_suppliers) {
-            $showViewButton = true;
-            if (!$financeApproved) {
-                $waitingReason = 'Waiting for Finance';
-            } elseif (!$booking->engineering_approved_by) {
-                $showButton = true;
-            }
-        }
-
-        // Finance
-        if ($userRole == 5 && !$booking->finance_approved_by) {
-            if (($booking->authorization_file && $booking->admin_approved_by) || !$booking->authorization_file) {
-                $showButton = true;
-            }
-        }
-
-        // Manager
-        if ($userRole == 7 && !$booking->manager_approved_by && $financeApproved) {
-            if (($booking->has_suppliers && $booking->engineering_approved_by) || !$booking->has_suppliers) {
-                $showButton = true;
-            } else {
-                $waitingReason = 'Waiting for Engineering';
-            }
+            case 7: // Manager
+                $showViewButton = true;
+                if (!$booking->concierge_user_id)
+                    $waitingReason = 'Waiting for Concierge';
+                elseif ($booking->authorization_file && !$booking->admin_user_id)
+                    $waitingReason = 'Waiting for Admin';
+                elseif (!$booking->finance_user_id)
+                    $waitingReason = 'Waiting for Finance';
+                elseif ($booking->has_suppliers && !$booking->engineering_user_id)
+                    $waitingReason = 'Waiting for Engineering';
+                elseif (!$booking->manager_user_id && !$rejectedByPrevious)
+                    $showApproveButton = true;
+                else
+                    $isApproved = true;
+                break;
         }
 
         return response()->json([
             'success' => true,
             'booking' => $booking,
             'authorization_file_url' => $authorizationFileUrl,
-            'show_approve_button' => $showButton,
+            'show_approve_button' => $showApproveButton,
             'show_view_button' => $showViewButton,
             'is_approved' => $isApproved,
             'waiting_reason' => $waitingReason,
+            'rejectedByPrevious' => $rejectedByPrevious,
+            'rejectedByRole' => $rejectedByRole,
+            'current_user_status' => $userApprovalStatus,
+            'current_user_rejected' => $currentUserRejected,
         ]);
     }
+
+
+
 
 
     public function showFunctionRoomBookingRecords(Request $request)
@@ -422,22 +897,38 @@ class FunctionRoomBookingController extends Controller
                 'booking_status' => $booking->booking_status,
                 'has_suppliers' => $booking->has_suppliers,
                 'authorization_file' => $booking->authorization_file,
+
+                // Approvals + remarks + approver + action_at
+                'concierge_approval' => $booking->concierge_approval,
+                'concierge_remarks' => $booking->concierge_remarks,
+                'concierge_approver' => $booking->conciergeApprover->name ?? null,
+                'concierge_action_at' => $booking->concierge_action_at,
+
                 'admin_approval' => $booking->admin_approval,
-                'admin_approved_at' => $booking->admin_approved_at,
+                'admin_remarks' => $booking->admin_remarks,
                 'admin_approver' => $booking->adminApprover->name ?? null,
+                'admin_action_at' => $booking->admin_action_at,
+
                 'finance_approval' => $booking->finance_approval,
-                'finance_approved_at' => $booking->finance_approved_at,
+                'finance_remarks' => $booking->finance_remarks,
                 'finance_approver' => $booking->financeApprover->name ?? null,
+                'finance_action_at' => $booking->finance_action_at,
+
                 'engineering_approval' => $booking->engineering_approval,
-                'engineering_approved_at' => $booking->engineering_approved_at,
+                'engineering_remarks' => $booking->engineering_remarks,
                 'engineering_approver' => $booking->engineeringApprover->name ?? null,
+                'engineering_action_at' => $booking->engineering_action_at,
+
                 'manager_approval' => $booking->manager_approval,
-                'manager_approved_at' => $booking->manager_approved_at,
+                'manager_remarks' => $booking->manager_remarks,
                 'manager_approver' => $booking->managerApprover->name ?? null,
+                'manager_action_at' => $booking->manager_action_at,
+
                 'created_at' => $booking->created_at->format('Y-m-d H:i:s'),
                 'updated_at' => $booking->updated_at->format('Y-m-d H:i:s'),
             ];
         });
+
 
         return response()->json([
             'data' => $data,

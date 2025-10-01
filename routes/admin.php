@@ -135,8 +135,11 @@ Route::middleware('auth:admin')->group(function () {
 
     //Function Room Bookings
     Route::get('/admin-function-room-bookings', [FunctionRoomBookingController::class, 'showFunctionRoomBookings'])->name('admin.show.function.room.bookings');
-    Route::get('/admin-function-room-bookings-approval', [FunctionRoomBookingController::class, 'FunctionRoomBookingApproval'])->name('admin.function.room.booking.approvals');
-    Route::get('/admin-function-room-bookings/{id}/details', [FunctionRoomBookingController::class, 'getFunctionRoomBookingDetails'])
+    Route::post('/admin-function-room-bookings-approval', [FunctionRoomBookingController::class, 'FunctionRoomBookingApproval'])->name('admin.function.room.booking.approvals');
+    Route::post('/admin-function-room-bookings-rejection', [FunctionRoomBookingController::class, 'FunctionRoomBookingReject']);
+
+
+    Route::get('/admin-function-room-bookings/{id}/details', action: [FunctionRoomBookingController::class, 'getFunctionRoomBookingDetails'])
         ->name('admin.get.function.room.bookings.details');
     Route::get('/admin-get-updated-function-room-bookings-table', [FunctionRoomBookingController::class, 'getUpdatedFunctionRoomBookingTable'])
         ->name('get.updated.function.room.bookings.table');

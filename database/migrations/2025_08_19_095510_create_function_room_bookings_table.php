@@ -32,49 +32,57 @@ return new class extends Migration {
             $table->decimal('total_amount', 12, 2)->default(0);
 
             // --- Pricing snapshot ---
-            $table->decimal('base_rate', 10, 2);   // Original rate at booking time
-            $table->decimal('discount', 5, 2)->default(0); // Discount % at booking time
-            $table->decimal('final_rate', 10, 2);  // Final discounted rate
+            $table->decimal('base_rate', 10, 2);
+            $table->decimal('discount', 5, 2)->default(0);
+            $table->decimal('final_rate', 10, 2);
 
+
+            // --- Concierge Approval ---
+            $table->tinyInteger('concierge_approval')->default(0);
+            $table->unsignedBigInteger('concierge_user_id')->nullable();
+            $table->timestamp('concierge_action_at')->nullable();
+            $table->text('concierge_remarks')->nullable();
 
             // --- Admin Approval ---
-            $table->boolean('admin_approval')->default(false);
-            $table->unsignedBigInteger('admin_approved_by')->nullable();
-            $table->timestamp('admin_approved_at')->nullable();
+            $table->tinyInteger('admin_approval')->default(0);
+            $table->unsignedBigInteger('admin_user_id')->nullable();
+            $table->timestamp('admin_action_at')->nullable();
+            $table->text('admin_remarks')->nullable();
 
             // --- Finance Approval ---
-            $table->boolean('finance_approval')->default(false);
-            $table->unsignedBigInteger('finance_approved_by')->nullable();
-            $table->timestamp('finance_approved_at')->nullable();
+            $table->tinyInteger('finance_approval')->default(0);
+            $table->unsignedBigInteger('finance_user_id')->nullable();
+            $table->timestamp('finance_action_at')->nullable();
+            $table->text('finance_remarks')->nullable();
 
             // --- Engineering Approval ---
-            $table->boolean('engineering_approval')->default(false);
-            $table->unsignedBigInteger('engineering_approved_by')->nullable();
-            $table->timestamp('engineering_approved_at')->nullable();
+            $table->tinyInteger('engineering_approval')->default(0);
+            $table->unsignedBigInteger('engineering_user_id')->nullable();
+            $table->timestamp('engineering_action_at')->nullable();
+            $table->text('engineering_remarks')->nullable();
 
             // --- Manager Approval ---
-            $table->boolean('manager_approval')->default(false);
-            $table->unsignedBigInteger('manager_approved_by')->nullable();
-            $table->timestamp('manager_approved_at')->nullable();
+            $table->tinyInteger('manager_approval')->default(0);
+            $table->unsignedBigInteger('manager_user_id')->nullable();
+            $table->timestamp('manager_action_at')->nullable();
+            $table->text('manager_remarks')->nullable();
 
-
-
+            // --- Booking Status ---
+            // 0 = pending, 1 = approved, 2 = rejected
+            $table->tinyInteger('booking_status')->default(0);
 
             $table->timestamps();
 
             // Foreign Keys
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('admin_approved_by')->references('id')->on('users')->nullOnDelete();
-            $table->foreign('finance_approved_by')->references('id')->on('users')->nullOnDelete();
-            $table->foreign('engineering_approved_by')->references('id')->on('users')->nullOnDelete();
-            $table->foreign('manager_approved_by')->references('id')->on('users')->nullOnDelete();
-
-            $table->boolean('booking_status')->default(false);
+            $table->foreign('concierge_user_id')->references('id')->on('users')->nullOnDelete();
+            $table->foreign('admin_user_id')->references('id')->on('users')->nullOnDelete();
+            $table->foreign('finance_user_id')->references('id')->on('users')->nullOnDelete();
+            $table->foreign('engineering_user_id')->references('id')->on('users')->nullOnDelete();
+            $table->foreign('manager_user_id')->references('id')->on('users')->nullOnDelete();
 
             $table->unique(['function_room_id', 'function_room_booking_date'], 'unique_room_booking');
-
         });
-
     }
 
     /**
@@ -84,6 +92,4 @@ return new class extends Migration {
     {
         Schema::dropIfExists('function_room_bookings');
     }
-
-
 };

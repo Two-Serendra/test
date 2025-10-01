@@ -72,7 +72,6 @@
                                 <div class="invalid-feedback">Required</div>
                             </div>
 
-
                         </div>
                         <!-- Right Column -->
                         <div class="col-md-6">

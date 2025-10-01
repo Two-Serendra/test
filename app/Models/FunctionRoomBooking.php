@@ -37,18 +37,35 @@ class FunctionRoomBooking extends Model
         'total_amount',
 
         // Approval tracking
+        'concierge_approval',
+        'concierge_user_id',
+        'concierge_action_at',
+        'concierge_remarks',
+
+
         'admin_approval',
-        'admin_approved_by',
-        'admin_approved_at',
+        'admin_user_id',
+        'admin_action_at',
+        'admin_remarks',
+
         'finance_approval',
-        'finance_approved_by',
-        'finance_approved_at',
+        'finance_user_id',
+        'finance_action_at',
+        'finance_remarks',
+
+
+
         'engineering_approval',
-        'engineering_approved_by',
-        'engineering_approved_at',
+        'engineering_user_id',
+        'engineering_action_at',
+        'engineering_remarks',
+
         'manager_approval',
-        'manager_approved_by',
-        'manager_approved_at',
+        'manager_user_id',
+        'manager_action_at',
+        'manager_remarks',
+
+
         'booking_status',
     ];
 
@@ -83,23 +100,29 @@ class FunctionRoomBooking extends Model
         return $this->hasMany(FunctionRoomGuestList::class, 'booking_id');
     }
     // Generate Transaction No when creating
+
+    public function conciergeApprover()
+    {
+        return $this->belongsTo(User::class, 'concierge_user_id');
+    }
+
     public function adminApprover()
     {
-        return $this->belongsTo(User::class, 'admin_approved_by');
+        return $this->belongsTo(User::class, 'admin_user_id');
     }
 
     public function engineeringApprover()
     {
-        return $this->belongsTo(User::class, 'engineering_approved_by');
+        return $this->belongsTo(User::class, 'engineering_user_id');
     }
 
     public function managerApprover()
     {
-        return $this->belongsTo(User::class, 'manager_approved_by');
+        return $this->belongsTo(User::class, 'manager_user_id');
     }
     public function financeApprover()
     {
-        return $this->belongsTo(User::class, 'finance_approved_by');
+        return $this->belongsTo(User::class, 'finance_user_id');
     }
 
     public function addOns()
@@ -120,6 +143,10 @@ class FunctionRoomBooking extends Model
     public function isReadyForConfirmation()
     {
         // If authorization is uploaded, admin approval is required
+        if ($this->concierge_approval) {
+            return false;
+        }
+
         if ($this->authorization_file && !$this->admin_approval) {
             return false;
         }

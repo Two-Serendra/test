@@ -100,41 +100,60 @@
                             <th>Payment</th>
                             <th>Status</th>
 
-                            @if(in_array(auth()->user()->role_id, [1, 3, 7]))
+                            @if(in_array(auth()->user()->role_id, [1, 3, 7, 6]))
                                 <th>Supplier</th>
                             @endif
+                            {{-- Concierge Approval --}}
+                            @if(in_array(auth()->user()->role_id, [1, 6]))
+                                <th>Concierge Status</th>
+                                <th>Concierge Remarks</th>
+                                <th>Concierge By</th>
+                                <th>Concierge At</th>
+                            @else
+                                <th>Concierge</th>
+                                <th>Concierge Remarks</th>
+                            @endif
+
                             {{-- Admin Approval --}}
-                            @if(auth()->user()->role_id == 1)
+                            @if(in_array(auth()->user()->role_id, [1, 6]))
                                 <th>Admin Status</th>
+                                <th>Admin Remarks</th>
                                 <th>Admin By</th>
                                 <th>Admin At</th>
                             @else
                                 <th>Admin</th>
+                                <th>Admin Remarks</th>
                             @endif
                             {{-- Finance Approval --}}
-                            @if(auth()->user()->role_id == 1)
+                            @if(in_array(auth()->user()->role_id, [1, 6]))
                                 <th>Finance Status</th>
+                                <th>Finance Remarks</th>
                                 <th>Finance By</th>
                                 <th>Finance At</th>
                             @else
                                 <th>Finance</th>
+                                <th>Finance Remarks</th>
                             @endif
                             {{-- Engineer Approval --}}
-                            @if(auth()->user()->role_id == 1)
+                            @if(in_array(auth()->user()->role_id, [1, 6]))
                                 <th>Engineering Status</th>
+                                <th>Engineering Remarks</th>
                                 <th>Engineering By</th>
                                 <th>Engineering At</th>
                             @else
                                 <th>Engineering</th>
+                                <th>Engineering Remarks</th>
                             @endif
 
 
-                            @if(auth()->user()->role_id == 1)
+                            @if(in_array(auth()->user()->role_id, [1, 6]))
                                 <th>Manager Status</th>
+                                <th>Manager Remarks</th>
                                 <th>Manager By</th>
                                 <th>Manager At</th>
                             @else
                                 <th>Manager</th>
+                                <th>Manager Remarks</th>
                             @endif
 
 
@@ -196,7 +215,7 @@
                                         <span class="badge bg-warning">Waiting</span>
                                     @endif
                                 </td>
-                                @if(in_array(auth()->user()->role_id, [1, 3, 7]))
+                                @if(in_array(auth()->user()->role_id, [1, 3, 7, 6]))
                                     <td>
                                         @if($booking->has_suppliers)
                                             <span class="badge bg-success">Yes</span>
@@ -206,15 +225,89 @@
                                     </td>
                                 @endif
 
+                                {{-- Concierge Approval --}}
+                                @if(in_array(auth()->user()->role_id, [1, 6]))
+                                    <td>
+                                        @if($booking->concierge_approval === 1)
+                                            <span class="badge bg-success">Approved</span>
+                                        @elseif($booking->concierge_approval === 2)
+                                            <span class="badge bg-danger">Rejected</span>
+                                        @else
+                                            <span class="badge bg-warning">Waiting</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($booking->concierge_remarks)
+                                            {{ $booking->concierge_remarks }}
+                                        @else
+                                            <span class="badge bg-secondary">N/A</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($booking->conciergeApprover && $booking->conciergeApprover->name)
+                                            {{ $booking->conciergeApprover->name }}
+                                        @else
+                                            <span class="badge bg-warning">Waiting</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($booking->concierge_action_at)
+                                            {{ $booking->concierge_action_at }}
+                                        @else
+                                            <span class="badge bg-warning">Waiting</span>
+                                        @endif
+                                    </td>
+                                @else
+                                    <td>
+                                        @if($booking->concierge_approval === 1)
+                                            <span class="badge bg-success">Approved</span>
+                                        @elseif($booking->concierge_approval === 2)
+                                            <span class="badge bg-danger">Rejected</span>
+                                        @else
+                                            <span class="badge bg-warning">Waiting</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($booking->concierge_remarks)
+                                            {{ $booking->concierge_remarks }}
+                                        @else
+                                            <span class="badge bg-secondary">N/A</span>
+                                        @endif
+                                    </td>
+                                @endif
+
+
                                 {{-- Admin Approval --}}
-                                @if(auth()->user()->role_id == 1)
-                                    @if($booking->authorization_file)
-                                        {{-- Needs admin approval --}}
+                                @if(in_array(auth()->user()->role_id, [1, 6]))
+                                    {{-- Admin columns for super roles --}}
+                                    @if(!$booking->authorization_file)
+                                        {{-- No authorization file: Admin not needed --}}
+                                        <td><span class="badge bg-secondary">N/A</span></td>
                                         <td>
-                                            @if($booking->admin_approval)
+                                            @if($booking->admin_remarks)
+                                                {{ $booking->admin_remarks }}
+                                            @else
+                                                <span class="badge bg-secondary">N/A</span>
+                                            @endif
+                                        </td>
+                                        <td><span class="badge bg-secondary">N/A</span></td>
+                                        <td><span class="badge bg-secondary">N/A</span></td>
+                                    @else
+                                        {{-- With authorization file: normal approval flow --}}
+                                        <td>
+                                            @if($booking->admin_approval === 1)
                                                 <span class="badge bg-success">Approved</span>
+                                            @elseif($booking->admin_approval === 2)
+                                                <span class="badge bg-danger">Rejected</span>
                                             @else
                                                 <span class="badge bg-warning">Waiting</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($booking->admin_remarks)
+                                                {{ $booking->admin_remarks }}
+                                            @else
+                                                <span class="badge bg-secondary">N/A</span>
                                             @endif
                                         </td>
                                         <td>
@@ -225,39 +318,62 @@
                                             @endif
                                         </td>
                                         <td>
-                                            @if($booking->admin_approved_at)
-                                                {{ $booking->admin_approved_at }}
+                                            @if($booking->admin_action_at)
+                                                {{ $booking->admin_action_at }}
                                             @else
                                                 <span class="badge bg-warning">Waiting</span>
                                             @endif
                                         </td>
-                                    @else
-                                        {{-- No authorization file --}}
-                                        <td><span class="badge bg-secondary">N/A</span></td>
-                                        <td><span class="badge bg-secondary">N/A</span></td>
-                                        <td><span class="badge bg-secondary">N/A</span></td>
                                     @endif
                                 @else
-                                    {{-- Other roles --}}
+                                    {{-- For other roles --}}
+                                    @if(!$booking->authorization_file)
+                                        <td><span class="badge bg-secondary">N/A</span></td>
+                                        <td>
+                                            @if($booking->admin_remarks)
+                                                {{ $booking->admin_remarks }}
+                                            @else
+                                                <span class="badge bg-secondary">N/A</span>
+                                            @endif
+                                        </td>
+                                    @else
+                                        <td>
+                                            @if($booking->admin_approval === 1)
+                                                <span class="badge bg-success">Approved</span>
+                                            @elseif($booking->admin_approval === 2)
+                                                <span class="badge bg-danger">Rejected</span>
+                                            @else
+                                                <span class="badge bg-warning">Waiting</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($booking->admin_remarks)
+                                                {{ $booking->admin_remarks }}
+                                            @else
+                                                <span class="badge bg-secondary">N/A</span>
+                                            @endif
+                                        </td>
+                                    @endif
+                                @endif
+
+
+
+                                {{-- Finance Approval --}}
+                                @if(in_array(auth()->user()->role_id, [1, 6]))
                                     <td>
-                                        @if(!$booking->authorization_file)
-                                            <span class="badge bg-secondary">N/A</span>
-                                        @elseif($booking->admin_approval)
+                                        @if($booking->finance_approval === 1)
                                             <span class="badge bg-success">Approved</span>
+                                        @elseif($booking->finance_approval === 2)
+                                            <span class="badge bg-danger">Rejected</span>
                                         @else
                                             <span class="badge bg-warning">Waiting</span>
                                         @endif
                                     </td>
-                                @endif
-
-
-                                {{-- Finance Approval --}}
-                                @if(auth()->user()->role_id == 1)
                                     <td>
-                                        @if($booking->finance_approval)
-                                            <span class="badge bg-success">Approved</span>
+                                        @if($booking->finance_remarks)
+                                            {{ $booking->finance_remarks }}
                                         @else
-                                            <span class="badge bg-warning">Waiting</span>
+                                            <span class="badge bg-secondary">N/A</span>
                                         @endif
                                     </td>
                                     <td>
@@ -268,32 +384,63 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if($booking->finance_approved_at)
-                                            {{ $booking->finance_approved_at }}
+                                        @if($booking->finance_action_at)
+                                            {{ $booking->finance_action_at }}
                                         @else
                                             <span class="badge bg-warning">Waiting</span>
                                         @endif
                                     </td>
                                 @else
                                     <td>
-                                        @if($booking->finance_approval)
+                                        @if($booking->finance_approval === 1)
                                             <span class="badge bg-success">Approved</span>
+                                        @elseif($booking->finance_approval === 2)
+                                            <span class="badge bg-danger">Rejected</span>
                                         @else
                                             <span class="badge bg-warning">Waiting</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($booking->finance_remarks)
+                                            {{ $booking->finance_remarks }}
+                                        @else
+                                            <span class="badge bg-secondary">N/A</span>
                                         @endif
                                     </td>
                                 @endif
 
 
                                 {{-- Engineering Approval --}}
-                                @if(auth()->user()->role_id == 1)
-                                    @if($booking->has_suppliers)
-                                        {{-- Has suppliers --}}
+                                @if(in_array(auth()->user()->role_id, [1, 6]))
+                                    {{-- Engineering columns for super roles --}}
+                                    @if(!$booking->has_suppliers)
+                                        {{-- No suppliers: Engineering not needed --}}
+                                        <td><span class="badge bg-secondary">N/A</span></td>
                                         <td>
-                                            @if($booking->engineering_approval)
+                                            @if($booking->engineering_remarks)
+                                                {{ $booking->engineering_remarks }}
+                                            @else
+                                                <span class="badge bg-secondary">N/A</span>
+                                            @endif
+                                        </td>
+                                        <td><span class="badge bg-secondary">N/A</span></td>
+                                        <td><span class="badge bg-secondary">N/A</span></td>
+                                    @else
+                                        {{-- With suppliers: normal approval flow --}}
+                                        <td>
+                                            @if($booking->engineering_approval === 1)
                                                 <span class="badge bg-success">Approved</span>
+                                            @elseif($booking->engineering_approval === 2)
+                                                <span class="badge bg-danger">Rejected</span>
                                             @else
                                                 <span class="badge bg-warning">Waiting</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($booking->engineering_remarks)
+                                                {{ $booking->engineering_remarks }}
+                                            @else
+                                                <span class="badge bg-secondary">N/A</span>
                                             @endif
                                         </td>
                                         <td>
@@ -304,41 +451,60 @@
                                             @endif
                                         </td>
                                         <td>
-                                            @if($booking->engineering_approved_at)
-                                                {{ $booking->engineering_approved_at }}
+                                            @if($booking->engineering_action_at)
+                                                {{ $booking->engineering_action_at }}
                                             @else
                                                 <span class="badge bg-warning">Waiting</span>
                                             @endif
                                         </td>
-                                    @else
-                                        {{-- No suppliers --}}
-                                        <td><span class="badge bg-secondary">N/A</span></td>
-                                        <td><span class="badge bg-secondary">N/A</span></td>
-                                        <td><span class="badge bg-secondary">N/A</span></td>
                                     @endif
                                 @else
-                                    <td>
-                                        @if($booking->has_suppliers)
-                                            @if($booking->engineering_approval)
+                                    {{-- For other roles --}}
+                                    @if(!$booking->has_suppliers)
+                                        <td><span class="badge bg-secondary">N/A</span></td>
+                                        <td>
+                                            @if($booking->engineering_remarks)
+                                                {{ $booking->engineering_remarks }}
+                                            @else
+                                                <span class="badge bg-secondary">N/A</span>
+                                            @endif
+                                        </td>
+                                    @else
+                                        <td>
+                                            @if($booking->engineering_approval === 1)
                                                 <span class="badge bg-success">Approved</span>
+                                            @elseif($booking->engineering_approval === 2)
+                                                <span class="badge bg-danger">Rejected</span>
                                             @else
                                                 <span class="badge bg-warning">Waiting</span>
                                             @endif
-                                        @else
-                                            <span class="badge bg-secondary">N/A</span>
-                                        @endif
-                                    </td>
+                                        </td>
+                                        <td>
+                                            @if($booking->engineering_remarks)
+                                                {{ $booking->engineering_remarks }}
+                                            @else
+                                                <span class="badge bg-secondary">N/A</span>
+                                            @endif
+                                        </td>
+                                    @endif
                                 @endif
 
-
-
                                 {{-- Manager Approval --}}
-                                @if(auth()->user()->role_id == 1)
+                                @if(in_array(auth()->user()->role_id, [1, 6]))
                                     <td>
-                                        @if($booking->manager_approval)
+                                        @if($booking->manager_approval === 1)
                                             <span class="badge bg-success">Approved</span>
+                                        @elseif($booking->manager_approval === 2)
+                                            <span class="badge bg-danger">Rejected</span>
                                         @else
                                             <span class="badge bg-warning">Waiting</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($booking->manager_remarks)
+                                            {{ $booking->manager_remarks }}
+                                        @else
+                                            <span class="badge bg-secondary">N/A</span>
                                         @endif
                                     </td>
                                     <td>
@@ -349,18 +515,27 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if($booking->manager_approved_at)
-                                            {{ $booking->manager_approved_at }}
+                                        @if($booking->manager_action_at)
+                                            {{ $booking->manager_action_at }}
                                         @else
                                             <span class="badge bg-warning">Waiting</span>
                                         @endif
                                     </td>
                                 @else
                                     <td>
-                                        @if($booking->manager_approval)
+                                        @if($booking->manager_approval === 1)
                                             <span class="badge bg-success">Approved</span>
+                                        @elseif($booking->manager_approval === 2)
+                                            <span class="badge bg-danger">Rejected</span>
                                         @else
                                             <span class="badge bg-warning">Waiting</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($booking->manager_remarks)
+                                            {{ $booking->manager_remarks }}
+                                        @else
+                                            <span class="badge bg-secondary">N/A</span>
                                         @endif
                                     </td>
                                 @endif
@@ -373,7 +548,7 @@
                                         View
                                     </button>
 
-                                    @if(auth()->user()->role_id == 8)
+                                    @if(auth()->user()->role_id == 6)
                                         <button class="btn btn-sm btn-warning edit-booking-btn" data-id="{{ $booking->id }}"
                                             style="width: 60px;">
                                             Edit

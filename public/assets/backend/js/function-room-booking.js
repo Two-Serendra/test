@@ -11,11 +11,22 @@ $(document).ready(function () {
     let currentFunctionRoomBookingPageUrl = '/admin/admin-get-updated-function-room-bookings-table';
     let currentFunctionRoomBookingSearchTerm = '';
 
+    // Status helper
     function renderStatusBadge(status) {
         if (status == 1) return '<span class="badge bg-success">Confirmed</span>';
         if (status == 2) return '<span class="badge bg-danger">Cancelled</span>';
         return '<span class="badge bg-warning">Waiting</span>';
     }
+
+    function renderApprovalBadge(status) {
+        // Convert string to number if needed
+        status = Number(status);
+
+        if (status === 1) return '<span class="badge bg-success">Approved</span>';
+        if (status === 2) return '<span class="badge bg-danger">Rejected</span>';
+        return '<span class="badge bg-warning">Waiting</span>'; // 0 or any other
+    }
+
 
     function refreshFunctionRoomBookingsTable(url = currentFunctionRoomBookingPageUrl) {
         $.ajax({
@@ -28,12 +39,10 @@ $(document).ready(function () {
                 'X-Requested-With': 'XMLHttpRequest'
             },
             success: function (response) {
-                console.log($('#searchInputFunctionRooms').val());
                 const bookings = response.data;
                 const tableBody = $('#functionRoomBookingsTable tbody');
                 const paginationContainerFunctionRoomBooking = $('.pagination-container-function-room-booking');
 
-                $('[data-bs-toggle="tooltip"]').tooltip('dispose');
                 tableBody.empty();
 
                 if (!bookings.length) {
@@ -42,18 +51,20 @@ $(document).ready(function () {
                         <td colspan="25" class="text-center">No Bookings Found</td>
                     </tr>
                 `);
-                } else {
-                    bookings.forEach(function (b) {
-                        let row = `
+                    return;
+                }
+
+                bookings.forEach(function (b) {
+                    let row = `
                     <tr>
                         <td>${b.transaction_no}</td>
                         <td>${b.unit_no}</td>
                         <td>${b.user?.name || 'N/A'}</td>
                         <td>${b.resident_type === 'TENANT'
-                                ? '<span class="badge bg-danger">TENANT</span>'
-                                : b.resident_type === 'OWNER'
-                                    ? '<span class="badge bg-primary">OWNER</span>'
-                                    : `<span class="badge bg-secondary">${b.resident_type}</span>`}
+                            ? '<span class="badge bg-danger">TENANT</span>'
+                            : b.resident_type === 'OWNER'
+                                ? '<span class="badge bg-primary">OWNER</span>'
+                                : `<span class="badge bg-secondary">${b.resident_type}</span>`}
                         </td>
                         <td>${b.function_room?.function_room_name || 'N/A'}</td>
                         <td>${b.purpose_of_event || 'N/A'}</td>
@@ -62,113 +73,93 @@ $(document).ready(function () {
                         <td>${b.event_end_time || 'N/A'}</td>
                         <td>${b.contact_number || 'N/A'}</td>
                         <td>${b.pax || 'N/A'}</td>
+                        <td>${b.base_rate ? '₱' + parseFloat(b.base_rate).toFixed(2) : 'N/A'}</td>
+                        <td>${b.discount > 0
+                            ? `<span class="badge bg-success">${parseFloat(b.discount).toFixed(2)}%</span>`
+                            : '<span class="badge bg-secondary">0%</span>'}</td>
+                        <td>${b.final_rate || 'N/A'}</td>
                         <td>${b.payment_mode || 'N/A'}</td>
                         <td>${renderStatusBadge(b.booking_status)}</td>
-                    `;
+                `;
 
-                        // Supplier column for roles 1,3,7
-                        if ([1, 3, 7].includes(USER_ROLE)) {
-                            row += `<td>${b.has_suppliers
-                                ? '<span class="badge bg-success">Yes</span>'
-                                : '<span class="badge bg-secondary">No</span>'}</td>`;
-                        }
+                    // Supplier Column
+                    if ([1, 3, 7, 6].includes(USER_ROLE)) {
+                        row += `<td>${b.has_suppliers
+                            ? '<span class="badge bg-success">Yes</span>'
+                            : '<span class="badge bg-secondary">No</span>'}</td>`;
+                    }
 
-                        // Admin approval
-                        if (USER_ROLE === 1) {
-                            if (b.authorization_file) {
-                                row += `
-                                <td>${b.admin_approval ? '<span class="badge bg-success">Approved</span>' : '<span class="badge bg-warning">Waiting</span>'}</td>
-                                <td>${b.admin_approver || '<span class="badge bg-warning">Waiting</span>'}</td>
-                                <td>${b.admin_approved_at || '<span class="badge bg-warning">Waiting</span>'}</td>
-                            `;
+                    // Approval helper
+                    function approvalColumns(type, requiresAuth = false, requiresSupplier = false) {
+                        let cols = '';
+                        let approval = b[`${type}_approval`];
+                        let remarks = b[`${type}_remarks`] || null;
+                        let approver = b[`${type}_approver`] || '<span class="badge bg-warning">Waiting</span>';
+                        let actionAt = b[`${type}_action_at`] || '<span class="badge bg-warning">Waiting</span>';
+
+                        // 🔹 If this approver is NOT required → show N/A (same as Blade)
+                        if ((requiresAuth && !b.authorization_file) || (requiresSupplier && !b.has_suppliers)) {
+                            if ([1, 6].includes(USER_ROLE)) {
+                                cols += `<td><span class="badge bg-secondary">N/A</span></td>`;
+                                cols += `<td>${remarks ? `<span class="badge bg-info">${remarks}</span>` : '<span class="badge bg-secondary">N/A</span>'}</td>`;
+                                cols += `<td><span class="badge bg-secondary">N/A</span></td>`;
+                                cols += `<td><span class="badge bg-secondary">N/A</span></td>`;
                             } else {
-                                row += `<td><span class="badge bg-secondary">N/A</span></td>
-                                    <td><span class="badge bg-secondary">N/A</span></td>
-                                    <td><span class="badge bg-secondary">N/A</span></td>`;
+                                cols += `<td><span class="badge bg-secondary">N/A</span></td>`;
+                                cols += `<td>${remarks ? remarks : '<span class="badge bg-secondary">N/A</span>'}</td>`;
                             }
                         } else {
-                            row += `<td>${!b.authorization_file
-                                ? '<span class="badge bg-secondary">N/A</span>'
-                                : b.admin_approval
-                                    ? '<span class="badge bg-success">Approved</span>'
-                                    : '<span class="badge bg-warning">Waiting</span>'}</td>`;
-                        }
-
-                        // Finance approval
-                        if (USER_ROLE === 1) {
-                            row += `<td>${b.finance_approval ? '<span class="badge bg-success">Approved</span>' : '<span class="badge bg-warning">Waiting</span>'}</td>
-                                <td>${b.finance_approver || '<span class="badge bg-warning">Waiting</span>'}</td>
-                                <td>${b.finance_approved_at || '<span class="badge bg-warning">Waiting</span>'}</td>`;
-                        } else {
-                            row += `<td>${b.finance_approval ? '<span class="badge bg-success">Approved</span>' : '<span class="badge bg-warning">Waiting</span>'}</td>`;
-                        }
-
-                        // Engineering approval
-                        if (USER_ROLE === 1) {
-                            if (b.has_suppliers) {
-                                row += `<td>${b.engineering_approval ? '<span class="badge bg-success">Approved</span>' : '<span class="badge bg-warning">Waiting</span>'}</td>
-                                    <td>${b.engineering_approver || '<span class="badge bg-warning">Waiting</span>'}</td>
-                                    <td>${b.engineering_approved_at || '<span class="badge bg-warning">Waiting</span>'}</td>`;
+                            // 🔹 Normal approval flow
+                            if ([1, 6].includes(USER_ROLE)) {
+                                cols += `<td>${renderApprovalBadge(approval)}</td>`;
+                                cols += `<td>${remarks ? `<span class="badge bg-info">${remarks}</span>` : '<span class="badge bg-secondary">N/A</span>'}</td>`;
+                                cols += `<td>${approver}</td>`;
+                                cols += `<td>${actionAt}</td>`;
                             } else {
-                                row += `<td><span class="badge bg-secondary">N/A</span></td>
-                                    <td><span class="badge bg-secondary">N/A</span></td>
-                                    <td><span class="badge bg-secondary">N/A</span></td>`;
+                                cols += `<td>${renderApprovalBadge(approval)}</td>`;
+                                cols += `<td>${remarks ? remarks : '<span class="badge bg-secondary">N/A</span>'}</td>`;
                             }
-                        } else {
-                            row += `<td>${b.has_suppliers
-                                ? (b.engineering_approval ? '<span class="badge bg-success">Approved</span>' : '<span class="badge bg-warning">Waiting</span>')
-                                : '<span class="badge bg-secondary">N/A</span>'}</td>`;
                         }
 
-                        // Manager approval
-                        if (USER_ROLE === 1) {
-                            row += `<td>${b.manager_approval ? '<span class="badge bg-success">Approved</span>' : '<span class="badge bg-warning">Waiting</span>'}</td>
-                                <td>${b.manager_approver || '<span class="badge bg-warning">Waiting</span>'}</td>
-                                <td>${b.manager_approved_at || '<span class="badge bg-warning">Waiting</span>'}</td>`;
-                        } else {
-                            row += `<td>${b.manager_approval ? '<span class="badge bg-success">Approved</span>' : '<span class="badge bg-warning">Waiting</span>'}</td>`;
-                        }
+                        return cols;
+                    }
 
-                        // Created/Updated and View button
-                        row += `<td>${b.created_at}</td>
-                            <td>${b.updated_at}</td>
-                            <td><button class="btn btn-sm btn-info view-booking-btn" data-id="${b.id}">View</button></td>
-                        </tr>`;
 
-                        tableBody.append(row);
-                    });
-                }
+                    // Concierge (no auth required)
+                    row += approvalColumns('concierge');
+                    // Admin (requires authorization file)
+                    row += approvalColumns('admin', true);
+                    // Finance (requires authorization file)
+                    row += approvalColumns('finance', true);
+                    // Engineering (requires supplier)
+                    row += approvalColumns('engineering', false, true);
+                    // Manager (no additional requirements)
+                    row += approvalColumns('manager');
+
+                    // Created/Updated + Actions
+                    row += `
+                        <td>${b.created_at}</td>
+                        <td>${b.updated_at}</td>
+                        <td class="sticky-action-col">
+                            <button class="btn btn-sm btn-info view-booking-btn mb-2" data-id="${b.id}">View</button>
+                            ${USER_ROLE == 6 ? `<button class="btn btn-sm btn-warning edit-booking-btn" data-id="${b.id}">Edit</button>` : ''}
+                        </td>
+                    </tr>
+                `;
+
+                    tableBody.append(row);
+                });
 
                 paginationContainerFunctionRoomBooking.html(response.links);
-
-                $('.pagination-container-function-room-booking').find('a').off('click').on('click', function (e) {
-                    e.preventDefault();
-                    const pageUrl = $(this).attr('href');
-                    currentFunctionRoomBookingPageUrl = pageUrl;
-                    refreshFunctionRoomTable(pageUrl);
-                });
-
-                $('[data-bs-toggle="tooltip"]').tooltip();
             },
-            error: function (xhr, status, error) {
-                console.error('Error:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error loading bookings',
-                    text: xhr.status + ': ' + xhr.statusText
-                });
+            error: function (xhr) {
+                console.error('Error:', xhr.responseText);
             }
         });
     }
 
 
 
-
-    // function renderStatusBadge(status) {
-    //     if (status === 1) return '<span class="badge bg-success">Confirmed</span>';
-    //     if (status === 2) return '<span class="badge bg-danger">Cancelled</span>';
-    //     return '<span class="badge bg-warning">Waiting</span>';
-    // }
 
     function formatTime(time) {
         if (!time) return 'N/A';
@@ -195,10 +186,13 @@ $(document).ready(function () {
 
                 $.ajax({
                     url: "/admin/admin-function-room-bookings-approval",
-                    type: 'GET',
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
                     data: {
-                        booking_id: bookingId,
-                        approval_type: approvalType
+                        booking_id: bookingId
+
                     },
                     success: function (response) {
                         Swal.fire({
@@ -209,7 +203,7 @@ $(document).ready(function () {
                             showConfirmButton: false
                         });
                         approveBtn.prop('disabled', true).text('Approved');
-                        refreshFunctionRoomTable();
+                        refreshFunctionRoomBookingsTable();
                     },
                     error: function (xhr) {
                         Swal.fire({
@@ -222,6 +216,72 @@ $(document).ready(function () {
             }
         });
     });
+
+
+    $('.reject-btn').on('click', function () {
+        const bookingId = $('#approveBookingBtn').data('id');
+        const department = $('#approveBookingBtn').data('type');
+
+        // Close the booking modal first
+        $('#functionRoomBookingDetailsModal').modal('hide');
+
+        Swal.fire({
+            title: 'Reject Booking',
+            input: 'textarea',
+            inputLabel: 'Remarks (required)',
+            inputPlaceholder: 'Enter reason for rejection...',
+            inputAttributes: { 'aria-label': 'Enter reason for rejection' },
+            showCancelButton: true,
+            confirmButtonText: 'Reject',
+            confirmButtonColor: '#d33',
+            didOpen: () => {
+                Swal.getInput().focus();
+            },
+            preConfirm: (remarks) => {
+                if (!remarks) {
+                    Swal.showValidationMessage('Remarks are required!');
+                    return false;
+                }
+                return remarks;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "/admin/admin-function-room-bookings-rejection",
+                    type: 'POST',
+                    data: {
+                        booking_id: bookingId,
+                        department: department,
+                        remarks: result.value,
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (response) {
+                        Swal.fire({
+                            title: 'Rejected!',
+                            text: response.message,
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                        refreshFunctionRoomBookingsTable();
+                    },
+                    error: function (xhr) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: xhr.responseJSON ? xhr.responseJSON.message : 'Something went wrong.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+
+
+
+
+
 
     // Show spinner
     function showSpinner() {
@@ -237,17 +297,21 @@ $(document).ready(function () {
         const bookingId = $(this).data('id');
         showSpinner();
 
-        // reset modal fields to "Loading..."
-        $('#detail-transaction-no, #detail-unit, #detail-name, #detail-contact, #detail-resident-type, #detail-function-room, #detail-purpose, #detail-status, #detail-booking-date, #detail-start-time, #detail-end-time, #detail-pax, #detail-payment-mode, #detail-authorization, #detail-suppliers, #detail-rate, #detail-breakdown, #detail-grand-total')
-            .html('<span class="text-muted">Loading...</span>');
+        // Reset modal fields
+        const fields = [
+            '#detail-transaction-no', '#detail-unit', '#detail-name', '#detail-contact', '#detail-resident-type',
+            '#detail-function-room', '#detail-purpose', '#detail-status', '#detail-booking-date', '#detail-start-time',
+            '#detail-end-time', '#detail-pax', '#detail-payment-mode', '#detail-authorization', '#detail-suppliers',
+            '#detail-rate', '#detail-breakdown', '#detail-grand-total'
+        ];
+        $(fields.join(',')).html('<span class="text-muted">Loading...</span>');
 
         const approveBtn = $('#approveBookingBtn');
-        approveBtn.addClass('d-none').prop('disabled', false).text('Approve');
+        const rejectBtn = $('.reject-btn');
         approveBtn.data('id', bookingId);
 
         function parseTimeToDate(timeStr) {
             if (!timeStr) return null;
-            timeStr = timeStr.trim();
             const ampmMatch = timeStr.match(/(\d{1,2}):(\d{2})(?::\d{2})?\s*([AaPp][Mm])/);
             if (ampmMatch) {
                 let h = parseInt(ampmMatch[1], 10);
@@ -276,7 +340,7 @@ $(document).ready(function () {
 
             const booking = response.booking;
 
-            // Basic fields
+            // Fill basic fields
             $('#detail-transaction-no').text(booking.transaction_no ?? 'N/A');
             $('#detail-unit').text(booking.unit_no ?? 'N/A');
             $('#detail-name').text(booking.user?.name ?? 'N/A');
@@ -287,29 +351,24 @@ $(document).ready(function () {
                     ? '<span class="badge bg-primary">Owner</span>'
                     : `<span class="badge bg-secondary">${booking.resident_type ?? 'N/A'}</span>`;
             $('#detail-resident-type').html(residentTypeBadge);
-
             $('#detail-function-room').text(booking.function_room?.function_room_name ?? 'N/A');
             $('#detail-purpose').text(booking.purpose_of_event ?? 'N/A');
 
-            // Status logic
-            let statusBadge = '';
+            // Booking status badge
             const today = new Date(); today.setHours(0, 0, 0, 0);
             const bookingDate = booking.function_room_booking_date ? new Date(booking.function_room_booking_date) : null;
-            if (booking.booking_status == 1) {
-                if (bookingDate && bookingDate < today) {
-                    statusBadge = '<span class="badge bg-secondary">Completed</span>';
-                } else {
-                    statusBadge = '<span class="badge bg-success">Confirmed</span>';
-                }
-            } else if (booking.booking_status == 0) {
-                statusBadge = '<span class="badge bg-warning">Waiting</span>';
-            } else if (booking.booking_status == 2) {
-                statusBadge = '<span class="badge bg-danger">Cancelled</span>';
-            } else {
-                statusBadge = '<span class="badge bg-dark">Unknown</span>';
+            let statusBadge = '';
+            switch (booking.booking_status) {
+                case 0: statusBadge = '<span class="badge bg-warning">Waiting</span>'; break;
+                case 1: statusBadge = bookingDate && bookingDate < today ?
+                    '<span class="badge bg-secondary">Completed</span>' :
+                    '<span class="badge bg-success">Confirmed</span>'; break;
+                case 2: statusBadge = '<span class="badge bg-danger">Cancelled</span>'; break;
+                default: statusBadge = '<span class="badge bg-dark">Unknown</span>';
             }
             $('#detail-status').html(statusBadge);
 
+            // Other details
             $('#detail-booking-date').text(booking.function_room_booking_date ?? 'N/A');
             $('#detail-start-time').text(booking.event_start_time ?? 'N/A');
             $('#detail-end-time').text(booking.event_end_time ?? 'N/A');
@@ -317,42 +376,58 @@ $(document).ready(function () {
             $('#detail-payment-mode').text(booking.payment_mode ?? 'N/A');
 
             // Authorization
-            if (response.authorization_file_url) {
-                $('#detail-authorization').html(`<a href="${response.authorization_file_url}" target="_blank" class="custom-link">View</a>`);
-            } else {
-                $('#detail-authorization').html('<span class="text-muted">N/A</span>');
-            }
+            $('#detail-authorization').html(response.authorization_file_url
+                ? `<a href="${response.authorization_file_url}" target="_blank" class="custom-link">View</a>`
+                : '<span class="text-muted">N/A</span>');
 
             // Suppliers
-            if (booking.suppliers && booking.suppliers.length > 0) {
-                let suppliersHtml = '';
+            if (booking.suppliers && booking.suppliers.length) {
+                let html = '';
                 booking.suppliers.forEach(s => {
-                    suppliersHtml += `<div>${s.name} ${s.attachment_url ? `<a href="${s.attachment_url}" target="_blank" class="custom-link">View</a>` : ''}</div>`;
+                    html += `<div>${s.name} ${s.attachment_url ? `<a href="${s.attachment_url}" target="_blank" class="custom-link">View</a>` : ''}</div>`;
                 });
-                $('#detail-suppliers').html(suppliersHtml);
-            } else {
-                $('#detail-suppliers').html('<span class="text-muted">N/A</span>');
+                $('#detail-suppliers').html(html);
+            } else $('#detail-suppliers').html('<span class="text-muted">N/A</span>');
+
+            // Reset defaults
+            approveBtn.removeClass('d-none').text('Approve').prop('disabled', true);
+            rejectBtn.removeClass('d-none').text('Reject').prop('disabled', true);
+
+            // 1️⃣ If the current user already rejected
+            if (response.current_user_status === 2) {
+                approveBtn.prop('disabled', false).text('Approve'); // allow reversal
+                rejectBtn.prop('disabled', true).text('Rejected');
+            }
+            // 2️⃣ If the current user already approved
+            else if (response.current_user_status === 1) {
+                approveBtn.prop('disabled', true).text('Approved');
+                rejectBtn.prop('disabled', true).text('Reject');
+            }
+            // 3️⃣ If someone before rejected → but NOT this user
+            else if (response.rejectedByPrevious && response.current_user_status === 0) {
+                approveBtn.prop('disabled', true).text('Waiting');
+                rejectBtn.prop('disabled', true).text('Rejected by ' + response.rejectedByRole);
+            }
+            // 4️⃣ Current user can still act
+            else if (response.show_approve_button) {
+                approveBtn.prop('disabled', false).text('Approve');
+                rejectBtn.prop('disabled', false).text('Reject');
+            }
+            // 5️⃣ Fallback waiting/view only
+            else if (response.show_view_button) {
+                approveBtn.prop('disabled', true).text(response.waiting_reason || 'Waiting');
+                rejectBtn.prop('disabled', true).text('Reject');
             }
 
-            // Approve button logic
-            if (booking.booking_status == 1) {
-                approveBtn.addClass('d-none');
-            } else if (response.show_approve_button) {
-                approveBtn.removeClass('d-none').prop('disabled', false).text('Approve');
-            } else if (response.waiting_for_approval) {
-                approveBtn.removeClass('d-none').prop('disabled', true).text('Waiting');
-            } else if (response.is_approved) {
-                approveBtn.removeClass('d-none').prop('disabled', true).text('Approved');
-            } else {
-                approveBtn.removeClass('d-none').prop('disabled', true).text('Waiting');
-            }
 
-            // === RATE + BREAKDOWN (same as user-side) ===
+
+
+
+            // === RATE + BREAKDOWN LOGIC ===
             const durationHoursBackend = parseFloat(booking.duration_hours ?? booking.duration_in_hours ?? NaN);
             const ratePerHourBackend = parseFloat(booking.final_rate ?? booking.function_room?.function_room_rate ?? NaN);
             const roomTotalBackend = parseFloat(booking.room_total ?? NaN);
 
-            // Compute duration (fallback to parsing)
             let hours = !isNaN(durationHoursBackend) ? durationHoursBackend : 1;
             if (!durationHoursBackend) {
                 const startDate = parseTimeToDate(booking.event_start_time);
@@ -371,93 +446,84 @@ $(document).ready(function () {
                 const baseRate = parseFloat(booking.function_room?.function_room_rate ?? ratePerHour);
                 if (baseRate > ratePerHour) {
                     $('#detail-rate').html(`
-            <div>
-                <small class="text-muted"><s>₱${Number(baseRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</s></small>
-                &nbsp; → &nbsp;
-                <small class="text-success">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</small>
-                &nbsp; × &nbsp;
-                <small>${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })} hr(s)</small>
-                &nbsp; = &nbsp;
-                <strong class="text-success">₱${Number(roomLineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
-            </div>
-        `);
+                    <div>
+                        <small class="text-muted"><s>₱${Number(baseRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</s></small>
+                        &nbsp; → &nbsp;
+                        <small class="fw-bold">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</small>
+                        &nbsp; × &nbsp;
+                        <small>${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })} hr(s)</small>
+                        &nbsp; = &nbsp;
+                        <strong class="fw-bold">₱${Number(roomLineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
+                    </div>
+                `);
                 } else {
                     $('#detail-rate').html(`
-            <div>
-                <small class="text-muted">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</small>
-                &nbsp; × &nbsp;
-                <small>${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })} hr(s)</small>
-                &nbsp; = &nbsp;
-                <strong>₱${Number(roomLineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
-            </div>
-        `);
+                    <div>
+                        <small class="text-muted">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</small>
+                        &nbsp; × &nbsp;
+                        <small>${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })} hr(s)</small>
+                        &nbsp; = &nbsp;
+                        <strong>₱${Number(roomLineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
+                    </div>
+                `);
                 }
-            } else {
-                $('#detail-rate').html('<span class="text-muted">N/A</span>');
-            }
+            } else $('#detail-rate').html('<span class="text-muted">N/A</span>');
 
-            // === Breakdown Table ===
+            // Breakdown table
             let breakdownHtml = '';
             let addonsTotal = 0;
 
-            // Function Room row
             if (ratePerHour && ratePerHour > 0) {
                 breakdownHtml += `
-        <tr>
-            <td>Function Room Rate (${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })} hr${hours > 1 ? 's' : ''})</td>
-            <td class="text-center">${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })}</td>
-            <td class="text-end">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</td>
-            <td class="text-end">₱${Number(roomLineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-        </tr>
-    `;
+                <tr>
+                    <td>Function Room Rate (${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })} hr${hours > 1 ? 's' : ''})</td>
+                    <td class="text-center">${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })}</td>
+                    <td class="text-end">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</td>
+                    <td class="text-end">₱${Number(roomLineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                </tr>
+            `;
             }
 
-            // Add-ons rows
-            if (booking.add_ons && booking.add_ons.length > 0) {
+            if (booking.add_ons && booking.add_ons.length) {
                 booking.add_ons.forEach(addon => {
                     const pivot = addon.pivot || {};
                     const qty = parseFloat(pivot.quantity ?? pivot.qty ?? addon.qty ?? 0) || 0;
                     const price = parseFloat(pivot.price ?? addon.price ?? 0) || 0;
                     const lineTotal = Math.round(qty * price * 100) / 100;
                     addonsTotal += lineTotal;
-
                     breakdownHtml += `
-            <tr>
-                <td>${addon.item ?? addon.name ?? 'Add-on'}</td>
-                <td class="text-center">${qty}</td>
-                <td class="text-end">₱${Number(price).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                <td class="text-end">₱${Number(lineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-            </tr>
-        `;
+                    <tr>
+                        <td>${addon.item ?? addon.name ?? 'Add-on'}</td>
+                        <td class="text-center">${qty}</td>
+                        <td class="text-end">₱${Number(price).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                        <td class="text-end">₱${Number(lineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    </tr>
+                `;
                 });
 
                 breakdownHtml += `
-        <tr class="table-light fw-bold">
-            <td colspan="3" class="text-end">Add-ons Subtotal</td>
-            <td class="text-end">₱${Number(addonsTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-        </tr>
-    `;
+                <tr class="table-light fw-bold">
+                    <td colspan="3" class="text-end">Add-ons Subtotal</td>
+                    <td class="text-end">₱${Number(addonsTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                </tr>
+            `;
             }
 
-            // No charges fallback
-            if (!breakdownHtml) {
-                breakdownHtml = `<tr><td colspan="4" class="text-center text-muted">No charges</td></tr>`;
-            }
-
+            if (!breakdownHtml) breakdownHtml = `<tr><td colspan="4" class="text-center text-muted">No charges</td></tr>`;
             $('#detail-breakdown').html(breakdownHtml);
 
-            // Grand Total
             const grandTotal = Math.round((roomLineTotal + addonsTotal) * 100) / 100;
             $('#detail-grand-total').text("₱" + Number(grandTotal).toLocaleString(undefined, { minimumFractionDigits: 2 }));
 
-
             hideSpinner();
             $('#functionRoomBookingDetailsModal').modal('show');
+
         }).fail(function () {
             hideSpinner();
             alert('Something went wrong.');
         });
     });
+
 
 
 
@@ -870,6 +936,5 @@ $(document).ready(function () {
             }
         });
     });
-
 
 });

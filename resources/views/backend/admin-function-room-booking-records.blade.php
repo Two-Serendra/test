@@ -25,7 +25,7 @@
                         </div>
                     </form>
 
-                    @if(in_array(auth()->user()->role_id, [1, 7,8]))
+                    @if(in_array(auth()->user()->role_id, [1, 7,6]))
                         <div class="">
                             <button type="button" class="btn btn-primary badge DownloadFunctionRoomBookingRecords">
                                <i class="menu-icon tf-icons bx bx-download"></i>Download
@@ -164,7 +164,7 @@
                                     <td>
                                         @if(!$functionRoomBookingRecord->authorization_file)
                                             <span class="badge bg-secondary">N/A</span>
-                                        @elseif($functionRoomBookingRecord->admin_approved_by)
+                                        @elseif($functionRoomBookingRecord->admin_user_id)
                                             <span class="">{{ $functionRoomBookingRecord->adminApprover->name ?? 'Unknown' }}</span>
                                         @else
                                             <span class="badge bg-warning">Waiting</span>
@@ -197,7 +197,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if($functionRoomBookingRecord->finance_approved_by)
+                                        @if($functionRoomBookingRecord->finance_user_id)
                                             <span class="">{{ $functionRoomBookingRecord->financeApprover->name ?? 'Unknown' }}</span>
                                         @else
                                             <span class="badge bg-warning">Waiting</span>
@@ -258,7 +258,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if($functionRoomBookingRecord->manager_approved_by)
+                                        @if($functionRoomBookingRecord->manager_user_id)
                                             <span class="">{{ $functionRoomBookingRecord->managerApprover->name ?? 'Unknown' }}</span>
                                         @else
                                             <span class="badge bg-warning">Waiting</span>

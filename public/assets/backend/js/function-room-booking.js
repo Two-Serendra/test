@@ -141,8 +141,8 @@ $(document).ready(function () {
                         <td>${b.created_at}</td>
                         <td>${b.updated_at}</td>
                         <td class="sticky-action-col">
-                            <button class="btn btn-sm btn-info view-booking-btn mb-2" data-id="${b.id}">View</button>
-                            ${USER_ROLE == 6 ? `<button class="btn btn-sm btn-warning edit-booking-btn" data-id="${b.id}">Edit</button>` : ''}
+                            <button class="btn btn-sm btn-info view-booking-btn mb-2" data-id="${b.id}" style="width: 60px;">View</button>
+                            ${USER_ROLE == 6 ? `<button class="btn btn-sm btn-warning edit-booking-btn" data-id="${b.id}" style="width: 60px;">Edit</button>` : ''}
                         </td>
                     </tr>
                 `;

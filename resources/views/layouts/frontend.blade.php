@@ -115,7 +115,7 @@
         });
     </script> -->
 
-    <script>
+    <!-- <script>
         $(document).ready(function () {
             // Redirect after login if needed
             if (localStorage.getItem("redirect_after_login")) {
@@ -222,7 +222,7 @@
                 });
             });
         });
-    </script>
+    </script> -->
 
 </body>
 

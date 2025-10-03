@@ -474,7 +474,7 @@ $(document).ready(function () {
                 }
             }
 
-    
+
             const ratePerHour = !isNaN(ratePerHourBackend) ? ratePerHourBackend : (parseFloat(booking.final_rate) || 0);
             const roomLineTotal = !isNaN(roomTotalBackend) ? roomTotalBackend : Math.round((ratePerHour * hours) * 100) / 100;
 
@@ -485,11 +485,11 @@ $(document).ready(function () {
             <div>
                 <small class="text-muted"><s>₱${Number(baseRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</s></small>
                 &nbsp; → &nbsp;
-                <small class="text-success">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</small>
+                <small class="fw-bold">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</small>
                 &nbsp; × &nbsp;
                 <small>${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })} hr(s)</small>
                 &nbsp; = &nbsp;
-                <strong class="text-success">₱${Number(roomLineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
+                <strong class="fw-bold">₱${Number(roomLineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
             </div>
         `);
                 } else {
@@ -526,7 +526,7 @@ $(document).ready(function () {
 
             if (booking.add_ons && booking.add_ons.length > 0) {
                 booking.add_ons.forEach(addon => {
-      
+
                     const pivot = addon.pivot || {};
                     const qty = parseFloat(pivot.quantity ?? pivot.qty ?? addon.qty ?? 0) || 0;
                     const price = parseFloat(pivot.price ?? addon.price ?? 0) || 0;
@@ -602,6 +602,7 @@ $(document).ready(function () {
                         _token: $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function (res) {
+                        $("#functionRoomBookingModal").modal("hide");
                         if (res.success) {
                             Swal.fire('Cancelled!', 'The booking has been cancelled.', 'success')
                                 .then(() => location.reload());

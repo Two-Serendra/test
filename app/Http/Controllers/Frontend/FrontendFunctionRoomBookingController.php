@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Notification;
 use App\Notifications\UserFunctionRoomBookingBellNotification;
 use App\Models\FunctionRoomDateBlocking;
 use App\Models\AddOnFunctionRoomBooking;
+use App\Models\FunctionRoomDiscount;
 use App\Events\FunctionRoomBookingCreated;
 use App\Events\FunctionRoomBookingCancellation;
 use App\Mail\UserFunctionRoomBookingCancelled;
@@ -34,11 +35,26 @@ class FrontendFunctionRoomBookingController extends Controller
         $category = $request->get('category', '');
 
         if ($category === 'function_room') {
-            $items = FunctionRoom::with('firstImage')
+            $items = FunctionRoom::with(['firstImage', 'discounts'])
                 ->get()
                 ->map(function ($item) {
                     $item->type = 'function_room';
                     $item->imageFolder = 'function-rooms';
+
+                    // get active discount
+                    $activeDiscount = $item->discounts
+                        ->where('start_date', '<=', now())
+                        ->where('end_date', '>=', now())
+                        ->first();
+
+                    if ($activeDiscount) {
+                        $item->discount = $activeDiscount->discount;
+                        $item->discounted_rate = $item->function_room_rate - ($item->function_room_rate * ($activeDiscount->discount / 100));
+                    } else {
+                        $item->discount = 0;
+                        $item->discounted_rate = $item->function_room_rate;
+                    }
+
                     return $item;
                 });
         } elseif ($category === 'amenity') {
@@ -50,11 +66,26 @@ class FrontendFunctionRoomBookingController extends Controller
                     return $item;
                 });
         } else {
-            $functionRooms = FunctionRoom::with('firstImage')
+            $functionRooms = FunctionRoom::with(['firstImage', 'discounts'])
                 ->get()
                 ->map(function ($item) {
                     $item->type = 'function_room';
                     $item->imageFolder = 'function-rooms';
+
+                    // get active discount
+                    $activeDiscount = $item->discounts
+                        ->where('start_date', '<=', now())
+                        ->where('end_date', '>=', now())
+                        ->first();
+
+                    if ($activeDiscount) {
+                        $item->discount = $activeDiscount->discount;
+                        $item->discounted_rate = $item->function_room_rate - ($item->function_room_rate * ($activeDiscount->discount / 100));
+                    } else {
+                        $item->discount = 0;
+                        $item->discounted_rate = $item->function_room_rate;
+                    }
+
                     return $item;
                 });
 
@@ -79,19 +110,48 @@ class FrontendFunctionRoomBookingController extends Controller
     public function fullDetails($type, $id)
     {
         if ($type === 'function_room') {
-            $item = FunctionRoom::with('images')->findOrFail($id);
+            $item = FunctionRoom::with(['images', 'discounts'])->findOrFail($id);
 
-            // Show suggestions only from Function Rooms
-            $suggestions = FunctionRoom::with('images')
-                ->where('id', '!=', $id) // Exclude current one
+            // Get active discount
+            $activeDiscount = $item->discounts
+                ->where('start_date', '<=', now())
+                ->where('end_date', '>=', now())
+                ->first();
+
+            if ($activeDiscount) {
+                $item->discount = $activeDiscount->discount;
+                $item->discounted_rate = $item->function_room_rate - ($item->function_room_rate * ($activeDiscount->discount / 100));
+            } else {
+                $item->discount = 0;
+                $item->discounted_rate = $item->function_room_rate;
+            }
+
+            // Suggestions only from Function Rooms
+            $suggestions = FunctionRoom::with(['images', 'discounts'])
+                ->where('id', '!=', $id)
                 ->inRandomOrder()
                 ->take(4)
-                ->get();
+                ->get()
+                ->map(function ($suggestion) {
+                    $activeDiscount = $suggestion->discounts
+                        ->where('start_date', '<=', now())
+                        ->where('end_date', '>=', now())
+                        ->first();
+
+                    if ($activeDiscount) {
+                        $suggestion->discount = $activeDiscount->discount;
+                        $suggestion->discounted_rate = $suggestion->function_room_rate - ($suggestion->function_room_rate * ($activeDiscount->discount / 100));
+                    } else {
+                        $suggestion->discount = 0;
+                        $suggestion->discounted_rate = $suggestion->function_room_rate;
+                    }
+                    return $suggestion;
+                });
 
         } elseif ($type === 'amenity') {
             $item = Amenity::with('images')->findOrFail($id);
 
-            // Show suggestions only from Amenities
+            // Suggestions only from Amenities
             $suggestions = Amenity::with('images')
                 ->where('id', '!=', $id)
                 ->inRandomOrder()
@@ -111,6 +171,7 @@ class FrontendFunctionRoomBookingController extends Controller
 
         return view('frontend.booking-full-details', compact('item', 'type', 'residences', 'suggestions', 'addons'));
     }
+
 
     public function getAddonsAvailability(Request $request)
     {
@@ -183,13 +244,60 @@ class FrontendFunctionRoomBookingController extends Controller
                     $authorizationPath = 'assets/frontend/uploads/function-room-bookings/authorizations/' . $filename;
                 }
 
+
+                // $start = Carbon::parse($request->event_start_time);
+                // $end = Carbon::parse($request->event_end_time);
+                // if ($end->lte($start))
+                //     $end->addDay();
+                // $durationHours = $start->floatDiffInHours($end);
+                // $roomTotal = $room->discounted_rate * $durationHours;
+                // $booking = FunctionRoomBooking::create([
+                //     'transaction_no' => $transactionNo,
+                //     'user_id' => auth()->id(),
+                //     'unit_no' => $unitNo,
+                //     'resident_type' => $resident?->resident_type,
+                //     'function_room_id' => $room->id,
+                //     'purpose_of_event' => $request->purpose_of_event,
+                //     'function_room_booking_date' => $request->function_room_booking_date,
+                //     'event_start_time' => $request->event_start_time,
+                //     'event_end_time' => $request->event_end_time,
+                //     'contact_number' => $request->contact_number,
+                //     'pax' => $request->pax,
+                //     'payment_mode' => $request->payment_mode,
+                //     'has_suppliers' => $request->boolean('has_suppliers'),
+                //     'authorization_file' => $authorizationPath,
+                //     'base_rate' => $room->function_room_rate,
+                //     'discount' => $room->discount,
+                //     'final_rate' => $room->discounted_rate,
+                //     'room_total' => $roomTotal,
+                //     'addons_total' => 0,
+                //     'total_amount' => $roomTotal,
+                // ]);
+
                 // === Booking duration & rate ===
                 $start = Carbon::parse($request->event_start_time);
                 $end = Carbon::parse($request->event_end_time);
                 if ($end->lte($start))
                     $end->addDay();
                 $durationHours = $start->floatDiffInHours($end);
-                $roomTotal = $room->discounted_rate * $durationHours;
+
+                // 🔹 Use booking date (NOT today) to check discount eligibility
+                $bookingDate = Carbon::parse($request->function_room_booking_date);
+
+                $activeDiscount = FunctionRoomDiscount::where('function_room_id', $room->id)
+                    ->whereDate('start_date', '<=', $bookingDate)
+                    ->whereDate('end_date', '>=', $bookingDate)
+                    ->orderByDesc('discount')
+                    ->first();
+
+                $appliedDiscount = $activeDiscount?->discount ?? 0;
+                $finalRate = $room->function_room_rate;
+
+                if ($appliedDiscount > 0) {
+                    $finalRate = $finalRate - ($finalRate * ($appliedDiscount / 100));
+                }
+
+                $roomTotal = $finalRate * $durationHours;
 
                 // === Create booking ===
                 $booking = FunctionRoomBooking::create([
@@ -207,13 +315,17 @@ class FrontendFunctionRoomBookingController extends Controller
                     'payment_mode' => $request->payment_mode,
                     'has_suppliers' => $request->boolean('has_suppliers'),
                     'authorization_file' => $authorizationPath,
+
+                    // 🔹 snapshot values
                     'base_rate' => $room->function_room_rate,
-                    'discount' => $room->discount,
-                    'final_rate' => $room->discounted_rate,
+                    'discount' => $appliedDiscount,
+                    'final_rate' => $finalRate,
                     'room_total' => $roomTotal,
                     'addons_total' => 0,
                     'total_amount' => $roomTotal,
                 ]);
+
+
 
                 // === Save suppliers ===
                 if ($request->has('suppliers')) {
@@ -385,7 +497,7 @@ class FrontendFunctionRoomBookingController extends Controller
         $booking = FunctionRoomBooking::with('user', 'functionRoom')->findOrFail($id);
 
         if ($booking->booking_status == 0) {
-            $eventDateTime = \Carbon\Carbon::parse($booking->function_room_booking_date . ' ' . $booking->event_start_time);
+            $eventDateTime = Carbon::parse($booking->function_room_booking_date . ' ' . $booking->event_start_time);
             $hoursDiff = now()->diffInHours($eventDateTime, false);
             $penalty = 0;
             if ($hoursDiff < 24) {

@@ -55,6 +55,13 @@
                                     <span class="badge bg-danger badge-forge position-absolute top-0 start-0 m-2">Unavailable</span>
                                 @endif
 
+                                {{-- ✅ Discount Badge --}}
+                                @if($item->type === 'function_room' && $item->discount > 0)
+                                    <span class="badge bg-danger position-absolute top-0 end-0 m-2">
+                                       {{ rtrim(rtrim($item->discount, '0'), '.') }}% OFF
+                                    </span>
+                                @endif
+
                                 <div class="card-body">
                                     <h5 class="card-title">{{ $item->function_room_name ?? $item->amenity_name }}</h5>
 
@@ -67,7 +74,6 @@
                                                 ₱{{ number_format($item->discounted_rate, 2) }}/hr
                                             </span>
                                         </div>
-                                       
                                     @else
                                         <p class="card-text fw-bold mb-0">
                                             ₱{{ number_format($item->function_room_rate ?? $item->amenity_rate, 2) }}/hr
@@ -78,7 +84,7 @@
                         </a>
                     </div>
                 @empty
-                    <p class="text-muted">No results found.</p>
+                    <p class="text-muted">Coming soon.</p>
                 @endforelse
             </div>
         </div>

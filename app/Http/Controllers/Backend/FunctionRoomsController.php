@@ -42,7 +42,6 @@ class FunctionRoomsController extends Controller
             'function_room_section' => $request->function_room_section,
             'function_room_name' => $request->function_room_name,
             'function_room_rate' => $request->function_room_rate,
-            'discount' => $request->discount ?? 0,
             'function_room_capacity' => $request->function_room_capacity,
             'function_room_description' => $request->function_room_description,
             'function_room_policy' => $request->function_room_policy,

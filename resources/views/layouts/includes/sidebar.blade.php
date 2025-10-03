@@ -122,6 +122,12 @@
                     </a>
                 </li>
 
+                <li class="menu-item {{ request()->routeIs('admin.show.function.room.discounts') ? 'active' : '' }}">
+                    <a href="{{ route('admin.show.function.room.discounts') }}" class="menu-link">
+                        <div data-i18n="Typography">Discounts</div>
+                    </a>
+                </li>
+
                 <li class="menu-item {{ request()->routeIs('admin.show.add.ons') ? 'active' : '' }}">
                     <a href="{{ route('admin.show.add.ons') }}" class="menu-link">
                         <div data-i18n="Typography">Add Ons</div>

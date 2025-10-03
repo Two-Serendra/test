@@ -37,13 +37,6 @@
                                 <div class="invalid-feedback">Required</div>
                             </div>
 
-
-                            <div class="mb-3">
-                                <label class="form-label">Discount (%)</label>
-                                <input type="number" name="discount" id="discount" class="form-control"
-                                    min="0" max="100" step="0.01">
-                            </div>
-
                             <div class="mb-3">
                                 <label for="functionRoomName" class="form-label">Function Room *</label>
                                 <input type="text" class="form-control" id="functionRoomName" name="function_room_name"

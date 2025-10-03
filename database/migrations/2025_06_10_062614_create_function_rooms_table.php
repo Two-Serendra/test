@@ -17,7 +17,6 @@ return new class extends Migration {
             $table->string('function_room_name');
             $table->string('function_room_capacity');
             $table->string('function_room_rate');
-            $table->decimal('discount', 5, 2)->default(0);
             $table->string('function_room_description');
             $table->string('function_room_policy');
             $table->string('function_room_360');

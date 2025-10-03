@@ -42,6 +42,9 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
+
 
 </head>
 
@@ -86,6 +89,7 @@
     <script src="{{ asset('assets/backend/js/main.js') }}"></script>
     <script src="{{ asset('assets/backend/js/dashboards-analytics.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
@@ -113,6 +117,7 @@
     <script src="{{ asset('assets/backend/js/dashboard.js')}}"></script>
     <script src="{{ asset('assets/backend/js/addOns.js')}}"></script>
     <script src="{{ asset('assets/backend/js/records.js')}}"></script>
+    <script src="{{ asset('assets/backend/js/function-room-discount.js')}}"></script>
 
 
 
@@ -160,7 +165,7 @@
         const functionRoomChannel = pusher.subscribe('function-room-bookings');
         functionRoomChannel.bind('FunctionRoomBookingCreated', function (data) {
             // ✅ FIXED: Proper role check (removed typo `|`)
-            if ([1, 2, 5, 7].includes(currentUserRoleId)) {
+            if ([1, 2, 3, 5, 7, 6].includes(currentUserRoleId)) {
                 toastr.success(
                     `(Unit: ${data.unit_no})`,
                     `New Booking - ${data.function_room}`,
@@ -177,7 +182,7 @@
         });
 
         functionRoomChannel.bind('FunctionRoomBookingCancelled', function (data) {
-            if ([1, 2, 5, 7].includes(currentUserRoleId)) {
+            if ([1, 2, 3, 5, 7, 6].includes(currentUserRoleId)) {
                 toastr.warning(
                     `(Unit: ${data.unit_no})`,
                     `Booking Cancelled - ${data.function_room}`,

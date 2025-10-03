@@ -12,6 +12,7 @@ use App\Http\Controllers\Backend\ResidenceRequestController;
 use App\Http\Controllers\Backend\ServicesController;
 use App\Http\Controllers\Backend\UsersController;
 use App\Http\Controllers\Backend\WorkPermitController;
+use App\Http\Controllers\Backend\FunctionRoomDiscountController;
 use App\Models\ResidentDetails;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Backend\FunctionRoomBookingController;
@@ -112,6 +113,14 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/admin-function-rooms/enable/{id}', [FunctionRoomsController::class, 'enable']);
     Route::get('/get-updated-function-rooms-table', [FunctionRoomsController::class, 'getUpdatedFunctionRoomsTable'])->name('get.updated.function.rooms.table');
 
+    //Function Rooms Discounts
+    Route::get('/admin-function-room-discounts', [FunctionRoomDiscountController::class, 'showFunctionRoomDiscounts'])->name('admin.show.function.room.discounts');
+    Route::post('/admin-create-function-room-discounts', [FunctionRoomDiscountController::class, 'createFunctionRoomDiscounts'])->name('create.function.room.discounts');
+    Route::get('/get-updated-function-room-discount-table', [FunctionRoomDiscountController::class, 'getUpdatedFunctionRoomDiscountTable']);
+    Route::delete('/admin-delete_function_room_discounts', [FunctionRoomDiscountController::class, 'deleteFunctionRoomDiscounts']);
+    Route::get('/admin-fetch-function-room-discount/{id}', [FunctionRoomDiscountController::class, 'fetchFunctionRoomDiscounts']);
+    Route::post('/admin-update-function-room-discount', [FunctionRoomDiscountController::class, 'updateFunctionRoomDiscount'])->name(name: 'admin.update.function.room.discount');
+
 
     // Add Ons
     Route::get('/admin-add-ons-table', [AddOnsController::class, 'showAddOns'])->name('admin.show.add.ons');
@@ -137,8 +146,6 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/admin-function-room-bookings', [FunctionRoomBookingController::class, 'showFunctionRoomBookings'])->name('admin.show.function.room.bookings');
     Route::post('/admin-function-room-bookings-approval', [FunctionRoomBookingController::class, 'FunctionRoomBookingApproval'])->name('admin.function.room.booking.approvals');
     Route::post('/admin-function-room-bookings-rejection', [FunctionRoomBookingController::class, 'FunctionRoomBookingReject']);
-
-
     Route::get('/admin-function-room-bookings/{id}/details', action: [FunctionRoomBookingController::class, 'getFunctionRoomBookingDetails'])
         ->name('admin.get.function.room.bookings.details');
     Route::get('/admin-get-updated-function-room-bookings-table', [FunctionRoomBookingController::class, 'getUpdatedFunctionRoomBookingTable'])
@@ -149,14 +156,16 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/admin-bookings/{id}/edit', [FunctionRoomBookingController::class, 'editFunctionRoomBooking']);
     Route::post('/admin-update-function-room-booking', [FunctionRoomBookingController::class, 'updateFunctionRoomBooking'])
         ->name('admin.update.function.room.booking');
-
-    //Function Room Bookings Records
-    Route::get('/admin-function-room-booking-records', action: [FunctionRoomBookingController::class, 'showFunctionRoomBookingRecords'])->name('admin.show.function.room.booking.records');
-
     Route::get('/admin-search-function-room-booking-records', [FunctionRoomBookingController::class, 'searchFunctionRoomBookingRecords'])
         ->name('search.function.room.booking.records');
     Route::post('/admin-download-function-room-booking-records', [FunctionRoomBookingController::class, 'downloadFunctionRoomBookingRecords'])
         ->name('download.function.room.booking.records');
+
+
+    //Function Room Bookings Records
+    Route::get('/admin-function-room-booking-records', action: [FunctionRoomBookingController::class, 'showFunctionRoomBookingRecords'])->name('admin.show.function.room.booking.records');
+
+
 
 
     //Gallery

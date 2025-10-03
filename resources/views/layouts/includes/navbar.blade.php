@@ -40,37 +40,11 @@
                         class="nav-item nav-link {{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a>
                 </div>
 
-                <!-- <div class="ms-auto">
+                <div class="ms-auto">
                     <a href="{{ route('booking.list') }}" class="btn btn-primary custom-btn">Book Now</a>
-                </div> -->
+                </div>
 
-                <!-- <div class="nav-item dropdown ms-3 mt-2 mt-lg-0">
-                    <a href="#" class="nav-link dropdown-toggle d-flex align-items-center justify-content-center"
-                        id="userDropdown" role="button" data-bs-toggle="dropdown"
-                        style="width: 40px; height: 40px; background-color: #008b26; border-radius: 50%; color: white;">
-                        <i class='bx bx-user' style="font-size: 1.4rem;"></i>
-                    </a>
-                    <div class="dropdown-menu bg-light rounded-0 rounded-bottom m-0">
-                        @auth
-                            <a href="{{ route('profile.edit') }}" class="dropdown-item">
-                                <i class='bx bx-user-circle me-2'></i> Profile
-                            </a>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="dropdown-item">
-                                    <i class='bx bx-log-out me-2'></i> Logout
-                                </button>
-                            </form>
-
-                        @else
-                            <a href="{{ route('login') }}" class="dropdown-item">
-                                <i class='bx bx-log-in me-2'></i> Login
-                            </a>
-                        @endauth
-                    </div>
-                </div> -->
-
-                <!-- @auth
+                @auth
                     <div class="nav-item dropdown ms-3 mt-2 mt-lg-0">
                         <a href="#"
                             class="nav-link dropdown-toggle d-flex align-items-center justify-content-center position-relative"
@@ -113,7 +87,35 @@
                             @endforelse
                         </div>
                     </div>
-                @endauth -->
+                @endauth
+
+                <div class="nav-item dropdown ms-3 mt-2 mt-lg-0">
+                    <a href="#" class="nav-link dropdown-toggle d-flex align-items-center justify-content-center"
+                        id="userDropdown" role="button" data-bs-toggle="dropdown"
+                        style="width: 40px; height: 40px; background-color: #008b26; border-radius: 50%; color: white;">
+                        <i class='bx bx-user' style="font-size: 1.4rem;"></i>
+                    </a>
+                    <div class="dropdown-menu bg-light rounded-0 rounded-bottom m-0">
+                        @auth
+                            <a href="{{ route('profile.edit') }}" class="dropdown-item">
+                                <i class='bx bx-user-circle me-2'></i> Profile
+                            </a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="dropdown-item">
+                                    <i class='bx bx-log-out me-2'></i> Logout
+                                </button>
+                            </form>
+
+                        @else
+                            <a href="{{ route('login') }}" class="dropdown-item">
+                                <i class='bx bx-log-in me-2'></i> Login
+                            </a>
+                        @endauth
+                    </div>
+                </div>
+
+
 
             </div>
         </nav>

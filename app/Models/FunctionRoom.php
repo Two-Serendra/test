@@ -20,7 +20,6 @@ class FunctionRoom extends Model
         'featured',
         'function_room_status',
         'function_room_remarks',
-        'discount',
     ];
 
     public function images()
@@ -38,11 +37,29 @@ class FunctionRoom extends Model
         return $this->hasMany(FunctionRoomBooking::class, 'function_room_id');
     }
 
+
+    public function discounts()
+    {
+        return $this->hasMany(FunctionRoomDiscount::class, 'function_room_id');
+    }
+
+    // Get only the active discount (based on current date)
+    public function activeDiscount()
+    {
+        return $this->hasOne(FunctionRoomDiscount::class, 'function_room_id')
+            ->whereDate('start_date', '<=', now())
+            ->whereDate('end_date', '>=', now());
+    }
+
+    // Calculate discounted rate
     public function getDiscountedRateAttribute()
     {
-        if ($this->discount > 0) {
-            return $this->function_room_rate - ($this->function_room_rate * ($this->discount / 100));
+        $discount = $this->activeDiscount()->first();
+
+        if ($discount) {
+            return $this->function_room_rate - ($this->function_room_rate * ($discount->discount / 100));
         }
+
         return $this->function_room_rate;
     }
 }

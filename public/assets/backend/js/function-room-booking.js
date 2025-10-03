@@ -130,7 +130,7 @@ $(document).ready(function () {
                     // Admin (requires authorization file)
                     row += approvalColumns('admin', true);
                     // Finance (requires authorization file)
-                    row += approvalColumns('finance', true);
+                    row += approvalColumns('finance');
                     // Engineering (requires supplier)
                     row += approvalColumns('engineering', false, true);
                     // Manager (no additional requirements)
@@ -293,7 +293,7 @@ $(document).ready(function () {
         $('#global-loading').removeClass('show');
     }
 
-    $('.view-booking-btn').on('click', function () {
+    $('#functionRoomBookingsTable').on('click', '.view-booking-btn', function () {
         const bookingId = $(this).data('id');
         showSpinner();
 

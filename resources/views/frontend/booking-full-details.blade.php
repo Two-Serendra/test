@@ -76,20 +76,23 @@
 
                         <div>
                             @if($type === 'function_room' && $item->discount > 0)
-                        <div class="mb-1">
-                            <span class="text-muted text-decoration-line-through fs-5 d-block">
-                                ₱{{ number_format($item->function_room_rate, 2) }}
-                            </span>
-                            <span class="text-danger fw-bold fs-4 d-block">
-                                ₱{{ number_format($item->discounted_rate, 2) }}/hr
-                            </span>
-                        </div>
+                                <div class="mb-1 d-flex align-items-center gap-2">
+                                    <span class="text-muted text-decoration-line-through fs-5">
+                                        ₱{{ number_format($item->function_room_rate, 2) }}
+                                    </span>
+                                    <span class="badge bg-danger">
+                                        {{ rtrim(rtrim(number_format($item->discount, 2), '0'), '.') }}% OFF
+                                    </span>
+                                </div>
+                                <span class="text-danger fw-bold fs-4 d-block">
+                                    ₱{{ number_format($item->discounted_rate, 2) }}/hr
+                                </span>
+                            @else
+                                <p class="fw-bold fs-4 mb-3 text-dark">
+                                    ₱{{ number_format($type === 'function_room' ? $item->function_room_rate : $item->amenity_rate, 2) }}/hour
+                                </p>
+                            @endif
 
-                        @else
-                            <p class="fw-bold fs-4 mb-3 text-dark">
-                                ₱{{ number_format($type === 'function_room' ? $item->function_room_rate : $item->amenity_rate, 2) }}/hour
-                            </p>
-                        @endif
                             @if($type === 'function_room' && !empty($item->function_room_360))
                                 <button type="button" class="btn btn-secondary text-white me-2 360View customBtn"
                                     data-img="{{ asset('assets/images/uploads/function-rooms/360/' . $item->function_room_360) }}"
@@ -134,36 +137,57 @@
                 </h5>
                 <div class="row z-1 position-relative">
                     @foreach($suggestions as $suggestion)
-                        <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
-                            <div class="card shadow featured-card h-100" style="border-radius: 5px;">
-                                <a href="{{ route('booking.full.details', ['type' => $type, 'id' => $suggestion->id]) }}"
-                                    class="text-decoration-none text-dark">
-                                    <div class="card-body text-center">
-                                        <div class="mb-3">
-                                            @if($suggestion->images->first())
-                                                <img src="{{ asset('assets/images/uploads/' . ($type === 'function_room' ? 'function-rooms' : 'amenities') . '/images/' . $suggestion->images->first()->image) }}"
-                                                    alt="{{ $type === 'function_room' ? 'Function Room' : 'Amenity' }} Image"
-                                                    class="featured-img" loading="lazy">
-                                            @else
-                                                <p class="text-muted">No Image</p>
-                                            @endif
-                                        </div>
+    <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+        <div class="card shadow featured-card h-100 position-relative" style="border-radius: 5px;">
+            <a href="{{ route('booking.full.details', ['type' => $type, 'id' => $suggestion->id]) }}"
+               class="text-decoration-none text-dark">
+               
+                <!-- 🔹 Discount Badge -->
+                @if($type === 'function_room' && $suggestion->discount > 0)
+                    <span class="badge bg-danger position-absolute top-0 end-0 m-2">
+    {{ rtrim(rtrim($suggestion->discount, '0'), '.') }}% OFF
+</span>
+                @endif
 
-                                        <h5 class="card-title fw-bold text-start mb-1 text-dark" style="font-size: 1.1rem;">
-                                            {{ $type === 'function_room' ? $suggestion->function_room_name : $suggestion->amenity_name }}
-                                        </h5>
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        @if($suggestion->images->first())
+                            <img src="{{ asset('assets/images/uploads/' . ($type === 'function_room' ? 'function-rooms' : 'amenities') . '/images/' . $suggestion->images->first()->image) }}"
+                                 alt="{{ $type === 'function_room' ? 'Function Room' : 'Amenity' }} Image"
+                                 class="featured-img" loading="lazy">
+                        @else
+                            <p class="text-muted">No Image</p>
+                        @endif
+                    </div>
 
-                                        <p class="fw-semibold text-start mb-2 text-dark" style="font-size: 0.95rem;">
-                                            <span class="text-uppercase fw-bold">Rate:</span>
-                                            <span class="ms-1 fw-bold">
-                                                ₱{{ number_format($type === 'function_room' ? $suggestion->function_room_rate : $suggestion->amenity_rate, 2) }}/hr
-                                            </span>
-                                        </p>
-                                    </div>
-                                </a>
-                            </div>
+                    <h5 class="card-title fw-bold text-start mb-1 text-dark" style="font-size: 1.1rem;">
+                        {{ $type === 'function_room' ? $suggestion->function_room_name : $suggestion->amenity_name }}
+                    </h5>
+
+                    <!-- 🔹 Price Layout -->
+                    @if($type === 'function_room' && $suggestion->discount > 0)
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted text-decoration-line-through">
+                                ₱{{ number_format($suggestion->function_room_rate, 2) }}/hr
+                            </span>
+                            <span class="text-danger fw-bold">
+                                ₱{{ number_format($suggestion->discounted_rate, 2) }}/hr
+                            </span>
                         </div>
-                    @endforeach
+                    @else
+                        <p class="fw-semibold text-start mb-2 text-dark" style="font-size: 0.95rem;">
+                            <span class="text-uppercase fw-bold">Rate:</span>
+                            <span class="ms-1 fw-bold">
+                                ₱{{ number_format($type === 'function_room' ? $suggestion->function_room_rate : $suggestion->amenity_rate, 2) }}/hr
+                            </span>
+                        </p>
+                    @endif
+                </div>
+            </a>
+        </div>
+    </div>
+@endforeach
+
                 </div>
             </div>
         @endif

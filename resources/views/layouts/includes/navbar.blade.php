@@ -40,11 +40,11 @@
                         class="nav-item nav-link {{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a>
                 </div>
 
-                <div class="ms-auto">
+                <!-- <div class="ms-auto">
                     <a href="{{ route('booking.list') }}" class="btn btn-primary custom-btn">Book Now</a>
-                </div>
+                </div> -->
 
-                @auth
+                <!-- @auth
                     <div class="nav-item dropdown ms-3 mt-2 mt-lg-0">
                         <a href="#"
                             class="nav-link dropdown-toggle d-flex align-items-center justify-content-center position-relative"
@@ -90,7 +90,7 @@
 
                         </div>
                     </div>
-                @endauth
+                @endauth -->
 
                 <!-- <div class="nav-item dropdown ms-3 mt-2 mt-lg-0">
                     <a href="#" class="nav-link dropdown-toggle d-flex align-items-center justify-content-center"

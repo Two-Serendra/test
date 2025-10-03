@@ -721,16 +721,35 @@ class FunctionRoomBookingController extends Controller
                 break;
 
             case 5: // Finance
+                // $showViewButton = true;
+                // if ($booking->admin_approval == 2)
+                //     $waitingReason = 'Waiting for Admin';
+                // elseif ($booking->authorization_file && !$booking->finance_user_id && !$rejectedByPrevious)
+                //     $showApproveButton = true;
+                // elseif (!$booking->authorization_file && !$booking->finance_user_id && !$rejectedByPrevious)
+                //     $showApproveButton = true;
+                // else
+                //     $isApproved = true;
+                // break;
                 $showViewButton = true;
-                if ($booking->admin_approval == 2)
+
+                // If admin rejected, finance cannot act
+                if ($booking->admin_approval == 2) {
                     $waitingReason = 'Waiting for Admin';
-                elseif ($booking->authorization_file && !$booking->finance_user_id && !$rejectedByPrevious)
+                }
+                // Must wait for Concierge first (whether or not there's an authorization file)
+                elseif (!$booking->concierge_user_id) {
+                    $waitingReason = 'Waiting for Concierge';
+                }
+                // If everything is okay and finance has not yet approved/rejected
+                elseif (!$booking->finance_user_id && !$rejectedByPrevious) {
                     $showApproveButton = true;
-                elseif (!$booking->authorization_file && !$booking->finance_user_id && !$rejectedByPrevious)
-                    $showApproveButton = true;
-                else
+                } else {
                     $isApproved = true;
+                }
                 break;
+
+
 
             case 3: // Engineering
                 $showViewButton = true;

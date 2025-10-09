@@ -511,3 +511,8 @@ input[type="file"].form-control {
     display: flex;
     /* Flex only when 'show' class is added */
 }
+
+#toast-container.toast-bottom-right {
+    bottom: 70px !important; /* raise it higher, adjust as needed */
+    right: 12px !important;
+}

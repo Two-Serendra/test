@@ -75,8 +75,11 @@ $(document).ready(function () {
                         <td>${b.pax || 'N/A'}</td>
                         <td>${b.base_rate ? '₱' + parseFloat(b.base_rate).toFixed(2) : 'N/A'}</td>
                         <td>${b.discount > 0
-                            ? `<span class="badge bg-success">${parseFloat(b.discount).toFixed(2)}%</span>`
-                            : '<span class="badge bg-secondary">0%</span>'}</td>
+                            ? `<span class="badge bg-success">${parseFloat(b.discount).toString().replace(/\.0+$/, '')
+                            }%</span>`
+                            : '<span class="badge bg-secondary">0%</span>'
+                        }</td>
+                        <td>${b.discount_remarks || 'N/A'}</td>
                         <td>${b.final_rate || 'N/A'}</td>
                         <td>${b.payment_mode || 'N/A'}</td>
                         <td>${renderStatusBadge(b.booking_status)}</td>
@@ -296,7 +299,7 @@ $(document).ready(function () {
             '#detail-transaction-no', '#detail-unit', '#detail-name', '#detail-contact', '#detail-resident-type',
             '#detail-function-room', '#detail-purpose', '#detail-status', '#detail-booking-date', '#detail-start-time',
             '#detail-end-time', '#detail-pax', '#detail-payment-mode', '#detail-authorization', '#detail-suppliers',
-            '#detail-rate', '#detail-breakdown', '#detail-grand-total'
+            '#detail-rate', 'detail-discount', '#detail-breakdown', '#detail-grand-total'
         ];
         $(fields.join(',')).html('<span class="text-muted">Loading...</span>');
 
@@ -462,6 +465,33 @@ $(document).ready(function () {
                 `);
                 }
             } else $('#detail-rate').html('<span class="text-muted">N/A</span>');
+            // === Show Discount + Remarks ===
+            let discountValue = booking.discount ?? 0;
+            const discountRemarks = booking.discount_remarks ?? '';
+
+            // Convert to number first
+            discountValue = parseFloat(discountValue);
+
+            // Format discount: remove unnecessary decimals (e.g. 10.00 → 10, 12.5 → 12.5)
+            if (discountValue % 1 === 0) {
+                discountValue = discountValue.toFixed(0);
+            } else {
+                discountValue = discountValue.toFixed(1).replace(/\.0$/, '');
+            }
+
+            if (discountValue > 0) {
+                $('#detail-discount').html(`
+        <div style="margin-top: 6px;">
+            <strong class="text-danger">${discountValue}%</strong>
+            ${discountRemarks ? `<span style="margin-left: 6px; color: #555;">${discountRemarks}</span>` : ''}
+        </div>
+    `);
+            } else {
+                $('#detail-discount').html('<span class="text-muted" style="margin-top: 6px;">No discount</span>');
+            }
+
+
+
 
             // Breakdown table
             let breakdownHtml = '';
@@ -569,6 +599,8 @@ $(document).ready(function () {
             $('#roomCapacity').val(booking.function_room.function_room_capacity);
             $('#editRoomCapacity').text(booking.function_room.function_room_capacity);
             $('#editFunctionRoomBookingDate').val(booking.function_room_booking_date); // 👈 IMPORTANT
+            $('#editDiscount').val(parseFloat(booking.discount ?? 0));
+            $('#editDiscountRemarks').val(booking.discount_remarks);
 
             $('#editPurposeOfEvent').val(booking.purpose_of_event);
             $('#editStartTime').val(booking.event_start_time);
@@ -832,6 +864,8 @@ $(document).ready(function () {
         const endTime = $('#editEndTime').val();
         const pax = parseInt($('#editPaxInput').val() || 0);
         const roomCapacity = parseInt($('#editRoomCapacity').text() || 0);
+        const discountValue = $('#editDiscount').val()?.trim();
+        const discountRemarks = $('#editDiscountRemarks').val()?.trim();
 
         function convertToMinutes(time) {
             if (!time) return null;
@@ -859,6 +893,20 @@ $(document).ready(function () {
         } else {
             $('#capacityError').addClass('d-none');
             $('#editPaxInput').removeClass('is-invalid');
+        }
+
+        // ✅ Validate discount remarks only if discount is greater than 0
+        if (parseFloat(discountValue) > 0 && !discountRemarks) {
+            $('#editDiscountRemarks').addClass('is-invalid');
+            // Optional: show inline error message
+            if ($('#discountRemarksError').length === 0) {
+            } else {
+                $('#discountRemarksError').removeClass('d-none');
+            }
+            isValid = false;
+        } else {
+            $('#editDiscountRemarks').removeClass('is-invalid');
+            $('#discountRemarksError').addClass('d-none');
         }
 
         if (!isValid) return;

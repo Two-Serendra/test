@@ -96,6 +96,7 @@
                             <th>Pax</th>
                             <th>Base Rate</th>
                             <th>Discount</th>
+                            <th>Discount Remarks</th>
                             <th>Final Rate</th>
                             <th>Payment</th>
                             <th>Status</th>
@@ -203,6 +204,12 @@
                                         <span class="badge bg-secondary">0%</span>
                                     @endif
                                 </td>
+                                <td> @if ( $booking->discount_remarks)
+                                    {{ $booking->discount_remarks }}</td>
+                                    @else
+                                    <span class="badge bg-secondary">N/A</span>
+                                    @endif
+
                                 <td>{{ $booking->final_rate }}</td>
                                 <td>{{ $booking->payment_mode }}</td>
                                 <td>

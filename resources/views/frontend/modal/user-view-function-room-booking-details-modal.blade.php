@@ -74,6 +74,12 @@
                         <div class="col-4 fw-bold">Rate:</div>
                         <div class="col-8" id="detail-rate"></div>
                     </div>
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Discount:</div>
+                        <div class="col-8" id="detail-discount"></div>
+                    </div>
+                    
                     <div class="row mb-2">
                         <div class="col-4 fw-bold">Payment Mode:</div>
                         <div class="col-8" id="detail-payment-mode"></div>

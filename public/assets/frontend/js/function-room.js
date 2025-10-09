@@ -511,6 +511,28 @@ $(document).ready(function () {
                 $('#detail-rate').html('<span class="text-muted">N/A</span>');
             }
 
+            let discountValue = booking.discount ?? 0;
+            const discountRemarks = booking.discount_remarks ?? '';
+
+            // Convert and format
+            discountValue = parseFloat(discountValue);
+            if (discountValue % 1 === 0) {
+                discountValue = discountValue.toFixed(0);
+            } else {
+                discountValue = discountValue.toFixed(1).replace(/\.0$/, '');
+            }
+
+            if (discountValue > 0) {
+                $('#detail-discount').html(`
+        <div style="margin-top: 6px;">
+            <strong class="text-danger">${discountValue}%</strong>
+            ${discountRemarks ? `<span style="margin-left: 6px; color: #555;">${discountRemarks}</span>` : ''}
+        </div>
+    `);
+            } else {
+                $('#detail-discount').html('<span class="text-muted" style="margin-top: 6px;">No discount</span>');
+            }
+
             let breakdownHtml = '';
             let addonsTotal = 0;
 

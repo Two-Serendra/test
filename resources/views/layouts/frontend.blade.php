@@ -50,6 +50,8 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+
 </head>
 
 <body>
@@ -88,6 +90,7 @@
     <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
     <script src="https://js.pusher.com/8.2/pusher.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/laravel-echo/1.15.2/echo.iife.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 
     <!-- Template Javascript -->
@@ -116,6 +119,17 @@
     </script>
 
     <script>
+        // $(document).ready(function () {
+        //     toastr.options = {
+        //         closeButton: true,
+        //         progressBar: true,
+        //         positionClass: "toast-bottom-right",
+        //         timeOut: 0, // 0 means it won't auto-dismiss
+        //         extendedTimeOut: 0
+        //     };
+        //     toastr.info("🔧 Adjusting Toastr position — test notification!");
+        // });
+
         $(document).ready(function () {
             // Redirect after login if needed
             if (localStorage.getItem("redirect_after_login")) {
@@ -180,7 +194,13 @@
                         console.log('🔔 New Notification:', notification);
                         addNotification(notification);
 
-                        // Optional toast
+                        toastr.options = {
+                            closeButton: true,
+                            progressBar: true,
+                            positionClass: "toast-bottom-right",
+                            timeOut: 4000
+                        };
+
                         toastr.info(notification.data?.message || 'You have a new notification');
                     });
             } else {

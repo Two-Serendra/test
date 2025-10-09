@@ -34,8 +34,8 @@ return new class extends Migration {
             // --- Pricing snapshot ---
             $table->decimal('base_rate', 10, 2);
             $table->decimal('discount', 5, 2)->default(0);
+            $table->string('discount_remarks')->nullable();
             $table->decimal('final_rate', 10, 2);
-
 
             // --- Concierge Approval ---
             $table->tinyInteger('concierge_approval')->default(0);

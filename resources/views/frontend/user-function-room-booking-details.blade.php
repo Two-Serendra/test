@@ -129,6 +129,29 @@
                             @endif
                         </div>
                     </div>
+
+                      @php
+        $discountValue = floatval($booking->discount ?? 0);
+        $discountRemarks = $booking->discount_remarks ?? '';
+    @endphp
+
+    <div class="row mb-2">
+        <div class="col-4 fw-bold">Discount:</div>
+        <div class="col-8">
+            @if($discountValue > 0)
+                <div style="margin-top: 6px;">
+                    <strong class="text-danger">
+                        {{ rtrim(rtrim(number_format($discountValue, 2), '0'), '.') }}%
+                    </strong>
+                    @if(!empty($discountRemarks))
+                        <span style="margin-left: 6px; color: #555;">{{ $discountRemarks }}</span>
+                    @endif
+                </div>
+            @else
+                <span class="text-muted" style="margin-top: 6px;">No discount</span>
+            @endif
+        </div>
+    </div>
                     <div class="row mb-2">
                         <div class="col-4 fw-bold">Payment Mode:</div>
                         <div class="col-8">{{ ucfirst($booking->payment_mode) }}</div>

@@ -30,6 +30,7 @@ class FunctionRoomBooking extends Model
         // Pricing snapshot
         'base_rate',
         'discount',
+        'discount_remarks',
         'final_rate',
 
         'room_total',

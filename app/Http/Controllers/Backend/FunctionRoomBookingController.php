@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Foundation\Events\DiscoverEvents;
 use Illuminate\Http\Request;
 use App\Models\FunctionRoomBooking;
 use App\Models\FunctionRoom;
 use App\Models\AddOn;
 use App\Models\AddOnFunctionRoomBooking;
 use App\Models\ResidentDetails;
+use App\Models\FunctionRoomDiscount;
 use App\Models\FunctionRoomBookingSupplier;
 use App\Mail\FunctionRoomBookingConfirmedNotification;
 use App\Notifications\UserFunctionRoomBookingBellNotification;
@@ -506,6 +508,11 @@ class FunctionRoomBookingController extends Controller
                     : null,
                 'contact_number' => $booking->contact_number ?? 'N/A',
                 'pax' => $booking->pax ?? 'N/A',
+                'base_rate' => $booking->base_rate ?? 'N/A',
+                'discount' => $booking->discount ?? 0,
+                'discount_remarks' => $booking->discount_remarks ?? 'N/A',
+                'final_rate' => $booking->final_rate ?? 0,
+
                 'payment_mode' => $booking->payment_mode ?? 'N/A',
                 'booking_status' => $booking->booking_status,
                 'has_suppliers' => $booking->has_suppliers,
@@ -757,14 +764,72 @@ class FunctionRoomBookingController extends Controller
                 }
 
                 // === Calculate totals ===
+                // $start = Carbon::parse($request->event_start_time);
+                // $end = Carbon::parse($request->event_end_time);
+                // if ($end->lte($start))
+                //     $end->addDay();
+                // $durationHours = $start->floatDiffInHours($end);
+                // $roomTotal = $room->discounted_rate * $durationHours;
+
+                // === Calculate duration ===
+                // === Calculate duration ===
+                // === Calculate duration ===
                 $start = Carbon::parse($request->event_start_time);
                 $end = Carbon::parse($request->event_end_time);
-                if ($end->lte($start))
+                if ($end->lte($start)) {
                     $end->addDay();
+                }
                 $durationHours = $start->floatDiffInHours($end);
-                $roomTotal = $room->discounted_rate * $durationHours;
+
+                // === Determine applicable discount & recalc ===
+                $manualDiscount = is_numeric($request->discount) ? floatval($request->discount) : 0;
+                $baseRate = $room->function_room_rate;
+                $appliedDiscount = 0;
+                $finalRate = $baseRate;
+
+                $overrideRoles = [1, 6];
+
+                if (in_array(auth()->user()->role_id, $overrideRoles) && $manualDiscount > 0) {
+                    $appliedDiscount = $manualDiscount;
+
+                } elseif (isset($booking) && $booking->discount > 0) {
+                    $appliedDiscount = floatval($booking->discount);
+
+                } else {
+                    $bookingDate = Carbon::parse($request->function_room_booking_date);
+                    $activeDiscount = FunctionRoomDiscount::where('function_room_id', $room->id)
+                        ->whereDate('start_date', '<=', $bookingDate)
+                        ->whereDate('end_date', '>=', $bookingDate)
+                        ->orderByDesc('discount')
+                        ->first();
+
+                    $appliedDiscount = $activeDiscount?->discount ?? 0;
+                }
+
+                $finalRate = $baseRate - ($baseRate * ($appliedDiscount / 100));
+                $roomTotal = $finalRate * $durationHours;
+                $totalAmount = $roomTotal + $addonsTotal;
+
+
 
                 // === Update booking ===
+                // $booking->update([
+                //     'function_room_id' => $room->id,
+                //     'purpose_of_event' => $request->purpose_of_event,
+                //     'function_room_booking_date' => $request->function_room_booking_date,
+                //     'event_start_time' => $request->event_start_time,
+                //     'event_end_time' => $request->event_end_time,
+                //     'contact_number' => $request->contact_number,
+                //     'discount' => $request->discount,
+                //     'pax' => $request->pax,
+                //     'payment_mode' => $request->payment_mode,
+                //     'has_suppliers' => $request->boolean('has_suppliers'),
+                //     'authorization_file' => $authorizationPath,
+                //     'room_total' => $roomTotal,
+                //     'addons_total' => $addonsTotal,
+                //     'total_amount' => $roomTotal + $addonsTotal,
+                // ]);
+
                 $booking->update([
                     'function_room_id' => $room->id,
                     'purpose_of_event' => $request->purpose_of_event,
@@ -776,10 +841,15 @@ class FunctionRoomBookingController extends Controller
                     'payment_mode' => $request->payment_mode,
                     'has_suppliers' => $request->boolean('has_suppliers'),
                     'authorization_file' => $authorizationPath,
+                    'discount_remarks' => $request->discount_remarks,
+                    'base_rate' => $baseRate,
+                    'discount' => $appliedDiscount,
+                    'final_rate' => $finalRate,
                     'room_total' => $roomTotal,
                     'addons_total' => $addonsTotal,
-                    'total_amount' => $roomTotal + $addonsTotal,
+                    'total_amount' => $totalAmount,
                 ]);
+
 
                 DB::commit();
 

@@ -283,11 +283,26 @@ class FrontendFunctionRoomBookingController extends Controller
                     ->orderByDesc('discount')
                     ->first();
 
-                $appliedDiscount = $activeDiscount?->discount ?? 0;
+                // $appliedDiscount = $activeDiscount?->discount ?? 0;
+                // $finalRate = $room->function_room_rate;
+
+                // if ($appliedDiscount > 0) {
+                //     $finalRate = $finalRate - ($finalRate * ($appliedDiscount / 100));
+                // }
+
+                // $roomTotal = $finalRate * $durationHours;
+
+                $appliedDiscount = 0;
+                $discountRemarks = null;
                 $finalRate = $room->function_room_rate;
 
-                if ($appliedDiscount > 0) {
-                    $finalRate = $finalRate - ($finalRate * ($appliedDiscount / 100));
+                if ($activeDiscount) {
+                    $appliedDiscount = $activeDiscount->discount ?? 0;
+                    $discountRemarks = $activeDiscount->remarks ?? null;
+
+                    if ($appliedDiscount > 0) {
+                        $finalRate = $finalRate - ($finalRate * ($appliedDiscount / 100));
+                    }
                 }
 
                 $roomTotal = $finalRate * $durationHours;
@@ -312,6 +327,7 @@ class FrontendFunctionRoomBookingController extends Controller
                     // 🔹 snapshot values
                     'base_rate' => $room->function_room_rate,
                     'discount' => $appliedDiscount,
+                    'discount_remarks' => $discountRemarks,
                     'final_rate' => $finalRate,
                     'room_total' => $roomTotal,
                     'addons_total' => 0,

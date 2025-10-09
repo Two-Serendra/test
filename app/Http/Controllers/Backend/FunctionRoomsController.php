@@ -7,6 +7,8 @@ use App\Models\FunctionRoom;
 use App\Models\AddOn;
 use App\Models\FunctionRoomDateBlocking;
 use App\Models\FunctionRoomImages;
+use App\Models\FunctionRoomBooking;
+
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -232,40 +234,94 @@ class FunctionRoomsController extends Controller
     public function fetchFunctionRoomBlockDates(Request $request)
     {
         $function_room_id = $request->input('function_room_id');
-        $blockedDatesQuery = FunctionRoomDateBlocking::where('blocking_status', 1);
 
-        if ($function_room_id) {
-            $blockedDatesQuery->where('function_room_id', $function_room_id);
+        if (!$function_room_id) {
+            return response()->json([]);
         }
-        $blockedDates = $blockedDatesQuery->get();
-        $formattedDates = [];
 
-        foreach ($blockedDates as $block) {
+        // --- Fetch booked dates ---
+        $bookedDates = FunctionRoomBooking::where('function_room_id', $function_room_id)
+            ->whereIn('booking_status', [0, 1]) // 0 = pending, 1 = approved, adjust as needed
+            ->pluck('function_room_booking_date')
+            ->toArray();
+
+        // --- Fetch blocked date ranges ---
+        $blockedDatesQuery = FunctionRoomDateBlocking::where('blocking_status', 1)
+            ->where('function_room_id', $function_room_id)
+            ->get();
+
+        $blockedDates = [];
+        foreach ($blockedDatesQuery as $block) {
             $start = new \DateTime($block->date_blocking_start);
             $end = new \DateTime($block->date_blocking_end);
-
             while ($start <= $end) {
-                $formattedDates[] = $start->format('Y-m-d');
+                $blockedDates[] = $start->format('Y-m-d');
                 $start->modify('+1 day');
             }
         }
-        return response()->json($formattedDates);
+
+        // --- Merge and remove duplicates ---
+        $disabledDates = array_values(array_unique(array_merge($bookedDates, $blockedDates)));
+
+        return response()->json($disabledDates);
     }
+
 
     public function newDateBlocking(Request $request)
     {
         try {
+            $functionRoomId = $request->input('function_room_id_blocking');
+            $startDate = $request->input('function_room_date_blocking_start');
+            $endDate = $request->input('function_room_date_blocking_end');
+
+            if (!$startDate || !$endDate) {
+                return response()->json(['status' => 'error', 'message' => 'Invalid date range.'], 400);
+            }
+
+            $hasBookingConflict = FunctionRoomBooking::where('function_room_id', $functionRoomId)
+                ->whereIn('booking_status', [0, 1])
+                ->where(function ($query) use ($startDate, $endDate) {
+                    $query->whereBetween('function_room_booking_date', [$startDate, $endDate])
+                        ->orWhere(function ($query) use ($startDate, $endDate) {
+                            $query->where('function_room_booking_date', '<=', $startDate)
+                                ->where('function_room_booking_date', '>=', $endDate);
+                        });
+                })
+                ->exists();
+
+            if ($hasBookingConflict) {
+                return response()->json(['status' => 'error', 'message' => 'This date range overlaps with an existing booking.'], 409);
+            }
+
+            $hasBlockingConflict = FunctionRoomDateBlocking::where('function_room_id', $functionRoomId)
+                ->where('blocking_status', 1)
+                ->where(function ($query) use ($startDate, $endDate) {
+                    $query->whereBetween('date_blocking_start', [$startDate, $endDate])
+                        ->orWhereBetween('date_blocking_end', [$startDate, $endDate])
+                        ->orWhere(function ($query) use ($startDate, $endDate) {
+                            $query->where('date_blocking_start', '<=', $startDate)
+                                ->where('date_blocking_end', '>=', $endDate);
+                        });
+                })
+                ->exists();
+
+            if ($hasBlockingConflict) {
+                return response()->json(['status' => 'error', 'message' => 'This date range overlaps with another block.'], 409);
+            }
             $newBlocking = new FunctionRoomDateBlocking();
-            $newBlocking->function_room_id = $request->input('function_room_id_blocking');
+            $newBlocking->function_room_id = $functionRoomId;
             $newBlocking->blocking_remarks = strtoupper($request->input('blocking_remarks'));
-            $newBlocking->date_blocking_start = $request->input('function_room_date_blocking_start');
-            $newBlocking->date_blocking_end = $request->input('function_room_date_blocking_end');
+            $newBlocking->date_blocking_start = $startDate;
+            $newBlocking->date_blocking_end = $endDate;
+            $newBlocking->blocking_status = 1;
             $newBlocking->save();
+
             return response()->json(['status' => 'success', 'message' => 'Blocked Successfully']);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Blocking Failed'], 500);
+            return response()->json(['status' => 'error', 'message' => 'Blocking Failed: ' . $e->getMessage()], 500);
         }
     }
+
     public function getUpdatedFunctionRoomBlockingTable()
     {
         $functionRoomDateBlockings = FunctionRoomDateBlocking::with('functionRoom')->latest()
@@ -277,6 +333,29 @@ class FunctionRoomsController extends Controller
 
     }
 
-    
+    public function deleteDateBlocking(Request $request)
+    {
+        $dateBlockingId = $request->input('dateBlockingId');
+
+        try {
+            $dateBlocking = FunctionRoomDateBlocking::findOrFail($dateBlockingId);
+
+            $dateBlocking->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Deleted successfully.'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Deletion failed.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
 }
 

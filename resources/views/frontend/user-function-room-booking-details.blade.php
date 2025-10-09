@@ -112,11 +112,11 @@
                                 <div>
                                     <small class="text-muted"><s>₱{{ number_format($baseRate, 2) }}/hr</s></small>
                                     &nbsp; → &nbsp;
-                                    <small class="text-success">₱{{ number_format($ratePerHour, 2) }}/hr</small>
+                                    <small class="fw-bold">₱{{ number_format($ratePerHour, 2) }}/hr</small>
                                     &nbsp; × &nbsp;
                                     <small>{{ $hours }} hr{{ $hours > 1 ? 's' : '' }}</small>
                                     &nbsp; = &nbsp;
-                                    <strong class="text-success">₱{{ number_format($roomLineTotal, 2) }}</strong>
+                                    <strong class="fw-bold">₱{{ number_format($roomLineTotal, 2) }}</strong>
                                 </div>
                             @else
                                 <div>
@@ -217,7 +217,7 @@
                             @if($ratePerHour > 0)
                                 <tr>
                                     <td>
-                                        Function Room Rate ({{ $hours }} hr{{ $hours > 1 ? 's' : '' }})
+                                        {{ $booking->functionRoom->function_room_name ?? 'N/A' }} ({{ $hours }} hr{{ $hours > 1 ? 's' : '' }})
                                         <!-- @if($baseRate > $ratePerHour)
                                                                                     <br>
                                                                                     <small class="text-muted">
@@ -233,7 +233,7 @@
                                 </tr>
                             @endif
 
-                            {{-- Add-ons --}}
+                            {{-- Add-ons --}}{{ $booking->functionRoom->function_room_name ?? 'N/A' }}
                             @if($booking->addOns?->count() > 0)
                                 @foreach($booking->addOns as $addon)
                                     @php

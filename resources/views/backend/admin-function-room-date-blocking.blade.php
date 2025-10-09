@@ -52,7 +52,7 @@
                                     <td>{{ strtoupper($functionRoomDateBlocking->date_blocking_end ?: 'N/A') }}</td>
                                     <td>
                                         <button type="button"
-                                            class="btn btn-danger delete_block_date btn-responsive btn-equal btn-sm"
+                                            class="btn btn-danger delete_date_blockings btn-responsive btn-equal btn-sm"
                                             data-bs-toggle="tooltip" data-bs-placement="right" title="Delete"
                                             data-id="{{ $functionRoomDateBlocking->id }}">
                                             <i class="fa-solid fa-trash"></i>

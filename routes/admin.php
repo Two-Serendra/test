@@ -137,9 +137,9 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/admin-show-function-room-date-blocking-table', [FunctionRoomsController::class, 'showFunctionRoomDateBlockingTable'])
         ->name('admin.show.function.rooms.date.blocking');
     Route::post('/admin-new-function-room-date-blocking', [FunctionRoomsController::class, 'newDateBlocking'])->name('new.function.room.date.blocking');
-
+    Route::get('/admin-fetch-function-room-blocked-dates', [FunctionRoomsController::class, 'fetchFunctionRoomBlockDates'])->name('fetch.function.room.block.dates');
     Route::get('/admin-get-updated-function-room-date-blocking', [FunctionRoomsController::class, 'getUpdatedFunctionRoomBlockingTable'])->name('get.updated.function.room.blocking.table');
-
+    Route::delete('/admin-delete-date-blocking', [FunctionRoomsController::class, 'deleteDateBlocking']);
 
 
     //Function Room Bookings
@@ -158,17 +158,17 @@ Route::middleware('auth:admin')->group(function () {
         ->name('admin.update.function.room.booking');
     Route::get('/admin-search-function-room-booking-records', [FunctionRoomBookingController::class, 'searchFunctionRoomBookingRecords'])
         ->name('search.function.room.booking.records');
-    Route::post('/admin-download-function-room-booking-records', [FunctionRoomBookingController::class, 'downloadFunctionRoomBookingRecords'])
-        ->name('download.function.room.booking.records');
+
 
 
     //Function Room Bookings Records
     Route::get('/admin-function-room-booking-records', action: [FunctionRoomBookingController::class, 'showFunctionRoomBookingRecords'])->name('admin.show.function.room.booking.records');
 
+    Route::post('/admin-download-function-room-booking-records', [FunctionRoomBookingController::class, 'downloadFunctionRoomBookingRecords'])
+        ->name('download.function.room.booking.records');
 
 
-
-    //Gallery
+    //dow
     Route::get('/admin-gallery', [GalleryController::class, 'showGallery'])->name('admin.show.gallery');
     Route::post('/admin/gallery/upload', [GalleryController::class, 'uploadGalleryImages'])->name('admin.gallery.upload');
     Route::get('/get-updated-gallery-table', [GalleryController::class, 'getUpdatedGalleryTable'])->name('get.updated.gallery.table');
@@ -186,6 +186,5 @@ Route::middleware('auth:admin')->group(function () {
 
 
 
-    Route::get('/admin-fetch-function-room-blocked-dates', [FunctionRoomsController::class, 'fetchFunctionRoomBlockDates'])->name('fetch.function.room.block.dates');
 
 });

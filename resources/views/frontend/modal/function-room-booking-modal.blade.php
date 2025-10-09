@@ -79,7 +79,7 @@
                             <div class="mb-3">
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="payment_mode"
-                                        id="Charge to Account" value="Charge to account" required>
+                                        id="Charge to Account" value="Charge to Account" required>
                                     <label class="form-check-label" for="Charge to Account">Charge to Account</label>
                                 </div>
                                 <div class="form-check form-check-inline">

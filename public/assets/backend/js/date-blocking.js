@@ -60,12 +60,14 @@ $(document).ready(function () {
         const endDateStr = $(form).find('[name="function_room_date_blocking_end"]').val();
         const startDate = new Date(Date.parse(startDateStr));
         const endDate = new Date(Date.parse(endDateStr));
+
+        // Validate input dates
         if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
             Swal.fire({
                 icon: 'error',
                 title: 'Invalid Date Format',
                 text: 'Please select valid dates.',
-                showConfirmButton: true
+                confirmButtonColor: '#d33',
             });
             return;
         }
@@ -74,7 +76,7 @@ $(document).ready(function () {
                 icon: 'error',
                 title: 'Invalid Date Selection',
                 text: 'End Date must be later than Start Date.',
-                showConfirmButton: true
+                confirmButtonColor: '#d33',
             });
             return;
         }
@@ -85,6 +87,7 @@ $(document).ready(function () {
             .attr('disabled', true)
             .html(`<div class="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></div>`)
             .css('width', originalWidth + 'px');
+
         var formData = new FormData(form);
 
         $.ajax({
@@ -98,53 +101,35 @@ $(document).ready(function () {
             contentType: false,
             success: function (response) {
                 $('#AddDateBlockingFunctionRoom').modal('hide');
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: "top-end",
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Blocked Successfully',
                     showConfirmButton: false,
-                    timer: 2000,
-                    timerProgressBar: true,
-                    customClass: {
-                        popup: 'colored-toast'
-                    },
-                    didOpen: (toast) => {
-                        toast.onmouseenter = Swal.stopTimer;
-                        toast.onmouseleave = Swal.resumeTimer;
-                    }
+                    timer: 2000
                 });
 
-                Toast.fire({
-                    icon: 'success',
-                    title: 'Blocked Successfully'
-                });
                 form.reset();
                 $(form).removeClass('was-validated');
                 refreshFunctionRoomDateBlocking();
             },
             error: function (xhr, status, error) {
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: "top-end",
-                    showConfirmButton: false,
-                    timer: 2000,
-                    timerProgressBar: true,
-                    customClass: {
-                        popup: 'colored-toast-error'
-                    },
-                    didOpen: (toast) => {
-                        toast.onmouseenter = Swal.stopTimer;
-                        toast.onmouseleave = Swal.resumeTimer;
-                    }
-                });
+                const response = xhr.responseJSON;
+                const message = response && response.message ? response.message : 'Blocking Failed. Please try again.';
 
-                Toast.fire({
+                // ✅ Show SweetAlert2 modal instead of toast
+                Swal.fire({
                     icon: 'error',
-                    title: 'Blocking Failed'
+                    title: 'Blocking Failed',
+                    text: message,
+                    confirmButtonText: 'Choose Another Date',
+                    confirmButtonColor: '#d33',
+                    allowOutsideClick: false,
+                }).then(() => {
+                    // Keep modal open to let admin adjust dates
+                    $('#AddDateBlockingFunctionRoom').modal('show');
                 });
             },
-
             complete: function () {
-                // Restore button to original state
                 $btn
                     .attr('disabled', false)
                     .html(`<span class="btn-text">Save</span>`)
@@ -152,6 +137,7 @@ $(document).ready(function () {
             }
         });
     });
+
 
 
     function refreshFunctionRoomDateBlocking() {
@@ -166,7 +152,7 @@ $(document).ready(function () {
                 tableBody.empty();
                 functionRoomDateBlockings.forEach(function (functionRoomDateBlocking) {
 
-                    var actionButtons = `<button type="button" class="btn btn-danger delete_block_date btn-responsive btn-equal btn-sm"
+                    var actionButtons = `<button type="button" class="btn btn-danger delete_date_blockings btn-responsive btn-equal btn-sm"
                                     data-bs-toggle="tooltip" data-bs-placement="right" title="Delete"
                                     data-id="${functionRoomDateBlocking.id}">
                                     <i class="fa-solid fa-trash"></i>
@@ -174,11 +160,16 @@ $(document).ready(function () {
 
 
 
-                    var function_room_name = functionRoomDateBlocking.functionRoom.function_room_name ? functionRoomDateBlocking.functionRoom.function_room_name.toUpperCase() : 'N/A';
-                    var blocking_remarks = functionRoomDateBlocking.blocking_remarks ? functionRoomDateBlocking.blocking_remarks.toUpperCase() : 'N/A';
+                    var function_room_name =
+                        functionRoomDateBlocking.function_room && functionRoomDateBlocking.function_room.function_room_name
+                            ? functionRoomDateBlocking.function_room.function_room_name.toUpperCase()
+                            : 'N/A';
+
 
                     var date_blocking_start = functionRoomDateBlocking.date_blocking_start ? functionRoomDateBlocking.date_blocking_start.toUpperCase() : 'N/A';
                     var date_blocking_end = functionRoomDateBlocking.date_blocking_end ? functionRoomDateBlocking.date_blocking_end.toUpperCase() : 'N/A';
+                    var blocking_remarks = functionRoomDateBlocking.blocking_remarks ? functionRoomDateBlocking.blocking_remarks.toUpperCase() : 'N/A';
+
                     var row = $(`
                                 <tr>
                                     <td>${function_room_name}</td>
@@ -197,5 +188,77 @@ $(document).ready(function () {
             }
         });
     }
+
+
+    $('#functionRoomDateBlockingTable').on('click', '.delete_date_blockings', function () {
+        var dateBlockingId = $(this).data('id');
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/admin/admin-delete-date-blocking',
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: {
+                        dateBlockingId: dateBlockingId,
+                        _method: 'DELETE'
+                    },
+                    success: function (response) {
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: "top-end",
+                            showConfirmButton: false,
+                            timer: 2000,
+                            timerProgressBar: true,
+                            customClass: {
+                                popup: 'colored-toast'
+                            },
+                            didOpen: (toast) => {
+                                toast.onmouseenter = Swal.stopTimer;
+                                toast.onmouseleave = Swal.resumeTimer;
+                            },
+                            target: 'body'
+                        });
+
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Deleted Successfully'
+                        });
+                        refreshFunctionRoomDateBlocking();
+                    },
+                    error: function (xhr, status, error) {
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: "top-end",
+                            showConfirmButton: false,
+                            timer: 2000,
+                            timerProgressBar: true,
+                            customClass: {
+                                popup: 'colored-toast-error'
+                            },
+                            didOpen: (toast) => {
+                                toast.onmouseenter = Swal.stopTimer;
+                                toast.onmouseleave = Swal.resumeTimer;
+                            }
+                        });
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Failed to delete'
+                        });
+                    },
+                });
+            }
+        });
+    });
+
 
 });

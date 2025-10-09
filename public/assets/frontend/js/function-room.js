@@ -201,7 +201,7 @@ $(document).ready(function () {
         $fileInput.prop('required', false);
 
         // ✅ Tenant booking with CTA
-        if (residentType === 'tenant' && paymentMode === 'Charge to account') {
+        if (residentType === 'tenant' && paymentMode === 'Charge to Account') {
             $('#authorizationLabel').text('CTA Authorization Letter *');
             $('#authorizationNote').text('Required because you are booking as a tenant with CTA.');
             $wrapper.removeClass('d-none');
@@ -251,7 +251,6 @@ $(document).ready(function () {
 
         if (!isValid) return;
 
-
         if (!form.checkValidity()) {
             form.classList.add('was-validated');
             return;
@@ -292,6 +291,7 @@ $(document).ready(function () {
                 $(form).find('#supplierSection, #authorizationUploadWrapper').hide();
             },
             error: function (xhr) {
+                // 409 → Conflict (double booking OR date blocked)
                 if (xhr.status === 409) {
                     Swal.fire({
                         icon: 'error',
@@ -303,6 +303,7 @@ $(document).ready(function () {
                     return;
                 }
 
+                // 422 → Add-ons stock insufficient
                 if (xhr.status === 422) {
                     Swal.fire({
                         icon: 'error',
@@ -314,6 +315,7 @@ $(document).ready(function () {
                     return;
                 }
 
+                // Fallback error
                 Swal.fire({
                     toast: true,
                     position: "top-end",
@@ -331,6 +333,7 @@ $(document).ready(function () {
             }
         });
     });
+
 
     $('input[name="contact_number"]').on('input', function () {
         this.value = this.value.replace(/\D/g, '').slice(0, 11);
@@ -515,7 +518,7 @@ $(document).ready(function () {
             if (ratePerHour && ratePerHour > 0) {
                 breakdownHtml += `
                 <tr>
-                    <td>Function Room Rate (${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })} hr${hours > 1 ? 's' : ''})</td>
+                    <td>${booking.function_room?.function_room_name ?? 'Function Room'} (${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })} hr${hours > 1 ? 's' : ''})</td>
                     <td class="text-center">${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })}</td>
                     <td class="text-end">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</td>
                     <td class="text-end">₱${Number(roomLineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>

@@ -220,6 +220,29 @@ class FrontendFunctionRoomBookingController extends Controller
                     ], 409);
                 }
 
+                // === Check if the booking date is blocked by admin ===
+                $isBlocked = FunctionRoomDateBlocking::where('function_room_id', $request->function_room_id)
+                    ->where('blocking_status', 1)
+                    ->where(function ($query) use ($request) {
+                        $query->whereBetween('date_blocking_start', [$request->function_room_booking_date, $request->function_room_booking_date])
+                            ->orWhereBetween('date_blocking_end', [$request->function_room_booking_date, $request->function_room_booking_date])
+                            ->orWhere(function ($query) use ($request) {
+                                $query->where('date_blocking_start', '<=', $request->function_room_booking_date)
+                                    ->where('date_blocking_end', '>=', $request->function_room_booking_date);
+                            });
+                    })
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($isBlocked) {
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Sorry, this date has been blocked by admin. Please choose another date.'
+                    ], 409);
+                }
+
+
                 // === Generate transaction number ===
                 $lastId = FunctionRoomBooking::max('id') + 1;
                 $transactionNo = '2SFR-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
@@ -243,36 +266,6 @@ class FrontendFunctionRoomBookingController extends Controller
                     $file->move($destinationPath, $filename);
                     $authorizationPath = 'assets/frontend/uploads/function-room-bookings/authorizations/' . $filename;
                 }
-
-
-                // $start = Carbon::parse($request->event_start_time);
-                // $end = Carbon::parse($request->event_end_time);
-                // if ($end->lte($start))
-                //     $end->addDay();
-                // $durationHours = $start->floatDiffInHours($end);
-                // $roomTotal = $room->discounted_rate * $durationHours;
-                // $booking = FunctionRoomBooking::create([
-                //     'transaction_no' => $transactionNo,
-                //     'user_id' => auth()->id(),
-                //     'unit_no' => $unitNo,
-                //     'resident_type' => $resident?->resident_type,
-                //     'function_room_id' => $room->id,
-                //     'purpose_of_event' => $request->purpose_of_event,
-                //     'function_room_booking_date' => $request->function_room_booking_date,
-                //     'event_start_time' => $request->event_start_time,
-                //     'event_end_time' => $request->event_end_time,
-                //     'contact_number' => $request->contact_number,
-                //     'pax' => $request->pax,
-                //     'payment_mode' => $request->payment_mode,
-                //     'has_suppliers' => $request->boolean('has_suppliers'),
-                //     'authorization_file' => $authorizationPath,
-                //     'base_rate' => $room->function_room_rate,
-                //     'discount' => $room->discount,
-                //     'final_rate' => $room->discounted_rate,
-                //     'room_total' => $roomTotal,
-                //     'addons_total' => 0,
-                //     'total_amount' => $roomTotal,
-                // ]);
 
                 // === Booking duration & rate ===
                 $start = Carbon::parse($request->event_start_time);

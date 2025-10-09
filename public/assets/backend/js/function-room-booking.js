@@ -277,12 +277,6 @@ $(document).ready(function () {
         });
     });
 
-
-
-
-
-
-
     // Show spinner
     function showSpinner() {
         $('#global-loading').addClass('show');
@@ -476,7 +470,7 @@ $(document).ready(function () {
             if (ratePerHour && ratePerHour > 0) {
                 breakdownHtml += `
                 <tr>
-                    <td>Function Room Rate (${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })} hr${hours > 1 ? 's' : ''})</td>
+                    <td>${booking.function_room?.function_room_name ?? 'Function Room'} (${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })} hr${hours > 1 ? 's' : ''})</td>
                     <td class="text-center">${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })}</td>
                     <td class="text-end">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</td>
                     <td class="text-end">₱${Number(roomLineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
@@ -574,6 +568,7 @@ $(document).ready(function () {
             $('#editFunctionRoomName').text(booking.function_room.function_room_name);
             $('#roomCapacity').val(booking.function_room.function_room_capacity);
             $('#editRoomCapacity').text(booking.function_room.function_room_capacity);
+            $('#editFunctionRoomBookingDate').val(booking.function_room_booking_date); // 👈 IMPORTANT
 
             $('#editPurposeOfEvent').val(booking.purpose_of_event);
             $('#editStartTime').val(booking.event_start_time);
@@ -584,7 +579,7 @@ $(document).ready(function () {
             $('#editContactNumber').val(booking.contact_number);
 
             // --- Payment Mode ---
-            const paymentModes = ['Charge to account', 'Advance Payment'];
+            const paymentModes = ['Charge to Account', 'Advance Payment'];
             let paymentHtml = '';
             paymentModes.forEach(pm => {
                 const checked = pm === booking.payment_mode ? 'checked' : '';
@@ -633,6 +628,7 @@ $(document).ready(function () {
             $('#editAddonsWrapper').html(addonHtml);
 
             // --- Suppliers ---
+            // --- Suppliers ---
             if (booking.has_suppliers && booking.suppliers.length > 0) {
                 $('#hasSuppliers').prop('checked', true);
                 $('#supplierSection').removeClass('d-none');
@@ -640,42 +636,64 @@ $(document).ready(function () {
                 let supplierHtml = '';
                 booking.suppliers.forEach((s, index) => {
                     supplierHtml += `
-                    <div class="row g-2 supplier-item mb-2">
-                        <div class="col-md-4">
-                            <input type="text" name="suppliers[${index}][name]" class="form-control" 
-                                placeholder="Supplier Name" value="${s.name}">
-                        </div>
-                        <div class="col-md-6">
-                            <a href="/assets/frontend/uploads/function-room-bookings/suppliers/${s.attachment}" 
-                               target="_blank" class="btn btn-sm btn-outline-primary mb-1">View File</a>
-                            <input type="file" name="suppliers[${index}][attachment]" class="form-control mt-1">
-                        </div>
-                        <div class="col-md-2 d-flex align-items-center">
-                            <button type="button" class="btn btn-sm btn-danger removeSupplier">Remove</button>
-                        </div>
-                    </div>
-                `;
+        <div class="row align-items-center g-2 supplier-item mb-2">
+            <input type="hidden" name="suppliers[${index}][id]" value="${s.id}">
+            
+            <div class="col-md-4">
+                <input type="text" 
+                       name="suppliers[${index}][name]" 
+                       class="form-control" 
+                       placeholder="Supplier Name" 
+                       value="${s.name ?? ''}">
+            </div>
+
+            <div class="col-md-6 d-flex align-items-center gap-2">
+                ${s.attachment_url
+                            ? `<a href="${s.attachment_url}" target="_blank" class="btn btn-sm btn-outline-primary">View</a>`
+                            : `<span class="text-muted small">No file</span>`}
+                <input type="file" 
+                       name="suppliers[${index}][attachment]" 
+                       class="form-control form-control-sm flex-grow-1">
+            </div>
+
+            <div class="col-md-2 text-end">
+                <button type="button" class="btn btn-sm btn-danger removeSupplier w-100">Remove</button>
+            </div>
+        </div>
+    `;
                 });
                 $('#suppliersWrapper').html(supplierHtml);
             } else {
                 $('#hasSuppliers').prop('checked', false);
                 $('#supplierSection').addClass('d-none');
                 $('#suppliersWrapper').html(`
-                <div class="row g-2 supplier-item mb-2">
-                    <div class="col-md-4">
-                        <input type="text" name="suppliers[0][name]" class="form-control" placeholder="Supplier Name">
-                    </div>
-                    <div class="col-md-6">
-                        <input type="file" name="suppliers[0][attachment]" class="form-control">
-                    </div>
-                </div>
-            `);
+        <div class="row align-items-center g-2 supplier-item mb-2">
+            <div class="col-md-4">
+                <input type="text" 
+                       name="suppliers[0][name]" 
+                       class="form-control" 
+                       placeholder="Supplier Name">
+            </div>
+            <div class="col-md-6 d-flex align-items-center gap-2">
+                <input type="file" 
+                       name="suppliers[0][attachment]" 
+                       class="form-control form-control-sm flex-grow-1">
+            </div>
+            <div class="col-md-2 text-end">
+                <button type="button" class="btn btn-sm btn-danger removeSupplier w-100">Remove</button>
+            </div>
+        </div>
+    `);
+
+
             }
 
             // --- Flatpickr ---
             $.get('/admin/admin-function-room/' + booking.function_room_id + '/booked-dates', function (disabledDates) {
                 let dateInput = document.getElementById("editFunctionRoomBookingDate");
                 if (dateInput._flatpickr) dateInput._flatpickr.destroy();
+
+                console.log(booking.function_room_booking_date);
 
                 flatpickr("#editFunctionRoomBookingDate", {
                     dateFormat: "Y-m-d",
@@ -742,7 +760,7 @@ $(document).ready(function () {
         $('#authorizationLabel').text('');
         $('#authorizationNote').text('');
 
-        if (residentType === 'tenant' && paymentMode === 'Charge to account') {
+        if (residentType === 'tenant' && paymentMode === 'Charge to Account') {
             $('#authorizationLabel').text('CTA Authorization Letter *');
             $('#authorizationNote').text('Required because you are booking as a tenant with CTA.');
             $wrapper.removeClass('d-none');

@@ -123,7 +123,7 @@
         //     toastr.options = {
         //         closeButton: true,
         //         progressBar: true,
-        //         positionClass: "toast-bottom-right",
+        //         positionClass: "toast-top-right",
         //         timeOut: 0, // 0 means it won't auto-dismiss
         //         extendedTimeOut: 0
         //     };
@@ -197,7 +197,7 @@
                         toastr.options = {
                             closeButton: true,
                             progressBar: true,
-                            positionClass: "toast-bottom-right",
+                            positionClass: "toast-top-right",
                             timeOut: 4000
                         };
 

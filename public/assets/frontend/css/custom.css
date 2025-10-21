@@ -512,7 +512,74 @@ input[type="file"].form-control {
     /* Flex only when 'show' class is added */
 }
 
-#toast-container.toast-bottom-right {
-    bottom: 70px !important; /* raise it higher, adjust as needed */
+#toast-container.toast-top-right {
+    top: 153px !important;
     right: 12px !important;
 }
+
+
+.sticky-top {
+    overflow: visible !important;
+}
+
+/* Ensure dropdown menus display properly above everything */
+.navbar .dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    left: auto !important;
+    z-index: 1055 !important;
+    transform: none !important;
+}
+
+/* Notification dropdown scroll + readability */
+#notifDropdownMenu {
+    max-height: 300px;
+    overflow-y: auto;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+@media (max-width: 576px) {
+    #notifDropdownMenu {
+        max-width: 90vw;
+        left: 5vw !important;
+        right: 5vw !important;
+    }
+}
+
+
+#userDropdown+.dropdown-menu {
+    right: 0;
+    left: auto;
+}
+
+
+@media (max-width: 991.98px) {
+    .navbar .dropdown-menu {
+        position: static !important;
+        transform: none !important;
+        box-shadow: none !important;
+        width: 100% !important;
+        margin-top: 0.5rem;
+    }
+
+    #notifDropdownMenu {
+        max-height: 250px;
+        overflow-y: auto;
+        width: 100% !important;
+    }
+
+    /* .nav-item.dropdown {
+        width: 100%;
+        text-align: center;
+    } */
+
+    .nav-item.dropdown .dropdown-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+

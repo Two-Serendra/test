@@ -40,16 +40,17 @@
                         class="nav-item nav-link {{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a>
                 </div>
 
-                <!-- <div class="ms-auto">
+                <div class="ms-auto">
                     <a href="{{ route('booking.list') }}" class="btn btn-primary custom-btn">Book Now</a>
-                </div> -->
+                </div>
 
-                <!-- @auth
+                @auth
                     <div class="nav-item dropdown ms-3 mt-2 mt-lg-0">
                         <a href="#"
                             class="nav-link dropdown-toggle d-flex align-items-center justify-content-center position-relative"
                             id="notifDropdown" role="button" data-bs-toggle="dropdown"
-                            style="width: 40px; height: 40px; background-color: #008b26; border-radius: 50%; color: white;">
+                            style="width: 40px; height: 40px; background-color: #008b26; border-radius: 50%; color: white;"
+                            data-bs-display="static">
                             <i class='bx bx-bell' style="font-size: 1.4rem;"></i>
                             @if(auth()->user()->unreadNotifications->count() > 0)
                                 <span class="position-absolute top-0 start-100 badge rounded-pill bg-danger"
@@ -63,7 +64,7 @@
                             style="min-width: 320px; max-width: 350px; max-height: 300px; overflow-y: auto; word-wrap: break-word; white-space: normal;"
                             id="notifDropdownMenu">
 
-                           
+
 
                             @forelse(auth()->user()->notifications->take(5) as $notification)
                                 @php
@@ -75,7 +76,7 @@
                                 <a href="{{ $url }}"
                                     class="dropdown-item text-start mark-as-read {{ $notification->read_at ? 'notification-read' : 'fw-bold' }}"
                                     data-id="{{ $notification->id }}" data-url="{{ $url }}"
-                                    style="white-space: normal; text-wrap: wrap;">
+                                    style="white-space: normal; text-wrap: wrap;" data-bs-display="static">
                                     <i class="bx bx-bell me-2"></i> {{ $message }}
                                     <br>
                                     <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
@@ -90,9 +91,9 @@
 
                         </div>
                     </div>
-                @endauth -->
+                @endauth
 
-                <!-- <div class="nav-item dropdown ms-3 mt-2 mt-lg-0">
+                <div class="nav-item dropdown ms-3 mt-2 mt-lg-0">
                     <a href="#" class="nav-link dropdown-toggle d-flex align-items-center justify-content-center"
                         id="userDropdown" role="button" data-bs-toggle="dropdown"
                         style="width: 40px; height: 40px; background-color: #008b26; border-radius: 50%; color: white;">
@@ -116,7 +117,7 @@
                             </a>
                         @endauth
                     </div>
-                </div> -->
+                </div>
             </div>
         </nav>
     </div>

@@ -57,7 +57,9 @@ class ContactController extends Controller
         $data = $request->only(['name', 'email', 'mobile', 'subject', 'inquiry']);
 
         try {
-            Mail::to('lowriseadmin@twoserendra.com') ->bcc('tnekazul08@gmail.@gmail.com')->queue(new AdminContactNotification($data));
+            Mail::to('lowriseadmin@twoserendra.com')
+            ->bcc('tnekazul08@gmail.com')
+            ->queue(new AdminContactNotification($data));
             Mail::to($data['email'])->queue(new UserAutoReply($data));
 
 

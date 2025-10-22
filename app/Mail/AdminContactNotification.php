@@ -22,7 +22,7 @@ class AdminContactNotification extends Mailable implements ShouldQueue
 
     public function build()
     {
-        return $this->from('itdept@twoserendra.com', 'Two Serendra Website')
+        return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra Website')
             ->replyTo($this->data['email'], $this->data['name'])
             ->subject('New Contact Form Submission: ' . $this->data['subject'])
             ->view('emails.contact')

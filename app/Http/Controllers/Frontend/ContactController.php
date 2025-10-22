@@ -57,8 +57,9 @@ class ContactController extends Controller
         $data = $request->only(['name', 'email', 'mobile', 'subject', 'inquiry']);
 
         try {
-            Mail::to('lowriseadmin@twoserendra.com')->send(new AdminContactNotification($data));
-            Mail::to($data['email'])->send(new UserAutoReply($data));
+            Mail::to('lowriseadmin@twoserendra.com')->queue(new AdminContactNotification($data));
+            Mail::to($data['email'])->queue(new UserAutoReply($data));
+
 
             \Log::info('Contact form submitted & auto-reply sent:', $data);
 

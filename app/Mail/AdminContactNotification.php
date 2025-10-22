@@ -22,8 +22,17 @@ class AdminContactNotification extends Mailable implements ShouldQueue
 
     public function build()
     {
-        return $this->view('emails.contact')
+        return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra Website')
+            ->replyTo($this->data['email'], $this->data['name'])
             ->subject('New Contact Form Submission: ' . $this->data['subject'])
+            ->view('emails.contact')
+            ->with([
+                'name' => $this->data['name'],
+                'email' => $this->data['email'],
+                'mobile' => $this->data['mobile'],
+                'inquiry' => $this->data['inquiry'],
+                'subject' => $this->data['subject'],
+            ])
             ->withSwiftMessage(function ($message) {
                 $message->getHeaders()->addTextHeader('X-ElasticEmail-MessageCategory', 'Transactional');
             });

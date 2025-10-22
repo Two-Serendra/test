@@ -19,7 +19,8 @@ class UserAutoReply extends Mailable implements ShouldQueue
 
     public function build()
     {
-        return $this->subject('Thank you for contacting Two Serendra')
+        return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra')
+            ->subject('Thank you for contacting Two Serendra')
             ->view('emails.contact-auto-reply')
             ->with([
                 'name' => $this->data['name'],

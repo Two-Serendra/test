@@ -28,12 +28,14 @@ class TestMailController extends Controller
                 'fromName' => 'Two Serendra',
                 'to' => $email,
                 'subject' => 'Test Email',
-                'template' => 'EmailTest', 
+                'template' => 'EmailTest',
                 'isTransactional' => true,
             ]);
 
             // Log the response
             \Log::info('Elastic Email Response: ' . $response->body());
+            \Log::info('Elastic Email API Key: ' . env('ELASTICEMAIL_API_KEY'));
+
 
             return response()->json(['message' => 'Email sent via Elastic Email template']);
         } catch (Exception $e) {

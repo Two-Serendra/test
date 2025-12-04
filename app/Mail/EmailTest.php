@@ -25,7 +25,7 @@ class EmailTest extends Mailable implements ShouldQueue
     {
        
 
-    return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra')
+    return $this->from('circulars@twoserendra.com', 'Two Serendra')
             ->subject('Test Mail')
             ->view('emails.email-test');
     }

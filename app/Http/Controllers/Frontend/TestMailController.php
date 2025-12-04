@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\EmailTest;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 use Exception;
 
 class TestMailController extends Controller
@@ -20,23 +21,25 @@ class TestMailController extends Controller
     {
         $email = $request->email;
 
-        Log::info("Attempting to send email to: " . $email);
-
         try {
-            Mail::to($email)->send(new EmailTest()); // use send() for testing
-            Log::info("Email sent immediately to: " . $email);
+            $response = Http::post('https://api.elasticemail.com/v2/email/send', [
+                'apikey' => env('ELASTICEMAIL_API_KEY'),
+                'from' => 'no-reply@twoserendra.com',
+                'fromName' => 'Two Serendra',
+                'to' => $email,
+                'subject' => 'Test Email',
+                'template' => 'EmailTest', 
+                'isTransactional' => true,
+            ]);
 
-            return response()->json(['message' => 'Email sent']);
+            // Log the response
+            \Log::info('Elastic Email Response: ' . $response->body());
 
+            return response()->json(['message' => 'Email sent via Elastic Email template']);
         } catch (Exception $e) {
-
-            Log::error("Email sending failed: " . $e->getMessage());
-
-            return response()->json([
-                'message' => 'Email sending failed',
-                'error' => $e->getMessage()
-            ], 500);
+            \Log::error('Elastic Email failed: ' . $e->getMessage());
+            return response()->json(['message' => 'Email sending failed', 'error' => $e->getMessage()], 500);
         }
-        
+
     }
 }

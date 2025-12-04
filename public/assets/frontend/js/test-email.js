@@ -39,14 +39,14 @@ $(document).ready(function () {
                 Swal.fire({
                     icon: "error",
                     title: "Oops!",
-                    text: "Something went wrong.",
+                    text: xhr.responseJSON?.message || "Something went wrong.",
                 });
 
                 btn.prop("disabled", false).text("Send");
-
                 console.error(xhr.responseText);
             }
+
         });
     });
-    
+
 });

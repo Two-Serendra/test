@@ -31,4 +31,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'elasticemail' => [
+        'key' => env('ELASTICEMAIL_API_KEY'),
+        'from' => env('ELASTICEMAIL_FROM', 'circulars@twoserendra.com'),
+        'from_name' => env('ELASTICEMAIL_FROM_NAME', 'Two Serendra'),
+    ],
+
 ];

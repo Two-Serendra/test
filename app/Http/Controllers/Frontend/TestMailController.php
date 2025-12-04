@@ -23,9 +23,9 @@ class TestMailController extends Controller
 
         try {
             $response = Http::post('https://api.elasticemail.com/v2/email/send', [
-                'apikey' => env('ELASTICEMAIL_API_KEY'),
-                'from' => 'circulars@twoserendra.com',
-                'fromName' => 'Two Serendra',
+                'apikey' => config('services.elasticemail.key'),
+                'from' => config('services.elasticemail.from'),
+                'fromName' => config('services.elasticemail.from_name'),
                 'to' => $email,
                 'subject' => 'Test Email',
                 'template' => 'EmailTest',
@@ -34,7 +34,7 @@ class TestMailController extends Controller
 
             // Log the response
             \Log::info('Elastic Email Response: ' . $response->body());
-            \Log::info('Elastic Email API Key: ' . env('ELASTICEMAIL_API_KEY'));
+            \Log::info('Elastic Email API Key: [' . config('services.elasticemail.key') . ']');
 
 
             return response()->json(['message' => 'Email sent via Elastic Email template']);

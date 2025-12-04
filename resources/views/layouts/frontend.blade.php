@@ -52,6 +52,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
 
+
+
 </head>
 
 <body>
@@ -99,6 +101,7 @@
     <script src="{{ asset('assets/frontend/js/work-permit.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/profile.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/function-room.js') }}"></script>
+    <script src="{{ asset('assets/frontend/js/test-email.js') }}"></script>
 
 
     <script>

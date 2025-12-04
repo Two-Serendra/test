@@ -51,6 +51,7 @@ Route::get('/maps', [NavbarController::class, 'maps'])->name('maps');
 Route::get('/events', [NavbarController::class, 'events'])->name('events');
 Route::get('/events/{id}', [NavbarController::class, 'showEventDetails'])->name('show.event.details');
 Route::get('/email-test', [TestMailController::class, 'emailTest'])->name('email.test');
+
 Route::post('/send-email', [TestMailController::class, 'sendEmail'])->name('send.email.test');
 ;
 

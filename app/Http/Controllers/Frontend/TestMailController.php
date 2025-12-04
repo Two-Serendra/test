@@ -37,5 +37,6 @@ class TestMailController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+        
     }
 }

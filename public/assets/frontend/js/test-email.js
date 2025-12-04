@@ -29,7 +29,7 @@ $(document).ready(function () {
                 Swal.fire({
                     icon: "success",
                     title: "Email Sent!",
-                    text: "The email has been sent successfully.",
+                    text: "Kindly check your inbox/spam/junk folder to view the email. If you did not receive the email, kindly contact lowriseadmin@twoserendra.com or (02)8252-5063.",
                 });
 
                 $("#sentTestEmail")[0].reset();

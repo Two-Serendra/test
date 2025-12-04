@@ -24,7 +24,7 @@ class TestMailController extends Controller
         try {
             $response = Http::post('https://api.elasticemail.com/v2/email/send', [
                 'apikey' => env('ELASTICEMAIL_API_KEY'),
-                'from' => 'no-reply@twoserendra.com',
+                'from' => 'circulars@twoserendra.com',
                 'fromName' => 'Two Serendra',
                 'to' => $email,
                 'subject' => 'Test Email',

@@ -22,26 +22,44 @@ class TestMailController extends Controller
         $email = $request->email;
 
         try {
+            // Get API key and other settings from config
+            $apiKey = config('services.elasticemail.key');
+            $from = config('services.elasticemail.from');
+            $fromName = config('services.elasticemail.from_name');
+
+            // Log the config values for debugging
+            \Log::info('Sending Elastic Email with:');
+            \Log::info('API Key: [' . $apiKey . ']');
+            \Log::info('From: ' . $from);
+            \Log::info('From Name: ' . $fromName);
+            \Log::info('Recipient: ' . $email);
+
+            // Send the email
             $response = Http::post('https://api.elasticemail.com/v2/email/send', [
-                'apikey' => config('services.elasticemail.key'),
-                'from' => config('services.elasticemail.from'),
-                'fromName' => config('services.elasticemail.from_name'),
+                'apikey' => $apiKey,
+                'from' => $from,
+                'fromName' => $fromName,
                 'to' => $email,
                 'subject' => 'Test Email',
-                'template' => 'EmailTest', 
+                'template' => 'EmailTest',
                 'isTransactional' => true,
             ]);
 
-            // Log the response
+            // Log full response from Elastic Email
             \Log::info('Elastic Email Response: ' . $response->body());
-            \Log::info('Elastic Email API Key: [' . config('services.elasticemail.key') . ']');
 
+            // Return JSON success
+            return response()->json(['message' => 'Email sent via Elastic Email template', 'response' => $response->body()]);
 
-            return response()->json(['message' => 'Email sent via Elastic Email template']);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
+            // Log error
             \Log::error('Elastic Email failed: ' . $e->getMessage());
-            return response()->json(['message' => 'Email sending failed', 'error' => $e->getMessage()], 500);
-        }
 
+            return response()->json([
+                'message' => 'Email sending failed',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
+
 }

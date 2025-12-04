@@ -35,7 +35,7 @@ class TestMailController extends Controller
             \Log::info('Recipient: ' . $email);
 
             // Send the email
-            $response = Http::post('https://api.elasticemail.com/v2/email/send', [
+            $response = Http::asForm()->post('https://api.elasticemail.com/v2/email/send', [
                 'apikey' => $apiKey,
                 'from' => $from,
                 'fromName' => $fromName,
@@ -44,6 +44,7 @@ class TestMailController extends Controller
                 'template' => 'EmailTest',
                 'isTransactional' => true,
             ]);
+
 
             // Log full response from Elastic Email
             \Log::info('Elastic Email Response: ' . $response->body());

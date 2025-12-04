@@ -28,7 +28,7 @@ class TestMailController extends Controller
                 'fromName' => config('services.elasticemail.from_name'),
                 'to' => $email,
                 'subject' => 'Test Email',
-                'template' => 'EmailTest',
+                'template' => 'EmailTest', 
                 'isTransactional' => true,
             ]);
 

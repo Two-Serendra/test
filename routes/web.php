@@ -9,6 +9,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Frontend\NavbarController;
 use App\Http\Controllers\Frontend\UserProfileController;
 use App\Http\Controllers\Frontend\FrontendFunctionRoomBookingController;
+use App\Http\Controllers\Frontend\TestMailController;
 use App\Http\Controllers\Backend\AdminAuthController;
 use App\Http\Controllers\Backend\DashboardController;
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -49,7 +50,9 @@ Route::get('/sections', [NavbarController::class, 'sections'])->name('sections')
 Route::get('/maps', [NavbarController::class, 'maps'])->name('maps');
 Route::get('/events', [NavbarController::class, 'events'])->name('events');
 Route::get('/events/{id}', [NavbarController::class, 'showEventDetails'])->name('show.event.details');
-
+Route::get('/email-test', [TestMailController::class, 'emailTest'])->name('email.test');
+Route::post('/send-email', [TestMailController::class, 'sendEmail'])->name('send.email.test');
+;
 
 
 Route::get('/our-team', [NavbarController::class, 'ourTeam'])->name('ourTeam');
@@ -60,6 +63,8 @@ Route::get('/minor-work-permit', [NavbarController::class, 'minorWorkPermit'])->
 //Work Permit
 Route::post('/submit-minor-work-permit', [UserWorkPermitController::class, 'submitMinorWorkPermit'])->middleware(['auth'])->name('submit.minor.work.permit');
 Route::get('/forms', [NavbarController::class, 'getAllDownloads'])->name('downloads');
+
+
 
 //Booking
 Route::get('/booking/list', [FrontendFunctionRoomBookingController::class, 'list'])->name('booking.list');
@@ -91,7 +96,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/function-room/{id}/booked-dates', [FrontendFunctionRoomBookingController::class, 'getFunctionRoomBookedDates']);
     Route::get('/view-function-room-bookings/{id}/details', [FrontendFunctionRoomBookingController::class, 'getFunctionRoomBookingDetails'])
         ->name('get.function.room.bookings.details');
-    
+
     // Add Ons
     Route::get('/function-room/addons-availability', [FrontendFunctionRoomBookingController::class, 'getAddOnsAvailability']);
 
@@ -110,7 +115,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/booking/{id}/cancel', [FrontendFunctionRoomBookingController::class, 'cancel'])->name('booking.cancel');
 
 });
-
 
 Route::middleware('web')
     ->prefix('admin')

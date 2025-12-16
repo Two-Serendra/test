@@ -191,7 +191,7 @@
                         and corrective maintenance activities, and respond promptly to technical concerns. At Two Serendra,
                         the
                         Engineering Team plays a critical role in maintaining the overall quality and comfort of residential
-                        living by ensuring that all facilities and equipment operate reliably and efficiently at all times.X
+                        living by ensuring that all facilities and equipment operate reliably and efficiently at all times.
                     </p>
                 </div>
             </div>

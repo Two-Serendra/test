@@ -62,7 +62,7 @@
                                 <a href="https://outlook.office.com/book/TwoSerendraEngineering@twoserendra.com" target="_blank"
                                     class="d-flex align-items-center fs-6 text-dark online-form-link">
                                     <i class='bx bx-file-blank me-2 fs-4'></i>
-                                    ANUAL UNIT SAFETY INSPECTION (AUSI)
+                                    ANNUAL UNIT SAFETY INSPECTION (AUSI)
                                 </a>
                             </li>
                         </ul>

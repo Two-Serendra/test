@@ -59,17 +59,10 @@
                                 </a>
                             </li>
                             <li class="list-group-item">
-                                <a href="https://bit.ly/3DjCJ94" target="_blank"
+                                <a href="https://outlook.office.com/book/TwoSerendraEngineering@twoserendra.com" target="_blank"
                                     class="d-flex align-items-center fs-6 text-dark online-form-link">
                                     <i class='bx bx-file-blank me-2 fs-4'></i>
-                                    AUSI - Low Rise
-                                </a>
-                            </li>
-                            <li class="list-group-item">
-                                <a href="https://bit.ly/3DmZ19S" target="_blank"
-                                    class="d-flex align-items-center fs-6 text-dark online-form-link">
-                                    <i class='bx bx-file-blank me-2 fs-4'></i>
-                                    AUSI - High Rise
+                                    ANUAL UNIT SAFETY INSPECTION (AUSI)
                                 </a>
                             </li>
                         </ul>

@@ -59,20 +59,21 @@
 <body>
     @include('layouts.includes.topbar')
     @include('layouts.includes.navbar')
-    <div class="wrapper">
-        <div class="main">
+    <div class="wrapper d-flex flex-column min-vh-100">
+        <div class="main flex-grow-1">
             <div class="main-panel">
                 <div id="app">
-                    <div id="notifications-container">
-                    </div>
+                    <div id="notifications-container"></div>
                 </div>
                 @yield('content')
             </div>
         </div>
+
+        @include('layouts.includes.footer')
+        @include('layouts.includes.copyright')
     </div>
 
-    @include('layouts.includes.footer')
-    @include('layouts.includes.copyright')
+
 
     <a href="#" class="btn btn-lg btn-lg-square back-to-top text-light" style="background-color: #004d1a;"><i
             class="bi bi-arrow-up"></i></a>

@@ -45,11 +45,27 @@
 
         <!-- Submit -->
         <div class="mt-4">
-            <x-primary-button class="w-full flex justify-center items-center text-center"
+            <!-- <x-primary-button class="w-full flex justify-center items-center text-center"
                 style="background-color: #008b26;">
                 {{ __('Register') }}
+            </x-primary-button> -->
+
+            <x-primary-button type="submit" id="loginBtn"
+                class="w-full flex justify-center items-center text-center relative cursor-pointer transition-colors duration-200"
+                style="background-color: #008b26; color: white;">
+                <!-- Spinner (hidden by default) -->
+                <svg id="btnSpinner" class="h-5 w-5 text-white mr-3 hidden" xmlns="http://www.w3.org/2000/svg"
+                    fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                </svg>
+
+                <span id="btnText">Submit</span>
             </x-primary-button>
         </div>
+        </div>
+
+
 
         <!-- Already Registered -->
         <div class="mt-2 text-center">
@@ -62,3 +78,36 @@
         </div>
     </form>
 </x-guest-layout>
+
+<script>
+    const btn = document.getElementById('loginBtn');
+    const spinner = document.getElementById('btnSpinner');
+    const text = document.getElementById('btnText');
+
+    document.querySelector('form').addEventListener('submit', function (e) {
+
+        if (btn.disabled) return;
+        btn.disabled = true;
+        btn.style.backgroundColor = '#007a20';
+        spinner.classList.remove('hidden');
+        spinner.style.animation = "spin 1s linear infinite";
+        text.textContent = 'Submitting...';
+    });
+
+    // Hover effect: only if button is enabled
+    btn.addEventListener('mouseenter', function () {
+        if (!btn.disabled) btn.style.backgroundColor = '#009432';
+    });
+    btn.addEventListener('mouseleave', function () {
+        if (!btn.disabled) btn.style.backgroundColor = '#008b26';
+    });
+
+    const style = document.createElement('style');
+    style.innerHTML = `
+@keyframes spin { 
+    0% { transform: rotate(0deg); } 
+    100% { transform: rotate(360deg); } 
+}
+`;
+    document.head.appendChild(style);
+</script>

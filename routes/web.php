@@ -15,6 +15,7 @@ use App\Http\Controllers\Backend\DashboardController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 
 
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -53,8 +54,7 @@ Route::get('/events/{id}', [NavbarController::class, 'showEventDetails'])->name(
 Route::get('/email-test', [TestMailController::class, 'emailTest'])->name('email.test');
 
 Route::post('/send-email', [TestMailController::class, 'sendEmail'])->name('send.email.test');
-;
-
+route::get('/request-electricity/{unitNo}/{year}/{month}', [ProfileController::class, 'requestElectricity'])->name('request.electricity');
 
 Route::get('/our-team', [NavbarController::class, 'ourTeam'])->name('ourTeam');
 Route::get('/gallery', [NavbarController::class, 'gallery'])->name('gallery');
@@ -66,6 +66,9 @@ Route::post('/submit-minor-work-permit', [UserWorkPermitController::class, 'subm
 Route::get('/forms', [NavbarController::class, 'getAllDownloads'])->name('downloads');
 
 
+
+
+route::get('/request-electricity/{unitNo}/{year}/{month}', [ProfileController::class, 'requestElectricity'])->name('request.electricity');
 
 //Booking
 Route::get('/booking/list', [FrontendFunctionRoomBookingController::class, 'list'])->name('booking.list');
@@ -83,11 +86,16 @@ Route::get('/check-auth', function () {
 Route::post('/send', [ContactController::class, 'send'])
     ->name('contact.send')
     ->middleware('throttle:5,1');
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/profile/soa', [ProfileController::class, 'soa'])->name('soa');
+    Route::get('/request-soa', [ProfileController::class, 'Reqsoa'])->name('request.soa');
+    Route::post('/generate-soa', [ProfileController::class, 'GenerateSoa'])->name(name: 'generate.soa');
+
 
 
     // Function Room Booking

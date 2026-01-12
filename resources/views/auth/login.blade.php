@@ -24,20 +24,23 @@
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
-        <div class="mt-4">
-            <x-primary-button class="w-full flex justify-center items-center text-center"
-                style="background-color: #008b26;">
-                {{ __('Log in') }}
-            </x-primary-button>
+    
+          <div class="mt-4">
+    <x-primary-button 
+        type="submit" 
+        id="loginBtn" 
+        class="w-full flex justify-center items-center text-center relative cursor-pointer transition-colors duration-200"
+        style="background-color: #008b26; color: white;"
+    >
+        <!-- Spinner (hidden by default) -->
+        <svg id="btnSpinner" class="h-5 w-5 text-white mr-3 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+        </svg>
 
-            <!-- @if (Route::has('password.request'))
-                <div class="mt-2 text-center">
-                    <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
-                        href="{{ route('password.request') }}">
-                        {{ __('Forgot your password?') }}
-                    </a>
-                </div>
-            @endif -->
+        <span id="btnText">Log in</span>
+    </x-primary-button>
+</div>
 
             @if (Route::has('register'))
                 <div class="mt-2 text-center">
@@ -49,33 +52,38 @@
             @endif
 
         </div>
-
-
-
-
-
-
-        <!-- Remember Me -->
-        <!-- <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox"
-                    class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
-                    name="remember">
-                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
-            </label>
-        </div> -->
-
-        <!-- <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
-                    href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div> -->
     </form>
 </x-guest-layout>
+
+<script>
+const btn = document.getElementById('loginBtn');
+const spinner = document.getElementById('btnSpinner');
+const text = document.getElementById('btnText');
+
+document.querySelector('form').addEventListener('submit', function(e) {
+   
+    if(btn.disabled) return;
+    btn.disabled = true;
+    btn.style.backgroundColor = '#007a20'; 
+    spinner.classList.remove('hidden');
+    spinner.style.animation = "spin 1s linear infinite";
+    text.textContent = 'Logging in...';
+});
+
+// Hover effect: only if button is enabled
+btn.addEventListener('mouseenter', function() {
+    if(!btn.disabled) btn.style.backgroundColor = '#009432'; 
+});
+btn.addEventListener('mouseleave', function() {
+    if(!btn.disabled) btn.style.backgroundColor = '#008b26'; 
+});
+
+const style = document.createElement('style');
+style.innerHTML = `
+@keyframes spin { 
+    0% { transform: rotate(0deg); } 
+    100% { transform: rotate(360deg); } 
+}
+`;
+document.head.appendChild(style);
+</script>

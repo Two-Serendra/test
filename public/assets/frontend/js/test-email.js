@@ -3,7 +3,7 @@ $(document).ready(function () {
     $("#sentTestEmail").submit(function (event) {
         event.preventDefault();
 
-        let form = $(this)[0];   // FIXED
+        let form = $(this)[0];
         let email = $("#emailInput").val();
 
         // HTML5 validation
@@ -15,7 +15,13 @@ $(document).ready(function () {
         $(form).removeClass('was-validated');
 
         let btn = $("#submitBtn");
-        btn.prop("disabled", true).text("Sending...");
+        let spinner = btn.find(".spinner-border");
+        let btnText = btn.find(".btn-text");
+
+        // Show spinner and hide text
+        spinner.removeClass("d-none");
+        btnText.addClass("d-none");
+        btn.prop("disabled", true);
 
         $.ajax({
             url: $(this).attr('action'),
@@ -25,7 +31,6 @@ $(document).ready(function () {
                 _token: $('input[name="_token"]').val()
             },
             success: function () {
-
                 Swal.fire({
                     icon: "success",
                     title: "Email Sent!",
@@ -33,7 +38,6 @@ $(document).ready(function () {
                 });
 
                 $("#sentTestEmail")[0].reset();
-                btn.prop("disabled", false).text("Send");
             },
             error: function (xhr) {
                 Swal.fire({
@@ -41,12 +45,17 @@ $(document).ready(function () {
                     title: "Oops!",
                     text: xhr.responseJSON?.message || "Something went wrong.",
                 });
-
-                btn.prop("disabled", false).text("Send");
                 console.error(xhr.responseText);
+            },
+            complete: function () {
+                // Hide spinner and restore text
+                spinner.addClass("d-none");
+                btnText.removeClass("d-none");
+                btn.prop("disabled", false);
             }
-
         });
     });
+
+
 
 });

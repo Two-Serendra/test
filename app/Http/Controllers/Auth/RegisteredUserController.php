@@ -44,7 +44,6 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
-        // 🔎 Check if email exists in emails table
         $emailRow = ResidentDetails::where('email', $request->email)->first();
 
         if (!$emailRow) {
@@ -53,14 +52,13 @@ class RegisteredUserController extends Controller
             ]);
         }
 
-        // ✅ Create user and link to email record
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role_id' => 0, // normal user
+            'role_id' => 0,
             'is_active' => true,
-            'email_id' => $emailRow->id, // link to email table row
+            // 'email_id' => $emailRow->id,
         ]);
 
         event(new Registered($user));

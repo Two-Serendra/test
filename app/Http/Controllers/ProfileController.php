@@ -11,7 +11,7 @@ use Illuminate\View\View;
 use App\Models\ResidentDetails;
 use App\Models\FunctionRoomBooking;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Http;
 class ProfileController extends Controller
 {
     /**
@@ -35,17 +35,27 @@ class ProfileController extends Controller
         $selectedUnit = request('unit_no', $allResidences->first()->unit_no ?? null);
 
         // Fetch bookings only for the selected unit
+        // $bookings = FunctionRoomBooking::with('functionRoom')
+        //     ->when($selectedUnit, function ($query) use ($selectedUnit) {
+        //         $query->where('unit_no', $selectedUnit);
+        //     })
+        //     ->orderBy('created_at', 'desc')
+        //     ->paginate(5, ['*'], 'bookings_page');
+
         $bookings = FunctionRoomBooking::with('functionRoom')
+            ->select(DB::raw('MIN(id) as id'), 'transaction_no')
             ->when($selectedUnit, function ($query) use ($selectedUnit) {
                 $query->where('unit_no', $selectedUnit);
             })
-            ->orderBy('created_at', 'desc')
+            ->groupBy('transaction_no')
+            ->orderByRaw('MIN(created_at) DESC')
             ->paginate(5, ['*'], 'bookings_page');
+
 
         return view('profile.edit', [
             'user' => $request->user(),
-            'residences' => $residences,  
-            'allResidences' => $allResidences, 
+            'residences' => $residences,
+            'allResidences' => $allResidences,
             'bookings' => $bookings,
             'selectedUnit' => $selectedUnit,
         ]);
@@ -87,5 +97,45 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function soa()
+    {
+        $residences = auth()->check()
+            ? DB::table('resident_details')
+                ->where('email', auth()->user()->email)
+                ->select('id', 'unit_no', 'resident_type')
+                ->get()
+            : collect();
+
+        return view('frontend.soa', compact('residences'));
+    }
+
+
+    public function GenerateSoa(Request $request)
+    {
+        $request->validate([
+            'resident_id' => 'required',
+            'year' => 'required',
+            'month' => 'required',
+        ]);
+
+        $residence = ResidentDetails::findOrFail($request->resident_id); 
+
+        $unit = $residence->unit_no;
+        $year = $request->year;
+        $month = str_pad($request->month, 2, '0', STR_PAD_LEFT);
+
+        $soaUrl = "http://localhost:3000/request-electricity/{$unit}/{$year}/{$month}";
+
+        return response()->json([
+            'soaUrl' => $soaUrl
+        ]);
+    }
+
+
+    public function requestElectricity()
+    {
+
     }
 }

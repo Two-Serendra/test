@@ -223,6 +223,84 @@ $(document).ready(function () {
 
 
 
+    $('#requestSoaForm').submit(function (event) {
+        event.preventDefault();
+
+        var isValid = true;
+        $('.is-invalid').removeClass('is-invalid');
+
+        var residence = $('select[name="resident_id"]').val();
+        var year = $('select[name="year"]').val();
+        var month = $('select[name="month"]').val();
+
+        if (!residence) {
+            isValid = false;
+            $('select[name="resident_id"]').addClass('is-invalid');
+        }
+        if (!year) {
+            isValid = false;
+            $('select[name="year"]').addClass('is-invalid');
+        }
+        if (!month) {
+            isValid = false;
+            $('select[name="month"]').addClass('is-invalid');
+        }
+
+        if (!isValid) return;
+
+        var formData = $(this).serialize();
+
+        // UI reset
+        $('#soaContainer').hide();
+        $('#soaFrame').attr('src', '');
+        $('#soaLoading').show();
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: $(this).attr('method'),
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: formData,
+            dataType: "json",
+            success: function (data) {
+                if (!data.soaUrl) {
+                    $('#soaLoading').hide();
+                    alert('No SOA URL returned.');
+                    return;
+                }
+
+                // 🔹 Attach iframe load handler BEFORE setting src
+                $('#soaFrame')
+                    .off('load error')
+                    .on('load', function () {
+                        $('#soaLoading').hide();
+                        $('#soaContainer').show();
+                    })
+                    .on('error', function () {
+                        $('#soaLoading').hide();
+                        alert('Failed to load SOA PDF.');
+                    });
+
+                // Start loading PDF
+                $('#soaFrame').attr('src', data.soaUrl);
+            },
+            error: function () {
+                $('#soaLoading').hide();
+                alert('Failed to fetch SOA. Please check your input or network.');
+            }
+        });
+    });
+
+    // Remove validation highlight
+    $('select').on('change', function () {
+        $(this).removeClass('is-invalid');
+    });
+
+
+
+
+
 });
 
 

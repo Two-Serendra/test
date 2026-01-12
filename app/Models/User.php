@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\ResidentDetails;
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -22,6 +22,8 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
+        'is_active',
+        // 'email_id',
     ];
 
     /**
@@ -58,4 +60,15 @@ class User extends Authenticatable
     {
         return $this->hasOne(ResidentDetails::class, 'user_id', 'id');
     }
+
+    protected static function booted()
+    {
+        static::updated(function ($user) {
+            if ($user->hasVerifiedEmail()) {
+                $user->updateQuietly(['is_active' => true]);
+            }
+        });
+    }
+
+
 }

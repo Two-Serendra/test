@@ -129,9 +129,9 @@ class ProfileController extends Controller
 
         // Determine URL based on billing type
         if ($request->billing_type === 'Electricity') {
-            $soaUrl = "http://localhost:3000/request-electricity/{$unit}/{$year}/{$month}";
+            $soaUrl = "http://192.168.194.113:3000/request-electricity/{$unit}/{$year}/{$month}";
         } elseif ($request->billing_type === 'Soa') {
-            $soaUrl = "http://localhost:3000/request-soa/{$unit}/{$year}/{$month}";
+            $soaUrl = "http://192.168.194.113:3000/request-soa/{$unit}/{$year}/{$month}";
         } else {
             return response()->json([
                 'error' => 'Invalid billing type selected.'

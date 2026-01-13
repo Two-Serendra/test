@@ -161,11 +161,12 @@ class ProfileController extends Controller
         $year = $request->year;
         $month = str_pad($request->month, 2, '0', STR_PAD_LEFT);
 
-        if ($request->billing_type === 'Electricity') {
-            $apiUrl = "http://192.168.194.113:3000/request-electricity/{$unit}/{$year}/{$month}";
-        } else {
-            $apiUrl = "http://192.168.194.113:3000/request-soa/{$unit}/{$year}/{$month}";
-        }
+        $apiBase = env('EBT_API_BASE');
+
+        $apiUrl = $apiBase . ($request->billing_type === 'Electricity'
+            ? "/request-electricity/{$unit}/{$year}/{$month}"
+            : "/request-soa/{$unit}/{$year}/{$month}");
+
 
         // 🔑 Laravel talks to API
         $response = Http::timeout(90)->get($apiUrl);
@@ -198,7 +199,7 @@ class ProfileController extends Controller
             ->header('Content-Disposition', 'inline');
     }
 
-    
+
     public function requestElectricity()
     {
 

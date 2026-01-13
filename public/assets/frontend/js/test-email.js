@@ -5,9 +5,7 @@ $(document).ready(function () {
 
         let form = $(this)[0];
         let email = $("#emailInput").val();
-        let fromEmail = $("#fromEmail").val(); // <- Add this
-
-        // HTML5 validation
+        let fromEmail = $("#fromEmail").val();
         if (!form.checkValidity()) {
             $(form).addClass('was-validated');
             return;
@@ -15,21 +13,18 @@ $(document).ready(function () {
 
         $(form).removeClass('was-validated');
 
-        let btn = $("#submitBtn");
-        let spinner = btn.find(".spinner-border");
-        let btnText = btn.find(".btn-text");
-
-        // Show spinner and hide text
-        spinner.removeClass("d-none");
-        btnText.addClass("d-none");
-        btn.prop("disabled", true);
-
+        const $btn = $('#submitBtnTestMail');
+        const originalWidth = $btn.outerWidth();
+        $btn
+            .attr('disabled', true)
+            .html(`<div class="spinner-border spinner-border-sm text-light"></div>`)
+            .css('width', originalWidth + 'px');
         $.ajax({
             url: $(this).attr('action'),
             type: "POST",
             data: {
                 email: email,
-                from_email: fromEmail, // <- Include this
+                from_email: fromEmail,
                 _token: $('input[name="_token"]').val()
             },
             success: function () {
@@ -50,10 +45,10 @@ $(document).ready(function () {
                 console.error(xhr.responseText);
             },
             complete: function () {
-                // Hide spinner and restore text
-                spinner.addClass("d-none");
-                btnText.removeClass("d-none");
-                btn.prop("disabled", false);
+                $btn
+                    .attr('disabled', false)
+                    .html(`<span class="btn-text">Send</span>`)
+                    .css('width', '');
             }
         });
     });

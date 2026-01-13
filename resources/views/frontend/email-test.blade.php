@@ -27,7 +27,7 @@
                                     <select class="form-select form-select-lg" id="fromEmail" name="from_email" required>
                                         <option value="" selected disabled>Choose sender</option>
                                         <option value="circulars">
-                                           circulars@twoserendra.com
+                                            circulars@twoserendra.com
                                         </option>
                                         <option value="finance">
                                             finance@twoserendra.com
@@ -46,12 +46,11 @@
                                     </div>
                                 </div>
 
-                                <button id="submitBtn" type="submit"
-                                    class="btn btn-primary w-100 d-flex align-items-center justify-content-center">
-                                    <span class="spinner-border spinner-border-sm d-none me-2" role="status"
-                                        aria-hidden="true"></span>
-                                    Send
+                                <button id="submitBtnTestMail" type="submit" 
+                                    class="btn btn-primary w-100 d-flex align-items-center justify-content-center"  style="min-width: 100px; height: 38px;">
+                                    <span>Send</span> 
                                 </button>
+
                             </form>
                         </div>
 

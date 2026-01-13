@@ -8,7 +8,7 @@
                 @csrf
 
                 <div class="row g-2 align-items-end">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">Select Residence <span class="required">*</span></label>
                         <select name="resident_id" class="form-select" required>
                             <option value="">-- Select Residence --</option>
@@ -20,7 +20,7 @@
                         </select>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label class="form-label">Year <span class="required">*</span></label>
                         <select name="year" class="form-select" required>
                             <option value="">-- Select Year --</option>
@@ -42,6 +42,16 @@
                         </select>
                     </div>
 
+                    <div class="col-md-2">
+                        <label class="form-label">Billing Type <span class="required">*</span></label>
+                        <select name="billing_type" class="form-select" required>
+                            <option value="">-- Select --</option>
+                            <option value="Electricity">ELECTRICITY</option>
+                            <option value="Soa">SOA</option>
+
+                        </select>
+                    </div>
+
                     <div class="col-md-2 d-grid">
                         <button type="submit" class="btn btn-primary rounded-pill">
                             Generate
@@ -56,7 +66,7 @@
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
-            <p class="mt-2">Generating Statement of Account…</p>
+            <p class="mt-2">Generating</p>
         </div>
 
 

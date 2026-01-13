@@ -118,20 +118,31 @@ class ProfileController extends Controller
             'resident_id' => 'required',
             'year' => 'required',
             'month' => 'required',
+            'billing_type' => 'required',
         ]);
 
-        $residence = ResidentDetails::findOrFail($request->resident_id); 
+        $residence = ResidentDetails::findOrFail($request->resident_id);
 
         $unit = $residence->unit_no;
         $year = $request->year;
         $month = str_pad($request->month, 2, '0', STR_PAD_LEFT);
 
-        $soaUrl = "http://localhost:3000/request-electricity/{$unit}/{$year}/{$month}";
+        // Determine URL based on billing type
+        if ($request->billing_type === 'Electricity') {
+            $soaUrl = "http://localhost:3000/request-electricity/{$unit}/{$year}/{$month}";
+        } elseif ($request->billing_type === 'Soa') {
+            $soaUrl = "http://localhost:3000/request-soa/{$unit}/{$year}/{$month}";
+        } else {
+            return response()->json([
+                'error' => 'Invalid billing type selected.'
+            ], 400);
+        }
 
         return response()->json([
             'soaUrl' => $soaUrl
         ]);
     }
+
 
 
     public function requestElectricity()

@@ -5,6 +5,7 @@ $(document).ready(function () {
 
         let form = $(this)[0];
         let email = $("#emailInput").val();
+        let fromEmail = $("#fromEmail").val(); // <- Add this
 
         // HTML5 validation
         if (!form.checkValidity()) {
@@ -28,6 +29,7 @@ $(document).ready(function () {
             type: "POST",
             data: {
                 email: email,
+                from_email: fromEmail, // <- Include this
                 _token: $('input[name="_token"]').val()
             },
             success: function () {
@@ -55,6 +57,7 @@ $(document).ready(function () {
             }
         });
     });
+
 
 
 

@@ -16,51 +16,28 @@ class TestMailController extends Controller
     {
         return view('frontend.email-test');
     }
-
     public function sendEmail(Request $request)
     {
-        $email = $request->email;
+        $validated = $request->validate([
+            'email' => 'required|email',
+            'from_email' => 'required|in:circulars,finance',
+        ]);
 
-        try {
-            // Get API key and other settings from config
-            $apiKey = config('services.elasticemail.key');
-            $from = config('services.elasticemail.from');
-            $fromName = config('services.elasticemail.from_name');
+        $email = $validated['email'];
+        $fromKey = $validated['from_email'];
 
-            // Log the config values for debugging
-            \Log::info('Sending Elastic Email with:');
-            \Log::info('API Key: [' . $apiKey . ']');
-            \Log::info('From: ' . $from);
-            \Log::info('From Name: ' . $fromName);
-            \Log::info('Recipient: ' . $email);
+        $senderMap = [
+            'circulars' => ['from' => 'circulars@twoserendra.com', 'name' => 'Two Serendra'],
+            'finance' => ['from' => 'finance@twoserendra.com', 'name' => 'Two Serendra'],
+        ];
 
-            // Send the email
-            $response = Http::asForm()->post('https://api.elasticemail.com/v2/email/send', [
-                'apikey' => $apiKey,
-                'from' => $from,
-                'fromName' => $fromName,
-                'to' => $email,
-                'subject' => 'Test Email',
-                'template' => 'EmailTest',
-                'isTransactional' => true,
-            ]);
+        $from = $senderMap[$fromKey]['from'];
+        $fromName = $senderMap[$fromKey]['name'];
+        EmailTest::dispatch($email, $from, $fromName);
 
-
-            // Log full response from Elastic Email
-            \Log::info('Elastic Email Response: ' . $response->body());
-
-            // Return JSON success
-            return response()->json(['message' => 'Email sent via Elastic Email template', 'response' => $response->body()]);
-
-        } catch (\Exception $e) {
-            // Log error
-            \Log::error('Elastic Email failed: ' . $e->getMessage());
-
-            return response()->json([
-                'message' => 'Email sending failed',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'message' => 'Email queued successfully! You will receive it shortly.',
+        ]);
     }
 
 }

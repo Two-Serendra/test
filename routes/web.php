@@ -95,6 +95,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile/soa', [ProfileController::class, 'soa'])->name('soa');
     Route::get('/request-soa', [ProfileController::class, 'Reqsoa'])->name('request.soa');
     Route::post('/generate-soa', [ProfileController::class, 'GenerateSoa'])->name(name: 'generate.soa');
+    Route::get('/soa/view/{token}', [ProfileController::class, 'view']);
 
 
 

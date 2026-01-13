@@ -66,7 +66,7 @@
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
-            <p class="mt-2">Generating</p>
+            <p class="mt-2">Generating may take 30-60 seconds.</p>
         </div>
 
 

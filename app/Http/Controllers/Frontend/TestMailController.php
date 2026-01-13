@@ -9,6 +9,7 @@ use App\Mail\EmailTest;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Exception;
+use App\Jobs\SendElasticEmail;
 
 class TestMailController extends Controller
 {
@@ -31,9 +32,11 @@ class TestMailController extends Controller
             'finance' => ['from' => 'finance@twoserendra.com', 'name' => 'Two Serendra'],
         ];
 
-        $from = $senderMap[$fromKey]['from'];
+        $fromEmail = $senderMap[$fromKey]['from'];
         $fromName = $senderMap[$fromKey]['name'];
-        EmailTest::dispatch($email, $from, $fromName);
+
+        // ✅ Queue the job
+        SendElasticEmail::dispatch($email, $fromEmail, $fromName);
 
         return response()->json([
             'message' => 'Email queued successfully! You will receive it shortly.',

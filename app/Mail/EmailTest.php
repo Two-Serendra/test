@@ -15,9 +15,9 @@ use Illuminate\Support\Facades\Http;
 class EmailTest extends Mailable implements ShouldQueue
 { 
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    protected $email;
-    protected $from;
-    protected $fromName;
+    public $email;
+    public $from;
+    public $fromName;
 
     public function __construct($email, $from, $fromName)
     {

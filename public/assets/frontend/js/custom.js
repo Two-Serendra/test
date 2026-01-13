@@ -264,27 +264,21 @@ $(document).ready(function () {
             data: formData,
             dataType: "json",
             success: function (data) {
-                if (!data.soaUrl) {
+                if (!data.token) {
                     $('#soaLoading').hide();
-                    alert('No SOA URL returned.');
+                    alert('Failed to generate SOA');
                     return;
                 }
 
-                // 🔹 Attach iframe load handler BEFORE setting src
                 $('#soaFrame')
-                    .off('load error')
+                    .off('load')
                     .on('load', function () {
                         $('#soaLoading').hide();
                         $('#soaContainer').show();
                     })
-                    .on('error', function () {
-                        $('#soaLoading').hide();
-                        alert('Failed to load SOA PDF.');
-                    });
-
-                // Start loading PDF
-                $('#soaFrame').attr('src', data.soaUrl);
-            },
+                    .attr('src', '/soa/view/' + data.token);
+            }
+            ,
             error: function () {
                 $('#soaLoading').hide();
                 alert('Failed to fetch SOA. Please check your input or network.');

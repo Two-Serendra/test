@@ -12,6 +12,8 @@ use App\Models\ResidentDetails;
 use App\Models\FunctionRoomBooking;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 class ProfileController extends Controller
 {
     /**
@@ -112,6 +114,38 @@ class ProfileController extends Controller
     }
 
 
+    // public function GenerateSoa(Request $request)
+    // {
+    //     $request->validate([
+    //         'resident_id' => 'required',
+    //         'year' => 'required',
+    //         'month' => 'required',
+    //         'billing_type' => 'required',
+    //     ]);
+
+    //     $residence = ResidentDetails::findOrFail($request->resident_id);
+
+    //     $unit = $residence->unit_no;
+    //     $year = $request->year;
+    //     $month = str_pad($request->month, 2, '0', STR_PAD_LEFT);
+
+    //     // Determine URL based on billing type
+    //     if ($request->billing_type === 'Electricity') {
+    //         $soaUrl = "http://192.168.194.113:3000/request-electricity/{$unit}/{$year}/{$month}";
+    //     } elseif ($request->billing_type === 'Soa') {
+    //         $soaUrl = "http://192.168.194.113:3000/request-soa/{$unit}/{$year}/{$month}";
+    //     } else {
+    //         return response()->json([
+    //             'error' => 'Invalid billing type selected.'
+    //         ], 400);
+    //     }
+
+    //     return response()->json([
+    //         'soaUrl' => $soaUrl
+    //     ]);
+    // }
+
+
     public function GenerateSoa(Request $request)
     {
         $request->validate([
@@ -127,24 +161,44 @@ class ProfileController extends Controller
         $year = $request->year;
         $month = str_pad($request->month, 2, '0', STR_PAD_LEFT);
 
-        // Determine URL based on billing type
         if ($request->billing_type === 'Electricity') {
-            $soaUrl = "http://192.168.194.113:3000/request-electricity/{$unit}/{$year}/{$month}";
-        } elseif ($request->billing_type === 'Soa') {
-            $soaUrl = "http://192.168.194.113:3000/request-soa/{$unit}/{$year}/{$month}";
+            $apiUrl = "http://192.168.194.113:3000/request-electricity/{$unit}/{$year}/{$month}";
         } else {
-            return response()->json([
-                'error' => 'Invalid billing type selected.'
-            ], 400);
+            $apiUrl = "http://192.168.194.113:3000/request-soa/{$unit}/{$year}/{$month}";
         }
 
+        // 🔑 Laravel talks to API
+        $response = Http::timeout(90)->get($apiUrl);
+
+        if ($response->failed()) {
+            return response()->json(['error' => 'SOA generation failed'], 500);
+        }
+
+        // 🔐 Create temporary token
+        $token = (string) Str::uuid();
+
+        // Store PDF in cache for 10 minutes
+        Cache::put("soa_pdf_$token", $response->body(), now()->addMinutes(10));
+
         return response()->json([
-            'soaUrl' => $soaUrl
+            'token' => $token
         ]);
     }
 
+    public function view($token)
+    {
+        $pdf = Cache::get("soa_pdf_$token");
 
+        if (!$pdf) {
+            abort(404);
+        }
 
+        return response($pdf, 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline');
+    }
+
+    
     public function requestElectricity()
     {
 

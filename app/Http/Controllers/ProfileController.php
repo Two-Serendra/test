@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 class ProfileController extends Controller
 {
     /**
@@ -161,18 +162,35 @@ class ProfileController extends Controller
         $year = $request->year;
         $month = str_pad($request->month, 2, '0', STR_PAD_LEFT);
 
-        $apiBase = env('EBT_API_BASE');
+        $apiBase = rtrim(env('EBT_API_BASE'), '/');
 
         $apiUrl = $apiBase . ($request->billing_type === 'Electricity'
             ? "/request-electricity/{$unit}/{$year}/{$month}"
             : "/request-soa/{$unit}/{$year}/{$month}");
 
+        Log::info("GenerateSoa called", ['api_url' => $apiUrl]);
+
 
         // 🔑 Laravel talks to API
-        $response = Http::timeout(90)->get($apiUrl);
+        try {
+            $response = Http::timeout(90)->get($apiUrl);
 
-        if ($response->failed()) {
-            return response()->json(['error' => 'SOA generation failed'], 500);
+            // Log status
+            Log::info("API response", [
+                'status' => $response->status(),
+                'body_length' => strlen($response->body())
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error("SOA generation failed", [
+                'message' => $e->getMessage(),
+                'api_url' => $apiUrl
+            ]);
+
+            return response()->json([
+                'error' => 'SOA generation failed',
+                'message' => $e->getMessage()
+            ], 500);
         }
 
         // 🔐 Create temporary token

@@ -37,4 +37,13 @@ return [
         'from_name' => env('ELASTICEMAIL_FROM_NAME', 'Two Serendra'),
     ],
 
+    'soa' => [
+        'proxy_url' => env('SOA_PROXY_URL'),
+        'key' => env('SOA_PROXY_KEY'),
+    ],
+
+    'ebt' => [
+        'base_url' => env('EBT_API_BASE'),
+    ],
+
 ];

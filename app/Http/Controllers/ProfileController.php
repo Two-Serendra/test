@@ -162,7 +162,7 @@ class ProfileController extends Controller
         $year = $request->year;
         $month = str_pad($request->month, 2, '0', STR_PAD_LEFT);
 
-        $apiBase = rtrim(env('EBT_API_BASE'), '/');
+        $apiBase = rtrim(config('services.ebt.base_url'), '/');
 
         $apiUrl = $apiBase . ($request->billing_type === 'Electricity'
             ? "/request-electricity/{$unit}/{$year}/{$month}"

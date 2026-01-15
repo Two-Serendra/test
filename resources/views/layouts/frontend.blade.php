@@ -103,12 +103,12 @@
 
     <!-- Template Javascript -->
     <script src="{{ asset('assets/frontend/js/main.js') }}"></script>
-    <script src="{{ asset('assets/frontend/js/custom.js') }}"></script>
+    <script src="{{ asset('assets/frontend/js/custom.js')}}?v=2 }}"></script>
     <script src="{{ asset('assets/frontend/js/work-permit.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/profile.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/function-room.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/test-email.js') }}"></script>
-     <script src="{{ asset('assets/frontend/js/soa.js') }}"></script>
+<script src="{{ asset('assets/frontend/js/soa.js') }}?v=2"></script>
 
 
     <script>

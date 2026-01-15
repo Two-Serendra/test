@@ -135,6 +135,10 @@
         // });
 
         $(document).ready(function () {
+
+            function isMobile() {
+                return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            }
             // Redirect after login if needed
             if (localStorage.getItem("redirect_after_login")) {
                 const url = localStorage.getItem("redirect_after_login");
@@ -245,11 +249,10 @@
                     }
                 });
             });
+
         });
 
-        function isMobile() {
-            return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-        }
+
     </script>
 
 </body>

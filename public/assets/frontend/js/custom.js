@@ -1,4 +1,5 @@
 $(document).ready(function () {
+    let isGeneratingSoa = false;
 
     let offset = 8;
     $('#loadMoreBtn').on('click', function () {
@@ -294,6 +295,7 @@ $(document).ready(function () {
 
     $('#requestSoaForm').submit(function (event) {
         event.preventDefault();
+        if (isGeneratingSoa) return;
 
         var isValid = true;
         $('.is-invalid').removeClass('is-invalid');
@@ -319,12 +321,9 @@ $(document).ready(function () {
 
         var formData = $(this).serialize();
 
-        // UI reset
-        $('#soaContainer').hide();
-        $('#soaFrame').attr('src', '');
-        $('#soaLoading').show();
-        $('#soaMobileLink').hide();
 
+        setGenerating(true);
+        resetSoAView();
         $.ajax({
             url: $(this).attr('action'),
             type: $(this).attr('method'),
@@ -335,10 +334,6 @@ $(document).ready(function () {
             dataType: "json",
 
             success: function (data) {
-                console.log('UserAgent:', navigator.userAgent);
-                console.log('isMobile():', isMobile());
-                console.log('UserAgent:', navigator.userAgent);
-                console.log('isMobile():', isMobile());
                 if (!data.token) {
                     $('#soaLoading').hide();
                     alert('Failed to generate SOA');
@@ -347,19 +342,16 @@ $(document).ready(function () {
                 const soaUrl = '/soa/view/' + data.token;
 
                 if (isMobile()) {
-                    $('#soaContainer').hide();
-                    $('#soaFrame').attr('src', '');
-                    $('#soaLoading').hide();
-
                     $('#soaOpenBtn').attr('href', soaUrl);
-                    $('#soaMobileLink').show();
+                    $('#soaMobileLink').fadeIn(150);
+                    setTimeout(() => setGenerating(false), 300)
                 }
                 else {
                     $('#soaFrame')
                         .off('load')
                         .on('load', function () {
-                            $('#soaLoading').hide();
-                            $('#soaContainer').show();
+                            $('#soaContainer').fadeIn(150);
+                            setGenerating(false);
                         })
                         .attr('src', soaUrl);
                 }
@@ -368,7 +360,7 @@ $(document).ready(function () {
 
 
             error: function (xhr, status, error) {
-                $('#soaLoading').hide();
+                setGenerating(false);
                 console.error(xhr.responseText);
                 alert('Error: ' + xhr.status + ' ' + error);
             }
@@ -376,15 +368,34 @@ $(document).ready(function () {
         });
     });
 
-    // Remove validation highlight
-    $('select').on('change', function () {
+    $('#requestSoaForm select').on('change', function () {
         $(this).removeClass('is-invalid');
     });
 
 
+    function resetSoAView() {
+        if (isGeneratingSoa) return;
+
+        $('#soaContainer').hide();
+        $('#soaMobileLink').hide();
+        $('#soaFrame').attr('src', '');
+        $('#soaOpenBtn').attr('href', '#');
+    }
 
 
+    function setGenerating(isGenerating) {
+        isGeneratingSoa = isGenerating;
 
+        const btn = $('#generateBtn');
+        btn.prop('disabled', isGenerating)
+            .toggleClass('disabled opacity-75', isGenerating);
+
+        if (isGenerating) {
+            $('#soaLoading').stop(true, true).fadeIn(150);
+        } else {
+            $('#soaLoading').stop(true, true).fadeOut(150);
+        }
+    }
 });
 
 

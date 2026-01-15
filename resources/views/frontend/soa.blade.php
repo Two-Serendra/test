@@ -24,7 +24,7 @@
                         <label class="form-label">Year <span class="required">*</span></label>
                         <select name="year" class="form-select" required>
                             <option value="">-- Select Year --</option>
-                            @for ($y = now()->year; $y >= now()->year - 10; $y--)
+                              @for ($y = now()->year; $y >= 2022; $y--)
                                 <option value="{{ $y }}">{{ $y }}</option>
                             @endfor
                         </select>
@@ -53,7 +53,7 @@
                     </div>
 
                     <div class="col-md-2 d-grid">
-                        <button type="submit" class="btn btn-primary rounded-pill">
+                        <button type="submit" class="btn btn-primary rounded-pill" id="generateBtn">
                             Generate
                         </button>
                     </div>
@@ -80,7 +80,7 @@
         </div>
 
         <div id="soaMobileLink" class="text-center mt-4" style="display:none;">
-            <a id="soaOpenBtn" href="#" target="_blank" class="btn btn-primary btn-lg">
+            <a id="soaOpenBtn" href="#" target="_blank" class="btn btn-primary btn-lg rounded-pill">
                 Open Statement of Account
             </a>
         </div>

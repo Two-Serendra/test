@@ -108,6 +108,7 @@
     <script src="{{ asset('assets/frontend/js/profile.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/function-room.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/test-email.js') }}"></script>
+     <script src="{{ asset('assets/frontend/js/soa.js') }}"></script>
 
 
     <script>

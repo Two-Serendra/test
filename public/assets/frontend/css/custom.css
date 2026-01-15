@@ -580,6 +580,12 @@ input[type="file"].form-control {
         align-items: center;
         justify-content: center;
     }
+
+
 }
 
-
+@media (max-width: 768px) {
+    #soaContainer {
+        display: none !important;
+    }
+}

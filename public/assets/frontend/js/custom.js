@@ -335,6 +335,10 @@ $(document).ready(function () {
             dataType: "json",
 
             success: function (data) {
+                console.log('UserAgent:', navigator.userAgent);
+                console.log('isMobile():', isMobile());
+                console.log('UserAgent:', navigator.userAgent);
+                console.log('isMobile():', isMobile());
                 if (!data.token) {
                     $('#soaLoading').hide();
                     alert('Failed to generate SOA');

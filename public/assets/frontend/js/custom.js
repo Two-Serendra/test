@@ -323,6 +323,7 @@ $(document).ready(function () {
         $('#soaContainer').hide();
         $('#soaFrame').attr('src', '');
         $('#soaLoading').show();
+        $('#soaMobileLink').hide();
 
         $.ajax({
             url: $(this).attr('action'),
@@ -332,21 +333,6 @@ $(document).ready(function () {
             },
             data: formData,
             dataType: "json",
-            // success: function (data) {
-            //     if (!data.token) {
-            //         $('#soaLoading').hide();
-            //         alert('Failed to generate SOA');
-            //         return;
-            //     }
-
-            //     $('#soaFrame')
-            //         .off('load')
-            //         .on('load', function () {
-            //             $('#soaLoading').hide();
-            //             $('#soaContainer').show();
-            //         })
-            //         .attr('src', '/soa/view/' + data.token);
-            // },
 
             success: function (data) {
                 if (!data.token) {
@@ -354,14 +340,17 @@ $(document).ready(function () {
                     alert('Failed to generate SOA');
                     return;
                 }
-
                 const soaUrl = '/soa/view/' + data.token;
 
                 if (isMobile()) {
+                    $('#soaContainer').hide();
+                    $('#soaFrame').attr('src', '');
                     $('#soaLoading').hide();
+
                     $('#soaOpenBtn').attr('href', soaUrl);
                     $('#soaMobileLink').show();
-                } else {
+                }
+                else {
                     $('#soaFrame')
                         .off('load')
                         .on('load', function () {

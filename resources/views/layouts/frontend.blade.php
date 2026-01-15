@@ -78,6 +78,11 @@
     <a href="#" class="btn btn-lg btn-lg-square back-to-top text-light" style="background-color: #004d1a;"><i
             class="bi bi-arrow-up"></i></a>
 
+    <script>
+        function isMobile() {
+            return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        }
+    </script>
 
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
@@ -135,10 +140,6 @@
         // });
 
         $(document).ready(function () {
-
-            function isMobile() {
-                return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-            }
             // Redirect after login if needed
             if (localStorage.getItem("redirect_after_login")) {
                 const url = localStorage.getItem("redirect_after_login");

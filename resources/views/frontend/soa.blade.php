@@ -79,6 +79,12 @@
             </iframe>
         </div>
 
+        <div id="soaMobileLink" class="text-center mt-4" style="display:none;">
+            <a id="soaOpenBtn" href="#" target="_blank" class="btn btn-primary btn-lg">
+                Open Statement of Account
+            </a>
+        </div>
+
     </div>
 
 

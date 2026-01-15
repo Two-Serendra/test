@@ -332,6 +332,22 @@ $(document).ready(function () {
             },
             data: formData,
             dataType: "json",
+            // success: function (data) {
+            //     if (!data.token) {
+            //         $('#soaLoading').hide();
+            //         alert('Failed to generate SOA');
+            //         return;
+            //     }
+
+            //     $('#soaFrame')
+            //         .off('load')
+            //         .on('load', function () {
+            //             $('#soaLoading').hide();
+            //             $('#soaContainer').show();
+            //         })
+            //         .attr('src', '/soa/view/' + data.token);
+            // },
+
             success: function (data) {
                 if (!data.token) {
                     $('#soaLoading').hide();
@@ -339,14 +355,24 @@ $(document).ready(function () {
                     return;
                 }
 
-                $('#soaFrame')
-                    .off('load')
-                    .on('load', function () {
-                        $('#soaLoading').hide();
-                        $('#soaContainer').show();
-                    })
-                    .attr('src', '/soa/view/' + data.token);
+                const soaUrl = '/soa/view/' + data.token;
+
+                if (isMobile()) {
+                    $('#soaLoading').hide();
+                    $('#soaOpenBtn').attr('href', soaUrl);
+                    $('#soaMobileLink').show();
+                } else {
+                    $('#soaFrame')
+                        .off('load')
+                        .on('load', function () {
+                            $('#soaLoading').hide();
+                            $('#soaContainer').show();
+                        })
+                        .attr('src', soaUrl);
+                }
+
             },
+
 
             error: function (xhr, status, error) {
                 $('#soaLoading').hide();

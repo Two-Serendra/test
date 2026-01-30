@@ -27,10 +27,13 @@ class FinanceFunctionRoomBookingCancellation extends Mailable implements ShouldQ
      */
     public function build()
     {
+         $name = $this->booking->user->name ?? 'Resident';
+
         return $this->subject('Function Room Booking Cancellation - ' . $this->booking->transaction_no)
             ->view('emails.finance-function-room-booking-cancellation')
             ->with([
-                'booking' => $this->booking
+                'booking' => $this->booking,
+                'name' => $name,
             ]);
     }
 }

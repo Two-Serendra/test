@@ -108,7 +108,7 @@
                                 <p class="text-muted mb-3" style="font-size: 0.9rem;">
                                     Discount valid until
                                     <!-- <strong>{{ \Carbon\Carbon::parse($item->discount_start)->format('M d, Y') }}</strong>
-                                                                            to -->
+                                                                                    to -->
                                     <strong>{{ \Carbon\Carbon::parse($item->discount_end)->format('M d, Y') }}</strong>
                                 </p>
 
@@ -188,10 +188,10 @@
                 <h5 class="fw-bold mb-4">
                     You may also like
                     <!-- @if($type === 'function_room')
-                                                                                                                        Function Rooms
-                                                                                                                    @else
-                                                                                                                        Amenities
-                                                                                                                    @endif -->
+                                                                                                                                Function Rooms
+                                                                                                                            @else
+                                                                                                                                Amenities
+                                                                                                                            @endif -->
                 </h5>
                 <div class="row z-1 position-relative">
                     @foreach($suggestions as $suggestion)
@@ -250,22 +250,7 @@
             </div>
         @endif
     </div>
-    <div id="loadingOverlay" style="
-                                                                                    display: none; /* 🔥 Keep this as default */
-                                                                                    position: fixed;
-                                                                                    top: 0;
-                                                                                    left: 0;
-                                                                                    width: 100%;
-                                                                                    height: 100%;
-                                                                                    background: rgba(255, 255, 255, 0.7);
-                                                                                    z-index: 2000;
-                                                                                    justify-content: center;
-                                                                                    align-items: center;
-                                                                                ">
-        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    </div>
+
 
 
 
@@ -275,21 +260,6 @@
             border: 2px solid #007bff;
         }
 
-        #loadingOverlay {
-            display: none;
-            /* Hidden by default */
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.7);
-            z-index: 2000;
-            display: flex;
-            /* This centers it */
-            justify-content: center;
-            align-items: center;
-        }
     </style>
 
     @include('frontend.modal.360-modal-view')

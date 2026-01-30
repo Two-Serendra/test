@@ -12,10 +12,11 @@ class FunctionRoomDateBlocking extends Model
     protected $table = 'function_room_date_blockings';
     protected $fillable = [
         'function_room_id',
-        'blocking_status',
         'blocking_remarks',
+        'blocking_status',
         'date_blocking_start',
         'date_blocking_end',
+
     ];
 
     public function functionRoom()

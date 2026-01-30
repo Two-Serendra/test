@@ -8,19 +8,20 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-
 class UserFunctionRoomBookingNotification extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $booking;
+    public $mainBooking;
+    public $allBookings;
 
     /**
-     * Create a new message instance.
+     * Accept main booking + all linked bookings.
      */
-    public function __construct(FunctionRoomBooking $booking)
+    public function __construct(FunctionRoomBooking $mainBooking, $allBookings = [])
     {
-        $this->booking = $booking;
+        $this->mainBooking = $mainBooking;
+        $this->allBookings = $allBookings;
     }
 
     /**
@@ -28,16 +29,24 @@ class UserFunctionRoomBookingNotification extends Mailable implements ShouldQueu
      */
     public function build()
     {
-        return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra') // ✅ Verified domain
+        $name = $this->mainBooking->user->name ?? 'Resident';
+
+        // Collect the names of ALL function rooms booked
+        $rooms = collect($this->allBookings)
+            ->pluck('functionRoom.function_room_name')
+            ->unique()
+            ->implode(', ');
+
+        return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra')
             ->subject('Your Function Room Booking is Being Processed')
             ->view('emails.user-function-room-booking')
             ->with([
-                'name' => $this->booking->user->name,
-                'transaction_no' => $this->booking->transaction_no,
-                'function_room' => $this->booking->functionRoom->function_room_name ?? 'Function Room',
-                'date' => $this->booking->function_room_booking_date,
-                'start_time' => $this->booking->event_start_time,
-                'end_time' => $this->booking->event_end_time,
+                'name' => $name,
+                'transaction_no' => $this->mainBooking->transaction_no,
+                'rooms' => $rooms,
+                'date' => $this->mainBooking->function_room_booking_date,
+                'start_time' => $this->mainBooking->event_start_time,
+                'end_time' => $this->mainBooking->event_end_time,
             ]);
     }
 }

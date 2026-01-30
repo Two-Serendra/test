@@ -1,38 +1,29 @@
 $(document).ready(function () {
 
+    const linkedRooms = {
+        5: [6],
+        6: [5]
+    };
 
-    $('#searchFormFunctionRoomBookings').on('submit', function (e) {
-        e.preventDefault();
-        currentFunctionRoomBookingSearchTerm = $('#searchInputFunctionRoomBooking').val();
-        currentFunctionRoomBookingPageUrl = '/admin/admin-get-updated-function-room-bookings-table'; // reset to first page
-        refreshFunctionRoomBookingsTable();
-    });
+    let flatpickrInstance;
+    let disabledDatesGlobal = [];
 
     let currentFunctionRoomBookingPageUrl = '/admin/admin-get-updated-function-room-bookings-table';
+    let currentFunctionRoomBookingPage = 1;
     let currentFunctionRoomBookingSearchTerm = '';
 
-    // Status helper
-    function renderStatusBadge(status) {
-        if (status == 1) return '<span class="badge bg-success">Confirmed</span>';
-        if (status == 2) return '<span class="badge bg-danger">Cancelled</span>';
-        return '<span class="badge bg-warning">Waiting</span>';
-    }
-
-    function renderApprovalBadge(status) {
-        // Convert string to number if needed
-        status = Number(status);
-
-        if (status === 1) return '<span class="badge bg-success">Approved</span>';
-        if (status === 2) return '<span class="badge bg-danger">Rejected</span>';
-        return '<span class="badge bg-warning">Waiting</span>'; // 0 or any other
-    }
-
-
     function refreshFunctionRoomBookingsTable(url = currentFunctionRoomBookingPageUrl) {
+
+        const pageMatch = url.match(/page=(\d+)/);
+        const currentPage = pageMatch ? pageMatch[1] : 1;
+
         $.ajax({
             url: url,
             type: 'GET',
-            data: { searchFunctionRoomBooking: currentFunctionRoomBookingSearchTerm },
+            data: {
+                searchFunctionRoomBooking: currentFunctionRoomBookingSearchTerm,
+                page: currentPage
+            },
             dataType: 'json',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
@@ -42,6 +33,9 @@ $(document).ready(function () {
                 const bookings = response.data;
                 const tableBody = $('#functionRoomBookingsTable tbody');
                 const paginationContainerFunctionRoomBooking = $('.pagination-container-function-room-booking');
+                paginationContainerFunctionRoomBooking.html(response.links);
+                const pageMatch = url.match(/page=(\d+)/);
+                currentFunctionRoomBookingPage = pageMatch ? pageMatch[1] : 1;
 
                 tableBody.empty();
 
@@ -126,8 +120,6 @@ $(document).ready(function () {
 
                         return cols;
                     }
-
-
                     // Concierge (no auth required)
                     row += approvalColumns('concierge');
                     // Admin (requires authorization file)
@@ -154,6 +146,15 @@ $(document).ready(function () {
                 });
 
                 paginationContainerFunctionRoomBooking.html(response.links);
+                paginationContainerFunctionRoomBooking.find('a').on('click', function (e) {
+                    e.preventDefault();
+                    const newUrl = $(this).attr('href');
+                    if (newUrl) {
+                        currentFunctionRoomBookingPageUrl = newUrl; // ✅ already includes ?page=2, etc.
+                        refreshFunctionRoomBookingsTable(currentFunctionRoomBookingPageUrl);
+                    }
+                });
+
             },
             error: function (xhr) {
                 console.error('Error:', xhr.responseText);
@@ -162,13 +163,451 @@ $(document).ready(function () {
     }
 
 
+    $('.AdminAddFunctionRoomBooking').on('click', function () {
+        $('#adminFunctionRoomBookingModal').modal('show');
+        $(".addonQty").each(function () {
+            $(this).prop("disabled", true).val(0);
+        });
 
+        $(".text-muted[id^='addonAvailable']").text("Available: -");
+    });
+
+    $(document).on("change", ".adminAddOnsFields", function () {
+        let addonId = $(this).attr("id").replace("addon", "");
+        let qtyInput = $("input[data-addon-id='" + addonId + "']");
+
+        if ($(this).is(":checked")) {
+            qtyInput.prop("disabled", false).prop("required", true);
+            if (parseInt(qtyInput.val()) === 0) qtyInput.val(1);
+        } else {
+            qtyInput.prop("disabled", true).prop("required", false).val(0);
+        }
+    });
+
+    $(document).on("input", ".addonQty", function () {
+        let max = parseInt($(this).attr("max")) || 0;
+        let val = parseInt($(this).val()) || 0;
+
+        if (val > max) $(this).val(max);
+        else if (val < 0) $(this).val(0);
+    });
+
+    $('#functionRoomSelect').on('change', function () {
+        const $selected = $(this).find('option:selected');
+        const roomId = $selected.val();
+        const roomName = $selected.text().trim();
+        const capacity = parseInt($selected.data('capacity') || 0, 10);
+
+        const selectedRoomId = $(this).val();
+
+        // Hide options first
+        $('#linkedRoomOptionWrapper').addClass('d-none');
+        $('#adminBookLinkedRoom').prop('checked', false);
+
+        if (!selectedRoomId) return;
+
+        const linked = linkedRooms[selectedRoomId] || [];
+
+        if (linked.length > 0) {
+            const linkedNames = linked.map(id => {
+                const option = $(`#functionRoomSelect option[value="${id}"]`);
+                return option.text().trim();
+            }).join(', ');
+
+            $('#linkedRoomLabel').text(`You may also book: ${linkedNames}?`);
+            $('#linkedRoomOptionWrapper').removeClass('d-none');
+        }
+
+
+        // 🏠 Update room info
+        $('#roomCapacity').val(capacity);
+        $('#roomCapacityDisplay').text(capacity);
+        $('#paxInput').attr('max', capacity);
+
+        // 🧾 Update modal title
+        const nameOnly = $selected.data('name') || roomName.split('(')[0].trim();
+        $('#adminModalTitle').text(nameOnly ? `${nameOnly} — Booking` : 'Function Room Booking');
+
+        // 🔢 Validate pax
+        const currentPax = parseInt($('#paxInput').val() || '0', 10);
+        $('#capacityError').toggleClass('d-none', !(capacity > 0 && currentPax > capacity));
+
+        // 🚀 Fetch booked/blocked dates
+        if (roomId) {
+            $('#adminFunctionRoomBookingDate').val('').prop('disabled', true);
+
+            $.ajax({
+                url: `/admin/admin-function-room-booked-dates/${roomId}`,
+                method: 'GET',
+                success: function (disabledDates) {
+                    console.log('Disabled dates:', disabledDates);
+                    disabledDatesGlobal = disabledDates;
+
+                    // Destroy old instance
+                    if (flatpickrInstance) flatpickrInstance.destroy();
+
+                    // ✅ Initialize Flatpickr ONCE
+                    flatpickrInstance = flatpickr("#adminFunctionRoomBookingDate", {
+                        dateFormat: "Y-m-d",
+                        minDate: "today",
+                        disable: disabledDatesGlobal,
+                        onChange: function (selectedDates, dateStr) {
+                            if (!dateStr) return;
+
+                            // 🧮 Fetch add-ons availability dynamically
+                            $.get('/admin/admin-get-function-room-addons-availability', {
+                                date: dateStr,
+                                room_id: roomId
+                            }, function (res) {
+                                $(".addonQty").each(function () {
+                                    let addonId = $(this).data("addon-id");
+                                    let available = res[addonId] ?? 0;
+                                    let checkbox = $("#addon" + addonId);
+
+                                    $("#addonAvailable" + addonId).text("Available: " + available);
+
+                                    if (available <= 0) {
+                                        $(this).prop("disabled", true).val(0).prop("required", false);
+                                        checkbox.prop("disabled", true).prop("checked", false);
+                                    } else {
+                                        $(this).attr("max", available).val(0).prop("disabled", true).prop("required", false);
+                                        checkbox.prop("disabled", false).prop("checked", false);
+                                    }
+                                });
+                            });
+                        }
+                    });
+
+                    $('#adminFunctionRoomBookingDate').prop('disabled', false);
+                },
+                error: function () {
+                    console.error('Failed to load booked dates.');
+                    $('#adminFunctionRoomBookingDate').prop('disabled', false);
+                }
+            });
+        } else {
+            $('#adminFunctionRoomBookingDate').val('').prop('disabled', true);
+        }
+    });
+
+    // ✅ Prevent selecting disabled dates manually
+    $('#adminFunctionRoomBookingDate').on('change', function () {
+        const selectedDate = $(this).val();
+        if (disabledDatesGlobal.includes(selectedDate)) {
+            $('#dateError').removeClass('d-none');
+            $(this).val('');
+        } else {
+            $('#dateError').addClass('d-none');
+        }
+    });
+
+
+    // ✅ Auto-initialize if a room is already selected (edit mode or reopen modal)
+    (function initSelectedRoom() {
+        const $sel = $('#functionRoomSelect').find('option:selected');
+        if ($sel.length && $sel.val() !== '') {
+            $('#functionRoomSelect').trigger('change');
+        }
+    })();
+
+    $('#searchFormFunctionRoomBookings').on('submit', function (e) {
+        e.preventDefault();
+        currentFunctionRoomBookingSearchTerm = $('#searchInputFunctionRoomBooking').val();
+        currentFunctionRoomBookingPageUrl = '/admin/admin-get-updated-function-room-bookings-table'; // reset to first page
+        refreshFunctionRoomBookingsTable();
+    });
+
+
+    let adminSupplierIndex = 1;
+
+    $('#adminHasSuppliers').on('change', function () {
+        if ($(this).is(':checked')) {
+            $('#adminSupplierSection').removeClass('d-none');
+
+            // if empty, add back the first supplier row
+            if ($('#adminSuppliersWrapper').children().length === 0) {
+                let firstRow = `
+            <div class="row g-2 supplier-item mb-2">
+                <div class="col-md-4">
+                    <input type="text" name="suppliers[0][name]" class="form-control" placeholder="Supplier Name">
+                </div>
+                <div class="col-md-6">
+                    <input type="file" name="suppliers[0][attachment]" class="form-control" accept="image/*,.pdf">
+                </div>
+            </div>`;
+                $('#adminSuppliersWrapper').html(firstRow);
+                adminSupplierIndex = 1;
+            }
+
+        } else {
+            $('#adminSupplierSection').addClass('d-none');
+            $('#adminSuppliersWrapper').html('');
+            adminSupplierIndex = 1;
+        }
+    });
+
+    $('#adminAddSupplier').on('click', function () {
+        let newRow = `
+        <div class="row g-2 supplier-item mb-2">
+            <div class="col-md-4">
+                <input type="text" name="suppliers[${adminSupplierIndex}][name]" class="form-control" placeholder="Name">
+            </div>
+            <div class="col-md-6">
+                <input type="file" name="suppliers[${adminSupplierIndex}][attachment]" class="form-control" accept="image/*,.pdf">
+            </div>
+            <div class="col-md-2 d-flex align-items-center">
+                <button type="button" class="btn btn-danger adminRemoveSupplier">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        </div>`;
+        $('#adminSuppliersWrapper').append(newRow);
+        adminSupplierIndex++;
+    });
+
+    $(document).on('click', '.adminRemoveSupplier', function () {
+        $(this).closest('.supplier-item').remove();
+    });
+
+
+
+    $('#adminFunctionRoomNewBooking').on('submit', function (event) {
+        event.preventDefault();
+
+        const form = this;
+        let isValid = true;
+        const startTime = $('#startTime').val();
+        const endTime = $('#endTime').val();
+
+        // Convert time to minutes for comparison
+        function convertToMinutes(time) {
+            if (!time) return null;
+            const [hours, minutes] = time.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        const startMinutes = convertToMinutes(startTime);
+        const endMinutes = convertToMinutes(endTime);
+
+        // Validate time logic
+        if (startMinutes !== null && endMinutes !== null && endMinutes <= startMinutes) {
+            $('#timeError').removeClass('d-none');
+            $('#endTime').addClass('is-invalid');
+            isValid = false;
+        } else {
+            $('#timeError').addClass('d-none');
+            $('#endTime').removeClass('is-invalid');
+        }
+
+        if (!isValid) return;
+
+        // Validate required fields
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return;
+        }
+        form.classList.remove('was-validated');
+
+        // Submit button spinner
+        const $btn = $('#saveUserFunctionRoomBtn');
+        const originalWidth = $btn.outerWidth();
+        $btn
+            .attr('disabled', true)
+            .html(`<div class="spinner-border spinner-border-sm text-light"></div>`)
+            .css('width', originalWidth + 'px');
+
+        // Prepare form data
+        const formData = new FormData(form);
+
+        $.ajax({
+            url: $(form).attr('action'),
+            type: $(form).attr('method'),
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                $('#adminFunctionRoomBookingModal').modal('hide');
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Booking Saved!',
+                    text: response.message || 'The booking has been successfully saved.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                form.reset();
+                $(form).removeClass('was-validated');
+                $('#adminSupplierSection, #adminAuthorizationUploadWrapper').addClass('d-none');
+
+                // Optional: refresh table if you use DataTables
+                refreshFunctionRoomBookingsTable();
+            },
+            error: function (xhr) {
+                if (xhr.status === 409) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Booking Conflict',
+                        text: xhr.responseJSON.message,
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#d33'
+                    });
+                    return;
+                }
+
+                if (xhr.status === 422) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Not Enough Add-ons',
+                        text: xhr.responseJSON.message,
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#d33'
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    toast: true,
+                    position: "top-end",
+                    icon: 'error',
+                    title: 'Something went wrong. Please try again later.',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            },
+            complete: function () {
+                $btn
+                    .attr('disabled', false)
+                    .html(`<span class="btn-text">SUBMIT</span>`)
+                    .css('width', '');
+            }
+        });
+    });
 
     function formatTime(time) {
         if (!time) return 'N/A';
         const date = new Date(time);
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
+
+
+    function roundToHour(time) {
+        let [hours, minutes] = time.split(':').map(Number);
+        if (isNaN(hours)) return ''; // handle empty input
+        if (minutes >= 30) hours = (hours + 1) % 24;
+        return (hours < 10 ? '0' : '') + hours + ':00';
+    }
+
+    $('#startTime, #endTime').on('change blur', function () {
+        const rounded = roundToHour($(this).val());
+        $(this).val(rounded);
+    });
+
+    // Optional: Prevent manual entry of minutes
+    $('#startTime, #endTime').on('input', function () {
+        const val = $(this).val();
+        if (!/^[0-9]{2}:(00)$/.test(val)) {
+            $(this).val(roundToHour(val));
+        }
+    });
+
+
+
+
+
+
+
+    $('#residentSelectAdmin').select2({
+        placeholder: '-- Search Resident --',
+        allowClear: true,
+        dropdownParent: $('#adminFunctionRoomBookingModal'), // ✅ this is the fix
+        ajax: {
+            url: '/admin/admin-search-residents',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    term: params.term || ''
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.results
+                };
+            },
+            cache: true
+        }
+    });
+
+
+    $('#residentSelectAdmin').on('select2:select', function (e) {
+        const data = e.params.data;
+
+        $('#unitNoAdmin').val(data.unit_no);
+        $('#residentTypeAdmin').val(data.resident_type);
+
+        $('input[name="admin_payment_mode"]').prop('checked', false);
+
+        adminHideAuthorization();
+    });
+
+    $('input[name="admin_payment_mode"]').on('change', adminCheckAuthorization);
+
+    function adminHideAuthorization() {
+        const $wrapper = $('#adminAuthorizationUploadWrapper');
+        const $fileInput = $('input[name="admin_authorization_file"]');
+
+        $wrapper.addClass('d-none');
+        $('#adminAuthorizationLabel').text('');
+        $('#adminAuthorizationNote').text('');
+        $fileInput.prop('required', false);
+        $fileInput.val('');
+    }
+
+    function adminCheckAuthorization() {
+        const residentType = ($('#residentTypeAdmin').val() || '').trim().toLowerCase();
+        const unitNo = ($('#unitNoAdmin').val() || '').trim();
+        const paymentMode = ($('input[name="admin_payment_mode"]:checked').val() || '').trim();
+
+        const $wrapper = $('#adminAuthorizationUploadWrapper');
+        const $fileInput = $('input[name="admin_authorization_file"]');
+
+        adminHideAuthorization();
+
+        if (!residentType) return;
+
+        // --- CASE 1: Tenant + Charge to Account → SHOW upload ---
+        if (residentType === 'tenant' && paymentMode === 'Charge to Account') {
+            $('#adminAuthorizationLabel').text('CTA Authorization Letter *');
+            $('#adminAuthorizationNote').text('Required because you are booking as a tenant with CTA.');
+            $wrapper.removeClass('d-none');
+            $fileInput.prop('required', true);
+            return;
+        }
+
+        // --- CASE 2: Owner + Has Tenant → ALWAYS show upload regardless of payment mode ---
+        if (residentType === 'owner' && unitNo) {
+            $.get('/admin/admin-check-unit-tenant/' + encodeURIComponent(unitNo))
+                .done(function (response) {
+                    if (response && response.hasTenant) {
+                        $('#adminAuthorizationLabel').text('Tenant Authorization Letter *');
+                        $('#adminAuthorizationNote').text('Required because the unit is tenanted.');
+                        $wrapper.removeClass('d-none');
+                        $fileInput.prop('required', true);
+                    } else {
+                        adminHideAuthorization();
+                    }
+                })
+                .fail(function () {
+                    console.error('Failed to check unit tenancy.');
+                    adminHideAuthorization();
+                });
+        }
+    }
+
 
     $('.approve-btn').on('click', function () {
         const approveBtn = $(this); // Store button reference
@@ -206,7 +645,7 @@ $(document).ready(function () {
                             showConfirmButton: false
                         });
                         approveBtn.prop('disabled', true).text('Approved');
-                        refreshFunctionRoomBookingsTable();
+                        refreshFunctionRoomBookingsTable(currentFunctionRoomBookingPageUrl);
                     },
                     error: function (xhr) {
                         Swal.fire({
@@ -266,7 +705,7 @@ $(document).ready(function () {
                             timer: 1500,
                             showConfirmButton: false
                         });
-                        refreshFunctionRoomBookingsTable();
+                        refreshFunctionRoomBookingsTable(currentFunctionRoomBookingPageUrl);
                     },
                     error: function (xhr) {
                         Swal.fire({
@@ -293,8 +732,6 @@ $(document).ready(function () {
     $('#functionRoomBookingsTable').on('click', '.view-booking-btn', function () {
         const bookingId = $(this).data('id');
         showSpinner();
-
-        // Reset modal fields
         const fields = [
             '#detail-transaction-no', '#detail-unit', '#detail-name', '#detail-contact', '#detail-resident-type',
             '#detail-function-room', '#detail-purpose', '#detail-status', '#detail-booking-date', '#detail-start-time',
@@ -309,6 +746,7 @@ $(document).ready(function () {
 
         function parseTimeToDate(timeStr) {
             if (!timeStr) return null;
+            timeStr = String(timeStr).trim();
             const ampmMatch = timeStr.match(/(\d{1,2}):(\d{2})(?::\d{2})?\s*([AaPp][Mm])/);
             if (ampmMatch) {
                 let h = parseInt(ampmMatch[1], 10);
@@ -329,215 +767,289 @@ $(document).ready(function () {
             return isNaN(d.getTime()) ? null : d;
         }
 
+        function formatTimeStr(timeStr) {
+            const d = parseTimeToDate(timeStr);
+            if (!d) return (timeStr ?? 'N/A');
+            let h = d.getHours();
+            const m = d.getMinutes();
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12;
+            if (h === 0) h = 12;
+            return `${h}:${String(m).padStart(2, '0')} ${ampm}`;
+        }
+
+        function computeHours(startStr, endStr) {
+            const s = parseTimeToDate(startStr);
+            const e = parseTimeToDate(endStr);
+            if (!s || !e) return 1;
+            const start = new Date(s.getTime());
+            const end = new Date(e.getTime());
+            if (end <= start) {
+                end.setDate(end.getDate() + 1);
+            }
+            const diffMinutes = (end - start) / (1000 * 60);
+            let hours = Math.round((diffMinutes / 60) * 100) / 100; // 2 decimals
+            if (!isFinite(hours) || hours <= 0) hours = 1;
+            return hours;
+        }
+
+        function currency(num) {
+            return Number(num || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
         $.get(`/admin/admin-function-room-bookings/${bookingId}/details`, function (response) {
-            if (!response.success) {
-                hideSpinner();
-                return alert('Failed to load booking details.');
-            }
 
-            const booking = response.booking;
-
-            // Fill basic fields
-            $('#detail-transaction-no').text(booking.transaction_no ?? 'N/A');
-            $('#detail-unit').text(booking.unit_no ?? 'N/A');
-            $('#detail-name').text(booking.user?.name ?? 'N/A');
-            $('#detail-contact').text(booking.contact_number ?? 'N/A');
-            const residentTypeBadge = booking.resident_type === 'TENANT'
-                ? '<span class="badge bg-danger">Tenant</span>'
-                : booking.resident_type === 'OWNER'
-                    ? '<span class="badge bg-primary">Owner</span>'
-                    : `<span class="badge bg-secondary">${booking.resident_type ?? 'N/A'}</span>`;
-            $('#detail-resident-type').html(residentTypeBadge);
-            $('#detail-function-room').text(booking.function_room?.function_room_name ?? 'N/A');
-            $('#detail-purpose').text(booking.purpose_of_event ?? 'N/A');
-
-            // Booking status badge
-            const today = new Date(); today.setHours(0, 0, 0, 0);
-            const bookingDate = booking.function_room_booking_date ? new Date(booking.function_room_booking_date) : null;
-            let statusBadge = '';
-            switch (booking.booking_status) {
-                case 0: statusBadge = '<span class="badge bg-warning">Waiting</span>'; break;
-                case 1: statusBadge = bookingDate && bookingDate < today ?
-                    '<span class="badge bg-secondary">Completed</span>' :
-                    '<span class="badge bg-success">Confirmed</span>'; break;
-                case 2: statusBadge = '<span class="badge bg-danger">Cancelled</span>'; break;
-                default: statusBadge = '<span class="badge bg-dark">Unknown</span>';
-            }
-            $('#detail-status').html(statusBadge);
-
-            // Other details
-            $('#detail-booking-date').text(booking.function_room_booking_date ?? 'N/A');
-            $('#detail-start-time').text(booking.event_start_time ?? 'N/A');
-            $('#detail-end-time').text(booking.event_end_time ?? 'N/A');
-            $('#detail-pax').text(booking.pax ?? 'N/A');
-            $('#detail-payment-mode').text(booking.payment_mode ?? 'N/A');
-
-            // Authorization
-            $('#detail-authorization').html(response.authorization_file_url
-                ? `<a href="${response.authorization_file_url}" target="_blank" class="custom-link">View</a>`
-                : '<span class="text-muted">N/A</span>');
-
-            // Suppliers
-            if (booking.suppliers && booking.suppliers.length) {
-                let html = '';
-                booking.suppliers.forEach(s => {
-                    html += `<div>${s.name} ${s.attachment_url ? `<a href="${s.attachment_url}" target="_blank" class="custom-link">View</a>` : ''}</div>`;
-                });
-                $('#detail-suppliers').html(html);
-            } else $('#detail-suppliers').html('<span class="text-muted">N/A</span>');
-
-            // Reset defaults
             approveBtn.removeClass('d-none').text('Approve').prop('disabled', true);
             rejectBtn.removeClass('d-none').text('Reject').prop('disabled', true);
 
-            // 1️⃣ If the current user already rejected
+
             if (response.current_user_status === 2) {
                 approveBtn.prop('disabled', false).text('Approve'); // allow reversal
                 rejectBtn.prop('disabled', true).text('Rejected');
             }
-            // 2️⃣ If the current user already approved
+
             else if (response.current_user_status === 1) {
                 approveBtn.prop('disabled', true).text('Approved');
                 rejectBtn.prop('disabled', true).text('Reject');
             }
-            // 3️⃣ If someone before rejected → but NOT this user
             else if (response.rejectedByPrevious && response.current_user_status === 0) {
                 approveBtn.prop('disabled', true).text('Waiting');
                 rejectBtn.prop('disabled', true).text('Rejected by ' + response.rejectedByRole);
             }
-            // 4️⃣ Current user can still act
+
             else if (response.show_approve_button) {
                 approveBtn.prop('disabled', false).text('Approve');
                 rejectBtn.prop('disabled', false).text('Reject');
             }
-            // 5️⃣ Fallback waiting/view only
+
+
             else if (response.show_view_button) {
                 approveBtn.prop('disabled', true).text(response.waiting_reason || 'Waiting');
                 rejectBtn.prop('disabled', true).text('Reject');
             }
 
+            const main = response.booking;
 
-
-
-
-            // === RATE + BREAKDOWN LOGIC ===
-            const durationHoursBackend = parseFloat(booking.duration_hours ?? booking.duration_in_hours ?? NaN);
-            const ratePerHourBackend = parseFloat(booking.final_rate ?? booking.function_room?.function_room_rate ?? NaN);
-            const roomTotalBackend = parseFloat(booking.room_total ?? NaN);
-
-            let hours = !isNaN(durationHoursBackend) ? durationHoursBackend : 1;
-            if (!durationHoursBackend) {
-                const startDate = parseTimeToDate(booking.event_start_time);
-                const endDate = parseTimeToDate(booking.event_end_time);
-                if (startDate && endDate) {
-                    if (endDate <= startDate) endDate.setDate(endDate.getDate() + 1);
-                    hours = Math.round(((endDate - startDate) / (1000 * 60 * 60)) * 100) / 100;
-                    if (hours <= 0) hours = 1;
-                }
+            const linked = Array.isArray(response.linked_bookings) && response.linked_bookings.length ? response.linked_bookings : [];
+            $('#detail-transaction-no').text(main.transaction_no ?? 'N/A');
+            $('#detail-unit').text(main.unit_no ?? 'N/A');
+            if (main.user?.name) {
+                $('#detail-name').text(main.user.name);
+            } else if (main.created_by_name) {
+                $('#detail-name').text('Booked by: ' + main.created_by_name);
+            } else {
+                $('#detail-name').text('N/A');
             }
+            $('#detail-contact').text(main.contact_number ?? 'N/A');
+            $('#detail-purpose').text(main.purpose_of_event ?? 'N/A');
 
-            const ratePerHour = !isNaN(ratePerHourBackend) ? ratePerHourBackend : (parseFloat(booking.final_rate) || 0);
-            const roomLineTotal = !isNaN(roomTotalBackend) ? roomTotalBackend : Math.round((ratePerHour * hours) * 100) / 100;
+            const residentBadge = main.resident_type === 'TENANT'
+                ? '<span class="badge badge-forge bg-danger">TENANT</span>'
+                : main.resident_type === 'OWNER'
+                    ? '<span class="badge badge-forge bg-primary">OWNER</span>'
+                    : `<span class="badge bg-secondary">${main.resident_type ?? 'N/A'}</span>`;
+            $('#detail-resident-type').html(residentBadge);
+            $('#detail-payment-mode').text(main.payment_mode ?? 'N/A');
 
-            if (ratePerHour && ratePerHour > 0) {
-                const baseRate = parseFloat(booking.function_room?.function_room_rate ?? ratePerHour);
-                if (baseRate > ratePerHour) {
-                    $('#detail-rate').html(`
-                    <div>
-                        <small class="text-muted"><s>₱${Number(baseRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</s></small>
-                        &nbsp; → &nbsp;
-                        <small class="fw-bold">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</small>
-                        &nbsp; × &nbsp;
-                        <small>${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })} hr(s)</small>
-                        &nbsp; = &nbsp;
-                        <strong class="fw-bold">₱${Number(roomLineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
-                    </div>
-                `);
+
+            let statusHtml = '';
+            if (linked.length) {
+                const allConfirmed = linked.every(b => b.booking_status == 1);
+                const allCancelled = linked.every(b => b.booking_status == 2);
+                if (allConfirmed) statusHtml = '<span class="badge badge-forge bg-success">Confirmed</span>';
+                else if (allCancelled) statusHtml = '<span class="badge badge-forge bg-danger">Cancelled</span>';
+                else statusHtml = '<span class="badge badge-forge bg-warning text-white">Waiting</span>';
+            } else {
+                if (main.booking_status == 1) statusHtml = '<span class="badge badge-forge bg-success">Confirmed</span>';
+                else if (main.booking_status == 2) statusHtml = '<span class="badge badge-forge bg-danger">Cancelled</span>';
+                else statusHtml = '<span class="badge badge-forge bg-warning text-white">Waiting</span>';
+            }
+            $('#detail-status').html(statusHtml);
+
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const mainBookingDate = main.function_room_booking_date ? new Date(main.function_room_booking_date) : null;
+            if (main.booking_status == 1) {
+                if (mainBookingDate && mainBookingDate < today) {
+                    $('#cancel-booking-btn').addClass('d-none');
                 } else {
-                    $('#detail-rate').html(`
-                    <div>
-                        <small class="text-muted">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</small>
-                        &nbsp; × &nbsp;
-                        <small>${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })} hr(s)</small>
-                        &nbsp; = &nbsp;
-                        <strong>₱${Number(roomLineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
-                    </div>
-                `);
+                    $('#cancel-booking-btn').removeClass('d-none').data('id', main.id).data('start-time', main.event_start_time);
                 }
-            } else $('#detail-rate').html('<span class="text-muted">N/A</span>');
-            // === Show Discount + Remarks ===
-            let discountValue = booking.discount ?? 0;
-            const discountRemarks = booking.discount_remarks ?? '';
-
-            // Convert to number first
-            discountValue = parseFloat(discountValue);
-
-            // Format discount: remove unnecessary decimals (e.g. 10.00 → 10, 12.5 → 12.5)
-            if (discountValue % 1 === 0) {
-                discountValue = discountValue.toFixed(0);
+            } else if (main.booking_status == 0) {
+                $('#cancel-booking-btn').removeClass('d-none').data('id', main.id).data('start-time', main.event_start_time);
             } else {
-                discountValue = discountValue.toFixed(1).replace(/\.0$/, '');
+                $('#cancel-booking-btn').addClass('d-none');
             }
 
-            if (discountValue > 0) {
-                $('#detail-discount').html(`
-        <div style="margin-top: 6px;">
-            <strong class="text-danger">${discountValue}%</strong>
-            ${discountRemarks ? `<span style="margin-left: 6px; color: #555;">${discountRemarks}</span>` : ''}
-        </div>
-    `);
+            if (linked.length) {
+                let roomsHtml = '';
+                linked.forEach(b => {
+                    const name = (b.function_room && b.function_room.function_room_name) || (b.functionRoom && b.functionRoom.function_room_name) || 'Function Room';
+                    roomsHtml += `<span class="badge bg-primary me-1">${name}</span>`;
+                });
+                $('#detail-function-rooms').html(roomsHtml);
             } else {
-                $('#detail-discount').html('<span class="text-muted" style="margin-top: 6px;">No discount</span>');
+                const name = (main.function_room && main.function_room.function_room_name) || (main.functionRoom && main.functionRoom.function_room_name) || 'N/A';
+                $('#detail-function-rooms').html(`<span class="badge bg-primary">${name}</span>`);
             }
 
+            if (response.authorization_file_url) {
+                $('#detail-authorization').html(`<a href="${response.authorization_file_url}" target="_blank" class="text-decoration-none">View</a>`);
+            } else {
+                $('#detail-authorization').html('<span class="text-muted">N/A</span>');
+            }
 
+            if (main.suppliers && main.suppliers.length) {
+                let supHtml = '';
+                main.suppliers.forEach(s => {
+                    supHtml += `<div>${s.name} ${s.attachment_url ? ` - <a href="${s.attachment_url}" target="_blank" class="text-decoration-none">View</a>` : ''}</div>`;
+                });
+                $('#detail-suppliers').html(supHtml);
+            } else {
+                $('#detail-suppliers').html('<span class="text-muted">N/A</span>');
+            }
 
+            const roomsToRender = linked.length ? linked : [main];
+            let roomListHtml = '';
+            roomsToRender.forEach(b => {
+                const fr = b.function_room || b.functionRoom || {};
+                const roomName = fr.function_room_name || fr.name || 'Function Room';
+                const startRaw = b.event_start_time;
+                const endRaw = b.event_end_time;
+                const hours = computeHours(startRaw, endRaw);
+                const ratePerHour = parseFloat(b.final_rate ?? fr.function_room_rate ?? fr.rate ?? 0) || 0;
+                const baseRate = parseFloat(fr.function_room_rate ?? ratePerHour) || ratePerHour;
+                const roomTotal = Math.round(hours * ratePerHour * 100) / 100;
 
-            // Breakdown table
-            let breakdownHtml = '';
+                const discountValue = parseFloat(b.discount ?? 0) || 0;
+                const discountRemarks = b.discount_remarks ?? '';
+                const startFmt = startRaw ? formatTimeStr(startRaw) : 'N/A';
+                const endFmt = endRaw ? formatTimeStr(endRaw) : 'N/A';
+                const bookingDateFmt = b.function_room_booking_date ? new Date(b.function_room_booking_date).toLocaleDateString(undefined, { month: 'long', day: '2-digit', year: 'numeric' }) : 'N/A';
+
+                roomListHtml += `
+                <div class="border-bottom pb-2 mb-3">
+                    <h6 class="fw-bold">${roomName}</h6>
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Booking Date:</div>
+                        <div class="col-8">${bookingDateFmt}</div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Time:</div>
+                        <div class="col-8">${startFmt} - ${endFmt}</div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Pax:</div>
+                        <div class="col-8">${b.pax ?? 'N/A'}</div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Rate:</div>
+                        <div class="col-8">`;
+
+                if (baseRate > ratePerHour) {
+                    roomListHtml += `<small class="text-muted"><s>₱${currency(baseRate)}/hr</s></small>
+                    &nbsp; → &nbsp;
+                    <small class="fw-bold">₱${currency(ratePerHour)}/hr</small>
+                    &nbsp; × &nbsp;
+                    <small>${hours} hr${hours > 1 ? 's' : ''}</small>
+                    &nbsp; = &nbsp;
+                    <strong>₱${currency(roomTotal)}</strong>`;
+                } else {
+                    roomListHtml += `<small>₱${currency(ratePerHour)}/hr</small>
+                    &nbsp; × &nbsp;
+                    <small>${hours} hr${hours > 1 ? 's' : ''}</small>
+                    &nbsp; = &nbsp;
+                    <strong>₱${currency(roomTotal)}</strong>`;
+                }
+
+                roomListHtml += `</div></div>`;
+                roomListHtml += `<div class="row mb-2"><div class="col-4 fw-bold">Discount:</div><div class="col-8">`;
+                if (discountValue > 0) {
+                    const dvStr = Number.isInteger(discountValue) ? discountValue.toFixed(0) : (discountValue % 1 === 0 ? discountValue.toFixed(0) : discountValue.toFixed(2).replace(/\.00$/, ''));
+                    roomListHtml += `<strong class="text-danger">${dvStr}%</strong>`;
+                    if (discountRemarks) roomListHtml += ` <span style="margin-left:6px;color:#555;">${discountRemarks}</span>`;
+                } else {
+                    roomListHtml += `<span class="text-muted">No discount</span>`;
+                }
+                roomListHtml += `</div></div></div>`;
+            });
+
+            $('#detail-room-list').html(roomListHtml);
+
+            let functionRoomsTotal = 0;
             let addonsTotal = 0;
+            let breakdownRows = '';
 
-            if (ratePerHour && ratePerHour > 0) {
-                breakdownHtml += `
+
+            roomsToRender.forEach(b => {
+                const fr = b.function_room || b.functionRoom || {};
+                const roomName = fr.function_room_name || fr.name || 'Function Room';
+                const hours = computeHours(b.event_start_time, b.event_end_time);
+                const ratePerHour = parseFloat(b.final_rate ?? fr.function_room_rate ?? fr.rate ?? 0) || 0;
+                const baseRate = parseFloat(fr.function_room_rate ?? ratePerHour) || ratePerHour;
+                const roomTotal = Math.round(hours * ratePerHour * 100) / 100;
+                functionRoomsTotal += roomTotal;
+
+                breakdownRows += `
                 <tr>
-                    <td>${booking.function_room?.function_room_name ?? 'Function Room'} (${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })} hr${hours > 1 ? 's' : ''})</td>
-                    <td class="text-center">${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })}</td>
-                    <td class="text-end">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</td>
-                    <td class="text-end">₱${Number(roomLineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                </tr>
-            `;
-            }
+                    <td>${roomName}</td>
+                    <td class="text-center">${hours} hr${hours > 1 ? 's' : ''}</td>
+                    <td class="text-end">`;
+                if (baseRate > ratePerHour) {
+                    breakdownRows += `<small class="text-muted"><s>₱${currency(baseRate)}</s></small>&nbsp;→&nbsp;<small class="fw-bold">₱${currency(ratePerHour)}</small>`;
+                } else {
+                    breakdownRows += `₱${currency(ratePerHour)}`;
+                }
+                breakdownRows += `</td><td class="text-end">₱${currency(roomTotal)}</td></tr>`;
+            });
 
-            if (booking.add_ons && booking.add_ons.length) {
-                booking.add_ons.forEach(addon => {
+            roomsToRender.forEach(b => {
+                const addOns = b.addOns || b.add_ons || [];
+                addOns.forEach(addon => {
                     const pivot = addon.pivot || {};
-                    const qty = parseFloat(pivot.quantity ?? pivot.qty ?? addon.qty ?? 0) || 0;
-                    const price = parseFloat(pivot.price ?? addon.price ?? 0) || 0;
+                    const qty = Number(pivot.quantity ?? pivot.qty ?? addon.qty ?? 0) || 0;
+                    const price = Number(pivot.price ?? addon.price ?? addon.price ?? 0) || 0;
                     const lineTotal = Math.round(qty * price * 100) / 100;
                     addonsTotal += lineTotal;
-                    breakdownHtml += `
+
+                    breakdownRows += `
                     <tr>
                         <td>${addon.item ?? addon.name ?? 'Add-on'}</td>
                         <td class="text-center">${qty}</td>
-                        <td class="text-end">₱${Number(price).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                        <td class="text-end">₱${Number(lineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                        <td class="text-end">₱${currency(price)}</td>
+                        <td class="text-end">₱${currency(lineTotal)}</td>
                     </tr>
                 `;
                 });
+            });
 
-                breakdownHtml += `
-                <tr class="table-light fw-bold">
-                    <td colspan="3" class="text-end">Add-ons Subtotal</td>
-                    <td class="text-end">₱${Number(addonsTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                </tr>
-            `;
+            if (!breakdownRows) {
+                breakdownRows = `<tr><td colspan="4" class="text-center text-muted">No charges</td></tr>`;
             }
 
-            if (!breakdownHtml) breakdownHtml = `<tr><td colspan="4" class="text-center text-muted">No charges</td></tr>`;
-            $('#detail-breakdown').html(breakdownHtml);
+            $('#detail-breakdown').html(breakdownRows);
+            const functionRoomsSubtotalStr = currency(functionRoomsTotal);
+            const addonsTotalStr = currency(addonsTotal);
+            const grandTotalStr = currency(Math.round((functionRoomsTotal + addonsTotal) * 100) / 100);
 
-            const grandTotal = Math.round((roomLineTotal + addonsTotal) * 100) / 100;
-            $('#detail-grand-total').text("₱" + Number(grandTotal).toLocaleString(undefined, { minimumFractionDigits: 2 }));
+            $('#detail-breakdown-footer').html(`
+            <tr class="table-light fw-bold">
+                <td colspan="3" class="text-end">Function Rooms Subtotal</td>
+                <td class="text-end">₱${functionRoomsSubtotalStr}</td>
+            </tr>
+            ${addonsTotal > 0 ? `
+            <tr class="table-light fw-bold">
+                <td colspan="3" class="text-end">Add-Ons Subtotal</td>
+                <td class="text-end">₱${addonsTotalStr}</td>
+            </tr>` : ''}
+            <tr class="table-dark fw-bold">
+                <td colspan="3" class="text-end">Grand Total</td>
+                <td class="text-end">₱${grandTotalStr}</td>
+            </tr>
+        `);
 
             hideSpinner();
             $('#functionRoomBookingDetailsModal').modal('show');
@@ -548,28 +1060,14 @@ $(document).ready(function () {
         });
     });
 
-
-
-
-    $('.AdminAddFunctionRoomBooking').on('click', function () {
-        $('#adminFunctionRoomBookingModal').modal('show');
-    });
-
-    // $('.DownloadFunctionRoomBooking').on('click', function () {
-    //     $('#DownloadFunctionRoomBookingModal').modal('show');
-    // });
-
     $('#functionRoomBookingsTable').on('click', '.edit-booking-btn', function () {
         let bookingId = $(this).data("id");
-
         showSpinner();
-
         $.get('/admin/admin-bookings/' + bookingId + '/edit', function (res) {
             const booking = res.booking;
             const addons = res.addons;
             $('#booking_id').val(booking.id);
             $('#function_room_id').val(booking.function_room_id);
-            // --- Resident Info ---
             const residentName = booking.user?.name ?? '';
             const unitNo = booking.unit_no ?? '';
             const residentType = booking.resident_type
@@ -578,13 +1076,34 @@ $(document).ready(function () {
 
             const displayValue = `${residentName} - Unit ${unitNo} - ${residentType}`;
 
+            const roomId = booking.function_room_id;
+            const linked = linkedRooms[roomId] || [];
+            if (linked.length > 0) {
+                const linkedRoomId = linked[0];
+                const linkedRoomName = res.linked_room_name;
+
+                $('#editLinkedRoomWrapper').removeClass('d-none');
+                $('#editLinkedRoomLabel').text(`Also book linked room: ${linkedRoomName}?`);
+
+                const alreadyBookedLinkedRoom = res.already_booked_linked_room === true;
+
+                if (alreadyBookedLinkedRoom) {
+                    $('#editLinkedRoomCheckbox').prop('checked', true);
+                    $('#editLinkedRoomInput').val(1);
+                } else {
+                    $('#editLinkedRoomCheckbox').prop('checked', false);
+                    $('#editLinkedRoomInput').val(0);
+                }
+            } else {
+                $('#editLinkedRoomWrapper').addClass('d-none');
+                $('#editLinkedRoomInput').val(0);
+            }
+            $('#function_room_id').val(booking.function_room_id);
             $('#editTransactionNo').text(booking.transaction_no ?? 'N/A');
             $('#editResidentDisplay')
                 .text(displayValue)
                 .data('type', booking.resident_type)
                 .data('unit', booking.unit_no);
-
-            // --- Authorization file ---
             if (res.authorization_file) {
                 $('#authorizationPreview').removeClass('d-none');
                 $('#authorizationViewLink').attr('href', res.authorization_file);
@@ -594,7 +1113,7 @@ $(document).ready(function () {
                 $('input[name="authorization_file"]').data('existing', false);
             }
 
-            // --- Booking Info ---
+
             $('#editFunctionRoomName').text(booking.function_room.function_room_name);
             $('#roomCapacity').val(booking.function_room.function_room_capacity);
             $('#editRoomCapacity').text(booking.function_room.function_room_capacity);
@@ -610,7 +1129,6 @@ $(document).ready(function () {
                 .attr('max', booking.function_room.function_room_capacity);
             $('#editContactNumber').val(booking.contact_number);
 
-            // --- Payment Mode ---
             const paymentModes = ['Charge to Account', 'Advance Payment'];
             let paymentHtml = '';
             paymentModes.forEach(pm => {
@@ -624,7 +1142,6 @@ $(document).ready(function () {
             });
             $('#editPaymentModeWrapper').html(paymentHtml);
 
-            // --- Add-ons ---
             let addonHtml = '';
             addons.forEach(addon => {
                 const booked = booking.add_ons.find(a => a.id == addon.id);
@@ -635,7 +1152,7 @@ $(document).ready(function () {
                     <div class="border rounded p-2 h-100">
                         <div class="form-check">
                             <input type="hidden" name="addons[${addon.id}][selected]" value="0">
-                            <input type="checkbox" class="form-check-input addOnsFields" 
+                            <input type="checkbox" class="form-check-input editAddOnsFields" 
                                 name="addons[${addon.id}][selected]" value="1" 
                                 id="addon${addon.id}" ${qty > 0 ? 'checked' : ''} 
                                 data-max="${addon.qty}">
@@ -658,9 +1175,6 @@ $(document).ready(function () {
             `;
             });
             $('#editAddonsWrapper').html(addonHtml);
-
-            // --- Suppliers ---
-            // --- Suppliers ---
             if (booking.has_suppliers && booking.suppliers.length > 0) {
                 $('#hasSuppliers').prop('checked', true);
                 $('#supplierSection').removeClass('d-none');
@@ -719,8 +1233,6 @@ $(document).ready(function () {
 
 
             }
-
-            // --- Flatpickr ---
             $.get('/admin/admin-function-room/' + booking.function_room_id + '/booked-dates', function (disabledDates) {
                 let dateInput = document.getElementById("editFunctionRoomBookingDate");
                 if (dateInput._flatpickr) dateInput._flatpickr.destroy();
@@ -761,7 +1273,8 @@ $(document).ready(function () {
 
             hideSpinner();
             $('#adminEditBookingModal').modal('show');
-            checkAuthorizationEdit(); // initial check
+            checkAuthorizationEdit();
+            $('#editLinkedRoomCheckbox').trigger('change');
         }).fail(function () {
             hideSpinner();
             Swal.fire('Error', 'Unable to fetch booking data.', 'error');
@@ -769,8 +1282,28 @@ $(document).ready(function () {
     });
 
 
+    $('#editLinkedRoomCheckbox').on('change', function () {
+        $('#editLinkedRoomInput').val(this.checked ? 1 : 0);
+    });
+
+
+    $(document).on('change', '.editAddOnsFields', function () {
+        const isChecked = $(this).is(':checked');
+        const addonId = $(this).attr('id').replace('addon', '');
+        const qtyInput = $(`input[data-addon-id="${addonId}"]`);
+
+        if (isChecked) {
+            qtyInput.prop('disabled', false).prop('required', true);
+            if (qtyInput.val() == 0) qtyInput.val(1);
+        } else {
+            qtyInput.prop('disabled', true).prop('required', false).val(0);
+        }
+    });
+
+
     // --- Event delegation for dynamic payment mode radios ---
-    $('#editPaymentModeWrapper').on('change', 'input[name="payment_mode"]', checkAuthorizationEdit);
+    $(document).on('change', '#editPaymentModeWrapper input[name="payment_mode"]', checkAuthorizationEdit);
+
 
     // --- Event delegation for suppliers toggle ---
     $('#hasSuppliers').on('change', function () {
@@ -782,27 +1315,35 @@ $(document).ready(function () {
         const residentType = $residentDisplay.data('type')?.toLowerCase();
         const paymentMode = $('input[name="payment_mode"]:checked').val();
 
-        const $wrapper = $('#authorizationUploadWrapper');
+        const $wrapper = $('#editAuthorizationUploadWrapper');
         const $fileInput = $('input[name="authorization_file"]');
         const hasExisting = $fileInput.data('existing') === true || $fileInput.data('existing') === 'true';
 
-        // Reset
+        const $preview = $('#authorizationPreview');
+        const $viewLink = $('#authorizationViewLink');
+
+        // Reset state
         $wrapper.addClass('d-none');
         $fileInput.prop('required', false);
-        $('#authorizationLabel').text('');
-        $('#authorizationNote').text('');
+        $('#editAuthorizationLabel').text('');
+        $('#editAuthorizationNote').text('');
 
+        // Hide preview by default
+        $preview.addClass('d-none');
+        $viewLink.attr('href', '#');
         if (residentType === 'tenant' && paymentMode === 'Charge to Account') {
-            $('#authorizationLabel').text('CTA Authorization Letter *');
-            $('#authorizationNote').text('Required because you are booking as a tenant with CTA.');
+            $('#editAuthorizationLabel').text('CTA Authorization Letter *');
+            $('#editAuthorizationNote').text('Required because you are booking as a tenant with CTA.');
             $wrapper.removeClass('d-none');
 
-            // ✅ Only require if no existing file
-            if (!hasExisting) {
+            if (hasExisting) {
+                $preview.removeClass('d-none');
+            } else {
                 $fileInput.prop('required', true);
             }
         }
     }
+
 
 
     let supplierIndex = 1;
@@ -1002,5 +1543,29 @@ $(document).ready(function () {
             }
         });
     });
+
+
+
+
+
+    function renderApprovalBadge(status) {
+        // Convert string to number if needed
+        status = Number(status);
+
+        if (status === 1) return '<span class="badge bg-success">Approved</span>';
+        if (status === 2) return '<span class="badge bg-danger">Rejected</span>';
+        return '<span class="badge bg-warning">Waiting</span>'; // 0 or any other
+    }
+
+
+
+    function renderStatusBadge(status) {
+        if (status == 1) return '<span class="badge bg-success">Confirmed</span>';
+        if (status == 2) return '<span class="badge bg-danger">Cancelled</span>';
+        return '<span class="badge bg-warning">Waiting</span>';
+    }
+
+
+
 
 });

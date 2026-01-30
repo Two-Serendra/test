@@ -1,10 +1,18 @@
 
 $(document).ready(function () {
 
-
-    $('.AdminAddAmenity').on('click', function () {
-        $('#adminCreateAmenities').modal('show');
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
     });
+    $('.addAmenity').on('click', function () {
+        $('#amenityAdd').modal('show');
+    });
+    $('#amenityAdd').on('hidden.bs.modal', function () {
+        $('.modal-backdrop').remove();
+    });
+
+    $('#addAmenity').tooltip();
 
     $('#amenityImage').change(function () {
         var file = this.files[0];
@@ -20,20 +28,37 @@ $(document).ready(function () {
         }
     });
 
-    $('#admin-new-amenities').submit(function (event) {
-        console.log('Event bound');
+    $('#edit_amenity_image').change(function () {
+        var file = this.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#edit_imagePreview').attr('src', e.target.result);
+                $('#edit_imagePreview').show();
+            };
+            reader.readAsDataURL(file);
+        } else {
+            $('#edit_imagePreview').hide();
+        }
+    });
+
+
+    $('#amenitiesForm').submit(function (event) {
         event.preventDefault();
-
-        const startTime = $('#startTime').val();
-        const endTime = $('#endTime').val();
-
-
 
         if (!this.checkValidity()) {
             this.classList.add('was-validated');
             return;
         }
         this.classList.remove('was-validated');
+
+
+        const $btn = $('#saveAmenityBtn');
+        const originalWidth = $btn.outerWidth();
+        $btn
+            .attr('disabled', true)
+            .html(`<div class="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></div>`)
+            .css('width', originalWidth + 'px');
 
 
         var formData = new FormData(this);
@@ -49,7 +74,7 @@ $(document).ready(function () {
             processData: false,
             contentType: false,
             success: function (response) {
-                $('#adminCreateAmenities').modal('hide');
+                $('#amenityAdd').modal('hide');
                 $('#imagePreview').attr('src', '#').hide();
 
                 const Toast = Swal.mixin({
@@ -96,6 +121,231 @@ $(document).ready(function () {
                     icon: 'error',
                     title: 'Failed to add amenity'
                 });
+            },
+            complete: function () {
+                // Restore button to original state
+                $btn
+                    .attr('disabled', false)
+                    .html(`<span class="btn-text">Create</span>`)
+                    .css('width', '');
+            }
+        });
+    });
+
+
+    $('#amenityAdd').on('hidden.bs.modal', function () {
+        $('.modal-backdrop').remove();
+    });
+
+    $('#amenityTable').on('click', '.editInfo_id_amenity', function () {
+        var info_id = $(this).data("id");
+        $.get('/admin/fetch/amenity/' + info_id, function (data) {
+            $('#amenityEdit').modal('show');
+            $('#edit_amenity_name').val(data.amenity_name);
+            $('#edit_amenity_description').val(data.amenity_description);
+            $('#currentImageFileName').val(data.amenity_image);
+            $('#info_id').val(info_id);
+            const imagePath = '/assets/images/amenities/' + data.amenity_image;
+            $('#edit_imagePreview').attr('src', imagePath).show();
+        })
+            .fail(function () {
+                alert("Data not found");
+            });
+    });
+
+
+    $('#updateFormAmenity').on('submit', function (e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+
+        $.ajax({
+            url: '/admin/update-amenities',
+            type: "POST",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                $('#amenityEdit').modal('hide');
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'colored-toast'
+                    },
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Updated Successfully'
+                });
+
+                refreshTableAmenities();
+            },
+            error: function (xhr, status, error) {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'colored-toast-error'
+                    },
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Update failed'
+                });
+            }
+        });
+    });
+
+    $('#amenityTable').on('click', '.add_remarks_amenity', function () {
+        var info_id = $(this).data("id");
+        $('#info_id').val(info_id);
+        $.get('/admin/fetch/amenity_add_remarks/' + info_id, function (data) {
+            $('#amenityRemarks').modal('show');
+        })
+            .fail(function () {
+                alert("Data not found");
+            });
+    });
+
+
+    $('#addAmenityRemarks').on('submit', function (e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+        formData.append('amenity_id', $('#info_id').val());
+        formData.append('status_id', 0);
+
+        $.ajax({
+            url: '/admin/add-remarks-amenities',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                $('#amenityRemarks').modal('hide');
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'colored-toast'
+                    },
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Status Updated Successfully'
+                });
+
+                refreshTableAmenities();
+                $('#addAmenityRemarks')[0].reset();
+            },
+            error: function (xhr, status, error) {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'colored-toast-error'
+                    },
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Status Update Failed'
+                });
+            }
+        });
+    });
+
+    $('#amenityTable').on('click', '.show-amenities', function () {
+        var amenityId = $(this).data('id');
+        // console.log("amenityId:", amenityId);
+        $.ajax({
+            url: '/admin/show-amenities',
+            type: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: {
+                amenity_id: amenityId,
+                status_id: 1
+            },
+
+            
+            success: function (response) {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'colored-toast'
+                    },
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Show Amenity Successfully'
+                });
+
+                refreshTableAmenities();
+            },
+            error: function (xhr, status, error) {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'colored-toast-error'
+                    },
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Show Amenity Failed'
+                });
             }
         });
     });
@@ -103,7 +353,7 @@ $(document).ready(function () {
 
     function refreshTableAmenities() {
         $.ajax({
-            url: '/get-updated-amenities-table',
+            url: '/admin/get-updated-amenities-table',
             type: 'GET',
             dataType: 'json',
             success: function (response) {
@@ -154,6 +404,5 @@ $(document).ready(function () {
             }
         });
     }
-
 });
 

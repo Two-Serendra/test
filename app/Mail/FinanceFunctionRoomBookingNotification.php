@@ -12,25 +12,32 @@ class FinanceFunctionRoomBookingNotification extends Mailable implements ShouldQ
 {
     use Queueable, SerializesModels;
 
-    public $booking;
+    public $mainBooking;
+    public $allBookings;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct(FunctionRoomBooking $booking)
+    public function __construct(FunctionRoomBooking $mainBooking, $allBookings = [])
     {
-        $this->booking = $booking;
+        $this->mainBooking = $mainBooking;
+        $this->allBookings = $allBookings;
     }
 
-    /**
-     * Build the message.
-     */
     public function build()
     {
-        return $this->subject('New Function Room Booking - ' . $this->booking->transaction_no)
+        $rooms = collect($this->allBookings)
+            ->pluck('functionRoom.function_room_name')
+            ->unique()
+            ->implode(', ');
+
+        $totalAmount = collect($this->allBookings)
+            ->sum('total_amount');
+
+        return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra')
+            ->subject('New Function Room Booking (Finance Copy)')
             ->view('emails.finance-function-room-booking')
             ->with([
-                'booking' => $this->booking
+                'booking' => $this->mainBooking,
+                'rooms' => $rooms,
+                'totalAmount' => $totalAmount,
             ]);
     }
 }

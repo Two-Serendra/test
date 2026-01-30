@@ -98,6 +98,8 @@
     <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
 
 
     <script async defer src="https://buttons.github.io/buttons.js"></script>
@@ -118,8 +120,14 @@
     <script src="{{ asset('assets/backend/js/addOns.js')}}"></script>
     <script src="{{ asset('assets/backend/js/records.js')}}"></script>
     <script src="{{ asset('assets/backend/js/function-room-discount.js')}}"></script>
-
-
+    <!-- <script src="{{ asset('assets/backend/js/amenities.js') }}"></script> -->
+    <script src="{{ asset('assets/backend/js/activities.js') }}"></script>
+    <!-- <script src="{{ asset('assets/backend/js/amenity-booking.js') }}"></script> -->
+    <script src="{{ asset('assets/backend/js/activity-schedule.js') }}"></script>
+    <script src="{{ asset('assets/backend/js/history.js') }}"></script>
+    <script src="{{ asset('assets/backend/js/calendar.js') }}"></script>
+    <script src="{{ asset('assets/backend/js/blocking.js') }}"></script>
+    <script src="{{ asset('assets/backend/js/activitiy-booking.js') }}"></script>
 
     @stack('scripts')
 
@@ -182,7 +190,7 @@
         });
 
         functionRoomChannel.bind('FunctionRoomBookingCancelled', function (data) {
-            if ([1, 2, 3, 5, 7, 6].includes(currentUserRoleId)) {
+            if ([1, 2, 3, 5, 7, 6, 8].includes(currentUserRoleId)) {
                 toastr.warning(
                     `(Unit: ${data.unit_no})`,
                     `Booking Cancelled - ${data.function_room}`,

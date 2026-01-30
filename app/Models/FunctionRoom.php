@@ -14,6 +14,7 @@ class FunctionRoom extends Model
         'function_room_name',
         'function_room_capacity',
         'function_room_rate',
+        'function_room_short_description',
         'function_room_description',
         'function_room_policy',
         'function_room_360',

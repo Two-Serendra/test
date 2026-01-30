@@ -8,6 +8,8 @@ use App\Models\Download;
 use App\Models\FunctionRoom;
 use App\Models\Gallery;
 use App\Models\Events;
+
+
 use Carbon\Carbon;
 
 
@@ -104,5 +106,9 @@ class NavbarController extends Controller
       $groupedDownloads = $downloads->groupBy('category_name');
       return view('frontend.pages.downloads', compact('groupedDownloads'));
    }
+
+  
+
+
 
 }

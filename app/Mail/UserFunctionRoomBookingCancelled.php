@@ -22,16 +22,19 @@ class UserFunctionRoomBookingCancelled extends Mailable implements ShouldQueue
     {
         $this->booking = $booking;
     }
- 
+
     /**
      * Build the message.
      */
     public function build()
     {
+        $name = $this->booking->user->name ?? 'Resident';
+
         return $this->subject('Your Function Room Booking Has Been Cancelled')
             ->view('emails.user-function-room-booking-cancellation')
             ->with([
-                'name' => $this->booking->user->name,
+                // 'name' => $this->booking->user->name,
+                'name' => $name,
                 'transaction_no' => $this->booking->transaction_no,
                 'function_room' => $this->booking->functionRoom->function_room_name ?? 'Function Room',
                 'date' => $this->booking->function_room_booking_date,

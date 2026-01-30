@@ -130,21 +130,59 @@ class ProfileController extends Controller
     //     $year = $request->year;
     //     $month = str_pad($request->month, 2, '0', STR_PAD_LEFT);
 
-    //     // Determine URL based on billing type
-    //     if ($request->billing_type === 'Electricity') {
-    //         $soaUrl = "http://192.168.194.113:3000/request-electricity/{$unit}/{$year}/{$month}";
-    //     } elseif ($request->billing_type === 'Soa') {
-    //         $soaUrl = "http://192.168.194.113:3000/request-soa/{$unit}/{$year}/{$month}";
-    //     } else {
+    //     $apiBase = rtrim(config('services.ebt.base_url'), '/');
+
+    //     $endpoint = $request->billing_type === 'Electricity'
+    //         ? "/request-electricity/{$unit}/{$year}/{$month}"
+    //         : "/request-soa/{$unit}/{$year}/{$month}";
+
+    //     $apiUrl = $apiBase . $endpoint;
+
+    //     Log::info('GenerateSoa called', ['api_url' => $apiUrl]);
+
+    //     try {
+    //         $response = Http::timeout(90)
+    //             ->withToken(config('services.ebt.token')) // 🔐 secure
+    //             ->withBasicAuth(
+    //                 config('services.ebt.username'),
+    //                 config('services.ebt.password')
+    //             )
+    //             ->withHeaders([
+    //                 'X-API-KEY' => config('services.ebt.api_key'),
+    //             ])
+    //             ->get($apiUrl);
+
+    //         if (!$response->successful()) {
+    //             Log::error('SOA API error', [
+    //                 'status' => $response->status(),
+    //                 'body' => $response->body(),
+    //             ]);
+
+    //             return response()->json([
+    //                 'error' => 'SOA API returned an error'
+    //             ], 502);
+    //         }
+
+    //     } catch (\Exception $e) {
+    //         Log::error('SOA generation failed', [
+    //             'message' => $e->getMessage(),
+    //             'api_url' => $apiUrl
+    //         ]);
+
     //         return response()->json([
-    //             'error' => 'Invalid billing type selected.'
-    //         ], 400);
+    //             'error' => 'SOA generation failed',
+    //             'message' => $e->getMessage()
+    //         ], 500);
     //     }
 
+    //     $token = (string) Str::uuid();
+    //     Cache::put("soa_pdf_$token", $response->body(), now()->addMinutes(10));
+
     //     return response()->json([
-    //         'soaUrl' => $soaUrl
+    //         'token' => $token
     //     ]);
     // }
+
 
 
     public function GenerateSoa(Request $request)
@@ -168,18 +206,26 @@ class ProfileController extends Controller
             ? "/request-electricity/{$unit}/{$year}/{$month}"
             : "/request-soa/{$unit}/{$year}/{$month}");
 
+
+
         Log::info("GenerateSoa called", ['api_url' => $apiUrl]);
 
-
-        // 🔑 Laravel talks to API
         try {
-            $response = Http::timeout(90)->get($apiUrl);
+            $response = Http::timeout(90)
+                ->retry(2, 3000)
+                ->withToken(config('services.ebt.api_key'))
+                ->get($apiUrl);
 
-            // Log status
-            Log::info("API response", [
-                'status' => $response->status(),
-                'body_length' => strlen($response->body())
-            ]);
+            if (!$response->successful()) {
+                Log::error('EBT API error', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+
+                return response()->json([
+                    'error' => 'SOA service unavailable'
+                ], 502);
+            }
 
         } catch (\Exception $e) {
             Log::error("SOA generation failed", [
@@ -192,11 +238,7 @@ class ProfileController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
-
-        // 🔐 Create temporary token
         $token = (string) Str::uuid();
-
-        // Store PDF in cache for 10 minutes
         Cache::put("soa_pdf_$token", $response->body(), now()->addMinutes(10));
 
         return response()->json([

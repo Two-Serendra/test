@@ -68,6 +68,7 @@ class FunctionRoomBooking extends Model
 
 
         'booking_status',
+        'created_by',
     ];
 
     public function user()
@@ -84,6 +85,12 @@ class FunctionRoomBooking extends Model
     {
         return $this->belongsTo(ResidentDetails::class);
     }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
 
 
     public function authorization()

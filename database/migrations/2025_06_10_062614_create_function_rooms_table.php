@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->string('function_room_name');
             $table->string('function_room_capacity');
             $table->string('function_room_rate');
+            $table->string('function_room_short_description');
             $table->string('function_room_description');
             $table->string('function_room_policy');
             $table->string('function_room_360');

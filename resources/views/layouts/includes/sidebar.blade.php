@@ -54,15 +54,21 @@
                 <div data-i18n="Form Elements">Amenities</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item {{ request()->routeIs('admin.show.minor.work.permit') ? 'active' : '' }}">
-                    <a href="{{ route('admin.show.minor.work.permit') }}" class="menu-link">
+                <li class="menu-item {{ request()->routeIs('admin.booking.activities') ? 'active' : '' }}">
+                    <a href="{{ route('admin.booking.activities') }}" class="menu-link">
                         <div data-i18n="Typography">Booking</div>
                     </a>
                 </li>
 
-                <li class="menu-item {{ request()->routeIs('admin.show.walkin.work.permit') ? 'active' : '' }}">
-                    <a href="{{ route('admin.show.walkin.work.permit') }}" class="menu-link">
+                <li class="menu-item {{ request()->routeIs('admin.activity.history') ? 'active' : '' }}">
+                    <a href="{{ route('admin.activity.history') }}" class="menu-link">
                         <div data-i18n="Typography">History</div>
+                    </a>
+                </li>
+
+                <li class="menu-item {{ request()->routeIs('admin.show.date.blocking') ? 'active' : '' }}">
+                    <a href="{{ route('admin.show.date.blocking') }}" class="menu-link">
+                        <div data-i18n="Typography">Date Blocking</div>
                     </a>
                 </li>
 
@@ -76,8 +82,8 @@
                                 <div data-i18n="Subitem">Add Amenities</div>
                             </a>
                         </li>
-                        <li class="menu-item">
-                            <a href="" class="menu-link">
+                        <li class="menu-item {{ request()->routeIs('admin.show.activities') ? 'active' : '' }}">
+                            <a href="{{ route('admin.show.activities') }}" class="menu-link">
                                 <div data-i18n="Subitem">Add Activities</div>
                             </a>
                         </li>

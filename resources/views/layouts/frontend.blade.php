@@ -36,6 +36,7 @@
     <link href="{{ asset('assets/frontend/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/frontend/css/style.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/frontend/css/custom.css') }}" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <!-- <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet"> -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -56,22 +57,27 @@
 
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
     @include('layouts.includes.topbar')
     @include('layouts.includes.navbar')
-    <div class="wrapper d-flex flex-column min-vh-100">
-        <div class="main flex-grow-1">
-            <div class="main-panel">
-                <div id="app">
-                    <div id="notifications-container"></div>
+    <main class="flex-grow-1">
+        <div class="wrapper">
+            <div class="main">
+                <div class="main-panel">
+                    <div id="app">
+                        <div id="notifications-container"></div>
+                    </div>
+
+                    @yield('content')
                 </div>
-                @yield('content')
             </div>
         </div>
+    </main>
 
+    <footer class="mt-auto">
         @include('layouts.includes.footer')
         @include('layouts.includes.copyright')
-    </div>
+    </footer>
 
 
 
@@ -99,6 +105,7 @@
     <script src="https://js.pusher.com/8.2/pusher.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/laravel-echo/1.15.2/echo.iife.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
 
     <!-- Template Javascript -->
@@ -108,7 +115,10 @@
     <script src="{{ asset('assets/frontend/js/profile.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/function-room.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/test-email.js') }}"></script>
-<script src="{{ asset('assets/frontend/js/soa.js') }}?v=2"></script>
+    <script src="{{ asset('assets/frontend/js/soa.js') }}?v=2"></script>
+    <script src="{{ asset('assets/frontend/js/grease-trap.js') }}"></script>
+    <script src="{{ asset('assets/frontend/js/activity-booking.js') }}"></script>
+    <script src="{{ asset('assets/frontend/js/resident-booking-history.js') }}"></script>
 
 
     <script>
@@ -141,7 +151,17 @@
         // });
 
         $(document).ready(function () {
-            // Redirect after login if needed
+
+            document.querySelectorAll('.unitStatusInfo').forEach(function (el) {
+                const tooltip = el.querySelector('.tooltipText');
+                el.addEventListener('mouseenter', () => {
+                    tooltip.style.visibility = 'visible';
+                });
+                el.addEventListener('mouseleave', () => {
+                    tooltip.style.visibility = 'hidden';
+                });
+            });
+            
             if (localStorage.getItem("redirect_after_login")) {
                 const url = localStorage.getItem("redirect_after_login");
                 localStorage.removeItem("redirect_after_login");
@@ -256,6 +276,12 @@
 
 
     </script>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
 
 </body>
 

@@ -12,8 +12,11 @@ return new class extends Migration {
     {
         Schema::create('function_room_bookings', function (Blueprint $table) {
             $table->id();
-            $table->string('transaction_no')->unique();
-            $table->unsignedBigInteger('user_id');
+            $table->string('transaction_no');
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+
+
             $table->string('unit_no');
             $table->string('resident_type');
             $table->unsignedBigInteger('function_room_id');
@@ -80,6 +83,7 @@ return new class extends Migration {
             $table->foreign('finance_user_id')->references('id')->on('users')->nullOnDelete();
             $table->foreign('engineering_user_id')->references('id')->on('users')->nullOnDelete();
             $table->foreign('manager_user_id')->references('id')->on('users')->nullOnDelete();
+            $table->foreign('created_by')->references('id')->on('users')->nullOnDelete();
 
             $table->unique(['function_room_id', 'function_room_booking_date'], 'unique_room_booking');
         });

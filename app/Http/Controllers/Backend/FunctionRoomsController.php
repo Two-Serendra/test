@@ -16,7 +16,7 @@ class FunctionRoomsController extends Controller
 {
     public function showFunctionRooms(Request $request)
     {
-        $functionRooms = FunctionRoom::paginate(10);
+        $functionRooms = FunctionRoom::orderBy('created_at', 'desc')->paginate(10);
         return view('backend.admin-function-rooms', compact('functionRooms'));
     }
 
@@ -93,6 +93,7 @@ class FunctionRoomsController extends Controller
             'function_room_name' => $function_room->function_room_name,
             'function_room_rate' => $function_room->function_room_rate,
             'function_room_capacity' => $function_room->function_room_capacity,
+            'function_room_short_description' => $function_room->function_room_short_description,
             'function_room_description' => $function_room->function_room_description,
             'function_room_policy' => $function_room->function_room_policy,
             'function_room_images' => $function_room->images->pluck('image'), // returns array of filenames
@@ -110,10 +111,10 @@ class FunctionRoomsController extends Controller
             $functionRoom->function_room_section = $request->input('function_room_section');
             $functionRoom->function_room_rate = $request->input('function_room_rate');
             $functionRoom->function_room_capacity = $request->input('function_room_capacity');
+            $functionRoom->function_room_short_description = $request->input('function_room_short_description');
             $functionRoom->function_room_description = $request->input('function_room_description');
             $functionRoom->function_room_policy = $request->input('function_room_policy');
             $functionRoom->featured = $request->input('featured') ? 1 : 0;
-            $functionRoom->discount = $request->input('discount') ?? 0;
             if ($request->hasFile('function_room_image')) {
                 $oldImages = FunctionRoomImages::where('function_room_id', $functionRoom->id)->get();
                 foreach ($oldImages as $oldImage) {
@@ -156,7 +157,8 @@ class FunctionRoomsController extends Controller
 
     public function getUpdatedFunctionRoomsTable()
     {
-        $functionRooms = FunctionRoom::paginate(5);
+        $functionRooms = FunctionRoom::orderBy('created_at', 'desc')->paginate(10);
+
         return response()->json([
             'data' => $functionRooms->items(),
             'links' => (string) $functionRooms->links('vendor.pagination.bootstrap-5')

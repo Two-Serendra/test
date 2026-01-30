@@ -2,7 +2,6 @@
 
 @section('content')
     <div class="container py-5">
-        {{-- Success alert for profile update --}}
         <div class="card mb-3 shadow-sm" style="border-radius: 4px;">
             <h5 class="card-header">Profile Information</h5>
             <div class="card-body">
@@ -12,8 +11,6 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
-
-                {{-- Profile Update Form --}}
                 <form method="POST" action="{{ route('profile.update') }}">
                     @csrf
                     @method('patch')
@@ -39,8 +36,6 @@
                                 email.</button>
                         </div>
                     @endif
-
-                    <!-- <button type="submit" class="btn btn-primary">Save Changes</button> -->
                 </form>
             </div>
         </div>
@@ -78,87 +73,14 @@
                             </tbody>
                         </table>
                     </div>
-
-                    <!-- Pagination -->
                     <div class="d-flex justify-content-center mt-3">
-                       {{ $residences->links('pagination::bootstrap-5') }}
+                        {{ $residences->links('pagination::bootstrap-5') }}
                     </div>
                 @else
                     <div class="text-muted">No residence records available.</div>
                 @endif
             </div>
         </div>
-
-
-        <div class="card mb-3 shadow-sm" style="border-radius: 4px;">
-            <h5 class="card-header">My Bookings</h5>
-            <div class="card-body">
-
-                @if ($allResidences->count())
-                    <!-- Residence Dropdown -->
-                    <form method="GET" action="{{ route('profile.edit') }}" class="mb-3">
-                        <label for="unit_no" class="form-label">Select Unit</label>
-                        <select name="unit_no" id="unit_no" class="form-select" onchange="this.form.submit()">
-                            @foreach ($allResidences as $allResidence)
-                                <option value="{{ $allResidence->unit_no }}" {{ $selectedUnit == $allResidence->unit_no ? 'selected' : '' }}>
-                                    {{ $allResidence->unit_no }} ({{ ucfirst($allResidence->resident_type) }})
-                                </option>
-                            @endforeach
-                        </select>
-                    </form>
-                @endif
-
-                @if ($bookings->count())
-                    <div class="table-responsive">
-                        <table class="table table-bordered text-center">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Booking ID</th>
-                                    <th>Function Room</th>
-                                    <th>Date</th>
-                                    <th>Time</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($bookings as $booking)
-                                    <tr>
-                                        <td>{{ $booking->transaction_no }}</td>
-                                        <td>{{ $booking->functionRoom->function_room_name ?? 'N/A' }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($booking->function_room_booking_date)->format('F d, Y') }}</td>
-                                        <td>
-                                            {{ \Carbon\Carbon::parse($booking->event_start_time)->format('g:i A') }} -
-                                            {{ \Carbon\Carbon::parse($booking->event_end_time)->format('g:i A') }}
-                                        </td>
-                                        <td>
-                                            @if ($booking->booking_status == 0)
-                                                <span class="badge bg-warning text-white badge-forge">Waiting</span>
-                                            @elseif ($booking->booking_status == 1)
-                                                <span class="badge bg-success badge-forge">Confirmed</span>
-                                            @else
-                                                <span class="badge bg-danger badge-forge">Cancelled</span>
-                                            @endif
-                                        </td>
-                                         <td>
-                                         <button class="btn btn-sm btn-info function-room-booking-details badge-forge text-white" data-id="{{ $booking->id }}">
-                                             View
-                                            </button>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div> 
-                    <div class="pagination-container">
-                    {{ $bookings->appends(['unit_no' => $selectedUnit])->links('vendor.pagination.bootstrap-4') }}
-                    </div>
-                @else
-                    <div class="text-muted">No bookings found for this unit.</div>
-                @endif
-            </div>
-        </div>
-
 
         {{-- Password Update Section --}}
         <div class="card shadow-sm" style="border-radius: 4px;">
@@ -211,7 +133,7 @@
         </form>
     </div>
 
-     <div id="global-loading">
+    <div id="global-loading">
         <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
             <span class="visually-hidden">Loading...</span>
         </div>

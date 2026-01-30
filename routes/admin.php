@@ -11,6 +11,7 @@ use App\Http\Controllers\Backend\GalleryController;
 use App\Http\Controllers\Backend\ResidenceRequestController;
 use App\Http\Controllers\Backend\ServicesController;
 use App\Http\Controllers\Backend\UsersController;
+use App\Http\Controllers\Backend\ActivitiesController;
 use App\Http\Controllers\Backend\WorkPermitController;
 use App\Http\Controllers\Backend\FunctionRoomDiscountController;
 use App\Models\ResidentDetails;
@@ -95,12 +96,49 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/admin-download-walkin-work-permit', [WorkPermitController::class, 'downloadWalkinWorkPermit'])->name('admin.download-walkin-work-permit');
 
     //Amenities
-    Route::get('/admin-amenities', [AmenitiesController::class, 'showAmenities'])->name('admin.show.amenities');
-    Route::post('/admin-store-amenities', [AmenitiesController::class, 'storeAmenities'])->name('admin.store.amenities');
-    Route::post('/admin-update-amenities', [AmenitiesController::class, 'updateAmenities'])->name('admin.update.amenities');
-    Route::get('/admin-search-amenities', [AmenitiesController::class, 'searchAmenities'])->name('admin.search.amenities');
+    Route::get('/amenities', [AmenitiesController::class, 'amenities'])->name('admin.show.amenities');
+    Route::post('/add-amenities', [AmenitiesController::class, 'addAmenities'])->name('admin.store.amenities');
+    Route::get('/fetch/amenity/{id}', [AmenitiesController::class, 'fetchInfoAmenity'])->name('fetchInfoAmenity');
     Route::get('/get-updated-amenities-table', [AmenitiesController::class, 'getUpdatedAmenitiesTable'])->name('getUpdatedAmenitiesTable');
+    Route::post('/update-amenities', [AmenitiesController::class, 'updateAmenities'])->name('amenitiesUpdate');
+    Route::get('/fetch/amenity_add_remarks/{id}', [AmenitiesController::class, 'fetchAmenityAddRemarks'])->name('fetchAmenityAddRemarks');
+    Route::post('/add-remarks-amenities', [AmenitiesController::class, 'addRemarks'])->name('addRemarks');
+    Route::post('/show-amenities', [AmenitiesController::class, 'showAmenities'])->name('showAmenity');
+    Route::get('/search-amenities', [AmenitiesController::class, 'searchAmenity'])->name('admin.search.amenities');
 
+    //Activities
+    Route::get('/activities', [ActivitiesController::class, 'activities'])->name('admin.show.activities');
+    Route::post('/add-activities', [ActivitiesController::class, 'addActivities'])->name('activitiesAdd');
+    Route::get('/get-updated-activities-table', [ActivitiesController::class, 'getUpdatedActivitiesTable'])->name('getUpdatedActivitiesTable');
+    Route::get('/fetch/activity/{id}', [ActivitiesController::class, 'fetchInfoActivity'])->name('fetchInfoActivity');
+    Route::post('/update-activities', [ActivitiesController::class, 'updateActivities'])->name('activitiesUpdate');
+    Route::get('/fetch/activity_add_remarks/{id}', [ActivitiesController::class, 'fetchActivityAddRemarks'])->name('fetchActivityAddRemarks');
+    Route::post('/deactivate-activities', [ActivitiesController::class, 'deactivateActivities'])->name('deactivateActivities');
+    Route::post('/activate-activities', [ActivitiesController::class, 'activateActivities'])->name('activateActivities');
+    Route::get('/delete-activities', [ActivitiesController::class, 'deleteActivities'])->name('deleteActivities');
+    Route::get('/search-activities', [ActivitiesController::class, 'searchActivity'])->name('admin.search.activities');
+    Route::get('/date-blocking', [ActivitiesController::class, 'fetchDateBlocking'])->name('admin.show.date.blocking');
+    Route::get('/search-block-dates', [ActivitiesController::class, 'searchBlockdDates'])->name('admin.search.block.dates');
+    Route::post('/new-date-blocking', [ActivitiesController::class, 'newDateBlocking'])->name('admin.new.date.blocking');
+    Route::get('/fetch-blocked-dates', [ActivitiesController::class, 'fetchBlockDates'])->name('DateBlocking');
+
+    //Activities Bookings
+    Route::get('get-updated-activities-blocking', [ActivitiesController::class, 'getUpdatedBlockingTable'])->name('get.updated.blocking.table');
+    Route::get('/admin-activity-booking', [ActivitiesController::class, 'AdminBookingActivities'])->name('admin.booking.activities');
+    Route::get('/search-booking', [ActivitiesController::class, 'searchBooking'])->name('admin.search.booking');
+    Route::post('/admin-new-booking', [ActivitiesController::class, 'AdminNewBookingActivities'])->name('admin.new.booking.activities');
+    Route::get('/fetch-all-slots-admin', [ActivitiesController::class, 'fetchAllSlotsAdmin'])->name('fetchAllSlotsAdmin');
+    Route::get('/fetch-blocked-dates', [ActivitiesController::class, 'fetchBlockDates'])->name('DateBlocking');
+    Route::get('/fetch-available-times', [ActivitiesController::class, 'fetchAvailableTimes']);
+    Route::get('/fetch-end-times', [ActivitiesController::class, 'fetchEndTimes']);
+    Route::get('/fetch-available-slots', [ActivitiesController::class, 'fetchAvailableSlots'])->name('fetchAvailableSlots');
+    Route::get('/check-unit-booking', [ActivitiesController::class, 'checkUnitBooking'])->name('checkUnitBooking');
+    Route::get('get-updated-bookings-table', [ActivitiesController::class, 'getUpdatedBookingTable'])->name('getUpdatedBookingTable');
+    Route::get('/fetch/booking/{id}', [ActivitiesController::class, 'fetchInfoBooking'])->name('fetchInfoBooking');
+    Route::post('/cancel-booking', [ActivitiesController::class, 'cancelBooking'])->name('cancelBooking');
+    Route::get('/history', [ActivitiesController::class, 'history'])->name('admin.activity.history');
+    Route::get('/search-histories', [ActivitiesController::class, 'searchHistory'])->name('search-history');
+    Route::post('/download-history', [ActivitiesController::class, 'downloadHistory'])->name('download-history');
 
     //Function Rooms
     Route::get('/admin-function-rooms', [FunctionRoomsController::class, 'showFunctionRooms'])->name('admin.show.function.rooms');
@@ -142,10 +180,13 @@ Route::middleware('auth:admin')->group(function () {
     Route::delete('/admin-delete-date-blocking', [FunctionRoomsController::class, 'deleteDateBlocking']);
 
 
+
     //Function Room Bookings
     Route::get('/admin-function-room-bookings', [FunctionRoomBookingController::class, 'showFunctionRoomBookings'])->name('admin.show.function.room.bookings');
+    // Route::get('/admin-function-room-bookings-store', [FunctionRoomBookingController::class, 'adminBookingStore'])->name('admin.booking.store');
+
     Route::post('/admin-function-room-bookings-approval', [FunctionRoomBookingController::class, 'FunctionRoomBookingApproval'])->name('admin.function.room.booking.approvals');
-    Route::post('/admin-function-room-bookings-rejection', [FunctionRoomBookingController::class, 'FunctionRoomBookingReject']);
+    Route::post('/admin-function-room-bookings-rejection', action: [FunctionRoomBookingController::class, 'FunctionRoomBookingReject']);
     Route::get('/admin-function-room-bookings/{id}/details', action: [FunctionRoomBookingController::class, 'getFunctionRoomBookingDetails'])
         ->name('admin.get.function.room.bookings.details');
     Route::get('/admin-get-updated-function-room-bookings-table', [FunctionRoomBookingController::class, 'getUpdatedFunctionRoomBookingTable'])
@@ -158,9 +199,13 @@ Route::middleware('auth:admin')->group(function () {
         ->name('admin.update.function.room.booking');
     Route::get('/admin-search-function-room-booking-records', [FunctionRoomBookingController::class, 'searchFunctionRoomBookingRecords'])
         ->name('search.function.room.booking.records');
+    Route::get('/admin-function-room-booked-dates/{id}', [FunctionRoomBookingController::class, 'getAdminFunctionRoomBookedDates']);
 
-
-
+    Route::get('/admin-search-residents', [FunctionRoomBookingController::class, 'searchResidents'])->name('admin.search.residents');
+    Route::get('/admin-check-unit-tenant/{unitNo}', [FunctionRoomBookingController::class, 'adminCheckUnitTenant']);
+    Route::post('/admin/booking/store', [FunctionRoomBookingController::class, 'AdminStoreBooking'])->name('admin.booking.store');
+    // Add Ons
+    Route::get('admin-get-function-room-addons-availability', [FunctionRoomBookingController::class, 'getAdminAddonsAvailability']);
     //Function Room Bookings Records
     Route::get('/admin-function-room-booking-records', action: [FunctionRoomBookingController::class, 'showFunctionRoomBookingRecords'])->name('admin.show.function.room.booking.records');
 
@@ -168,7 +213,7 @@ Route::middleware('auth:admin')->group(function () {
         ->name('download.function.room.booking.records');
 
 
-    //dow
+    //dow   
     Route::get('/admin-gallery', [GalleryController::class, 'showGallery'])->name('admin.show.gallery');
     Route::post('/admin/gallery/upload', [GalleryController::class, 'uploadGalleryImages'])->name('admin.gallery.upload');
     Route::get('/get-updated-gallery-table', [GalleryController::class, 'getUpdatedGalleryTable'])->name('get.updated.gallery.table');

@@ -11,6 +11,7 @@ use App\Models\AddOn;
 use App\Models\AddOnFunctionRoomBooking;
 use App\Models\ResidentDetails;
 use App\Models\FunctionRoomDiscount;
+use App\Models\FunctionRoomDateBlocking;
 use App\Models\FunctionRoomBookingSupplier;
 use App\Mail\FunctionRoomBookingConfirmedNotification;
 use App\Notifications\UserFunctionRoomBookingBellNotification;
@@ -19,37 +20,88 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use App\Mail\UserFunctionRoomBookingNotification;
+use App\Mail\FinanceFunctionRoomBookingNotification;
+use App\Events\FunctionRoomBookingCreated;
+
+
 
 class FunctionRoomBookingController extends Controller
 {
 
+    // public function showFunctionRoomBookings(Request $request)
+    // {
+    //     $roleId = auth()->user()->role_id;
+
+    //     $query = FunctionRoomBooking::with(['user', 'functionRoom', 'addOns']);
+
+    //     if (in_array($roleId, [1, 5, 6, 7])) {
+    //         // Role 1, 5, 7: Show pending and confirmed bookings
+    //         $query->whereIn('booking_status', [0, 1,]);
+
+    //     } elseif ($roleId == 2) {
+    //         // Role 2: Pending or confirmed bookings with authorization file
+    //         $query->whereIn('booking_status', [0, 1])
+    //             ->whereNotNull('authorization_file');
+
+    //     } elseif ($roleId == 3) {
+    //         // Role 3: Pending or confirmed bookings with supplier checked
+    //         $query->whereIn('booking_status', [0, 1])
+    //             ->where('has_suppliers', 1); // Assuming supplier is a boolean/int column
+    //     }
+
+    //     $functionRoomBookings = $query->latest()->paginate(perPage: 10);
+
+    //     $residences = ResidentDetails::select('id', 'unit_no', 'resident_type', 'email')
+    //         ->whereNotNull('unit_no')
+    //         ->get();
+
+
+    //     $functionRooms = FunctionRoom::where('function_room_status', 1)->get();
+    //     $addOns = AddOn::where('status', 1)->get();
+    //     return view('backend.admin-function-room-booking', compact('functionRoomBookings', 'functionRooms', 'addOns', 'residences', 'query'));
+    // }
+
     public function showFunctionRoomBookings(Request $request)
     {
         $roleId = auth()->user()->role_id;
-
-        $query = FunctionRoomBooking::with(['user', 'functionRoom', 'addOns']);
+        $baseQuery = FunctionRoomBooking::query();
 
         if (in_array($roleId, [1, 5, 6, 7])) {
-            // Role 1, 5, 7: Show pending and confirmed bookings
-            $query->whereIn('booking_status', [0, 1,]);
-
+            $baseQuery->whereIn('booking_status', [0, 1]);
         } elseif ($roleId == 2) {
-            // Role 2: Pending or confirmed bookings with authorization file
-            $query->whereIn('booking_status', [0, 1])
+            $baseQuery->whereIn('booking_status', [0, 1])
                 ->whereNotNull('authorization_file');
-
         } elseif ($roleId == 3) {
-            // Role 3: Pending or confirmed bookings with supplier checked
-            $query->whereIn('booking_status', [0, 1])
-                ->where('has_suppliers', 1); // Assuming supplier is a boolean/int column
+            $baseQuery->whereIn('booking_status', [0, 1])
+                ->where('has_suppliers', 1);
         }
+        $firstBookingIds = $baseQuery
+            ->selectRaw('MIN(id) as id')
+            ->groupBy('transaction_no')
+            ->pluck('id');
 
-        $functionRoomBookings = $query->latest()->paginate(perPage: 10);
+        $functionRoomBookings = FunctionRoomBooking::with(['user', 'functionRoom', 'addOns'])
+            ->whereIn('id', $firstBookingIds)
+            ->orderBy('id', 'desc')
+            ->paginate(10);
+
+        $residences = ResidentDetails::select('id', 'unit_no', 'resident_type', 'email')
+            ->whereNotNull('unit_no')
+            ->get();
 
         $functionRooms = FunctionRoom::where('function_room_status', 1)->get();
         $addOns = AddOn::where('status', 1)->get();
-        return view('backend.admin-function-room-booking', compact('functionRoomBookings', 'functionRooms', 'addOns'));
+
+        return view('backend.admin-function-room-booking', compact(
+            'functionRoomBookings',
+            'functionRooms',
+            'addOns',
+            'residences'
+        ));
+
     }
+
 
     public function checkUnitTenant($unitNo)
     {
@@ -86,28 +138,36 @@ class FunctionRoomBookingController extends Controller
 
     public function FunctionRoomBookingApproval(Request $request)
     {
+
         $bookingId = $request->booking_id;
         $booking = FunctionRoomBooking::findOrFail($bookingId);
+        $transactionNo = $booking->transaction_no;
+        $groupBookings = FunctionRoomBooking::where('transaction_no', $transactionNo)->get();
         $user = auth()->user();
 
         switch ($user->role_id) {
             case 6: // Concierge
-                $booking->update([
-                    'concierge_approval' => 1,
-                    'concierge_user_id' => $user->id,
-                    'concierge_action_at' => now(),
-                    'concierge_remarks' => null, // ✅ clear old remarks
-                ]);
+                $groupBookings->each(function ($b) use ($user) {
+                    $b->update([
+                        'concierge_approval' => 1,
+                        'concierge_user_id' => $user->id,
+                        'concierge_action_at' => now(),
+                        'concierge_remarks' => null,
+                    ]);
+                });
                 break;
 
             case 2: // Admin
                 if ($booking->authorization_file && $booking->concierge_approval) {
-                    $booking->update([
-                        'admin_approval' => 1,
-                        'admin_user_id' => $user->id,
-                        'admin_action_at' => now(),
-                        'admin_remarks' => null, // ✅ clear old remarks
-                    ]);
+                    $groupBookings->each(function ($b) use ($user) {
+                        $b->update([
+                            'admin_approval' => 1,
+                            'admin_user_id' => $user->id,
+                            'admin_action_at' => now(),
+                            'admin_remarks' => null, // ✅ clear old remarks
+                        ]);
+                    });
+
                 } else {
                     return response()->json([
                         'success' => false,
@@ -117,47 +177,57 @@ class FunctionRoomBookingController extends Controller
                 break;
 
             case 5: // Finance
-                $booking->update([
-                    'finance_approval' => 1,
-                    'finance_user_id' => $user->id,
-                    'finance_action_at' => now(),
-                    'finance_remarks' => null, // ✅ clear old remarks
-                ]);
+                $groupBookings->each(function ($b) use ($user) {
+                    $b->update([
+                        'finance_approval' => 1,
+                        'finance_user_id' => $user->id,
+                        'finance_action_at' => now(),
+                        'finance_remarks' => null, // ✅ clear old remarks
+                    ]);
+                });
                 break;
 
             case 3: // Engineering
                 if ($booking->suppliers && $booking->suppliers->count() > 0) {
-                    $booking->update([
-                        'engineering_approval' => 1,
-                        'engineering_user_id' => $user->id,
-                        'engineering_action_at' => now(),
-                        'engineering_remarks' => null, // ✅ clear old remarks
-                    ]);
+                    $groupBookings->each(function ($b) use ($user) {
+                        $b->update([
+                            'engineering_approval' => 1,
+                            'engineering_user_id' => $user->id,
+                            'engineering_action_at' => now(),
+                            'engineering_remarks' => null, // ✅ clear old remarks
+                        ]);
+                    });
                 }
                 break;
-
             case 7: // Manager
-                $booking->update([
-                    'manager_approval' => 1,
-                    'manager_user_id' => $user->id,
-                    'manager_action_at' => now(),
-                    'manager_remarks' => null, // ✅ clear old remarks
-                    'booking_status' => '1',
-                ]);
+                $groupBookings->each(function ($b) use ($user) {
+                    $b->update([
+                        'manager_approval' => 1,
+                        'manager_user_id' => $user->id,
+                        'manager_action_at' => now(),
+                        'manager_remarks' => null, // ✅ clear old remarks
+                        'booking_status' => '1',
+                    ]);
+                });
                 break;
         }
 
         if ($user->role_id !== 7 && $booking->isReadyForConfirmation()) {
-            $booking->update(['booking_status' => '1']);
+            $groupBookings->each(function ($b) {
+                $b->update(['booking_status' => 1]);
+            });
         }
 
-        if ($booking->booking_status == 1) {
-            // Dispatch in background
-            Mail::to($booking->user->email)
-                ->queue(new FunctionRoomBookingConfirmedNotification($booking));
+        // After updating all approvals
+        if ($groupBookings->first()->booking_status == 1) {
+            $mainBooking = $groupBookings->first(); // Pick the first booking as "main"
 
-            // Queue the notification
-            $booking->user->notify((new UserFunctionRoomBookingBellNotification($booking))->delay(now()->addSeconds(1)));
+            // Send email once for the whole transaction
+            Mail::to($mainBooking->user->email)
+                ->queue(new FunctionRoomBookingConfirmedNotification($mainBooking, $groupBookings));
+
+            // Send bell notification once
+            $mainBooking->user->notify((new UserFunctionRoomBookingBellNotification($mainBooking))->delay(now()->addSeconds(1)));
         }
 
         return response()->json([
@@ -175,53 +245,68 @@ class FunctionRoomBookingController extends Controller
         ]);
 
         $booking = FunctionRoomBooking::findOrFail($request->booking_id);
+        $transactionNo = $booking->transaction_no;
+        $groupBookings = FunctionRoomBooking::where('transaction_no', $transactionNo)->get();
         $user = auth()->user();
 
         switch ($user->role_id) {
             case 6: // Concierge
-                $booking->update([
-                    'concierge_approval' => 2, // rejected
-                    'concierge_user_id' => $user->id,
-                    'concierge_action_at' => now(),
-                    'concierge_remarks' => $request->remarks,
-                ]);
+                $groupBookings->each(function ($b) use ($user, $request) {
+                    $b->update([
+                        'concierge_approval' => 2, // rejected
+                        'concierge_user_id' => $user->id,
+                        'concierge_action_at' => now(),
+                        'concierge_remarks' => $request->remarks,
+                    ]);
+                });
+
                 break;
 
             case 2: // Admin
-                $booking->update([
-                    'admin_approval' => 2,
-                    'admin_user_id' => $user->id,
-                    'admin_action_at' => now(),
-                    'admin_remarks' => $request->remarks,
-                ]);
+                $groupBookings->each(function ($b) use ($user, $request) {
+                    $b->update([
+                        'admin_approval' => 2,
+                        'admin_user_id' => $user->id,
+                        'admin_action_at' => now(),
+                        'admin_remarks' => $request->remarks,
+                    ]);
+                });
                 break;
 
             case 5: // Finance
-                $booking->update([
-                    'finance_approval' => 2,
-                    'finance_user_id' => $user->id,
-                    'finance_action_at' => now(),
-                    'finance_remarks' => $request->remarks,
-                ]);
+                $groupBookings->each(function ($b) use ($user, $request) {
+                    $b->update([
+                        'finance_approval' => 2,
+                        'finance_user_id' => $user->id,
+                        'finance_action_at' => now(),
+                        'finance_remarks' => $request->remarks,
+                    ]);
+                });
                 break;
 
             case 3: // Engineering
-                $booking->update([
-                    'engineering_approval' => 2,
-                    'engineering_user_id' => $user->id,
-                    'engineering_action_at' => now(),
-                    'engineering_remarks' => $request->remarks,
-                ]);
+                $groupBookings->each(function ($b) use ($user, $request) {
+                    $b->update([
+                        'engineering_approval' => 2,
+                        'engineering_user_id' => $user->id,
+                        'engineering_action_at' => now(),
+                        'engineering_remarks' => $request->remarks,
+                    ]);
+                });
                 break;
 
             case 7: // Manager
-                $booking->update([
-                    'manager_approval' => 2,
-                    'manager_user_id' => $user->id,
-                    'manager_action_at' => now(),
-                    'manager_remarks' => $request->remarks,
-                    'booking_status' => 2, // rejected (global)
-                ]);
+
+                $groupBookings->each(function ($b) use ($user, $request) {
+                    $b->update([
+                        'manager_approval' => 2,
+                        'manager_user_id' => $user->id,
+                        'manager_action_at' => now(),
+                        'manager_remarks' => $request->remarks,
+                        'booking_status' => 2, // rejected (global)
+                    ]);
+                });
+
                 break;
         }
 
@@ -234,28 +319,20 @@ class FunctionRoomBookingController extends Controller
 
     public function getFunctionRoomBookingDetails($id)
     {
-        $booking = FunctionRoomBooking::with(['user', 'functionRoom', 'suppliers', 'addOns'])->findOrFail($id);
+        $booking = FunctionRoomBooking::with(['user', 'functionRoom', 'suppliers', 'addOns', 'createdBy'])->findOrFail($id);
         $userRole = auth()->user()->role_id;
-
-        // Format times
         $booking->event_start_time = $booking->event_start_time
-            ? \Carbon\Carbon::parse($booking->event_start_time)->format('h:i A')
+            ? Carbon::parse($booking->event_start_time)->format('h:i A')
             : null;
         $booking->event_end_time = $booking->event_end_time
-            ? \Carbon\Carbon::parse($booking->event_end_time)->format('h:i A')
+            ? Carbon::parse($booking->event_end_time)->format('h:i A')
             : null;
-
-        // Authorization URL
         $authorizationFileUrl = $booking->authorization_file ? asset($booking->authorization_file) : null;
-
-        // Supplier attachments
         $booking->suppliers->transform(function ($supplier) {
             $supplier->attachment_url = $supplier->attachment ? asset($supplier->attachment) : null;
             return $supplier;
         });
         $booking->has_suppliers = $booking->suppliers->count() > 0;
-
-        // Approval columns mapping
         $approvalColumns = [
             6 => 'concierge_approval',
             2 => 'admin_approval',
@@ -278,7 +355,7 @@ class FunctionRoomBookingController extends Controller
 
             if ($status == 2) {
                 if ($role . '_approval' == $userApprovalColumn) {
-                    $currentUserRejected = true; // This user rejected
+                    $currentUserRejected = true;
                 } else {
                     $rejectedByPrevious = true;
                     $rejectedByRole = ucfirst($role);
@@ -287,13 +364,11 @@ class FunctionRoomBookingController extends Controller
             }
         }
 
-        // Initialize buttons
         $showApproveButton = false;
         $showViewButton = false;
         $waitingReason = null;
         $isApproved = false;
 
-        // Approval logic per role
         switch ($userRole) {
             case 6: // Concierge
                 $showViewButton = true;
@@ -315,25 +390,21 @@ class FunctionRoomBookingController extends Controller
                 }
                 break;
 
-            case 5:
+            case 5: // FINANCE
                 $showViewButton = true;
-
-                // If admin rejected, finance cannot act
-                if ($booking->admin_approval == 2) {
-                    $waitingReason = 'Waiting for Admin';
-                }
-                // Must wait for Concierge first (whether or not there's an authorization file)
-                elseif (!$booking->concierge_user_id) {
+                if ($booking->concierge_approval != 1) {
                     $waitingReason = 'Waiting for Concierge';
-                }
-                // If everything is okay and finance has not yet approved/rejected
-                elseif (!$booking->finance_user_id && !$rejectedByPrevious) {
+                } elseif ($booking->authorization_file && $booking->admin_approval != 1) {
+                    $waitingReason = 'Waiting for Admin';
+                } elseif ($booking->finance_approval == 0 && !$rejectedByPrevious) {
                     $showApproveButton = true;
-                } else {
+                }
+
+                // 4. Already approved/rejected by Finance
+                else {
                     $isApproved = true;
                 }
                 break;
-
 
 
             case 3: // Engineering
@@ -363,6 +434,50 @@ class FunctionRoomBookingController extends Controller
                 break;
         }
 
+        $booking->created_by_name = $booking->createdBy?->name;
+
+        $transactionNo = $booking->transaction_no;
+        $linkedBookings = FunctionRoomBooking::with('functionRoom')
+            ->where('transaction_no', $transactionNo)
+            ->orderBy('function_room_id')
+            ->get();
+
+        $roomsBreakdown = [];
+
+        foreach ($linkedBookings as $linked) {
+            $hours = $linked->duration_in_hours ?? 1;
+            $rate = $linked->final_rate ?? $linked->functionRoom->function_room_rate;
+            $roomTotal = $rate * $hours;
+
+            $addons = [];
+            $addonsTotal = 0;
+
+            foreach ($linked->addOns as $addon) {
+                $qty = $addon->pivot->quantity ?? 0;
+                $price = $addon->pivot->price ?? 0;
+                $lineTotal = $qty * $price;
+
+                $addons[] = [
+                    'item' => $addon->item,
+                    'qty' => $qty,
+                    'price' => $price,
+                    'total' => $lineTotal,
+                ];
+
+                $addonsTotal += $lineTotal;
+            }
+
+            $roomsBreakdown[] = [
+                'room_name' => $linked->functionRoom->function_room_name,
+                'hours' => (float) $hours,
+                'rate' => (float) $rate,
+                'room_total' => (float) $roomTotal,
+                'addons' => $addons,
+                'addons_total' => (float) $addonsTotal,
+            ];
+        }
+
+
         return response()->json([
             'success' => true,
             'booking' => $booking,
@@ -375,12 +490,10 @@ class FunctionRoomBookingController extends Controller
             'rejectedByRole' => $rejectedByRole,
             'current_user_status' => $userApprovalStatus,
             'current_user_rejected' => $currentUserRejected,
+            'linked_bookings' => $linkedBookings,
+            'rooms_breakdown' => $roomsBreakdown,
         ]);
     }
-
-
-
-
 
     public function showFunctionRoomBookingRecords(Request $request)
     {
@@ -449,9 +562,29 @@ class FunctionRoomBookingController extends Controller
 
     public function getUpdatedFunctionRoomBookingTable(Request $request)
     {
-        // dd($request->all());
         $roleId = auth()->user()->role_id;
 
+        // Base query for filtering (same logic as the blade view version)
+        $baseQuery = FunctionRoomBooking::query();
+
+        // Role-based filtering
+        if (in_array($roleId, [1, 5, 7, 8])) {
+            $baseQuery->whereIn('booking_status', [0, 1]);
+        } elseif ($roleId == 2) {
+            $baseQuery->whereIn('booking_status', [0, 1])
+                ->whereNotNull('authorization_file');
+        } elseif ($roleId == 3) {
+            $baseQuery->whereIn('booking_status', [0, 1])
+                ->where('has_suppliers', 1);
+        }
+
+        // 🔹 Get only FIRST booking per transaction_no
+        $firstBookingIds = $baseQuery
+            ->selectRaw('MIN(id) as id')
+            ->groupBy('transaction_no')
+            ->pluck('id');
+
+        // Main query for display
         $query = FunctionRoomBooking::with([
             'user',
             'functionRoom',
@@ -459,20 +592,10 @@ class FunctionRoomBookingController extends Controller
             'financeApprover',
             'engineeringApprover',
             'managerApprover'
-        ])->latest();
+        ])->whereIn('id', $firstBookingIds) // ← Apply grouping here
+            ->orderBy('id', 'desc');
 
-        // 🔹 Role-based filtering
-        if (in_array($roleId, [1, 5, 7, 8])) {
-            $query->whereIn('booking_status', [0, 1]);
-        } elseif ($roleId == 2) {
-            $query->whereIn('booking_status', [0, 1])
-                ->whereNotNull('authorization_file');
-        } elseif ($roleId == 3) {
-            $query->whereIn('booking_status', [0, 1])
-                ->where('has_suppliers', 1);
-        }
-
-        // 🔹 Search (Transaction No, Unit No, User Name)
+        // 🔹 Search
         $search = $request->input('searchFunctionRoomBooking');
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
@@ -500,25 +623,20 @@ class FunctionRoomBookingController extends Controller
                 ],
                 'purpose_of_event' => $booking->purpose_of_event ?? 'N/A',
                 'function_room_booking_date' => $booking->function_room_booking_date,
-                'event_start_time' => $booking->event_start_time
-                    ? Carbon::parse($booking->event_start_time)->format('h:i A')
-                    : null,
-                'event_end_time' => $booking->event_end_time
-                    ? Carbon::parse($booking->event_end_time)->format('h:i A')
-                    : null,
+                'event_start_time' => $booking->event_start_time ? Carbon::parse($booking->event_start_time)->format('h:i A') : null,
+                'event_end_time' => $booking->event_end_time ? Carbon::parse($booking->event_end_time)->format('h:i A') : null,
                 'contact_number' => $booking->contact_number ?? 'N/A',
                 'pax' => $booking->pax ?? 'N/A',
                 'base_rate' => $booking->base_rate ?? 'N/A',
                 'discount' => $booking->discount ?? 0,
                 'discount_remarks' => $booking->discount_remarks ?? 'N/A',
                 'final_rate' => $booking->final_rate ?? 0,
-
                 'payment_mode' => $booking->payment_mode ?? 'N/A',
                 'booking_status' => $booking->booking_status,
                 'has_suppliers' => $booking->has_suppliers,
                 'authorization_file' => $booking->authorization_file,
 
-                // Approvals + remarks + approver + action_at
+                // Approvals
                 'concierge_approval' => $booking->concierge_approval,
                 'concierge_remarks' => $booking->concierge_remarks,
                 'concierge_approver' => $booking->conciergeApprover->name ?? null,
@@ -549,23 +667,74 @@ class FunctionRoomBookingController extends Controller
             ];
         });
 
-
         return response()->json([
             'data' => $data,
             'links' => $bookings
                 ->appends(['searchFunctionRoomBooking' => $search ?? ''])
-                ->withPath('/admin/admin-get-updated-function-room-bookings-table')
                 ->links('vendor.pagination.bootstrap-5')
                 ->render()
         ]);
     }
 
+
+    // public function editFunctionRoomBooking($id)
+    // {
+    //     $booking = FunctionRoomBooking::with(['user', 'functionRoom', 'addOns', 'suppliers'])->findOrFail($id);
+    //     $residences = ResidentDetails::all();
+    //     $addons = AddOn::where('status', 1)->get();
+
+    //     $booking->suppliers->transform(function ($supplier) {
+    //         $supplier->attachment_url = $supplier->attachment
+    //             ? asset($supplier->attachment)
+    //             : null;
+    //         return $supplier;
+    //     });
+
+    //     return response()->json([
+    //         'booking' => $booking,
+    //         'residences' => $residences,
+    //         'addons' => $addons,
+    //         'authorization_file' => $booking->authorization_file
+    //             ? asset($booking->authorization_file)
+    //             : null,
+    //     ]);
+    // }
+
     public function editFunctionRoomBooking($id)
     {
-        $booking = FunctionRoomBooking::with(['user', 'functionRoom', 'addOns', 'suppliers'])->findOrFail($id);
+        $booking = FunctionRoomBooking::with(['user', 'functionRoom', 'addOns', 'suppliers'])
+            ->findOrFail($id);
+
         $residences = ResidentDetails::all();
         $addons = AddOn::where('status', 1)->get();
 
+        // 🔗 Define linked rooms
+        $linkedRooms = [
+            5 => [6],
+            6 => [5],
+        ];
+
+        $mainRoomId = $booking->function_room_id;
+
+        // ⚡ Determine if current booking includes the linked room
+        $roomsUnderSameTransaction = FunctionRoomBooking::where('transaction_no', $booking->transaction_no)
+            ->pluck('function_room_id')
+            ->toArray();
+
+        $linkedRoomId = $linkedRooms[$mainRoomId][0] ?? null;
+
+        $alreadyBookedLinkedRoom = false;
+        $linkedRoomName = null;
+
+        if ($linkedRoomId) {
+            $linkedRoomName = FunctionRoom::where('id', $linkedRoomId)->value('function_room_name');
+
+            if (in_array($linkedRoomId, $roomsUnderSameTransaction)) {
+                $alreadyBookedLinkedRoom = true;
+            }
+        }
+
+        // Add supplier URLs
         $booking->suppliers->transform(function ($supplier) {
             $supplier->attachment_url = $supplier->attachment
                 ? asset($supplier->attachment)
@@ -580,8 +749,13 @@ class FunctionRoomBookingController extends Controller
             'authorization_file' => $booking->authorization_file
                 ? asset($booking->authorization_file)
                 : null,
+
+            // 🔥 Add these two (required by your JS)
+            'linked_room_name' => $linkedRoomName,
+            'already_booked_linked_room' => $alreadyBookedLinkedRoom,
         ]);
     }
+
 
     private function getUniqueFilename($destinationPath, $originalName)
     {
@@ -599,6 +773,651 @@ class FunctionRoomBookingController extends Controller
         return $newName;
     }
 
+    // public function updateFunctionRoomBooking(Request $request)
+    // {
+    //     $maxRetries = 3;
+    //     $attempt = 0;
+
+    //     while ($attempt < $maxRetries) {
+    //         try {
+    //             DB::beginTransaction();
+
+    //             $booking = FunctionRoomBooking::with(['suppliers', 'addOns'])
+    //                 ->findOrFail($request->booking_id);
+
+    //             $room = FunctionRoom::findOrFail($request->function_room_id);
+
+    //             // === Prevent double booking of function room ===
+    //             $isAlreadyBooked = FunctionRoomBooking::where('function_room_id', $request->function_room_id)
+    //                 ->where('function_room_booking_date', $request->function_room_booking_date)
+    //                 ->whereIn('booking_status', [0, 1])
+    //                 ->where('id', '!=', $booking->id)
+    //                 ->lockForUpdate()
+    //                 ->exists();
+
+    //             if ($isAlreadyBooked) {
+    //                 DB::rollBack();
+    //                 return response()->json([
+    //                     'success' => false,
+    //                     'message' => 'Sorry, another user has already booked this room for that date.'
+    //                 ], 409);
+    //             }
+
+    //             // === Handle authorization file ===
+    //             $authorizationPath = $booking->authorization_file;
+
+    //             if ($request->hasFile('authorization_file')) {
+    //                 if ($authorizationPath && file_exists(public_path($authorizationPath))) {
+    //                     unlink(public_path($authorizationPath));
+    //                 }
+
+    //                 $file = $request->file('authorization_file');
+    //                 $originalName = $file->getClientOriginalName();
+    //                 $destinationPath = public_path('assets/frontend/uploads/function-room-bookings/authorizations');
+
+    //                 if (!file_exists($destinationPath))
+    //                     mkdir($destinationPath, 0777, true);
+
+    //                 $filename = $this->getUniqueFilename($destinationPath, $originalName);
+    //                 $file->move($destinationPath, $filename);
+
+    //                 $authorizationPath = 'assets/frontend/uploads/function-room-bookings/authorizations/' . $filename;
+    //             } elseif ($request->remove_authorization == 1 && $authorizationPath) {
+    //                 if (file_exists(public_path($authorizationPath)))
+    //                     unlink(public_path($authorizationPath));
+    //                 $authorizationPath = null;
+    //             }
+
+    //             // === Update suppliers ===
+    //             $existingSuppliers = $booking->suppliers()->pluck('id')->toArray();
+    //             $newSupplierIds = [];
+
+    //             if ($request->has('suppliers')) {
+    //                 foreach ($request->suppliers as $index => $supplier) {
+    //                     if (!empty($supplier['name'])) {
+    //                         $supplierModel = isset($supplier['id'])
+    //                             ? FunctionRoomBookingSupplier::find($supplier['id'])
+    //                             : new FunctionRoomBookingSupplier();
+
+    //                         $supplierPath = $supplierModel->attachment;
+
+    //                         // If new file uploaded → replace
+    //                         if ($request->hasFile("suppliers.$index.attachment")) {
+    //                             if ($supplierPath && file_exists(public_path($supplierPath))) {
+    //                                 unlink(public_path($supplierPath));
+    //                             }
+
+    //                             $file = $request->file("suppliers.$index.attachment");
+    //                             $originalName = $file->getClientOriginalName();
+    //                             $destinationPath = public_path('assets/frontend/uploads/function-room-bookings/suppliers');
+
+    //                             if (!file_exists($destinationPath)) {
+    //                                 mkdir($destinationPath, 0777, true);
+    //                             }
+
+    //                             $filename = $this->getUniqueFilename($destinationPath, $originalName);
+    //                             $file->move($destinationPath, $filename);
+
+    //                             $supplierPath = 'assets/frontend/uploads/function-room-bookings/suppliers/' . $filename;
+
+    //                             // If user explicitly removes file
+    //                         } elseif (!empty($supplier['remove_attachment']) && $supplier['remove_attachment'] == 1) {
+    //                             if ($supplierPath && file_exists(public_path($supplierPath))) {
+    //                                 unlink(public_path($supplierPath));
+    //                             }
+    //                             $supplierPath = null;
+
+    //                             // ✅ Otherwise, keep existing file
+    //                         } else {
+    //                             $supplierPath = $supplierModel->attachment;
+    //                         }
+
+
+    //                         $supplierModel->fill([
+    //                             'booking_id' => $booking->id,
+    //                             'name' => $supplier['name'],
+    //                             'attachment' => $supplierPath,
+    //                         ])->save();
+
+    //                         $newSupplierIds[] = $supplierModel->id;
+    //                     }
+    //                 }
+    //             }
+
+    //             $toDelete = array_diff($existingSuppliers, $newSupplierIds);
+    //             foreach ($toDelete as $deleteId) {
+    //                 $sup = FunctionRoomBookingSupplier::find($deleteId);
+    //                 if ($sup && $sup->attachment && file_exists(public_path($sup->attachment))) {
+    //                     unlink(public_path($sup->attachment));
+    //                 }
+    //                 $sup?->delete();
+    //             }
+
+    //             // === Update Add-ons with stock check ===
+    //             $addonsTotal = 0;
+    //             $addonData = [];
+
+    //             $booking->addOns()->detach();
+
+    //             if ($request->has('addons')) {
+    //                 foreach ($request->addons as $addonId => $addon) {
+    //                     if (isset($addon['selected']) && $addon['selected'] == 1) {
+    //                         $addonModel = AddOn::where('id', $addonId)->lockForUpdate()->first();
+    //                         if ($addonModel) {
+    //                             $qtyRequested = max(1, $addon['qty'] ?? 1);
+
+    //                             // 🔹 Reserved qty excluding this booking
+    //                             $reserved = AddOnFunctionRoomBooking::whereHas('booking', function ($q) use ($request, $booking) {
+    //                                 $q->where('function_room_booking_date', $request->function_room_booking_date)
+    //                                     ->whereIn('booking_status', [0, 1])
+    //                                     ->where('id', '!=', $booking->id);
+    //                             })
+    //                                 ->where('add_on_id', $addonId)
+    //                                 ->lockForUpdate()
+    //                                 ->sum('qty');
+
+    //                             $available = $addonModel->qty - $reserved;
+
+    //                             if ($qtyRequested > $available) {
+    //                                 DB::rollBack();
+    //                                 return response()->json([
+    //                                     'success' => false,
+    //                                     'message' => "Sorry, another resident booked faster. Only {$available} of {$addonModel->item} left for this date."
+    //                                 ], 422);
+    //                             }
+
+    //                             $addonsTotal += $qtyRequested * $addonModel->price;
+    //                             $addonData[$addonId] = ['qty' => $qtyRequested, 'price' => $addonModel->price];
+    //                         }
+    //                     }
+    //                 }
+
+    //                 if (!empty($addonData)) {
+    //                     $booking->addOns()->attach($addonData);
+    //                 }
+    //             }
+
+    //             $start = Carbon::parse($request->event_start_time);
+    //             $end = Carbon::parse($request->event_end_time);
+    //             if ($end->lte($start)) {
+    //                 $end->addDay();
+    //             }
+    //             $durationHours = $start->floatDiffInHours($end);
+
+    //             // === Determine applicable discount & recalc ===
+    //             $manualDiscount = is_numeric($request->discount) ? floatval($request->discount) : 0;
+    //             $baseRate = $room->function_room_rate;
+    //             $appliedDiscount = 0;
+    //             $finalRate = $baseRate;
+
+    //             $overrideRoles = [1, 6];
+
+    //             if (in_array(auth()->user()->role_id, $overrideRoles) && $manualDiscount > 0) {
+    //                 $appliedDiscount = $manualDiscount;
+
+    //             } elseif (isset($booking) && $booking->discount > 0) {
+    //                 $appliedDiscount = floatval($booking->discount);
+
+    //             } else {
+    //                 $bookingDate = Carbon::parse($request->function_room_booking_date);
+    //                 $activeDiscount = FunctionRoomDiscount::where('function_room_id', $room->id)
+    //                     ->whereDate('start_date', '<=', $bookingDate)
+    //                     ->whereDate('end_date', '>=', $bookingDate)
+    //                     ->orderByDesc('discount')
+    //                     ->first();
+
+    //                 $appliedDiscount = $activeDiscount?->discount ?? 0;
+    //             }
+
+    //             $finalRate = $baseRate - ($baseRate * ($appliedDiscount / 100));
+    //             $roomTotal = $finalRate * $durationHours;
+    //             $totalAmount = $roomTotal + $addonsTotal;
+
+    //             $booking->update([
+    //                 'function_room_id' => $room->id,
+    //                 'purpose_of_event' => $request->purpose_of_event,
+    //                 'function_room_booking_date' => $request->function_room_booking_date,
+    //                 'event_start_time' => $request->event_start_time,
+    //                 'event_end_time' => $request->event_end_time,
+    //                 'contact_number' => $request->contact_number,
+    //                 'pax' => $request->pax,
+    //                 'payment_mode' => $request->payment_mode,
+    //                 'has_suppliers' => $request->boolean('has_suppliers'),
+    //                 'authorization_file' => $authorizationPath,
+    //                 'discount_remarks' => $request->discount_remarks,
+    //                 'base_rate' => $baseRate,
+    //                 'discount' => $appliedDiscount,
+    //                 'final_rate' => $finalRate,
+    //                 'room_total' => $roomTotal,
+    //                 'addons_total' => $addonsTotal,
+    //                 'total_amount' => $totalAmount,
+    //             ]);
+
+
+    //             DB::commit();
+
+    //             return response()->json([
+    //                 'success' => true,
+    //                 'message' => 'Booking updated successfully',
+    //             ]);
+
+    //         } catch (\Illuminate\Database\QueryException $e) {
+    //             DB::rollBack();
+
+    //             // 🔹 Deadlock / lock wait timeout → retry
+    //             if (in_array($e->errorInfo[1], [1213, 1205])) {
+    //                 $attempt++;
+    //                 if ($attempt < $maxRetries) {
+    //                     usleep(100000); // small delay 0.1s
+    //                     continue; // retry
+    //                 }
+    //             }
+
+    //             Log::error("Error updating booking", [
+    //                 'message' => $e->getMessage(),
+    //                 'trace' => $e->getTraceAsString(),
+    //             ]);
+
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Something went wrong while updating the booking.'
+    //             ], 500);
+
+    //         } catch (\Throwable $e) {
+    //             DB::rollBack();
+
+    //             Log::error("Error updating booking", [
+    //                 'message' => $e->getMessage(),
+    //                 'trace' => $e->getTraceAsString(),
+    //             ]);
+
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Something went wrong while updating the booking.'
+    //             ], 500);
+    //         }
+    //     }
+
+    //     // Fallback if all retries fail
+    //     return response()->json([
+    //         'success' => false,
+    //         'message' => "Could not update booking. Please try again in a few seconds."
+    //     ], 500);
+    // }
+
+
+    // public function updateFunctionRoomBooking(Request $request)
+    // {
+    //     $maxRetries = 3;
+    //     $attempt = 0;
+
+    //     while ($attempt < $maxRetries) {
+    //         try {
+    //             DB::beginTransaction();
+
+    //             $booking = FunctionRoomBooking::with(['suppliers', 'addOns'])
+    //                 ->findOrFail($request->booking_id);
+
+    //             $room = FunctionRoom::findOrFail($request->function_room_id);
+
+    //             $linkedRooms = [
+    //                 5 => [6], //b&c fr1
+    //                 6 => [5],//b&c fr2
+    //             ];
+
+    //             $roomsToBook = [$request->function_room_id];
+    //             if ($request->boolean('book_linked_rooms') && isset($linkedRooms[$request->function_room_id])) {
+    //                 $roomsToBook = array_merge($roomsToBook, $linkedRooms[$request->function_room_id]);
+    //             }
+
+    //             $sharedRooms = [
+    //                 7 => [8],  // meranti → culinary
+    //                 8 => [7],  // culinary → meranti
+    //             ];
+
+    //             $sharedRoomIds = [];
+    //             if (isset($sharedRooms[$request->function_room_id])) {
+    //                 $sharedRoomIds = $sharedRooms[$request->function_room_id];
+    //             }
+
+    //             $relatedRoomIds = array_unique(array_merge($roomsToBook, $sharedRoomIds));
+    //             $bookingDate = Carbon::parse($request->function_room_booking_date);
+
+    //             $fullLinkedSet = isset($linkedRooms[$request->function_room_id])
+    //                 ? array_merge([$request->function_room_id], $linkedRooms[$request->function_room_id])
+    //                 : [$request->function_room_id];
+    //             $fullSharedSet = isset($sharedRooms[$request->function_room_id])
+    //                 ? $sharedRooms[$request->function_room_id]
+    //                 : [];
+
+    //             $conflictRoomIds = array_unique(array_merge($fullLinkedSet, $fullSharedSet));
+
+    //             $linkedSet = isset($linkedRooms[$request->function_room_id])
+    //                 ? array_merge([$request->function_room_id], $linkedRooms[$request->function_room_id])
+    //                 : [$request->function_room_id];
+
+    //             $mainRoomId = $request->function_room_id;
+    //             $linkedRoomId = $linkedRooms[$mainRoomId][0] ?? null;
+
+    //             $wantsLinked = $request->boolean('book_linked_rooms');
+    //             $existingLinkedBooking = null;
+    //             if ($linkedRoomId) {
+    //                 $existingLinkedBooking = FunctionRoomBooking::where('transaction_no', $booking->transaction_no)
+    //                     ->where('function_room_id', $linkedRoomId)
+    //                     ->where('id', '!=', $booking->id)
+    //                     ->first();
+    //             }
+
+
+    //             $query = FunctionRoomBooking::whereIn('function_room_id', $conflictRoomIds)
+    //                 ->where('function_room_booking_date', $request->function_room_booking_date)
+    //                 ->where('booking_status', '!=', 2);
+    //             $query->where('id', '!=', $booking->id);
+
+    //             if (isset($existingLinkedBooking) && $existingLinkedBooking) {
+    //                 $query->where('id', '!=', $existingLinkedBooking->id);
+    //             }
+
+    //             $isAlreadyBooked = $query->lockForUpdate()->exists();
+
+    //             if ($isAlreadyBooked) {
+    //                 DB::rollBack();
+    //                 return response()->json([
+    //                     'success' => false,
+    //                     'message' => 'Sorry, this date has just been booked by another user in one of the linked/shared rooms.'
+    //                 ], 409);
+    //             }
+
+    //             $authorizationPath = $booking->authorization_file;
+
+    //             if ($request->hasFile('authorization_file')) {
+    //                 if ($authorizationPath && file_exists(public_path($authorizationPath))) {
+    //                     unlink(public_path($authorizationPath));
+    //                 }
+
+    //                 $file = $request->file('authorization_file');
+    //                 $originalName = $file->getClientOriginalName();
+    //                 $destinationPath = public_path('assets/frontend/uploads/function-room-bookings/authorizations');
+
+    //                 if (!file_exists($destinationPath))
+    //                     mkdir($destinationPath, 0777, true);
+
+    //                 $filename = $this->getUniqueFilename($destinationPath, $originalName);
+    //                 $file->move($destinationPath, $filename);
+
+    //                 $authorizationPath = 'assets/frontend/uploads/function-room-bookings/authorizations/' . $filename;
+    //             } elseif ($request->remove_authorization == 1 && $authorizationPath) {
+    //                 if (file_exists(public_path($authorizationPath)))
+    //                     unlink(public_path($authorizationPath));
+    //                 $authorizationPath = null;
+    //             }
+
+
+    //             $existingSuppliers = $booking->suppliers()->pluck('id')->toArray();
+    //             $newSupplierIds = [];
+
+    //             if ($request->has('suppliers')) {
+    //                 foreach ($request->suppliers as $index => $supplier) {
+    //                     if (!empty($supplier['name'])) {
+    //                         $supplierModel = isset($supplier['id'])
+    //                             ? FunctionRoomBookingSupplier::find($supplier['id'])
+    //                             : new FunctionRoomBookingSupplier();
+
+    //                         $supplierPath = $supplierModel->attachment;
+
+    //                         if ($request->hasFile("suppliers.$index.attachment")) {
+    //                             if ($supplierPath && file_exists(public_path($supplierPath))) {
+    //                                 unlink(public_path($supplierPath));
+    //                             }
+
+    //                             $file = $request->file("suppliers.$index.attachment");
+    //                             $originalName = $file->getClientOriginalName();
+    //                             $destinationPath = public_path('assets/frontend/uploads/function-room-bookings/suppliers');
+
+    //                             if (!file_exists($destinationPath)) {
+    //                                 mkdir($destinationPath, 0777, true);
+    //                             }
+
+    //                             $filename = $this->getUniqueFilename($destinationPath, $originalName);
+    //                             $file->move($destinationPath, $filename);
+
+    //                             $supplierPath = 'assets/frontend/uploads/function-room-bookings/suppliers/' . $filename;
+    //                         } elseif (!empty($supplier['remove_attachment']) && $supplier['remove_attachment'] == 1) {
+    //                             if ($supplierPath && file_exists(public_path($supplierPath))) {
+    //                                 unlink(public_path($supplierPath));
+    //                             }
+    //                             $supplierPath = null;
+    //                         }
+
+    //                         $supplierModel->fill([
+    //                             'booking_id' => $booking->id,
+    //                             'name' => $supplier['name'],
+    //                             'attachment' => $supplierPath,
+    //                         ])->save();
+
+    //                         $newSupplierIds[] = $supplierModel->id;
+    //                     }
+    //                 }
+    //             }
+
+    //             $toDelete = array_diff($existingSuppliers, $newSupplierIds);
+    //             foreach ($toDelete as $deleteId) {
+    //                 $sup = FunctionRoomBookingSupplier::find($deleteId);
+    //                 if ($sup && $sup->attachment && file_exists(public_path($sup->attachment))) {
+    //                     unlink(public_path($sup->attachment));
+    //                 }
+    //                 $sup?->delete();
+    //             }
+
+
+    //             $addonsTotal = 0;
+    //             $addonData = [];
+
+    //             $booking->addOns()->detach();
+
+    //             if ($request->has('addons')) {
+    //                 foreach ($request->addons as $addonId => $addon) {
+    //                     if (isset($addon['selected']) && $addon['selected'] == 1) {
+    //                         $addonModel = AddOn::where('id', $addonId)->lockForUpdate()->first();
+    //                         if ($addonModel) {
+    //                             $qtyRequested = max(1, $addon['qty'] ?? 1);
+
+    //                             $reserved = AddOnFunctionRoomBooking::whereHas('booking', function ($q) use ($request, $booking) {
+    //                                 $q->where('function_room_booking_date', $request->function_room_booking_date)
+    //                                     ->whereIn('booking_status', [0, 1])
+    //                                     ->where('id', '!=', $booking->id);
+    //                             })
+    //                                 ->where('add_on_id', $addonId)
+    //                                 ->lockForUpdate()
+    //                                 ->sum('qty');
+
+    //                             $available = $addonModel->qty - $reserved;
+
+    //                             if ($qtyRequested > $available) {
+    //                                 DB::rollBack();
+    //                                 return response()->json([
+    //                                     'success' => false,
+    //                                     'message' => "Sorry, another resident booked faster. Only {$available} of {$addonModel->item} left for this date."
+    //                                 ], 422);
+    //                             }
+
+    //                             $addonsTotal += $qtyRequested * $addonModel->price;
+    //                             $addonData[$addonId] = ['qty' => $qtyRequested, 'price' => $addonModel->price];
+    //                         }
+    //                     }
+    //                 }
+
+    //                 if (!empty($addonData)) {
+    //                     $booking->addOns()->attach($addonData);
+    //                 }
+    //             }
+
+    //             $start = Carbon::parse($request->event_start_time);
+    //             $end = Carbon::parse($request->event_end_time);
+    //             if ($end->lte($start)) {
+    //                 $end->addDay();
+    //             }
+    //             $durationHours = $start->floatDiffInHours($end);
+
+
+    //             $manualDiscount = is_numeric($request->discount) ? floatval($request->discount) : 0;
+    //             $baseRate = $room->function_room_rate;
+    //             $appliedDiscount = 0;
+    //             $finalRate = $baseRate;
+
+    //             $overrideRoles = [1, 6];
+
+    //             if (in_array(auth()->user()->role_id, $overrideRoles) && $manualDiscount > 0) {
+    //                 $appliedDiscount = $manualDiscount;
+    //             } elseif (isset($booking) && $booking->discount > 0) {
+    //                 $appliedDiscount = floatval($booking->discount);
+    //             } else {
+    //                 $bookingDate = Carbon::parse($request->function_room_booking_date);
+    //                 $activeDiscount = FunctionRoomDiscount::where('function_room_id', $room->id)
+    //                     ->whereDate('start_date', '<=', $bookingDate)
+    //                     ->whereDate('end_date', '>=', $bookingDate)
+    //                     ->orderByDesc('discount')
+    //                     ->first();
+
+    //                 $appliedDiscount = $activeDiscount?->discount ?? 0;
+    //             }
+
+    //             $finalRate = $baseRate - ($baseRate * ($appliedDiscount / 100));
+    //             $roomTotal = $finalRate * $durationHours;
+    //             $totalAmount = $roomTotal + $addonsTotal;
+
+    //             Log::info("Linked booking debug", [
+    //                 'wantsLinked' => $wantsLinked,
+    //                 'mainRoomId' => $mainRoomId,
+    //                 'linkedRoomId' => $linkedRoomId,
+    //                 'booking_id' => $booking->id,
+    //                 'existingLinkedBooking' => $existingLinkedBooking?->id,
+    //             ]);
+
+
+
+    //             if ($wantsLinked && $linkedRoomId) {
+    //                 $linkedBooking = FunctionRoomBooking::where('transaction_no', $booking->transaction_no)
+    //                     ->where('function_room_id', $linkedRoomId)
+    //                     ->where('id', '!=', $booking->id)
+    //                     ->first();
+
+    //                 if (!$linkedBooking) {
+
+    //                     $linkedBooking = $booking->replicate([
+    //                         'add_ons_total',
+    //                         'room_total',
+    //                         'total_amount',
+    //                         'base_rate',
+    //                         'final_rate',
+    //                         'discount',
+    //                         'discount_remarks'
+    //                     ]);
+
+    //                     $linkedBooking->function_room_id = $linkedRoomId;
+    //                     $linkedBooking->addons_total = 0;
+    //                     $linkedBooking->room_total = $booking->room_total;
+    //                     $linkedBooking->total_amount = $booking->room_total;
+    //                     $linkedBooking->authorization_file = $authorizationPath;
+    //                     $linkedBooking->save();
+
+    //                 } else {
+
+    //                     $linkedBooking->update([
+    //                         'function_room_booking_date' => $request->function_room_booking_date,
+    //                         'event_start_time' => $request->event_start_time,
+    //                         'event_end_time' => $request->event_end_time,
+    //                         'pax' => $request->pax,
+    //                         'purpose_of_event' => $request->purpose_of_event,
+    //                         'contact_number' => $request->contact_number,
+    //                         'base_rate' => $baseRate,
+    //                         'discount' => $appliedDiscount,
+    //                         'final_rate' => $finalRate,
+    //                         'room_total' => $roomTotal,
+    //                         'addons_total' => 0,
+    //                         'total_amount' => $roomTotal,
+    //                         'payment_mode' => $request->payment_mode,
+    //                         'authorization_file' => $authorizationPath,
+    //                     ]);
+    //                 }
+    //                 $linkedBooking->suppliers()->delete();
+    //                 foreach ($booking->suppliers as $sup) {
+    //                     FunctionRoomBookingSupplier::create([
+    //                         'booking_id' => $linkedBooking->id,
+    //                         'name' => $sup->name,
+    //                         'attachment' => $sup->attachment,
+    //                     ]);
+    //                 }
+    //             }
+
+    //             $booking->update([
+    //                 'function_room_id' => $room->id,
+    //                 'purpose_of_event' => $request->purpose_of_event,
+    //                 'function_room_booking_date' => $request->function_room_booking_date,
+    //                 'event_start_time' => $request->event_start_time,
+    //                 'event_end_time' => $request->event_end_time,
+    //                 'contact_number' => $request->contact_number,
+    //                 'pax' => $request->pax,
+    //                 'payment_mode' => $request->payment_mode,
+    //                 'has_suppliers' => $request->boolean('has_suppliers'),
+    //                 'authorization_file' => $authorizationPath,
+    //                 'discount_remarks' => $request->discount_remarks,
+    //                 'base_rate' => $baseRate,
+    //                 'discount' => $appliedDiscount,
+    //                 'final_rate' => $finalRate,
+    //                 'room_total' => $roomTotal,
+    //                 'addons_total' => $addonsTotal,
+    //                 'total_amount' => $totalAmount,
+    //             ]);
+
+    //             DB::commit();
+
+    //             return response()->json([
+    //                 'success' => true,
+    //                 'message' => 'Booking updated successfully',
+    //             ]);
+
+    //         } catch (\Illuminate\Database\QueryException $e) {
+    //             DB::rollBack();
+    //             if (in_array($e->errorInfo[1], [1213, 1205])) {
+    //                 $attempt++;
+    //                 if ($attempt < $maxRetries) {
+    //                     usleep(100000);
+    //                     continue;
+    //                 }
+    //             }
+
+    //             Log::error("Error updating booking", [
+    //                 'message' => $e->getMessage(),
+    //                 'trace' => $e->getTraceAsString(),
+    //             ]);
+
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Something went wrong while updating the booking.'
+    //             ], 500);
+
+    //         } catch (\Throwable $e) {
+    //             DB::rollBack();
+
+    //             Log::error("Error updating booking", [
+    //                 'message' => $e->getMessage(),
+    //                 'trace' => $e->getTraceAsString(),
+    //             ]);
+
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Something went wrong while updating the booking.'
+    //             ], 500);
+    //         }
+    //     }
+
+    //     return response()->json([
+    //         'success' => false,
+    //         'message' => "Could not update booking. Please try again in a few seconds."
+    //     ], 500);
+    // }
+
     public function updateFunctionRoomBooking(Request $request)
     {
         $maxRetries = 3;
@@ -608,15 +1427,54 @@ class FunctionRoomBookingController extends Controller
             try {
                 DB::beginTransaction();
 
-                $booking = FunctionRoomBooking::with(['suppliers', 'addOns'])
-                    ->findOrFail($request->booking_id);
+                $booking = FunctionRoomBooking::with(['suppliers', 'addOns'])->findOrFail($request->booking_id);
+                $mainRoom = FunctionRoom::findOrFail($request->function_room_id);
 
-                $room = FunctionRoom::findOrFail($request->function_room_id);
+                $linkedRooms = [5 => [6], 6 => [5]];
+                $sharedRooms = [7 => [8], 8 => [7]];
 
-                // === Prevent double booking of function room ===
-                $isAlreadyBooked = FunctionRoomBooking::where('function_room_id', $request->function_room_id)
+                // Determine rooms to update/book  
+                $roomsToBook = [$request->function_room_id];
+                if ($request->boolean('book_linked_rooms') && isset($linkedRooms[$request->function_room_id])) {
+                    $roomsToBook = array_merge($roomsToBook, $linkedRooms[$request->function_room_id]);
+                }
+
+                $sharedRoomIds = $sharedRooms[$request->function_room_id] ?? [];
+                $conflictRoomIds = array_unique(array_merge($roomsToBook, $sharedRoomIds));
+
+
+                $allBookings = FunctionRoomBooking::where('transaction_no', $booking->transaction_no)->get();
+                $mainBookingId = $allBookings->min('id');
+
+                foreach ($allBookings as $b) {
+                    // Skip main booking and any room still selected
+                    if ($b->id != $mainBookingId && !in_array($b->function_room_id, $roomsToBook)) {
+                        // Delete supplier files
+                        foreach ($b->suppliers as $sup) {
+                            if ($sup->attachment && file_exists(public_path($sup->attachment))) {
+                                unlink(public_path($sup->attachment));
+                            }
+                        }
+                        $b->suppliers()->delete();
+
+                        // Detach add-ons
+                        $b->addOns()->detach();
+
+                        // Delete authorization file
+                        if ($b->authorization_file && file_exists(public_path($b->authorization_file))) {
+                            unlink(public_path($b->authorization_file));
+                        }
+
+                        // Delete the linked booking
+                        $b->delete();
+                    }
+
+                }
+
+                // Check for conflicts  
+                $isAlreadyBooked = FunctionRoomBooking::whereIn('function_room_id', $conflictRoomIds)
                     ->where('function_room_booking_date', $request->function_room_booking_date)
-                    ->whereIn('booking_status', [0, 1])
+                    ->where('booking_status', '!=', 2)
                     ->where('id', '!=', $booking->id)
                     ->lockForUpdate()
                     ->exists();
@@ -625,28 +1483,17 @@ class FunctionRoomBookingController extends Controller
                     DB::rollBack();
                     return response()->json([
                         'success' => false,
-                        'message' => 'Sorry, another user has already booked this room for that date.'
+                        'message' => 'Sorry, this date has just been booked by another user in one of the linked/shared rooms.'
                     ], 409);
                 }
 
-                // === Handle authorization file ===
                 $authorizationPath = $booking->authorization_file;
-
                 if ($request->hasFile('authorization_file')) {
-                    if ($authorizationPath && file_exists(public_path($authorizationPath))) {
+                    if ($authorizationPath && file_exists(public_path($authorizationPath)))
                         unlink(public_path($authorizationPath));
-                    }
-
                     $file = $request->file('authorization_file');
-                    $originalName = $file->getClientOriginalName();
-                    $destinationPath = public_path('assets/frontend/uploads/function-room-bookings/authorizations');
-
-                    if (!file_exists($destinationPath))
-                        mkdir($destinationPath, 0777, true);
-
-                    $filename = $this->getUniqueFilename($destinationPath, $originalName);
-                    $file->move($destinationPath, $filename);
-
+                    $filename = $this->getUniqueFilename(public_path('assets/frontend/uploads/function-room-bookings/authorizations'), $file->getClientOriginalName());
+                    $file->move(public_path('assets/frontend/uploads/function-room-bookings/authorizations'), $filename);
                     $authorizationPath = 'assets/frontend/uploads/function-room-bookings/authorizations/' . $filename;
                 } elseif ($request->remove_authorization == 1 && $authorizationPath) {
                     if (file_exists(public_path($authorizationPath)))
@@ -654,50 +1501,34 @@ class FunctionRoomBookingController extends Controller
                     $authorizationPath = null;
                 }
 
-                // === Update suppliers ===
+                $start = Carbon::parse($request->event_start_time);
+                $end = Carbon::parse($request->event_end_time);
+                if ($end->lte($start))
+                    $end->addDay();
+                $durationHours = $start->floatDiffInHours($end);
+
+                // Prepare supplier updates  
                 $existingSuppliers = $booking->suppliers()->pluck('id')->toArray();
                 $newSupplierIds = [];
 
                 if ($request->has('suppliers')) {
                     foreach ($request->suppliers as $index => $supplier) {
                         if (!empty($supplier['name'])) {
-                            $supplierModel = isset($supplier['id'])
-                                ? FunctionRoomBookingSupplier::find($supplier['id'])
-                                : new FunctionRoomBookingSupplier();
+                            $supplierModel = isset($supplier['id']) ? FunctionRoomBookingSupplier::find($supplier['id']) : new FunctionRoomBookingSupplier();
+                            $supplierPath = $supplierModel->attachment ?? null;
 
-                            $supplierPath = $supplierModel->attachment;
-
-                            // If new file uploaded → replace
                             if ($request->hasFile("suppliers.$index.attachment")) {
-                                if ($supplierPath && file_exists(public_path($supplierPath))) {
+                                if ($supplierPath && file_exists(public_path($supplierPath)))
                                     unlink(public_path($supplierPath));
-                                }
-
                                 $file = $request->file("suppliers.$index.attachment");
-                                $originalName = $file->getClientOriginalName();
-                                $destinationPath = public_path('assets/frontend/uploads/function-room-bookings/suppliers');
-
-                                if (!file_exists($destinationPath)) {
-                                    mkdir($destinationPath, 0777, true);
-                                }
-
-                                $filename = $this->getUniqueFilename($destinationPath, $originalName);
-                                $file->move($destinationPath, $filename);
-
+                                $filename = $this->getUniqueFilename(public_path('assets/frontend/uploads/function-room-bookings/suppliers'), $file->getClientOriginalName());
+                                $file->move(public_path('assets/frontend/uploads/function-room-bookings/suppliers'), $filename);
                                 $supplierPath = 'assets/frontend/uploads/function-room-bookings/suppliers/' . $filename;
-
-                                // If user explicitly removes file
                             } elseif (!empty($supplier['remove_attachment']) && $supplier['remove_attachment'] == 1) {
-                                if ($supplierPath && file_exists(public_path($supplierPath))) {
+                                if ($supplierPath && file_exists(public_path($supplierPath)))
                                     unlink(public_path($supplierPath));
-                                }
                                 $supplierPath = null;
-
-                                // ✅ Otherwise, keep existing file
-                            } else {
-                                $supplierPath = $supplierModel->attachment;
                             }
-
 
                             $supplierModel->fill([
                                 'booking_id' => $booking->id,
@@ -709,46 +1540,36 @@ class FunctionRoomBookingController extends Controller
                         }
                     }
                 }
-
-                $toDelete = array_diff($existingSuppliers, $newSupplierIds);
-                foreach ($toDelete as $deleteId) {
+                foreach (array_diff($existingSuppliers, $newSupplierIds) as $deleteId) {
                     $sup = FunctionRoomBookingSupplier::find($deleteId);
-                    if ($sup && $sup->attachment && file_exists(public_path($sup->attachment))) {
+                    if ($sup?->attachment && file_exists(public_path($sup->attachment)))
                         unlink(public_path($sup->attachment));
-                    }
                     $sup?->delete();
                 }
 
-                // === Update Add-ons with stock check ===
+                // Handle add-ons  
                 $addonsTotal = 0;
                 $addonData = [];
-
                 $booking->addOns()->detach();
 
                 if ($request->has('addons')) {
                     foreach ($request->addons as $addonId => $addon) {
-                        if (isset($addon['selected']) && $addon['selected'] == 1) {
+                        if (!empty($addon['selected'])) {
                             $addonModel = AddOn::where('id', $addonId)->lockForUpdate()->first();
                             if ($addonModel) {
                                 $qtyRequested = max(1, $addon['qty'] ?? 1);
-
-                                // 🔹 Reserved qty excluding this booking
                                 $reserved = AddOnFunctionRoomBooking::whereHas('booking', function ($q) use ($request, $booking) {
                                     $q->where('function_room_booking_date', $request->function_room_booking_date)
                                         ->whereIn('booking_status', [0, 1])
                                         ->where('id', '!=', $booking->id);
-                                })
-                                    ->where('add_on_id', $addonId)
-                                    ->lockForUpdate()
-                                    ->sum('qty');
+                                })->where('add_on_id', $addonId)->lockForUpdate()->sum('qty');
 
                                 $available = $addonModel->qty - $reserved;
-
                                 if ($qtyRequested > $available) {
                                     DB::rollBack();
                                     return response()->json([
                                         'success' => false,
-                                        'message' => "Sorry, another resident booked faster. Only {$available} of {$addonModel->item} left for this date."
+                                        'message' => "Sorry, only {$available} of {$addonModel->item} left for this date."
                                     ], 422);
                                 }
 
@@ -763,75 +1584,21 @@ class FunctionRoomBookingController extends Controller
                     }
                 }
 
-                // === Calculate totals ===
-                // $start = Carbon::parse($request->event_start_time);
-                // $end = Carbon::parse($request->event_end_time);
-                // if ($end->lte($start))
-                //     $end->addDay();
-                // $durationHours = $start->floatDiffInHours($end);
-                // $roomTotal = $room->discounted_rate * $durationHours;
+                // Update main booking  
+                $baseRate = $mainRoom->function_room_rate;
+                $activeDiscount = FunctionRoomDiscount::where('function_room_id', $mainRoom->id)
+                    ->whereDate('start_date', '<=', $request->function_room_booking_date)
+                    ->whereDate('end_date', '>=', $request->function_room_booking_date)
+                    ->orderByDesc('discount')->first();
 
-                // === Calculate duration ===
-                // === Calculate duration ===
-                // === Calculate duration ===
-                $start = Carbon::parse($request->event_start_time);
-                $end = Carbon::parse($request->event_end_time);
-                if ($end->lte($start)) {
-                    $end->addDay();
-                }
-                $durationHours = $start->floatDiffInHours($end);
-
-                // === Determine applicable discount & recalc ===
-                $manualDiscount = is_numeric($request->discount) ? floatval($request->discount) : 0;
-                $baseRate = $room->function_room_rate;
-                $appliedDiscount = 0;
-                $finalRate = $baseRate;
-
-                $overrideRoles = [1, 6];
-
-                if (in_array(auth()->user()->role_id, $overrideRoles) && $manualDiscount > 0) {
-                    $appliedDiscount = $manualDiscount;
-
-                } elseif (isset($booking) && $booking->discount > 0) {
-                    $appliedDiscount = floatval($booking->discount);
-
-                } else {
-                    $bookingDate = Carbon::parse($request->function_room_booking_date);
-                    $activeDiscount = FunctionRoomDiscount::where('function_room_id', $room->id)
-                        ->whereDate('start_date', '<=', $bookingDate)
-                        ->whereDate('end_date', '>=', $bookingDate)
-                        ->orderByDesc('discount')
-                        ->first();
-
-                    $appliedDiscount = $activeDiscount?->discount ?? 0;
-                }
-
+                $appliedDiscount = $activeDiscount->discount ?? 0;
+                $discountRemarks = $activeDiscount->remarks ?? null;
                 $finalRate = $baseRate - ($baseRate * ($appliedDiscount / 100));
                 $roomTotal = $finalRate * $durationHours;
                 $totalAmount = $roomTotal + $addonsTotal;
 
-
-
-                // === Update booking ===
-                // $booking->update([
-                //     'function_room_id' => $room->id,
-                //     'purpose_of_event' => $request->purpose_of_event,
-                //     'function_room_booking_date' => $request->function_room_booking_date,
-                //     'event_start_time' => $request->event_start_time,
-                //     'event_end_time' => $request->event_end_time,
-                //     'contact_number' => $request->contact_number,
-                //     'discount' => $request->discount,
-                //     'pax' => $request->pax,
-                //     'payment_mode' => $request->payment_mode,
-                //     'has_suppliers' => $request->boolean('has_suppliers'),
-                //     'authorization_file' => $authorizationPath,
-                //     'room_total' => $roomTotal,
-                //     'addons_total' => $addonsTotal,
-                //     'total_amount' => $roomTotal + $addonsTotal,
-                // ]);
-
                 $booking->update([
-                    'function_room_id' => $room->id,
+                    'function_room_id' => $mainRoom->id,
                     'purpose_of_event' => $request->purpose_of_event,
                     'function_room_booking_date' => $request->function_room_booking_date,
                     'event_start_time' => $request->event_start_time,
@@ -841,15 +1608,80 @@ class FunctionRoomBookingController extends Controller
                     'payment_mode' => $request->payment_mode,
                     'has_suppliers' => $request->boolean('has_suppliers'),
                     'authorization_file' => $authorizationPath,
-                    'discount_remarks' => $request->discount_remarks,
                     'base_rate' => $baseRate,
                     'discount' => $appliedDiscount,
+                    'discount_remarks' => $discountRemarks,
                     'final_rate' => $finalRate,
                     'room_total' => $roomTotal,
                     'addons_total' => $addonsTotal,
                     'total_amount' => $totalAmount,
                 ]);
 
+                // Update linked/shared rooms  
+                foreach ($roomsToBook as $roomId) {
+                    if ($roomId == $mainRoom->id)
+                        continue;
+                    $linkedRoom = FunctionRoom::findOrFail($roomId);
+                    $linkedBooking = FunctionRoomBooking::where('transaction_no', $booking->transaction_no)
+                        ->where('function_room_id', $roomId)
+                        ->first();
+
+                    $baseRate = $linkedRoom->function_room_rate;
+                    $activeDiscount = FunctionRoomDiscount::where('function_room_id', $linkedRoom->id)
+                        ->whereDate('start_date', '<=', $request->function_room_booking_date)
+                        ->whereDate('end_date', '>=', $request->function_room_booking_date)
+                        ->orderByDesc('discount')->first();
+
+                    $appliedDiscount = $activeDiscount->discount ?? 0;
+                    $discountRemarks = $activeDiscount->remarks ?? null;
+                    $finalRate = $baseRate - ($baseRate * ($appliedDiscount / 100));
+                    $roomTotal = $finalRate * $durationHours;
+                    $totalAmount = $roomTotal;
+
+                    $data = [
+                        'purpose_of_event' => $request->purpose_of_event,
+                        'function_room_booking_date' => $request->function_room_booking_date,
+                        'event_start_time' => $request->event_start_time,
+                        'event_end_time' => $request->event_end_time,
+                        'contact_number' => $request->contact_number,
+                        'pax' => $request->pax,
+                        'payment_mode' => $request->payment_mode,
+                        'has_suppliers' => $request->boolean('has_suppliers'),
+                        'authorization_file' => $authorizationPath,
+                        'base_rate' => $baseRate,
+                        'discount' => $appliedDiscount,
+                        'discount_remarks' => $discountRemarks,
+                        'final_rate' => $finalRate,
+                        'room_total' => $roomTotal,
+                        'addons_total' => 0,
+                        'total_amount' => $totalAmount,
+                    ];
+
+                    if (!$linkedBooking) {
+                        $linkedBooking = FunctionRoomBooking::create(array_merge([
+                            'transaction_no' => $booking->transaction_no,
+                            'user_id' => $booking->user_id,
+                            'unit_no' => $booking->unit_no,
+                            'resident_type' => $booking->resident_type,
+                            'function_room_id' => $roomId,
+                            'created_by' => $booking->created_by,
+                            'booking_status' => $booking->booking_status,
+                            // include approval columns if any  
+                        ], $data));
+                    } else {
+                        $linkedBooking->update($data);
+                    }
+
+                    // replicate suppliers to linked rooms  
+                    $linkedBooking->suppliers()->delete();
+                    foreach ($booking->suppliers as $sup) {
+                        FunctionRoomBookingSupplier::create([
+                            'booking_id' => $linkedBooking->id,
+                            'name' => $sup->name,
+                            'attachment' => $sup->attachment,
+                        ]);
+                    }
+                }
 
                 DB::commit();
 
@@ -860,47 +1692,26 @@ class FunctionRoomBookingController extends Controller
 
             } catch (\Illuminate\Database\QueryException $e) {
                 DB::rollBack();
-
-                // 🔹 Deadlock / lock wait timeout → retry
                 if (in_array($e->errorInfo[1], [1213, 1205])) {
                     $attempt++;
                     if ($attempt < $maxRetries) {
-                        usleep(100000); // small delay 0.1s
-                        continue; // retry
+                        usleep(100000);
+                        continue;
                     }
                 }
-
-                Log::error("Error updating booking", [
-                    'message' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
-                ]);
-
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Something went wrong while updating the booking.'
-                ], 500);
-
+                Log::error("Error updating booking", ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+                return response()->json(['success' => false, 'message' => 'Something went wrong while updating the booking.'], 500);
             } catch (\Throwable $e) {
                 DB::rollBack();
-
-                Log::error("Error updating booking", [
-                    'message' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
-                ]);
-
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Something went wrong while updating the booking.'
-                ], 500);
+                Log::error("Error updating booking", ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+                return response()->json(['success' => false, 'message' => 'Something went wrong while updating the booking.'], 500);
             }
         }
 
-        // Fallback if all retries fail
-        return response()->json([
-            'success' => false,
-            'message' => "Could not update booking. Please try again in a few seconds."
-        ], 500);
+        return response()->json(['success' => false, 'message' => "Could not update booking. Please try again in a few seconds."], 500);
+
     }
+
 
     public function downloadFunctionRoomBookingRecords(Request $request)
     {
@@ -1061,6 +1872,734 @@ class FunctionRoomBookingController extends Controller
         $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
 
         return $response;
+    }
+
+    public function getAdminAddonsAvailability(Request $request)
+    {
+        $date = $request->date;
+
+        $addons = AddOn::where('status', 1)->get();
+
+        $availability = [];
+
+        foreach ($addons as $addon) {
+
+            $reserved = AddOnFunctionRoomBooking::whereHas('booking', function ($q) use ($date) {
+                $q->where('function_room_booking_date', $date)
+                    ->whereIn('booking_status', [0, 1]);
+            })
+                ->where('add_on_id', $addon->id)
+                ->sum('qty');
+
+            $availability[$addon->id] = max(0, $addon->qty - $reserved);
+        }
+
+        return response()->json($availability);
+    }
+
+
+    // public function getAdminFunctionRoomBookedDates($roomId)
+    // {
+    //     $bookedDates = FunctionRoomBooking::where('function_room_id', $roomId)
+    //         ->whereIn('booking_status', [0, 1])
+    //         ->pluck('function_room_booking_date')
+    //         ->toArray();
+    //     $blockedDates = FunctionRoomDateBlocking::where('function_room_id', $roomId)
+    //         ->get()
+    //         ->flatMap(function ($block) {
+    //             $dates = [];
+    //             $start = Carbon::parse($block->date_blocking_start)->startOfDay();
+    //             $end = Carbon::parse($block->date_blocking_end)->endOfDay();
+
+    //             while ($start->lte($end)) {
+    //                 $dates[] = $start->format('Y-m-d');
+    //                 $start->addDay();
+    //             }
+    //             return $dates;
+    //         })
+    //         ->toArray();
+
+    //     $disabledDates = array_values(array_unique(array_merge($bookedDates, $blockedDates)));
+
+    //     return response()->json($disabledDates);
+    // }
+
+    public function getAdminFunctionRoomBookedDates($roomId)
+    {
+        // Define linked room pairs (example: 5 <-> 6)
+        $linkedRooms = [
+            5 => [6],
+            6 => [5],
+        ];
+
+        // Include the linked room if applicable
+        $relatedRoomIds = [$roomId];
+        if (isset($linkedRooms[$roomId])) {
+            $relatedRoomIds = array_merge($relatedRoomIds, $linkedRooms[$roomId]);
+        }
+
+        // Get booked dates for all related rooms
+        $bookedDates = FunctionRoomBooking::whereIn('function_room_id', $relatedRoomIds)
+            ->whereIn('booking_status', [0, 1])
+            ->pluck('function_room_booking_date')
+            ->toArray();
+
+        // Get blocked dates for all related rooms
+        $blockedDates = FunctionRoomDateBlocking::whereIn('function_room_id', $relatedRoomIds)
+            ->get()
+            ->flatMap(function ($block) {
+                $dates = [];
+                $start = Carbon::parse($block->date_blocking_start)->startOfDay();
+                $end = Carbon::parse($block->date_blocking_end)->endOfDay();
+
+                while ($start->lte($end)) {
+                    $dates[] = $start->format('Y-m-d');
+                    $start->addDay();
+                }
+                return $dates;
+            })
+            ->toArray();
+
+        // Merge, remove duplicates, and reindex
+        $disabledDates = array_values(array_unique(array_merge($bookedDates, $blockedDates)));
+
+        return response()->json($disabledDates);
+    }
+
+
+    public function searchResidents(Request $request)
+    {
+        $search = $request->input('term'); // term is sent by Select2
+
+        $residents = ResidentDetails::where('unit_no', 'like', "%{$search}%")
+            ->orWhere('resident_type', 'like', "%{$search}%")
+            ->orWhere('email', 'like', "%{$search}%")
+            ->limit(20) // limit results for performance
+            ->get();
+
+        $results = $residents->map(function ($residence) {
+            return [
+                'id' => $residence->id,   // ✅ USE users.id
+                'text' => ucfirst($residence->resident_type) . ' - Unit ' . $residence->unit_no . ' (' . $residence->email . ')',
+                'unit_no' => $residence->unit_no,
+                'resident_type' => strtolower($residence->resident_type),
+            ];
+        });
+
+        return response()->json(['results' => $results]);
+    }
+
+    public function adminCheckUnitTenant($unitNo)
+    {
+        $hasTenant = DB::table('resident_details')
+            ->where('unit_no', $unitNo)
+            ->where('resident_type', 'TENANT')
+            ->exists();
+
+        return response()->json(['hasTenant' => $hasTenant]);
+    }
+
+
+    // public function AdminStoreBooking(Request $request)
+    // {
+    //     $residentEmail = ResidentDetails::where('id', $request->user_id)->value('email');
+
+    //     $maxRetries = 3;
+    //     $attempt = 0;
+    //     $linkedRooms = [
+    //         5 => [6],
+    //         6 => [5],
+    //     ];
+
+    //     $relatedRoomIds = [$request->function_room_id];
+    //     if (isset($linkedRooms[$request->function_room_id])) {
+    //         $relatedRoomIds = array_merge($relatedRoomIds, $linkedRooms[$request->function_room_id]);
+    //     }
+
+    //     while ($attempt < $maxRetries) {
+    //         try {
+    //             DB::beginTransaction();
+    //             $isAlreadyBooked = FunctionRoomBooking::whereIn('function_room_id', $relatedRoomIds)
+    //                 ->where('function_room_booking_date', $request->function_room_booking_date)
+    //                 ->whereIn('booking_status', [0, 1])
+    //                 ->lockForUpdate()
+    //                 ->exists();
+
+    //             if ($isAlreadyBooked) {
+    //                 DB::rollBack();
+    //                 return response()->json([
+    //                     'success' => false,
+    //                     'message' => 'Sorry, this date has just been booked by another user in one of the linked rooms. Try another date.'
+    //                 ], 409);
+    //             }
+    //             $isBlocked = FunctionRoomDateBlocking::whereIn('function_room_id', $relatedRoomIds)
+    //                 ->where('blocking_status', 1)
+    //                 ->where(function ($query) use ($request) {
+    //                     $query->whereBetween('date_blocking_start', [$request->function_room_booking_date, $request->function_room_booking_date])
+    //                         ->orWhereBetween('date_blocking_end', [$request->function_room_booking_date, $request->function_room_booking_date])
+    //                         ->orWhere(function ($query) use ($request) {
+    //                             $query->where('date_blocking_start', '<=', $request->function_room_booking_date)
+    //                                 ->where('date_blocking_end', '>=', $request->function_room_booking_date);
+    //                         });
+    //                 })
+    //                 ->lockForUpdate()
+    //                 ->exists();
+
+    //             if ($isBlocked) {
+    //                 DB::rollBack();
+    //                 return response()->json([
+    //                     'success' => false,
+    //                     'message' => 'Sorry, this date has been blocked in one of the linked rooms. Please choose another date.'
+    //                 ], 409);
+    //             }
+
+    //             $lastId = FunctionRoomBooking::max('id') + 1;
+    //             $transactionNo = '2SFR-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
+
+    //             $resident = ResidentDetails::find($request->user_id);
+    //             $existingUser = \App\Models\User::find($request->user_id);
+
+
+    //             $userId = $existingUser ? $existingUser->id : null;
+    //             $unitNo = $resident?->unit_no;
+
+    //             $room = FunctionRoom::findOrFail($request->function_room_id);
+
+    //             $authorizationPath = null;
+    //             if ($request->hasFile('admin_authorization_file')) {
+    //                 $file = $request->file('admin_authorization_file');
+    //                 $originalName = $file->getClientOriginalName();
+    //                 $destinationPath = public_path('assets/frontend/uploads/function-room-bookings/authorizations');
+
+    //                 if (!file_exists($destinationPath))
+    //                     mkdir($destinationPath, 0777, true);
+
+    //                 $filename = $this->getUniqueFilename($destinationPath, $originalName);
+    //                 $file->move($destinationPath, $filename);
+    //                 $authorizationPath = 'assets/frontend/uploads/function-room-bookings/authorizations/' . $filename;
+    //             }
+
+
+    //             $start = Carbon::parse($request->event_start_time);
+    //             $end = Carbon::parse($request->event_end_time);
+    //             if ($end->lte($start))
+    //                 $end->addDay();
+    //             $durationHours = $start->floatDiffInHours($end);
+
+    //             $bookingDate = Carbon::parse($request->function_room_booking_date);
+
+    //             $activeDiscount = FunctionRoomDiscount::where('function_room_id', $room->id)
+    //                 ->whereDate('start_date', '<=', $bookingDate)
+    //                 ->whereDate('end_date', '>=', $bookingDate)
+    //                 ->orderByDesc('discount')
+    //                 ->first();
+
+    //             $appliedDiscount = 0;
+    //             $discountRemarks = null;
+    //             $finalRate = $room->function_room_rate;
+
+    //             if ($activeDiscount) {
+    //                 $appliedDiscount = $activeDiscount->discount ?? 0;
+    //                 $discountRemarks = $activeDiscount->remarks ?? null;
+
+    //                 if ($appliedDiscount > 0) {
+    //                     $finalRate = $finalRate - ($finalRate * ($appliedDiscount / 100));
+    //                 }
+    //             }
+
+    //             $roomTotal = $finalRate * $durationHours;
+
+
+    //             $booking = FunctionRoomBooking::create([
+    //                 'transaction_no' => $transactionNo,
+    //                 'user_id' => $userId,
+    //                 'unit_no' => $unitNo,
+    //                 'resident_type' => $resident?->resident_type,
+    //                 'function_room_id' => $room->id,
+    //                 'purpose_of_event' => $request->purpose_of_event,
+    //                 'function_room_booking_date' => $request->function_room_booking_date,
+    //                 'event_start_time' => $request->event_start_time,
+    //                 'event_end_time' => $request->event_end_time,
+    //                 'contact_number' => $request->contact_number,
+    //                 'pax' => $request->pax,
+    //                 'payment_mode' => $request->admin_payment_mode,
+    //                 'has_suppliers' => $request->boolean('admin_has_suppliers'),
+    //                 'authorization_file' => $authorizationPath,
+    //                 'base_rate' => $room->function_room_rate,
+    //                 'discount' => $appliedDiscount,
+    //                 'discount_remarks' => $discountRemarks,
+    //                 'final_rate' => $finalRate,
+    //                 'room_total' => $roomTotal,
+    //                 'addons_total' => 0,
+    //                 'total_amount' => $roomTotal,
+    //                 'created_by' => auth()->id(), // ✅ logged-in admin
+    //             ]);
+
+    //             if ($request->has('suppliers')) {
+    //                 foreach ($request->suppliers as $index => $supplier) {
+    //                     if (!empty($supplier['name'])) {
+    //                         $supplierPath = null;
+    //                         $file = $request->file("suppliers.$index.attachment");
+
+    //                         if ($file) {
+    //                             $originalName = $file->getClientOriginalName();
+    //                             $destinationPath = public_path('assets/frontend/uploads/function-room-bookings/suppliers');
+    //                             if (!file_exists($destinationPath))
+    //                                 mkdir($destinationPath, 0777, true);
+
+    //                             $filename = $this->getUniqueFilename($destinationPath, $originalName);
+    //                             $file->move($destinationPath, $filename);
+    //                             $supplierPath = 'assets/frontend/uploads/function-room-bookings/suppliers/' . $filename;
+    //                         }
+
+    //                         FunctionRoomBookingSupplier::create([
+    //                             'booking_id' => $booking->id,
+    //                             'name' => $supplier['name'],
+    //                             'attachment' => $supplierPath,
+    //                         ]);
+    //                     }
+    //                 }
+    //             }
+
+    //             $addonsTotal = 0;
+    //             $addonData = [];
+
+    //             if ($request->has('addons')) {
+    //                 foreach ($request->addons as $addonId => $addon) {
+    //                     if (isset($addon['selected']) && $addon['selected'] == 1) {
+    //                         $addonModel = AddOn::where('id', $addonId)->lockForUpdate()->first();
+    //                         if ($addonModel) {
+    //                             $qtyRequested = max(1, $addon['qty'] ?? 1);
+
+    //                             $reserved = AddOnFunctionRoomBooking::whereHas('booking', function ($q) use ($request) {
+    //                                 $q->where('function_room_booking_date', $request->function_room_booking_date)
+    //                                     ->whereIn('booking_status', [0, 1]);
+    //                             })
+    //                                 ->where('add_on_id', $addonId)
+    //                                 ->lockForUpdate()
+    //                                 ->sum('qty');
+
+    //                             $available = $addonModel->qty - $reserved;
+
+    //                             if ($qtyRequested > $available) {
+    //                                 DB::rollBack();
+    //                                 return response()->json([
+    //                                     'success' => false,
+    //                                     'message' => "Sorry, only {$available} of {$addonModel->item} left for this date."
+    //                                 ], 422);
+    //                             }
+
+    //                             $addonsTotal += $qtyRequested * $addonModel->price;
+    //                             $addonData[$addonId] = ['qty' => $qtyRequested, 'price' => $addonModel->price];
+    //                         }
+    //                     }
+    //                 }
+
+    //                 if (!empty($addonData)) {
+    //                     $booking->addOns()->attach($addonData);
+    //                 }
+    //             }
+
+
+    //             $booking->update([
+    //                 'addons_total' => $addonsTotal,
+    //                 'total_amount' => $roomTotal + $addonsTotal,
+    //             ]);
+
+
+    //             $booking->load(['user', 'functionRoom']);
+    //             $recipientEmail = null;
+
+    //             if ($booking->user) {
+    //                 $recipientEmail = $booking->user->email;
+    //             } else {
+    //                 $residentEmail = ResidentDetails::where('id', $request->user_id)->value('email');
+    //                 if ($residentEmail) {
+    //                     $recipientEmail = $residentEmail;
+    //                     Log::warning("User not found in users table, fallback to resident_details email: {$residentEmail}");
+    //                 }
+    //             }
+    //             if ($recipientEmail) {
+    //                 Mail::to($recipientEmail)->queue(new UserFunctionRoomBookingNotification($booking));
+    //             } else {
+    //                 Log::warning("No email found for resident ID {$request->user_id}");
+    //             }
+
+    //             Mail::to('itdept@twoserendra.com')->queue(new FinanceFunctionRoomBookingNotification($booking));
+    //             event(new FunctionRoomBookingCreated($booking));
+    //             if ($booking->user) {
+    //                 $booking->user->notify(new UserFunctionRoomBookingBellNotification($booking));
+    //             }
+    //             DB::commit();
+
+    //             return response()->json([
+    //                 'success' => true,
+    //                 'message' => "Booking saved successfully! Transaction No: {$transactionNo}",
+    //                 'transaction_no' => $transactionNo,
+    //             ]);
+
+    //         } catch (\Illuminate\Database\QueryException $e) {
+    //             DB::rollBack();
+
+    //             if (in_array($e->errorInfo[1], [1213, 1205])) {
+    //                 $attempt++;
+    //                 if ($attempt < $maxRetries) {
+    //                     usleep(100000);
+    //                     continue;
+    //                 }
+    //             }
+
+    //             Log::error("Error saving admin booking", [
+    //                 'message' => $e->getMessage(),
+    //                 'trace' => $e->getTraceAsString(),
+    //             ]);
+
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Something went wrong while saving the booking.'
+    //             ], 500);
+
+    //         } catch (\Throwable $e) {
+    //             DB::rollBack();
+
+    //             Log::error("Error saving admin booking", [
+    //                 'message' => $e->getMessage(),
+    //                 'trace' => $e->getTraceAsString(),
+    //             ]);
+
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Something went wrong while saving the booking.'
+    //             ], 500);
+    //         }
+    //     }
+
+    //     return response()->json([
+    //         'success' => false,
+    //         'message' => 'Could not complete booking. Please try again.'
+    //     ], 500);
+    // }
+
+
+    public function AdminStoreBooking(Request $request)
+    {
+        $maxRetries = 3;
+        $attempt = 0;
+
+        while ($attempt < $maxRetries) {
+            try {
+                DB::beginTransaction();
+                $linkedRooms = [
+                    5 => [6], //b&c fr1
+                    6 => [5], //b&c fr1
+                ];
+
+                $roomsToBook = [$request->function_room_id];
+                if ($request->boolean('book_linked_rooms') && isset($linkedRooms[$request->function_room_id])) {
+                    $roomsToBook = array_merge($roomsToBook, $linkedRooms[$request->function_room_id]);
+                }
+
+                $sharedRooms = [
+                    7 => [8], //meranti tropical garden
+                    8 => [7], //meranti culinary room
+                ];
+                $sharedRoomIds = [];
+                if (isset($sharedRooms[$request->function_room_id])) {
+                    $sharedRoomIds = $sharedRooms[$request->function_room_id];
+                }
+
+                $relatedRoomIds = array_unique(array_merge($roomsToBook, $sharedRoomIds));
+                $bookingDate = Carbon::parse($request->function_room_booking_date);
+
+                $fullLinkedSet = isset($linkedRooms[$request->function_room_id])
+                    ? array_merge([$request->function_room_id], $linkedRooms[$request->function_room_id])
+                    : [$request->function_room_id];
+
+                // Always include full shared room group for conflict checking
+                $fullSharedSet = isset($sharedRooms[$request->function_room_id])
+                    ? $sharedRooms[$request->function_room_id]
+                    : [];
+
+                // Final conflict group (complete group)
+                $conflictRoomIds = array_unique(array_merge($fullLinkedSet, $fullSharedSet));
+
+
+                $isAlreadyBooked = FunctionRoomBooking::whereIn('function_room_id', $conflictRoomIds)
+                    ->where('function_room_booking_date', $request->function_room_booking_date)
+                    ->where('booking_status', '!=', 2) // only cancelled allowed
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($isAlreadyBooked) {
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Sorry, this date has just been booked by another user in one of the linked/shared rooms.'
+                    ], 409);
+                }
+
+                $isBlocked = FunctionRoomDateBlocking::whereIn('function_room_id', $relatedRoomIds)
+                    ->where('blocking_status', 1)
+                    ->where(function ($query) use ($request) {
+                        $query->whereBetween('date_blocking_start', [$request->function_room_booking_date, $request->function_room_booking_date])
+                            ->orWhereBetween('date_blocking_end', [$request->function_room_booking_date, $request->function_room_booking_date])
+                            ->orWhere(function ($query) use ($request) {
+                                $query->where('date_blocking_start', '<=', $request->function_room_booking_date)
+                                    ->where('date_blocking_end', '>=', $request->function_room_booking_date);
+                            });
+                    })
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($isBlocked) {
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Sorry, this date has been blocked in one of the linked/shared rooms. Please choose another date.'
+                    ], 409);
+                }
+
+
+                $lastId = FunctionRoomBooking::max('id') + 1;
+                $transactionNo = '2SFR-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
+
+
+                $resident = ResidentDetails::find($request->user_id);
+
+                $userId = null;
+                if ($resident && $resident->email) {
+                    $existingUser = \App\Models\User::where('email', $resident->email)->first();
+                    if ($existingUser) {
+                        $userId = $existingUser->id;
+                    }
+                }
+
+                $unitNo = $resident?->unit_no;
+                $authorizationPath = null;
+                if ($request->hasFile('admin_authorization_file')) {
+                    $file = $request->file('admin_authorization_file');
+                    $originalName = $file->getClientOriginalName();
+                    $destinationPath = public_path('assets/frontend/uploads/function-room-bookings/authorizations');
+
+                    if (!file_exists($destinationPath))
+                        mkdir($destinationPath, 0777, true);
+
+                    $filename = $this->getUniqueFilename($destinationPath, $originalName);
+                    $file->move($destinationPath, $filename);
+                    $authorizationPath = 'assets/frontend/uploads/function-room-bookings/authorizations/' . $filename;
+                }
+
+                $start = Carbon::parse($request->event_start_time);
+                $end = Carbon::parse($request->event_end_time);
+                if ($end->lte($start))
+                    $end->addDay();
+                $durationHours = $start->floatDiffInHours($end);
+
+
+                $bookings = [];
+                $totalAmountAllRooms = 0;
+
+                foreach ($roomsToBook as $roomId) {
+                    $room = FunctionRoom::findOrFail($roomId);
+
+                    $activeDiscount = FunctionRoomDiscount::where('function_room_id', $room->id)
+                        ->whereDate('start_date', '<=', $bookingDate)
+                        ->whereDate('end_date', '>=', $bookingDate)
+                        ->orderByDesc('discount')
+                        ->first();
+
+                    $appliedDiscount = $activeDiscount->discount ?? 0;
+                    $discountRemarks = $activeDiscount->remarks ?? null;
+                    $finalRate = $room->function_room_rate;
+
+                    if ($appliedDiscount > 0) {
+                        $finalRate = $finalRate - ($finalRate * ($appliedDiscount / 100));
+                    }
+
+                    $roomTotal = $finalRate * $durationHours;
+                    $totalAmountAllRooms += $roomTotal;
+
+                    $bookings[$roomId] = FunctionRoomBooking::create([
+                        'transaction_no' => $transactionNo,
+                        'user_id' => $userId,
+                        'unit_no' => $unitNo,
+                        'resident_type' => $resident?->resident_type,
+                        'function_room_id' => $room->id,
+                        'purpose_of_event' => $request->purpose_of_event,
+                        'function_room_booking_date' => $request->function_room_booking_date,
+                        'event_start_time' => $request->event_start_time,
+                        'event_end_time' => $request->event_end_time,
+                        'contact_number' => $request->contact_number,
+                        'pax' => $request->pax,
+                        'payment_mode' => $request->admin_payment_mode,
+                        'has_suppliers' => $request->boolean('admin_has_suppliers'),
+                        'authorization_file' => $authorizationPath,
+                        'base_rate' => $room->function_room_rate,
+                        'discount' => $appliedDiscount,
+                        'discount_remarks' => $discountRemarks,
+                        'final_rate' => $finalRate,
+                        'room_total' => $roomTotal,
+                        'addons_total' => 0,
+                        'total_amount' => $roomTotal,
+                        'created_by' => auth()->id(),
+                    ]);
+                }
+                $mainBooking = $bookings[$request->function_room_id] ?? reset($bookings);
+                $addonsTotal = 0;
+                $addonData = [];
+
+                if ($request->has('addons')) {
+                    foreach ($request->addons as $addonId => $addon) {
+                        if (isset($addon['selected']) && $addon['selected'] == 1) {
+                            $addonModel = AddOn::where('id', $addonId)->lockForUpdate()->first();
+                            if ($addonModel) {
+                                $qtyRequested = max(1, $addon['qty'] ?? 1);
+
+                                $reserved = AddOnFunctionRoomBooking::whereHas('booking', function ($q) use ($request) {
+                                    $q->where('function_room_booking_date', $request->function_room_booking_date)
+                                        ->whereIn('booking_status', [0, 1]);
+                                })
+                                    ->where('add_on_id', $addonId)
+                                    ->lockForUpdate()
+                                    ->sum('qty');
+
+                                $available = $addonModel->qty - $reserved;
+                                if ($qtyRequested > $available) {
+                                    DB::rollBack();
+                                    return response()->json([
+                                        'success' => false,
+                                        'message' => "Sorry, only {$available} of {$addonModel->item} left for this date."
+                                    ], 422);
+                                }
+
+                                $addonsTotal += $qtyRequested * $addonModel->price;
+                                $addonData[$addonId] = ['qty' => $qtyRequested, 'price' => $addonModel->price];
+                            }
+                        }
+                    }
+
+                    if (!empty($addonData)) {
+                        $mainBooking->addOns()->attach($addonData);
+                        $mainBooking->update([
+                            'addons_total' => $addonsTotal,
+                            'total_amount' => $mainBooking->room_total + $addonsTotal,
+                        ]);
+                    }
+
+                    foreach ($bookings as $booking) {
+                        if ($booking->id !== $mainBooking->id) {
+                            $booking->update([
+                                'addons_total' => 0,
+                                'total_amount' => $booking->room_total,
+                            ]);
+                        }
+                    }
+                }
+                $supplierUploads = [];
+                if ($request->has('suppliers')) {
+                    foreach ($request->suppliers as $index => $supplier) {
+                        if (!empty($supplier['name'])) {
+                            $supplierPath = null;
+                            $file = $request->file("suppliers.$index.attachment");
+                            if ($file) {
+                                $originalName = $file->getClientOriginalName();
+                                $destinationPath = public_path('assets/frontend/uploads/function-room-bookings/suppliers');
+                                if (!file_exists($destinationPath))
+                                    mkdir($destinationPath, 0777, true);
+                                $filename = $this->getUniqueFilename($destinationPath, $originalName);
+                                $file->move($destinationPath, $filename);
+                                $supplierPath = 'assets/frontend/uploads/function-room-bookings/suppliers/' . $filename;
+                            }
+
+                            $supplierUploads[$index] = [
+                                'name' => $supplier['name'],
+                                'attachment' => $supplierPath,
+                            ];
+                        }
+                    }
+                    foreach ($bookings as $booking) {
+                        foreach ($supplierUploads as $data) {
+                            FunctionRoomBookingSupplier::create([
+                                'booking_id' => $booking->id,
+                                'name' => $data['name'],
+                                'attachment' => $data['attachment'],
+                            ]);
+                        }
+                    }
+                }
+
+                $mainBooking->load(['user', 'functionRoom']);
+                $recipientEmail = null;
+
+                if ($mainBooking->user) {
+                    $recipientEmail = $mainBooking->user->email;
+                } else {
+                    $residentEmail = ResidentDetails::where('id', $request->user_id)->value('email');
+                    if ($residentEmail) {
+                        $recipientEmail = $residentEmail;
+                        Log::warning("User not found in users table, fallback to resident_details email: {$residentEmail}");
+                    }
+                }
+
+                if ($recipientEmail) {
+                    Mail::to($recipientEmail)->queue(new UserFunctionRoomBookingNotification($mainBooking, $bookings));
+                } else {
+                    Log::warning("No email found for resident ID {$request->user_id}");
+                }
+
+                Mail::to('itdept@twoserendra.com')->queue(new FinanceFunctionRoomBookingNotification($mainBooking, $bookings));
+                event(new FunctionRoomBookingCreated($mainBooking));
+                if ($mainBooking->user) {
+                    $mainBooking->user->notify(new UserFunctionRoomBookingBellNotification($mainBooking));
+                }
+
+                DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => "Booking saved successfully! Transaction No: {$transactionNo}",
+                    'transaction_no' => $transactionNo,
+                ]);
+            } catch (\Illuminate\Database\QueryException $e) {
+                DB::rollBack();
+
+                // deadlock / lock wait
+                if (in_array($e->errorInfo[1], [1213, 1205])) {
+                    $attempt++;
+                    if ($attempt < $maxRetries) {
+                        usleep(100000);
+                        continue;
+                    }
+                }
+
+                Log::error("Error saving admin booking", [
+                    'message' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Something went wrong while saving the booking.'
+                ], 500);
+            } catch (\Throwable $e) {
+                DB::rollBack();
+
+                Log::error("Error saving admin booking", [
+                    'message' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Something went wrong while saving the booking.'
+                ], 500);
+            }
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Could not complete booking. Please try again.'
+        ], 500);
     }
 
 

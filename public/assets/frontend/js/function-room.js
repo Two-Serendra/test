@@ -42,10 +42,32 @@ $(document).ready(function () {
     });
 
     $('.BookFunctionRoomBtn').on('click', function () {
-        $("#loadingOverlay").fadeIn();
+
+        showLoading();
 
         var functionRoomName = $(this).data("name");
         var roomId = $(this).data("id");
+        var linkedRooms = $(this).data("linked"); // this will be an array of names
+
+        if (linkedRooms && linkedRooms.length > 0) {
+            $("#linkedRoomContainer").html(`
+        <div class="col-md-12 mt-2">
+            <div class="form-check">
+                <input type="checkbox" name="book_linked_rooms" id="bookLinkedRooms" value="1" class="form-check-input">
+                <label class="form-check-label fw-semibold" for="bookLinkedRooms">
+                    You can also book: <span class="text-primary">${linkedRooms.join(', ')}</span>
+                </label>
+                <i class="bi bi-question-circle ms-1 text-secondary" data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        title="If you book both function rooms, you will also get the space between them."></i>
+            </div>
+            <input type="hidden" name="linked_room_ids" value="${linkedRooms.join(',')}">
+        </div>
+        
+        `);
+        } else {
+            $("#linkedRoomContainer").html("");
+        }
 
         $.ajax({
             url: "/check-auth",
@@ -98,19 +120,22 @@ $(document).ready(function () {
                                 }
                             });
 
+
+
                             $("#functionRoomBookingModal").modal("show");
+
                         },
                         error: function () {
                             alert("Failed to load booked dates.");
                         },
                         complete: function () {
-                            $("#loadingOverlay").fadeOut();
+                            hideLoading();
                         }
                     });
                 } else {
                     let redirectUrl = encodeURIComponent(window.location.href);
                     window.location.href = "/login?redirect=" + redirectUrl;
-                    $("#loadingOverlay").fadeOut();
+                    hideLoading();
                 }
             },
             error: function () {
@@ -185,43 +210,66 @@ $(document).ready(function () {
         }
     });
 
-    function checkAuthorization() {
-        let selectedOption = $('#residentSelect option:selected');
-        let residentType = selectedOption.data('type');
-        let unitNo = selectedOption.data('unit');
-        let paymentMode = $('input[name="payment_mode"]:checked').val();
+    $('#residentSelect').on('change', function () {
+        // Uncheck radios
+        $('input[name="payment_mode"]').prop('checked', false);
 
-        let $wrapper = $('#authorizationUploadWrapper');
-        let $fileInput = $('input[name="authorization_file"]');
+        hideAuthorization();
+    });
 
-        // Reset state
+    $('input[name="payment_mode"]').on('change', checkAuthorization);
+
+    function hideAuthorization() {
+        const $wrapper = $('#authorizationUploadWrapper');
+        const $fileInput = $('input[name="authorization_file"]');
+
         $wrapper.addClass('d-none');
         $('#authorizationLabel').text('');
         $('#authorizationNote').text('');
         $fileInput.prop('required', false);
+        $fileInput.val('');
+    }
 
-        // ✅ Tenant booking with CTA
-        if (residentType === 'tenant' && paymentMode === 'Charge to Account') {
+    function checkAuthorization() {
+        let selectedOption = $('#residentSelect option:selected');
+        let residentType = (selectedOption.data('type') || '').toString().trim().toLowerCase();
+        let unitNo = (selectedOption.data('unit') || '').toString().trim();
+        let paymentMode = ($('input[name="payment_mode"]:checked').val() || '').toString().trim();
+
+        const $wrapper = $('#authorizationUploadWrapper');
+        const $fileInput = $('input[name="authorization_file"]');
+
+        hideAuthorization();
+        if (!residentType || !paymentMode) return;
+        if (paymentMode !== 'Charge to Account') return;
+        if (residentType === 'tenant') {
             $('#authorizationLabel').text('CTA Authorization Letter *');
             $('#authorizationNote').text('Required because you are booking as a tenant with CTA.');
             $wrapper.removeClass('d-none');
             $fileInput.prop('required', true);
+            return;
+        }
 
-            // ✅ Owner with a tenant
-        } else if (residentType === 'owner' && unitNo) {
-            $.get('/check-unit-tenant/' + unitNo, function (response) {
-                if (response.hasTenant) {
-                    $('#authorizationLabel').text('Tenant Authorization Letter *');
-                    $('#authorizationNote').text('Required because the unit is tenanted.');
-                    $wrapper.removeClass('d-none');
-                    $fileInput.prop('required', true);
-                }
-            });
+        if (residentType === 'owner' && unitNo) {
+            $.get('/check-unit-tenant/' + encodeURIComponent(unitNo))
+                .done(function (response) {
+                    if (response && response.hasTenant) {
+                        $('#authorizationLabel').text('Tenant Authorization Letter *');
+                        $('#authorizationNote').text('Required because the unit is tenanted.');
+                        $wrapper.removeClass('d-none');
+                        $fileInput.prop('required', true);
+                    } else {
+                        hideAuthorization();
+                    }
+                })
+                .fail(function () {
+                    console.error('Failed to check unit tenancy.');
+                    hideAuthorization();
+                });
         }
     }
 
-    $('#residentSelect').on('change', checkAuthorization);
-    $('input[name="payment_mode"]').on('change', checkAuthorization);
+
 
     $('#userFunctionRoomNewBooking').submit(function (event) {
         event.preventDefault();
@@ -339,28 +387,20 @@ $(document).ready(function () {
         this.value = this.value.replace(/\D/g, '').slice(0, 11);
     })
 
-    // Show spinner
-    function showSpinner() {
-        $('#global-loading').addClass('show');
+
+    window.showLoading = function () {
+        $('#loadingOverlay').css('display', 'flex').hide().fadeIn(150);
     }
 
-    // Hide spinner
-    function hideSpinner() {
-        $('#global-loading').removeClass('show');
+    window.hideLoading = function () {
+        $('#loadingOverlay').fadeOut(150);
     }
-
-
-    $('.function-room-booking-details').on('click', function () {
+    $(document).on('click', '.function-room-booking-details', function () {
         const bookingId = $(this).data('id');
-        showSpinner();
-
-        // tiny helper: parse times like "15:00:00", "15:00", "3:00 PM", "03:00 PM"
+        showLoading();
         function parseTimeToDate(timeStr) {
             if (!timeStr) return null;
-            // Trim
-            timeStr = timeStr.trim();
-
-            // AM/PM format
+            timeStr = String(timeStr).trim();
             const ampmMatch = timeStr.match(/(\d{1,2}):(\d{2})(?::\d{2})?\s*([AaPp][Mm])/);
             if (ampmMatch) {
                 let h = parseInt(ampmMatch[1], 10);
@@ -370,8 +410,6 @@ $(document).ready(function () {
                 if (ampm === 'AM' && h === 12) h = 0;
                 return new Date(1970, 0, 1, h, m, 0);
             }
-
-            // 24-hour format (HH:mm or HH:mm:ss)
             const twentyFour = timeStr.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/);
             if (twentyFour) {
                 const h = parseInt(twentyFour[1], 10);
@@ -379,222 +417,277 @@ $(document).ready(function () {
                 const s = twentyFour[3] ? parseInt(twentyFour[3], 10) : 0;
                 return new Date(1970, 0, 1, h, m, s);
             }
-
-            // fallback: try Date parse (might still fail)
             const d = new Date(`1970-01-01T${timeStr}`);
             return isNaN(d.getTime()) ? null : d;
         }
 
+        function formatTimeStr(timeStr) {
+            const d = parseTimeToDate(timeStr);
+            if (!d) return (timeStr ?? 'N/A');
+            let h = d.getHours();
+            const m = d.getMinutes();
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12;
+            if (h === 0) h = 12;
+            return `${h}:${String(m).padStart(2, '0')} ${ampm}`;
+        }
+
+        function computeHours(startStr, endStr) {
+            const s = parseTimeToDate(startStr);
+            const e = parseTimeToDate(endStr);
+            if (!s || !e) return 1;
+            const start = new Date(s.getTime());
+            const end = new Date(e.getTime());
+            if (end <= start) {
+                end.setDate(end.getDate() + 1);
+            }
+            const diffMinutes = (end - start) / (1000 * 60);
+            let hours = Math.round((diffMinutes / 60) * 100) / 100; // 2 decimals
+            if (!isFinite(hours) || hours <= 0) hours = 1;
+            return hours;
+        }
+
+        function currency(num) {
+            return Number(num || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
         $.get(`/view-function-room-bookings/${bookingId}/details`, function (response) {
             if (!response.success) {
-                hideSpinner();
+                hideLoading();
                 return alert('Failed to load booking details.');
             }
+            const main = response.booking;
 
-            const booking = response.booking;
-            $('#detail-transaction-no').text(booking.transaction_no ?? 'N/A');
-            $('#detail-unit').text(booking.unit_no ?? 'N/A');
-            $('#detail-name').text(booking.user?.name ?? 'N/A');
-            $('#detail-contact').text(booking.contact_number ?? 'N/A');
+            const linked = Array.isArray(response.linked_bookings) && response.linked_bookings.length ? response.linked_bookings : [];
+            $('#detail-transaction-no').text(main.transaction_no ?? 'N/A');
+            $('#detail-unit').text(main.unit_no ?? 'N/A');
+            if (main.user?.name) {
+                $('#detail-name').text(main.user.name);
+            } else if (main.created_by_name) {
+                $('#detail-name').text('Booked by: ' + main.created_by_name);
+            } else {
+                $('#detail-name').text('N/A');
+            }
+            $('#detail-contact').text(main.contact_number ?? 'N/A');
+            $('#detail-purpose').text(main.purpose_of_event ?? 'N/A');
 
-            const residentTypeBadge = booking.resident_type === 'TENANT'
-                ? '<span class="badge badge-forge bg-danger">Tenant</span>'
-                : booking.resident_type === 'OWNER'
-                    ? '<span class="badge badge-forge bg-primary">Owner</span>'
-                    : `<span class="badge badge-forge bg-secondary">${booking.resident_type ?? 'N/A'}</span>`;
-            $('#detail-resident-type').html(residentTypeBadge);
-
-            $('#detail-function-room').text(booking.function_room?.function_room_name ?? 'N/A');
-            $('#detail-purpose').text(booking.purpose_of_event ?? 'N/A');
+            const residentBadge = main.resident_type === 'TENANT'
+                ? '<span class="badge badge-forge bg-danger">TENANT</span>'
+                : main.resident_type === 'OWNER'
+                    ? '<span class="badge badge-forge bg-primary">OWNER</span>'
+                    : `<span class="badge badge-forge bg-secondary">${main.resident_type ?? 'N/A'}</span>`;
+            $('#detail-resident-type').html(residentBadge);
+            $('#detail-payment-mode').text(main.payment_mode ?? 'N/A');
 
 
-            let statusBadge = '';
+            let statusHtml = '';
+            if (linked.length) {
+                const allConfirmed = linked.every(b => b.booking_status == 1);
+                const allCancelled = linked.every(b => b.booking_status == 2);
+                if (allConfirmed) statusHtml = '<span class="badge badge-forge bg-success">Confirmed</span>';
+                else if (allCancelled) statusHtml = '<span class="badge badge-forge bg-danger">Cancelled</span>';
+                else statusHtml = '<span class="badge badge-forge bg-warning text-light">Waiting</span>';
+            } else {
+                if (main.booking_status == 1) statusHtml = '<span class="badge badge-forge bg-success">Confirmed</span>';
+                else if (main.booking_status == 2) statusHtml = '<span class="badge badge-forge bg-danger">Cancelled</span>';
+                else statusHtml = '<span class="badge badge-forge bg-warning text-light">Waiting</span>';
+            }
+            $('#detail-status').html(statusHtml);
+
             const today = new Date(); today.setHours(0, 0, 0, 0);
-            const bookingDate = booking.function_room_booking_date ? new Date(booking.function_room_booking_date) : null;
-            if (booking.booking_status == 1) {
-                if (bookingDate && bookingDate < today) {
-                    statusBadge = '<span class="badge badge-forge bg-secondary">Completed</span>';
+            const mainBookingDate = main.function_room_booking_date ? new Date(main.function_room_booking_date) : null;
+            if (main.booking_status == 1) {
+                if (mainBookingDate && mainBookingDate < today) {
                     $('#cancel-booking-btn').addClass('d-none');
                 } else {
-                    statusBadge = '<span class="badge badge-forge bg-success">Confirmed</span>';
-                    $('#cancel-booking-btn').removeClass('d-none').data('id', booking.id).data('start-time', booking.event_start_time);
+                    $('#cancel-booking-btn').removeClass('d-none').data('id', main.id).data('start-time', main.event_start_time);
                 }
-            } else if (booking.booking_status == 0) {
-                statusBadge = '<span class="badge badge-forge bg-warning">Waiting</span>';
-                $('#cancel-booking-btn').removeClass('d-none').data('id', booking.id).data('start-time', booking.event_start_time);
-            } else if (booking.booking_status == 2) {
-                statusBadge = '<span class="badge badge-forge bg-danger">Cancelled</span>';
-                $('#cancel-booking-btn').addClass('d-none');
+            } else if (main.booking_status == 0) {
+                $('#cancel-booking-btn').removeClass('d-none').data('id', main.id).data('start-time', main.event_start_time);
             } else {
-                statusBadge = '<span class="badge badge-forge bg-dark">Unknown</span>';
                 $('#cancel-booking-btn').addClass('d-none');
             }
-            $('#detail-status').html(statusBadge);
-            $('#detail-booking-date').text(booking.function_room_booking_date ?? 'N/A');
-            $('#detail-start-time').text(booking.event_start_time ?? 'N/A');
-            $('#detail-end-time').text(booking.event_end_time ?? 'N/A');
-            $('#detail-pax').text(booking.pax ?? 'N/A');
-            $('#detail-payment-mode').text(booking.payment_mode ?? 'N/A');
+
+            if (linked.length) {
+                let roomsHtml = '';
+                linked.forEach(b => {
+                    const name = (b.function_room && b.function_room.function_room_name) || (b.functionRoom && b.functionRoom.function_room_name) || 'Function Room';
+                    roomsHtml += `<span class="badge badge-forge bg-primary me-1">${name}</span>`;
+                });
+                $('#detail-function-rooms').html(roomsHtml);
+            } else {
+                const name = (main.function_room && main.function_room.function_room_name) || (main.functionRoom && main.functionRoom.function_room_name) || 'N/A';
+                $('#detail-function-rooms').html(`<span class="badge badge-forge bg-primary">${name}</span>`);
+            }
 
             if (response.authorization_file_url) {
-                $('#detail-authorization').html(`<a href="${response.authorization_file_url}" target="_blank" class="custom-link">View</a>`);
+                $('#detail-authorization').html(`<a href="${response.authorization_file_url}" target="_blank" class="text-decoration-none">View</a>`);
             } else {
                 $('#detail-authorization').html('<span class="text-muted">N/A</span>');
             }
 
-
-            if (booking.suppliers && booking.suppliers.length > 0) {
-                let suppliersHtml = '';
-                booking.suppliers.forEach(s => {
-                    suppliersHtml += `<div>${s.name} ${s.attachment_url ? `<a href="${s.attachment_url}" target="_blank" class="custom-link">View</a>` : ''}</div>`;
+            if (main.suppliers && main.suppliers.length) {
+                let supHtml = '';
+                main.suppliers.forEach(s => {
+                    supHtml += `<div>${s.name} ${s.attachment_url ? ` - <a href="${s.attachment_url}" target="_blank" class="text-decoration-none">View</a>` : ''}</div>`;
                 });
-                $('#detail-suppliers').html(suppliersHtml);
+                $('#detail-suppliers').html(supHtml);
             } else {
                 $('#detail-suppliers').html('<span class="text-muted">N/A</span>');
             }
 
-            const durationHoursBackend = parseFloat(booking.duration_hours ?? booking.duration_in_hours ?? NaN);
-            const ratePerHourBackend = parseFloat(booking.final_rate ?? booking.function_room?.function_room_rate ?? NaN);
-            const roomTotalBackend = parseFloat(booking.room_total ?? NaN);
+            const roomsToRender = linked.length ? linked : [main];
+            let roomListHtml = '';
+            roomsToRender.forEach(b => {
+                const fr = b.function_room || b.functionRoom || {};
+                const roomName = fr.function_room_name || fr.name || 'Function Room';
+                const startRaw = b.event_start_time;
+                const endRaw = b.event_end_time;
+                const hours = computeHours(startRaw, endRaw);
+                const ratePerHour = parseFloat(b.final_rate ?? fr.function_room_rate ?? fr.rate ?? 0) || 0;
+                const baseRate = parseFloat(fr.function_room_rate ?? ratePerHour) || ratePerHour;
+                const roomTotal = Math.round(hours * ratePerHour * 100) / 100;
 
-            // Compute duration (front-end fallback) — robust parsing
-            let hours = !isNaN(durationHoursBackend) ? durationHoursBackend : 1;
-            if (isNaN(hours)) hours = 1;
+                const discountValue = parseFloat(b.discount ?? 0) || 0;
+                const discountRemarks = b.discount_remarks ?? '';
+                const startFmt = startRaw ? formatTimeStr(startRaw) : 'N/A';
+                const endFmt = endRaw ? formatTimeStr(endRaw) : 'N/A';
+                const bookingDateFmt = b.function_room_booking_date ? new Date(b.function_room_booking_date).toLocaleDateString(undefined, { month: 'long', day: '2-digit', year: 'numeric' }) : 'N/A';
 
+                roomListHtml += `
+                <div class="border-bottom pb-2 mb-3">
+                    <h6 class="fw-bold">${roomName}</h6>
 
-            if (!durationHoursBackend) {
-                const startDate = parseTimeToDate(booking.event_start_time);
-                const endDate = parseTimeToDate(booking.event_end_time);
-                if (startDate && endDate) {
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Booking Date:</div>
+                        <div class="col-8">${bookingDateFmt}</div>
+                    </div>
 
-                    if (endDate <= startDate) {
-                        endDate.setDate(endDate.getDate() + 1);
-                    }
-                    hours = Math.round(((endDate - startDate) / (1000 * 60 * 60)) * 100) / 100; // 2 decimal places
-                    if (hours <= 0) hours = 1;
-                } else {
-                    hours = 1;
-                }
-            }
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Time:</div>
+                        <div class="col-8">${startFmt} - ${endFmt}</div>
+                    </div>
 
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Pax:</div>
+                        <div class="col-8">${b.pax ?? 'N/A'}</div>
+                    </div>
 
-            const ratePerHour = !isNaN(ratePerHourBackend) ? ratePerHourBackend : (parseFloat(booking.final_rate) || 0);
-            const roomLineTotal = !isNaN(roomTotalBackend) ? roomTotalBackend : Math.round((ratePerHour * hours) * 100) / 100;
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Rate:</div>
+                        <div class="col-8">`;
 
-            if (ratePerHour && ratePerHour > 0) {
-                const baseRate = parseFloat(booking.function_room?.function_room_rate ?? ratePerHour);
                 if (baseRate > ratePerHour) {
-                    $('#detail-rate').html(`
-            <div>
-                <small class="text-muted"><s>₱${Number(baseRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</s></small>
-                &nbsp; → &nbsp;
-                <small class="fw-bold">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</small>
-                &nbsp; × &nbsp;
-                <small>${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })} hr(s)</small>
-                &nbsp; = &nbsp;
-                <strong class="fw-bold">₱${Number(roomLineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
-            </div>
-        `);
+                    roomListHtml += `<small class="text-muted"><s>₱${currency(baseRate)}/hr</s></small>
+                    &nbsp; → &nbsp;
+                    <small class="fw-bold">₱${currency(ratePerHour)}/hr</small>
+                    &nbsp; × &nbsp;
+                    <small>${hours} hr${hours > 1 ? 's' : ''}</small>
+                    &nbsp; = &nbsp;
+                    <strong>₱${currency(roomTotal)}</strong>`;
                 } else {
-
-                    $('#detail-rate').html(`
-            <div>
-                <small class="text-muted">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</small>
-                &nbsp; × &nbsp;
-                <small>${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })} hr(s)</small>
-                &nbsp; = &nbsp;
-                <strong>₱${Number(roomLineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
-            </div>
-        `);
+                    roomListHtml += `<small>₱${currency(ratePerHour)}/hr</small>
+                    &nbsp; × &nbsp;
+                    <small>${hours} hr${hours > 1 ? 's' : ''}</small>
+                    &nbsp; = &nbsp;
+                    <strong>₱${currency(roomTotal)}</strong>`;
                 }
-            } else {
-                $('#detail-rate').html('<span class="text-muted">N/A</span>');
-            }
 
-            let discountValue = booking.discount ?? 0;
-            const discountRemarks = booking.discount_remarks ?? '';
+                roomListHtml += `</div></div>`;
+                roomListHtml += `<div class="row mb-2"><div class="col-4 fw-bold">Discount:</div><div class="col-8">`;
+                if (discountValue > 0) {
+                    const dvStr = Number.isInteger(discountValue) ? discountValue.toFixed(0) : (discountValue % 1 === 0 ? discountValue.toFixed(0) : discountValue.toFixed(2).replace(/\.00$/, ''));
+                    roomListHtml += `<strong class="text-danger">${dvStr}%</strong>`;
+                    if (discountRemarks) roomListHtml += ` <span style="margin-left:6px;color:#555;">${discountRemarks}</span>`;
+                } else {
+                    roomListHtml += `<span class="text-muted">No discount</span>`;
+                }
+                roomListHtml += `</div></div></div>`;
+            });
 
-            // Convert and format
-            discountValue = parseFloat(discountValue);
-            if (discountValue % 1 === 0) {
-                discountValue = discountValue.toFixed(0);
-            } else {
-                discountValue = discountValue.toFixed(1).replace(/\.0$/, '');
-            }
+            $('#detail-room-list').html(roomListHtml);
 
-            if (discountValue > 0) {
-                $('#detail-discount').html(`
-        <div style="margin-top: 6px;">
-            <strong class="text-danger">${discountValue}%</strong>
-            ${discountRemarks ? `<span style="margin-left: 6px; color: #555;">${discountRemarks}</span>` : ''}
-        </div>
-    `);
-            } else {
-                $('#detail-discount').html('<span class="text-muted" style="margin-top: 6px;">No discount</span>');
-            }
-
-            let breakdownHtml = '';
+            let functionRoomsTotal = 0;
             let addonsTotal = 0;
+            let breakdownRows = '';
 
-            // Room row
-            if (ratePerHour && ratePerHour > 0) {
-                breakdownHtml += `
+
+            roomsToRender.forEach(b => {
+                const fr = b.function_room || b.functionRoom || {};
+                const roomName = fr.function_room_name || fr.name || 'Function Room';
+                const hours = computeHours(b.event_start_time, b.event_end_time);
+                const ratePerHour = parseFloat(b.final_rate ?? fr.function_room_rate ?? fr.rate ?? 0) || 0;
+                const baseRate = parseFloat(fr.function_room_rate ?? ratePerHour) || ratePerHour;
+                const roomTotal = Math.round(hours * ratePerHour * 100) / 100;
+                functionRoomsTotal += roomTotal;
+
+                breakdownRows += `
                 <tr>
-                    <td>${booking.function_room?.function_room_name ?? 'Function Room'} (${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })} hr${hours > 1 ? 's' : ''})</td>
-                    <td class="text-center">${Number(hours).toLocaleString(undefined, { minimumFractionDigits: (hours % 1 ? 2 : 0) })}</td>
-                    <td class="text-end">₱${Number(ratePerHour).toLocaleString(undefined, { minimumFractionDigits: 2 })}/hr</td>
-                    <td class="text-end">₱${Number(roomLineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                </tr>
-            `;
-            }
+                    <td>${roomName}</td>
+                    <td class="text-center">${hours} hr${hours > 1 ? 's' : ''}</td>
+                    <td class="text-end">`;
+                if (baseRate > ratePerHour) {
+                    breakdownRows += `<small class="text-muted"><s>₱${currency(baseRate)}</s></small>&nbsp;→&nbsp;<small class="fw-bold">₱${currency(ratePerHour)}</small>`;
+                } else {
+                    breakdownRows += `₱${currency(ratePerHour)}`;
+                }
+                breakdownRows += `</td><td class="text-end">₱${currency(roomTotal)}</td></tr>`;
+            });
 
-
-            if (booking.add_ons && booking.add_ons.length > 0) {
-                booking.add_ons.forEach(addon => {
-
+            roomsToRender.forEach(b => {
+                const addOns = b.addOns || b.add_ons || [];
+                addOns.forEach(addon => {
                     const pivot = addon.pivot || {};
-                    const qty = parseFloat(pivot.quantity ?? pivot.qty ?? addon.qty ?? 0) || 0;
-                    const price = parseFloat(pivot.price ?? addon.price ?? 0) || 0;
+                    const qty = Number(pivot.quantity ?? pivot.qty ?? addon.qty ?? 0) || 0;
+                    const price = Number(pivot.price ?? addon.price ?? addon.price ?? 0) || 0;
                     const lineTotal = Math.round(qty * price * 100) / 100;
                     addonsTotal += lineTotal;
 
-                    breakdownHtml += `
+                    breakdownRows += `
                     <tr>
                         <td>${addon.item ?? addon.name ?? 'Add-on'}</td>
                         <td class="text-center">${qty}</td>
-                        <td class="text-end">₱${Number(price).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                        <td class="text-end">₱${Number(lineTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                        <td class="text-end">₱${currency(price)}</td>
+                        <td class="text-end">₱${currency(lineTotal)}</td>
                     </tr>
                 `;
                 });
+            });
 
-
-                breakdownHtml += `
-                <tr class="table-light fw-bold">
-                    <td colspan="3" class="text-end">Add-ons Subtotal</td>
-                    <td class="text-end">₱${Number(addonsTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                </tr>
-            `;
+            if (!breakdownRows) {
+                breakdownRows = `<tr><td colspan="4" class="text-center text-muted">No charges</td></tr>`;
             }
 
-            if (!breakdownHtml) {
-                breakdownHtml = `<tr><td colspan="4" class="text-center text-muted">No charges</td></tr>`;
-            }
+            $('#detail-breakdown').html(breakdownRows);
+            const functionRoomsSubtotalStr = currency(functionRoomsTotal);
+            const addonsTotalStr = currency(addonsTotal);
+            const grandTotalStr = currency(Math.round((functionRoomsTotal + addonsTotal) * 100) / 100);
 
-            $('#detail-breakdown').html(breakdownHtml);
+            $('#detail-breakdown-footer').html(`
+            <tr class="table-light fw-bold">
+                <td colspan="3" class="text-end">Function Rooms Subtotal</td>
+                <td class="text-end">₱${functionRoomsSubtotalStr}</td>
+            </tr>
+            ${addonsTotal > 0 ? `
+            <tr class="table-light fw-bold">
+                <td colspan="3" class="text-end">Add-Ons Subtotal</td>
+                <td class="text-end">₱${addonsTotalStr}</td>
+            </tr>` : ''}
+            <tr class="table-dark fw-bold">
+                <td colspan="3" class="text-end">Grand Total</td>
+                <td class="text-end">₱${grandTotalStr}</td>
+            </tr>
+        `);
 
-            // Grand total
-            const grandTotal = Math.round((roomLineTotal + addonsTotal) * 100) / 100;
-            $('#detail-grand-total').text("₱" + Number(grandTotal).toLocaleString(undefined, { minimumFractionDigits: 2 }));
-
-            hideSpinner();
+            hideLoading();
             $('#userViewfunctionRoomBookingDetailsModal').modal('show');
 
         }).fail(function () {
-            hideSpinner();
+            hideLoading();
             alert('Something went wrong.');
         });
     });
+
 
 
     $('#cancel-booking-btn').on('click', function () {

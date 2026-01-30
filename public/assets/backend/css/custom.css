@@ -121,26 +121,15 @@
     z-index: 1055;
 }
 
-/* Make Select2 container visible inside modal */
 .select2-container {
-    z-index: 2000 !important;
     width: 100% !important;
 }
 
-/* Ensure the dropdown itself floats above everything */
 .select2-dropdown {
-    z-index: 9999 !important;
+    z-index: 2000 !important;
+    /* just above Bootstrap modal backdrop */
 }
 
-/* Fix typing issue: show the actual search input field */
-.select2-search__field {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    color: #000 !important;
-    background-color: #fff !important;
-    z-index: 9999 !important;
-}
 
 #addAddResidenceBtn {
     display: flex !important;
@@ -204,11 +193,11 @@
 }
 
 
-.form-control:disabled,
+/* .form-control:disabled,
 .form-control[readonly] {
     background-color: transparent !important;
     opacity: 1;
-}
+} */
 
 #global-loading {
     display: none;
@@ -229,3 +218,17 @@
     /* Flex only when 'show' class is added */
 }
 
+.form-control:not(:disabled)[readonly] {
+    background-color: #fff;
+}
+
+.nav-tabs .nav-link {
+    color: black;
+    font-weight: normal;
+}
+
+/* Active tab color and font weight */
+.nav-tabs .nav-link.active {
+    color: #008b26 !important;
+    font-weight: bold;
+}

@@ -9,11 +9,12 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Frontend\NavbarController;
 use App\Http\Controllers\Frontend\UserProfileController;
 use App\Http\Controllers\Frontend\FrontendFunctionRoomBookingController;
+use App\Http\Controllers\Frontend\FrontendActivityBookingController;
 use App\Http\Controllers\Frontend\TestMailController;
 use App\Http\Controllers\Backend\AdminAuthController;
-use App\Http\Controllers\Backend\DashboardController;
+use App\Http\Controllers\Frontend\ResidentBookingHistoryController;
 use App\Http\Controllers\Auth\RegisteredUserController;
-
+use App\Http\Controllers\Frontend\GreaseTrapController;
 
 
 use Illuminate\Support\Facades\Route;
@@ -64,20 +65,35 @@ Route::get('/minor-work-permit', [NavbarController::class, 'minorWorkPermit'])->
 //Work Permit
 Route::post('/submit-minor-work-permit', [UserWorkPermitController::class, 'submitMinorWorkPermit'])->middleware(['auth'])->name('submit.minor.work.permit');
 Route::get('/forms', [NavbarController::class, 'getAllDownloads'])->name('downloads');
-
-
-
-
 route::get('/request-electricity/{unitNo}/{year}/{month}', [ProfileController::class, 'requestElectricity'])->name('request.electricity');
 
-//Booking
+
+
+
+//Amenity/Activity Booking
 Route::get('/booking/list', [FrontendFunctionRoomBookingController::class, 'list'])->name('booking.list');
 Route::get('/booking/{type}/{id}', [FrontendFunctionRoomBookingController::class, 'fullDetails'])
     ->name('booking.full.details');
+Route::get('/booking-activity/{type}/{activity_id}', [FrontendFunctionRoomBookingController::class, 'fullDetailsActivity'])
+    ->name('booking.full.details.activity');
+
 Route::get('/check-unit-tenant/{unitNo}', [FrontendFunctionRoomBookingController::class, 'checkUnitTenant']);
 
+Route::post('/activity-new-booking', [FrontendActivityBookingController::class, 'ActivityNewBooking'])->name('activities.new.booking');
+Route::get('/fetch-blocked-dates', [FrontendActivityBookingController::class, 'fetchBlockDates'])->name('DateBlocking');
+Route::get('/check-unit-frontend', [FrontendActivityBookingController::class, 'checkUnitBooking'])->name('checkUnitBookingFront');
 
-// Route::get('/downloads', [NavbarController::class, 'getAllDownloads'])->middleware(['auth'])->name('downloads');Residence
+Route::get('/fetch-available-times-user', [FrontendActivityBookingController::class, 'fetchAvailableTimesUser']);
+Route::get('/fetch-end-times-user', [FrontendActivityBookingController::class, 'fetchEndTimesUser']);
+Route::get('/fetch-available-slots-user', [FrontendActivityBookingController::class, 'fetchAvailableSlotsUser']);
+Route::get('/resident/activity-booking/details/{id}', [FrontendActivityBookingController::class, 'getActivityBookingDetails'])
+    ->name('resident.activity.bookings.details');
+
+Route::post('/resident/activity-booking/cancel/{booking}', [FrontendActivityBookingController::class, 'cancelAmenityBooking'])
+    ->name('activity-booking.cancel');
+Route::get('/amenity-booking-details/{id}', [FrontendActivityBookingController::class, 'showAmenityBookingDetails'])
+    ->name('show.amenity.booking.details');
+
 Route::get('/check-auth', function () {
     return response()->json([
         'authenticated' => Auth::check()
@@ -92,16 +108,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    //SOA
     Route::get('/profile/soa', [ProfileController::class, 'soa'])->name('soa');
-    Route::get('/request-soa', [ProfileController::class, 'Reqsoa'])->name('request.soa');
+    // Route::get('/request-soa', [ProfileController::class, 'Reqsoa'])->name('request.soa');
     Route::post('/generate-soa', [ProfileController::class, 'GenerateSoa'])->name(name: 'generate.soa');
     Route::get('/soa/view/{token}', [ProfileController::class, 'view']);
+
+
+    Route::get('/resident-booking-history', [ResidentBookingHistoryController::class, 'ResidentsBookingHistory'])
+        ->name('resident.booking.history');
 
 
 
     // Function Room Booking
     Route::post('/booking/store', [FrontendFunctionRoomBookingController::class, 'store'])->name('booking.store');
-    Route::get('/booking-details/{booking}', [FrontendFunctionRoomBookingController::class, 'showFunctionRoomBookingDetails'])
+    Route::get('/booking-details/{id}', [FrontendFunctionRoomBookingController::class, 'showFunctionRoomBookingDetails'])
         ->name('show.functionroom.booking.details');
     Route::get('/function-room/{id}/booked-dates', [FrontendFunctionRoomBookingController::class, 'getFunctionRoomBookedDates']);
     Route::get('/view-function-room-bookings/{id}/details', [FrontendFunctionRoomBookingController::class, 'getFunctionRoomBookingDetails'])
@@ -124,6 +145,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('notifications.read')->middleware('auth');
     Route::post('/booking/{id}/cancel', [FrontendFunctionRoomBookingController::class, 'cancel'])->name('booking.cancel');
 
+
+    //Grease Trap Booking
+    Route::get('/grease-trap-booking', [GreaseTrapController::class, 'greeseTrap'])->name('grease.trap.booking');
+    Route::post('/grease-trap-booking/store', [GreaseTrapController::class, 'storeGreaseTrapBooking'])->name('grease.trap.booking.store');
+    Route::get('/grease-trap/booked-slots', [GreaseTrapController::class, 'getBookedSlots'])
+        ->name('grease.trap.booked.slots');
 });
 
 Route::middleware('web')

@@ -202,6 +202,7 @@ $(document).ready(function () {
             $('#editFunctionRoomDiscount').val(data.discount);
             $('#editFunctionRoomCapacity').val(data.function_room_capacity);
             $('#editFunctionRoomDescription').val(data.function_room_description);
+            $('#editFunctionRoomShortDescription').val(data.function_room_short_description);
             $('#editFunctionRoomPolicy').val(data.function_room_policy);
             $('#editFunctionRoomId').val(info_id);
 
@@ -552,6 +553,7 @@ $(document).ready(function () {
                     var function_room_name = functionRoom.function_room_name ? functionRoom.function_room_name.toUpperCase() : 'N/A';
                     var function_room_rate = functionRoom.function_room_rate ? functionRoom.function_room_rate : 'N/A';
                     var function_room_capacity = functionRoom.function_room_capacity ? functionRoom.function_room_capacity : 'N/A';
+                    var function_room_short_description = functionRoom.function_room_short_description ? functionRoom.function_room_short_description.toUpperCase() : 'N/A';
                     var function_room_description = functionRoom.function_room_description ? functionRoom.function_room_description.toUpperCase() : 'N/A';
                     var function_room_policy = functionRoom.function_room_policy ? functionRoom.function_room_policy : 'N/A';
                     var function_room_360 = functionRoom.function_room_360
@@ -582,6 +584,7 @@ $(document).ready(function () {
                                     <td>${function_room_rate}</td>
                                     <td>${discountDisplay}</td>
                                     <td>${function_room_capacity}</td>
+                                    <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${function_room_short_description}</td>
                                     <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${function_room_description}</td>
                                     <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${function_room_policy}</td>
                                     <td style="vertical-align: middle;">${function_room_360}</td>
@@ -601,5 +604,5 @@ $(document).ready(function () {
         });
     }
 
-  
+
 });

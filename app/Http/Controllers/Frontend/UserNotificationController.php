@@ -30,9 +30,12 @@ class UserNotificationController extends Controller
         $notification = auth()->user()->notifications()->findOrFail($id);
         $notification->markAsRead();
 
-        // Redirect to related page (e.g., booking details)
         if (isset($notification->data['booking_id'])) {
-            return redirect()->route('show.functionroom.booking.details', $notification->data['booking_id']);
+            $route = $notification->data['type'] === 'amenity'
+                ? route('show.amenity.booking.details', $notification->data['booking_id'])
+                : route('show.functionroom.booking.details', $notification->data['booking_id']);
+
+            return redirect($route);
         }
 
         return redirect()->route('notifications.index');

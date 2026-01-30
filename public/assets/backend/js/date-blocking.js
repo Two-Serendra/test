@@ -1,3 +1,4 @@
+
 $(document).ready(function () {
     $('.AddFunctionRoomDateBlocking').on('click', function () {
         $('#AddDateBlockingFunctionRoom').modal('show');

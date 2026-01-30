@@ -128,7 +128,7 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/search-booking', [ActivitiesController::class, 'searchBooking'])->name('admin.search.booking');
     Route::post('/admin-new-booking', [ActivitiesController::class, 'AdminNewBookingActivities'])->name('admin.new.booking.activities');
     Route::get('/fetch-all-slots-admin', [ActivitiesController::class, 'fetchAllSlotsAdmin'])->name('fetchAllSlotsAdmin');
-    Route::get('/fetch-blocked-dates', [ActivitiesController::class, 'fetchBlockDates'])->name('DateBlocking');
+    Route::get('/activity-fetch-blocked-dates', [ActivitiesController::class, 'fetchBlockDates'])->name('ActivityDateBlocking');
     Route::get('/fetch-available-times', [ActivitiesController::class, 'fetchAvailableTimes']);
     Route::get('/fetch-end-times', [ActivitiesController::class, 'fetchEndTimes']);
     Route::get('/fetch-available-slots', [ActivitiesController::class, 'fetchAvailableSlots'])->name('fetchAvailableSlots');

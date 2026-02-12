@@ -223,7 +223,7 @@ Route::middleware('auth:admin')->group(function () {
         ->name('admin.grease.trap.booked.slots');
     Route::get('/admin-get-updated-grease-trap-table', [GreaseTrapBookingController::class, 'getUpdatedGreaseTrapTable']);
     Route::post('/admin-grease-trap-booking/cancel/{booking}', [GreaseTrapBookingController::class, 'CancelGreaseTrapBookingAdmin'])
-        ->name('grease.trap.booking.cancel');
+        ->name('admin.grease.trap.booking.cancel');
     Route::post('/admin/grease-trap/emergency-booking/store', [GreaseTrapBookingController::class, 'AdminStoreEmergencyGreaseTrapBooking'])->name('admin.grease.trap.emergency.booking.store');
     Route::get('/admin-fetch-grease-trap-booking/{id}', [GreaseTrapBookingController::class, 'fetchGreaseTrapBooking'])->name('admin.fetch.grease.trao.booking');
     Route::post('/admin/grease-trap/booking/update', [GreaseTrapBookingController::class, 'AdminUpdateGreaseTrapBooking'])->name('admin.grease.trap.booking.update');

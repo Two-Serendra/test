@@ -47,7 +47,7 @@
                                     $isPast = $bookingDateTime ? $bookingDateTime->lt(now()) : false;
                                 @endphp
 
-                                @if ($b->booking_status == 0)
+                                @if ($b->booking_status == 2)
                                     <span class="badge bg-danger badge-forge">Cancelled</span>
                                 @elseif ($b->booking_status == 1 && $isPast)
                                     <span class="badge bg-success badge-forge">Completed</span>

@@ -40,11 +40,11 @@
                         class="nav-item nav-link {{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a>
                 </div>
 
-                <!-- <div class="ms-auto">
+                <div class="ms-auto">
                     <a href="{{ route('booking.list') }}" class="btn btn-primary custom-btn">Book Now</a>
-                </div> -->
+                </div>
 
-                <!-- @auth
+                @auth
                     <div class="nav-item dropdown ms-3 mt-2 mt-lg-0">
                         <a href="#"
                             class="nav-link dropdown-toggle d-flex align-items-center justify-content-center position-relative"
@@ -69,8 +69,10 @@
                             @forelse(auth()->user()->notifications->take(5) as $notification)
                                 @php
                                     $bookingId = $notification->data['booking_id'] ?? null;
+                                    // $message = \Illuminate\Support\Str::limit($notification->data['message'] ?? 'New notification', 80);
+                                    // $url = $bookingId ? route('show.functionroom.booking.details', $bookingId) : '#';
                                     $message = \Illuminate\Support\Str::limit($notification->data['message'] ?? 'New notification', 80);
-                                    $url = $bookingId ? route('show.functionroom.booking.details', $bookingId) : '#';
+                                    $url = route('notifications.show', $notification->id);
                                 @endphp
 
                                 <a href="{{ $url }}"
@@ -91,9 +93,9 @@
 
                         </div>
                     </div>
-                @endauth -->
+                @endauth
 
-                <!-- <div class="nav-item dropdown ms-3 mt-2 mt-lg-0">
+                <div class="nav-item dropdown ms-3 mt-2 mt-lg-0">
                     <a href="#" class="nav-link dropdown-toggle d-flex align-items-center justify-content-center"
                         id="userDropdown" role="button" data-bs-toggle="dropdown"
                         style="width: 40px; height: 40px; background-color: #008b26; border-radius: 50%; color: white;">
@@ -110,7 +112,7 @@
                             </a>
 
                             <a href="{{ route('resident.booking.history') }}" class="dropdown-item">
-                               <i class='bx bx-calendar me-2'></i> Bookings
+                                <i class='bx bx-calendar me-2'></i> Bookings
                             </a>
 
                             <form method="POST" action="{{ route('logout') }}">
@@ -126,7 +128,7 @@
                             </a>
                         @endauth
                     </div>
-                </div> -->
+                </div>
             </div>
         </nav>
     </div>

@@ -220,7 +220,7 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/admin/grease-trap/booking/store', [GreaseTrapBookingController::class, 'AdminStoreGreaseTrapBooking'])->name('admin.grease.trap.booking.store');
 
     Route::get('/grease-trap/booked-slots', [GreaseTrapBookingController::class, 'getBookedSlotsAdmin'])
-        ->name('grease.trap.booked.slots');
+        ->name('admin.grease.trap.booked.slots');
     Route::get('/admin-get-updated-grease-trap-table', [GreaseTrapBookingController::class, 'getUpdatedGreaseTrapTable']);
     Route::post('/admin-grease-trap-booking/cancel/{booking}', [GreaseTrapBookingController::class, 'CancelGreaseTrapBookingAdmin'])
         ->name('grease.trap.booking.cancel');

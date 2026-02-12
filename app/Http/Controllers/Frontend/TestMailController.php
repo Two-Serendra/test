@@ -28,8 +28,8 @@ class TestMailController extends Controller
         $fromKey = $validated['from_email'];
 
         $senderMap = [
-            'circulars' => ['from' => 'circulars@twoserendra.com', 'name' => 'Two Serendra'],
-            'finance' => ['from' => 'finance@twoserendra.com', 'name' => 'Two Serendra'],
+            'circulars' => ['from' => 'circulars@twoserendra.com', 'name' => '2S Circulars'],
+            'finance' => ['from' => 'finance@twoserendra.com', 'name' => '2S Billing Assistance Finance'],
         ];
 
         $fromEmail = $senderMap[$fromKey]['from'];

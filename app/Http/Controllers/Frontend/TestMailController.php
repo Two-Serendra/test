@@ -29,7 +29,7 @@ class TestMailController extends Controller
 
         $senderMap = [
             'circulars' => ['from' => 'circulars@twoserendra.com', 'name' => '2S Circulars'],
-            'finance' => ['from' => 'finance@twoserendra.com', 'name' => '2S Billing Assistance Finance'],
+            'finance' => ['from' => 'finance@twoserendra.com', 'name' => '2S Billing Assistant Finance'],
         ];
 
         $fromEmail = $senderMap[$fromKey]['from'];

@@ -25,7 +25,7 @@
 
         @roles(1)
         <li class="menu-header small text-uppercase"><span class="menu-header-text">Booking</span></li>
-        <li class="menu-item">
+        <!-- <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-file"></i>
                 <div data-i18n="Form Elements">Work Permit</div>
@@ -43,7 +43,7 @@
                     </a>
                 </li>
             </ul>
-        </li>
+        </li> -->
         @endroles
 
 
@@ -92,6 +92,7 @@
             </ul>
         </li>
         @endroles
+
 
         @roles(1, 2, 3, 5, 6, 7, 8)
         <li class="menu-item">
@@ -187,7 +188,29 @@
                 </li>
             </ul>
         </li> -->
+        @roles(1, 6)
+        <li class="menu-item">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-wrench"></i>
+                <div data-i18n="Form Elements">Grease Trap</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('admin.booking.grease.trap') ? 'active' : '' }}">
+                    <a href="{{ route('admin.booking.grease.trap') }}" class="menu-link">
+                        <div data-i18n="Typography">Booking</div>
+                    </a>
+                </li>
+            </ul>
 
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('admin.booking.grease.trap.calendar') ? 'active' : '' }}">
+                    <a href="{{ route('admin.booking.grease.trap.calendar') }}" class="menu-link">
+                        <div data-i18n="Typography">Calendar</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        @endroles
 
         <!-- Manage -->
         @roles(1)

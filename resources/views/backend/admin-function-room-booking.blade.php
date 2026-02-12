@@ -63,7 +63,7 @@
                                 class="form-control" placeholder="Transaction/Unit/Name" autocomplete="off">
                         </div>
                     </form>
-                    @if(in_array(auth()->user()->role_id, [1, 7]))
+                    @if(in_array(auth()->user()->role_id, [1, 6]))
                             <div class="">
                                 <button type="button" class="btn btn-primary badge AdminAddFunctionRoomBooking"
                                     id="addFunctionRoom">
@@ -175,7 +175,7 @@
                                 {{-- Booking Info --}}
                                 <td>{{ $booking->transaction_no }}</td>
                                 <td>{{ $booking->unit_no }}</td>
-                                <td>{{ $booking->user->name }}</td>
+                                <td>{{ $booking->user->name ?? 'N/A' }}</td>
                                 <td> @if($booking->resident_type === 'TENANT')
                                     <span class="badge bg-danger">TENANT</span>
                                 @elseif($booking->resident_type === 'OWNER')
@@ -591,5 +591,7 @@
 
     @include('backend.modal.admin-view-function-room-booking-details-modal')
     @include('backend.modal.admin-edit-function-room-booking-details-modal')
+    @include('backend.modal.admin-new-function-room-booking-modal')
+
 
 @endsection

@@ -8,7 +8,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Broadcasting\PrivateChannel;
-class UserAmenityBookingBellNotification extends Notification implements ShouldQueue, ShouldBroadcast
+class UserGreaseTrapBookingBellNotification extends Notification implements ShouldQueue, ShouldBroadcast
 {
     use Queueable;
 
@@ -27,10 +27,8 @@ class UserAmenityBookingBellNotification extends Notification implements ShouldQ
     public function toArray($notifiable)
     {
         $statusMessage = match ($this->booking->booking_status) {
-            1 => "Your Amenity booking has been confirmed.",
-            2 => "Your Amenity booking has been cancelled.",
-            3 => "Your booking for Amenity has been cancelled. ₱1000 penalty will be applied.",
-            default => "Booking status updated.",
+            1 => "Your grease trap booking has been confirmed.",
+            2 => "Your grease trap booking has been cancelled.",
         };
 
         return [
@@ -38,8 +36,7 @@ class UserAmenityBookingBellNotification extends Notification implements ShouldQ
             'message' => $statusMessage,
             'booking_id' => $this->booking->id,
             'status' => $this->booking->booking_status,
-            'type' => 'amenity',
-        ]; 
+        ];
     }
 
     public function broadcastOn()

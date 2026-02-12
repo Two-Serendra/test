@@ -203,7 +203,8 @@ $(document).ready(function () {
             $('#editFunctionRoomCapacity').val(data.function_room_capacity);
             $('#editFunctionRoomDescription').val(data.function_room_description);
             $('#editFunctionRoomShortDescription').val(data.function_room_short_description);
-            $('#editFunctionRoomPolicy').val(data.function_room_policy);
+            // $('#editFunctionRoomPolicy').val(data.function_room_policy);
+            $('#editFunctionRoomPolicy').summernote('code', data.function_room_policy);
             $('#editFunctionRoomId').val(info_id);
 
             let container = $('#editImagePreviewContainer');

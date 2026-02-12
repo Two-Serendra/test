@@ -118,7 +118,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/resident-booking-history', [ResidentBookingHistoryController::class, 'ResidentsBookingHistory'])
         ->name('resident.booking.history');
 
+    //Grease Trap Booking
 
+    Route::get('/grease-trap-booking', [GreaseTrapController::class, 'greeseTrap'])->name('grease.trap.booking');
+    Route::post('/grease-trap-booking/store', [GreaseTrapController::class, 'storeGreaseTrapBooking'])->name('grease.trap.booking.store');
+    Route::get('/grease-trap/booked-slots', [GreaseTrapController::class, 'getBookedSlots'])
+        ->name('grease.trap.booked.slots');
+    Route::post('/grease-trap-booking/cancel/{booking}', [GreaseTrapController::class, 'CancelGreaseTrapBooking'])
+        ->name('grease.trap.booking.cancel');
+    Route::get('/grease-trap-booking-details/{id}', [GreaseTrapController::class, 'showGreaseTrapBookingDetails'])
+        ->name('show.grease.trap.booking.details');
 
     // Function Room Booking
     Route::post('/booking/store', [FrontendFunctionRoomBookingController::class, 'store'])->name('booking.store');
@@ -147,10 +156,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
     //Grease Trap Booking
-    Route::get('/grease-trap-booking', [GreaseTrapController::class, 'greeseTrap'])->name('grease.trap.booking');
-    Route::post('/grease-trap-booking/store', [GreaseTrapController::class, 'storeGreaseTrapBooking'])->name('grease.trap.booking.store');
-    Route::get('/grease-trap/booked-slots', [GreaseTrapController::class, 'getBookedSlots'])
-        ->name('grease.trap.booked.slots');
+
 });
 
 Route::middleware('web')

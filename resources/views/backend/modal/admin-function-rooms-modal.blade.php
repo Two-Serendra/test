@@ -192,23 +192,33 @@
                                 <div class="invalid-feedback">Required</div>
                             </div>
 
+                            <!-- <div class="mb-3">
+                                <label for="editFunctionRoomDescription" class="form-label">Short Description *</label>
+                                <textarea class="form-control" id="editFunctionRoomShortDescription"
+                                    name="function_room_short_description" rows="5" required></textarea>
+                                <div class="invalid-feedback">Required</div>
+                            </div> -->
+
                             <div class="mb-3">
                                 <label for="editFunctionRoomDescription" class="form-label">Description *</label>
                                 <textarea class="form-control" id="editFunctionRoomDescription"
-                                    name="function_room_description" required></textarea>
+                                    name="function_room_description"  rows="5" required></textarea>
                                 <div class="invalid-feedback">Required</div>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="editFunctionRoomPolicy" class="form-label">Policy *</label>
-                                <textarea class="form-control" id="editFunctionRoomPolicy" name="function_room_policy"
-                                    required></textarea>
-                                <div class="invalid-feedback">Required</div>
-                            </div>
+
                         </div>
 
                         <!-- Right Column -->
                         <div class="col-md-6">
+
+                            <div class="mb-3">
+                                <label for="editFunctionRoomPolicy" class="form-label">Policy *</label>
+                                <textarea class="form-control" id="editFunctionRoomPolicy" name="function_room_policy"
+                                     rows="5" required></textarea>
+                                <div class="invalid-feedback">Required</div>
+                            </div>
+
                             <div class="mb-3">
                                 <label for="editFunctionRoomImage" class="form-label">Replace Images (Max 4)
                                     (Optional)</label>

@@ -108,7 +108,7 @@
                                 <p class="text-muted mb-3" style="font-size: 0.9rem;">
                                     Discount valid until
                                     <!-- <strong>{{ \Carbon\Carbon::parse($item->discount_start)->format('M d, Y') }}</strong>
-                                                                                    to -->
+                                                                                            to -->
                                     <strong>{{ \Carbon\Carbon::parse($item->discount_end)->format('M d, Y') }}</strong>
                                 </p>
 
@@ -162,10 +162,10 @@
                 @if($type === 'function_room')
 
                     <div class="mb-3">
-                        <h6 class="fw-semibold ">Policy</h6>
-                        <p class="text-muted text-justified ">
-                            {{ $item->function_room_policy ?? 'No policy information available.' }}
-                        </p>
+                        <h6 class="fw-semibold">Policy</h6>
+                        <div class="text-muted text-justified">
+                            {!! $item->function_room_policy ?? 'No policy information available.' !!}
+                        </div>
                     </div>
                 @else
                     <div>
@@ -188,10 +188,10 @@
                 <h5 class="fw-bold mb-4">
                     You may also like
                     <!-- @if($type === 'function_room')
-                                                                                                                                Function Rooms
-                                                                                                                            @else
-                                                                                                                                Amenities
-                                                                                                                            @endif -->
+                                                                                                                                        Function Rooms
+                                                                                                                                    @else
+                                                                                                                                        Amenities
+                                                                                                                                    @endif -->
                 </h5>
                 <div class="row z-1 position-relative">
                     @foreach($suggestions as $suggestion)
@@ -259,7 +259,6 @@
             opacity: 0.85;
             border: 2px solid #007bff;
         }
-
     </style>
 
     @include('frontend.modal.360-modal-view')

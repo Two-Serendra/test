@@ -6,13 +6,8 @@
             <!-- Filter Sidebar (No Card) -->
             <div class="col-md-3 mb-4">
                 <h5 class="mb-3">Filter By</h5>
-                <form method="GET" action="{{ route('booking.list') }}">
-                    <!-- <div class="form-check mb-2">
-                                                            <input class="form-check-input" type="radio" name="category" id="category_all"
-                                                                   value="" {{ $category == '' ? 'checked' : '' }} onchange="this.form.submit()">
-                                                            <label class="form-check-label" for="category_all">All</label>
-                                                        </div> -->
 
+                <form method="GET" action="{{ route('booking.list') }}">
                     <div class="form-check mb-2">
                         <input class="form-check-input" type="radio" name="category" id="category_function_room"
                             value="function_room" {{ $category == 'function_room' ? 'checked' : '' }}
@@ -20,10 +15,17 @@
                         <label class="form-check-label" for="category_function_room">Function Rooms</label>
                     </div>
 
-                    <div class="form-check">
+                    <div class="form-check mb-2">
                         <input class="form-check-input" type="radio" name="category" id="category_amenity" value="amenity"
                             {{ $category == 'amenity' ? 'checked' : '' }} onchange="this.form.submit()">
                         <label class="form-check-label" for="category_amenity">Amenities</label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="category" id="category_grease_trap"
+                            value="grease_trap" {{ $category == 'grease_trap' ? 'checked' : '' }}
+                            onchange="this.form.submit()">
+                        <label class="form-check-label" for="category_grease_trap">Grease Trap</label>
                     </div>
                 </form>
             </div>
@@ -31,10 +33,17 @@
             <!-- Items Display -->
             <div class="col-md-9">
                 <h5 class="mb-4">
+                    @php
+                        $category = $category ?? 'function_room';
+                    @endphp
+
                     @if($category == 'function_room')
                         Function Rooms
                     @elseif($category == 'amenity')
                         Amenities
+
+                    @elseif($category == 'grease_trap')
+                        Grease Trap
                     @else
                         All (Function Rooms & Amenities)
                     @endif
@@ -42,8 +51,21 @@
 
                 <div class="row">
 
+                    @if($category === 'grease_trap')
+                        @auth
+                            <div class="col-12">
+                                @include('frontend.grease-trap-booking')
+                            </div>
+                        @else
+                            <script>
+                                window.location.href = "{{ route('login', ['redirect' => route('grease.trap.booking')]) }}";
+                            </script>
+                        @endauth
+                    @endif
+
+
                     {{-- FUNCTION ROOMS --}}
-                    @if($category !== 'amenity')
+                    @if($category === 'function_room')
                         @foreach($items->where('type', 'function_room') as $item)
                             <div class="col-md-4 mb-4">
                                 <a href="{{ route('booking.full.details', ['type' => 'function_room', 'id' => $item->id]) }}"
@@ -97,7 +119,8 @@
                     @if($category === 'amenity')
                         @forelse($items as $activity)
                             <div class="col-md-4 mb-4">
-                                <a href="{{ route('booking.full.details.activity', ['type' => 'amenity', 'activity_id' => $activity->id]) }}">
+                                <a
+                                    href="{{ route('booking.full.details.activity', ['type' => 'amenity', 'activity_id' => $activity->id]) }}">
                                     <div class="card h-100 shadow-lg border-0 hover-card position-relative">
                                         <img src="{{ asset('assets/images/activities/' . $activity->activity_image) }}"
                                             class="card-img-top" style="height: 200px; object-fit: cover;"
@@ -122,7 +145,6 @@
             </div>
         </div>
     </div>
-
 @endsection
 {{-- Styles for Card Emphasis --}}
 <style>

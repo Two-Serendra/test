@@ -35,6 +35,8 @@ class FrontendFunctionRoomBookingController extends Controller
     public function list(Request $request)
     {
         $category = $request->get('category', 'function_room');
+        $items = collect();        // default
+        $residences = collect();
 
         if ($category === 'function_room') {
             $items = FunctionRoom::with(['firstImage', 'discounts'])
@@ -65,6 +67,17 @@ class FrontendFunctionRoomBookingController extends Controller
                     $item->type = 'amenity';
                     return $item;
                 });
+
+        } elseif ($category === 'grease_trap') {
+
+            $residences = auth()->check()
+                ? DB::table('resident_details')
+                    ->where('email', auth()->user()->email)
+                    ->select('id', 'unit_no', 'resident_type')
+                    ->get()
+                : collect();
+            $items = collect();
+
         } else {
             $functionRooms = FunctionRoom::with(['firstImage', 'discounts'])
                 ->get()
@@ -100,7 +113,8 @@ class FrontendFunctionRoomBookingController extends Controller
 
         return view('frontend.booking-list', [
             'items' => $items,
-            'category' => $category
+            'category' => $category,
+            'residences' => $residences
         ]);
     }
 

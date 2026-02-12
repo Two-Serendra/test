@@ -51,7 +51,7 @@
                     <tbody>
                         @if($activities->isEmpty())
                             <tr>
-                                <td colspan="11" class="text-center">No Records Found</td>
+                                <td colspan="11" class="text-center">Test No Records Found</td>
                             </tr>
                         @else
                             @foreach ($activities as $activity)

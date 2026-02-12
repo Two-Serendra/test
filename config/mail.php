@@ -94,6 +94,15 @@ return [
                 'postmark',
             ],
         ],
+
+        'concierge' => [
+            'transport' => 'smtp',
+            'host' => 'smtp.office365.com',
+            'port' => 587,
+            'encryption' => 'tls',
+            'username' => env('MAIL_CONCIERGE_USERNAME'),
+            'password' => env('MAIL_CONCIERGE_PASSWORD'),
+        ],
     ],
 
     /*

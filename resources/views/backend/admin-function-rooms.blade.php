@@ -35,6 +35,7 @@
                             <th class="table-custom">Rate /hr</th>
                             <th class="table-custom">Discount</th>
                             <th class="table-custom">Capacity</th>
+                            <th class="table-custom">Short Desc</th>
                             <th class="table-custom">Description</th>
                             <th class="table-custom">Policy</th>
                             <th class="table-custom">360</th>
@@ -64,10 +65,13 @@
                                     </td>
                                     <td>{{ strtoupper($functionRoom->function_room_capacity ?: 'N/A') }}</td>
                                     <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        {{ strtoupper($functionRoom->function_room_short_description ?: 'N/A') }}
+                                    </td>
+                                    <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                         {{ strtoupper($functionRoom->function_room_description ?: 'N/A') }}
                                     </td>
                                     <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                        {{ strtoupper($functionRoom->function_room_policy ?: 'N/A') }}
+                                        {!! Str::limit(strip_tags($functionRoom->function_room_policy ?: 'N/A'), 100, '...') !!}
                                     </td>
 
 
@@ -150,5 +154,20 @@
     </div>
 
     @include('backend.modal.admin-function-rooms-modal')
+
+    @push('scripts')
+        <script>
+            $(document).ready(function () {
+                $('#functionRoomPolicy').summernote({
+                    height: 300,
+                    placeholder: 'Enter function room policy here...'
+                });
+                $('#editFunctionRoomPolicy').summernote({
+                    height: 300,
+                    placeholder: 'Enter function room policy here...'
+                });
+            });
+        </script>
+    @endpush
 
 @endsection

@@ -4,13 +4,16 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Notifications\UserAmenityBookingBellNotification;
+use App\Notifications\UserFunctionRoomBookingBellNotification;
+use App\Notifications\UserGreaseTrapBookingBellNotification;
 
 class UserNotificationController extends Controller
 {
-    public function index()
-    {
-        return view('notifications.index');
-    }
+    // public function index()
+    // {
+    //     return view('frontend.booking-list');
+    // }
 
     // public function show($id)
     // {
@@ -27,18 +30,33 @@ class UserNotificationController extends Controller
 
     public function show($id)
     {
+
         $notification = auth()->user()->notifications()->findOrFail($id);
         $notification->markAsRead();
 
-        if (isset($notification->data['booking_id'])) {
-            $route = $notification->data['type'] === 'amenity'
-                ? route('show.amenity.booking.details', $notification->data['booking_id'])
-                : route('show.functionroom.booking.details', $notification->data['booking_id']);
+        $bookingId = $notification->data['booking_id'] ?? null;
 
-            return redirect($route);
+        if (!$bookingId) {
+            return redirect()->route('home');
         }
 
-        return redirect()->route('notifications.index');
+        return match ($notification->type) {
+
+            UserAmenityBookingBellNotification::class
+            => redirect()->route('show.amenity.booking.details', $bookingId),
+
+            UserFunctionRoomBookingBellNotification::class
+            => redirect()->route('show.functionroom.booking.details', $bookingId),
+
+            UserGreaseTrapBookingBellNotification::class
+            => redirect()->route('show.grease.trap.booking.details', $bookingId),
+
+
+            //    UserOtherBookingBellNotification::class
+            //     => redirect()->route('show.other.booking.details', $bookingId),
+
+            default => redirect()->route('home'),
+        };
     }
 
 

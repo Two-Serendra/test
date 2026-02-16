@@ -12,7 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class GreaseTrapBookingCreated implements ShouldBroadcast
+class GreaseTrapBookingCancellation implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -40,6 +40,6 @@ class GreaseTrapBookingCreated implements ShouldBroadcast
 
     public function broadcastAs()
     {
-        return 'GreaseTrapBookingCreated';
+        return 'GreaseTrapBookingCancellation';
     }
 }

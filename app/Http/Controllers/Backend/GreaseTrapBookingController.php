@@ -355,7 +355,7 @@ class GreaseTrapBookingController extends Controller
          'booking_time_slot' => $schedule->booking_time_slot,
          'transaction_no' => $schedule->transaction_no,
          'srf_no' => $schedule->srf_no ?? 'N/A',
-
+         'charged_type' => $schedule->charged_type,
       ]);
    }
 

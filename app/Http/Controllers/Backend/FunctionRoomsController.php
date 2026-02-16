@@ -38,7 +38,7 @@ class FunctionRoomsController extends Controller
             $file360->move($destination360, $fileName360);
         } else {
             $fileName360 = null;
-        }
+        } 
 
         $functionRoom = FunctionRoom::create([
             'function_room_section' => $request->function_room_section,

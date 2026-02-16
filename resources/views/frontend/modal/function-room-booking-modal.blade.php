@@ -18,7 +18,7 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-lg-7 border-end pe-4">
-                            <div class="row g-3 mb-4">
+                            <div class="row g-3 mb-">
                                 <div class="col-md-6">
                                     <label class="form-label">Select Residence <span class="required">*</span></label>
                                     <select id="residentSelect" name="resident_email_id" class="form-select" required>
@@ -41,6 +41,7 @@
                                             id="functionRoomBookingDate" name="function_room_booking_date" required>
                                     </div>
                                 </div>
+
 
                                 <div class="col-md-6">
                                     <label class="form-label">Purpose of Event <span class="required">*</span></label>
@@ -72,7 +73,15 @@
                                 <div class="col-md-6">
                                     <label class="form-label">Contact Number <span class="required">*</span></label>
                                     <input type="number" class="form-control" name="contact_number" required>
+
                                 </div>
+
+                                <div class="col-md-12 d-flex align-items-center mb-2">
+                                    <div id="linkedRoomContainer"></div>
+                                    
+                                </div>
+
+
                             </div>
 
                             <label class="form-label">Payment Mode <span class="required">*</span></label>

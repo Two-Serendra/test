@@ -15,7 +15,7 @@ use App\Http\Controllers\Backend\AdminAuthController;
 use App\Http\Controllers\Frontend\ResidentBookingHistoryController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Frontend\GreaseTrapController;
-
+use App\Http\Controllers\Frontend\PestControlController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -102,24 +102,27 @@ Route::get('/check-auth', function () {
 Route::post('/send', [ContactController::class, 'send'])
     ->name('contact.send')
     ->middleware('throttle:5,1');
+
+//SOA
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/profile/soa', [ProfileController::class, 'soa'])->name('soa');
+});
+
+// Route::get('/request-soa', [ProfileController::class, 'Reqsoa'])->name('request.soa');
+Route::post('/generate-soa', [ProfileController::class, 'GenerateSoa'])->name(name: 'generate.soa');
+Route::get('/soa/view/{token}', [ProfileController::class, 'view']);
+
+
+Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    //SOA
-    Route::get('/profile/soa', [ProfileController::class, 'soa'])->name('soa');
-    // Route::get('/request-soa', [ProfileController::class, 'Reqsoa'])->name('request.soa');
-    Route::post('/generate-soa', [ProfileController::class, 'GenerateSoa'])->name(name: 'generate.soa');
-    Route::get('/soa/view/{token}', [ProfileController::class, 'view']);
-
-
     Route::get('/resident-booking-history', [ResidentBookingHistoryController::class, 'ResidentsBookingHistory'])
         ->name('resident.booking.history');
 
     //Grease Trap Booking
-
     Route::get('/grease-trap-booking', [GreaseTrapController::class, 'greeseTrap'])->name('grease.trap.booking');
     Route::post('/grease-trap-booking/store', [GreaseTrapController::class, 'storeGreaseTrapBooking'])->name('grease.trap.booking.store');
     Route::get('/grease-trap/booked-slots', [GreaseTrapController::class, 'getBookedSlots'])
@@ -128,7 +131,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('grease.trap.booking.cancel');
     Route::get('/grease-trap-booking-details/{id}', [GreaseTrapController::class, 'showGreaseTrapBookingDetails'])
         ->name('show.grease.trap.booking.details');
+    Route::get('/resident-booking-reload-table', [GreaseTrapController::class, 'GreaseTrapBookiingTableReload'])->name('grease.trap.booking.table.reload');
 
+    //Pest Control Booking
+    Route::get('/pest-control-booking', [PestControlController::class, 'pestControl'])->name('pest.control.booking');
+    Route::post('/pest-control-booking/store', [PestControlController::class, 'storePestControlBooking'])->name('pest.control.booking.store');
+
+    Route::get('/pest-control/booked-slots', [PestControlController::class, 'getBookedSlotsPestControl'])
+        ->name('pest.control.booked.slots');
+    Route::get('/grease-trap-booking-details/{id}', [PestControlController::class, 'showPestControlBookingDetails'])
+        ->name('show.grease.trap.booking.details');
+
+        
     // Function Room Booking
     Route::post('/booking/store', [FrontendFunctionRoomBookingController::class, 'store'])->name('booking.store');
     Route::get('/booking-details/{id}', [FrontendFunctionRoomBookingController::class, 'showFunctionRoomBookingDetails'])

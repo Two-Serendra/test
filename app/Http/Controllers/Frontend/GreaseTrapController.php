@@ -8,7 +8,10 @@ use App\Mail\ConciergeGreaseTrapBookingConfirmation;
 use App\Mail\UserGreaseTrapBookingCancellation;
 use App\Mail\ConciergeGreaseTrapBookingCancellation;
 use App\Models\GreaseTrapBooking;
+use App\Models\PestControlBooking;
 use App\Models\ResidentDetails;
+use App\Models\FunctionRoomBooking;
+use App\Models\ActivityBooking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -234,7 +237,7 @@ class GreaseTrapController extends Controller
 
                 if (in_array($e->errorInfo[1], [1213, 1205])) {
                     $attempt++;
-                    usleep(100000); 
+                    usleep(100000);
                     continue;
                 }
 
@@ -356,6 +359,54 @@ class GreaseTrapController extends Controller
     {
         $booking = GreaseTrapBooking::with('user')->findOrFail($id);
         return view('frontend.user-grease-trap-booking-details', compact('booking'));
+    }
+    public function GreaseTrapBookiingTableReload(Request $request)
+    {
+        $selectedUnit = $request->unit_no;
+        $bookingType = $request->booking_type ?? 'function_room';
+
+        $bookings = collect();
+
+        switch ($bookingType) {
+            case 'function_room':
+                $bookings = FunctionRoomBooking::with('functionRoom')
+                    ->when($selectedUnit, fn($q) => $q->where('unit_no', $selectedUnit))
+                    ->latest('function_room_booking_date')
+                    ->paginate(5)
+                    ->withQueryString();
+                break;
+
+            case 'amenity':
+                $bookings = ActivityBooking::with('activity')
+                    ->when($selectedUnit, fn($q) => $q->where('unit', $selectedUnit))
+                    ->latest('booking_date')
+                    ->paginate(5)
+                    ->withQueryString();
+                break;
+
+            case 'grease_trap':
+                $bookings = GreaseTrapBooking::when($selectedUnit, fn($q) => $q->where('unit_no', $selectedUnit))
+                    ->latest('booking_date')
+                    ->paginate(5)
+                    ->withQueryString();
+                break;
+
+            case 'pest_control':
+                $bookings = PestControlBooking::when($selectedUnit, fn($q) => $q->where('unit_no', $selectedUnit))
+                    ->latest('booking_date')
+                    ->paginate(5)
+                    ->withQueryString();
+                break;
+        }
+
+        $view = match ($bookingType) {
+            'function_room' => 'frontend.resident-function-room-booking-table',
+            'amenity' => 'frontend.resident-activity-booking-table',
+            'grease_trap' => 'frontend.resident-grease-trap-booking-table',
+            'pest_control' => 'frontend.resident-pest-control-booking-table',
+        };
+
+        return view($view, compact('bookings', 'selectedUnit', 'bookingType'))->render();
     }
 
 

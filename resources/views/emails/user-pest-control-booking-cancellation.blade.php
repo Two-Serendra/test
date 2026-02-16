@@ -13,21 +13,19 @@
                 style="max-width: 180px;">
         </div>
 
-        <h2 style="color: #0056b3;">Hi {{ $name }},</h2>
-
-        <p>Good news! Your booking with <strong>Two Serendra</strong> has been <strong>confirmed</strong>.</p>
+        <h2 style="color:#c0392b;">Your Pest Control Booking Has Been Cancelled</h2>
+        <p>Hi {{ $name }},</p>
+        <p>We regret to inform you that your booking has been cancelled.</p>
+        <h4>Booking Details:</h4>
 
         <p><strong>Transaction No:</strong> {{ $transaction_no }}</p>
-        <p><strong>Function Room(s):</strong> {{ $function_rooms }}</p>
-        <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($date)->format('F d, Y') }}</p>
-        <p><strong>Time:</strong> {{ \Carbon\Carbon::parse($start_time)->format('h:i A') }} -
-            {{ \Carbon\Carbon::parse($end_time)->format('h:i A') }}
-        </p>
-
+        <p><strong>Unit No:</strong> {{ $unit_no }}</p>
+        <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($booking_date)->format('F d, Y') }}</p>
+        <p><strong>Time:</strong> {{ $booking_time_slot }}</p>
         <br>
 
         <p style="margin-top: 30px;">Best regards,</p>
-        <p><strong>Two Serendra Admin Team</strong></p>
+        <p><strong>Two Serendra Concierge Team</strong></p>
     </div>
 </body>
 

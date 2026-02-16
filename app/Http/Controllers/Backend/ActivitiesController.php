@@ -14,7 +14,7 @@ use App\Models\ActivityBooking;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class ActivitiesController extends Controller
+class ActivitiesController extends Controller 
 {
     public function activities(Request $request)
     {
@@ -496,8 +496,6 @@ class ActivitiesController extends Controller
 
                 $activitySpace = $activity->activity_space;
                 $amenityId = $activity->amenity_id;
-
-                // ✅ Fetch existing bookings overlapping with this time for the same amenity
                 $existingBookings = ActivityBooking::where('booking_date', $request->booking_date)
                     ->where('booking_status', 1)
                     ->whereHas('activity', function ($query) use ($amenityId) {
@@ -538,12 +536,11 @@ class ActivitiesController extends Controller
                 }
             }
 
-            // 🔢 Generate transaction number safely
+
             $lastTransaction = ActivityBooking::lockForUpdate()->latest('id')->first();
             $lastNumber = $lastTransaction ? ((int) str_replace('2s-', '', $lastTransaction->transaction_no)) : 0;
-            $newTransactionNo = '2s-' . str_pad($lastNumber + 1, 6, '0', STR_PAD_LEFT);
+            $newTransactionNo = '2SAM-' . str_pad($lastNumber + 1, 6, '0', STR_PAD_LEFT);
 
-            // ✅ Save new bookings
             foreach ($activityIds as $activityId) {
                 for ($i = 0; $i < $selectedCount; $i++) {
                     $newBooking = new ActivityBooking();

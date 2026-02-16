@@ -27,6 +27,13 @@
                             onchange="this.form.submit()">
                         <label class="form-check-label" for="category_grease_trap">Grease Trap</label>
                     </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="category" id="category_pest_control"
+                            value="pest_control" {{ $category == 'pest_control' ? 'checked' : '' }}
+                            onchange="this.form.submit()">
+                        <label class="form-check-label" for="category_pest_control">Pest Control</label>
+                    </div>
                 </form>
             </div>
 
@@ -44,6 +51,10 @@
 
                     @elseif($category == 'grease_trap')
                         Grease Trap
+
+                    @elseif($category == 'pest_control')
+                      Pest Control
+
                     @else
                         All (Function Rooms & Amenities)
                     @endif
@@ -63,6 +74,17 @@
                         @endauth
                     @endif
 
+                    @if($category === 'pest_control')
+                        @auth
+                            <div class="col-12">
+                                @include('frontend.pest-control-booking')
+                            </div>
+                        @else
+                            <script>
+                                window.location.href = "{{ route('login', ['redirect' => route('pest.control.booking')]) }}";
+                            </script>
+                        @endauth
+                    @endif
 
                     {{-- FUNCTION ROOMS --}}
                     @if($category === 'function_room')

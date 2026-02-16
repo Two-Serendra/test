@@ -32,7 +32,7 @@
         @endif
 
         <p style="margin-top: 30px;">Best regards,</p>
-        <p><strong>Two Serendra Admin Team</strong></p>
+        <p><strong>Two Serendra IT Team</strong></p>
     </div>
 </body>
 

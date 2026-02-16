@@ -332,7 +332,7 @@
 
 
                             <div class="mb-3">
-                                <label class="form-label">Resident Type</label>
+                                <label class="form-label"><b>Resident Type</b></label>
                                 <p class="form-control-plaintext" id="display_resident_type_calendar"></p>
                             </div>
 
@@ -349,6 +349,11 @@
                             <div class="mb-2">
                                 <label for="" class="form-label"><b>SRF No</b></label>
                                 <p id="calendar_srf_no" class="form-control-static calendar-value"></p>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label"><b>Charged Type</b></label>
+                                <p class="form-control-plaintext" id="display_charged_type_calendar"></p>
                             </div>
 
                             <div class="mb-2">

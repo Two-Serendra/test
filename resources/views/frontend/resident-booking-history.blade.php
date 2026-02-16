@@ -7,10 +7,11 @@
                 <div class="row g-2 mb-3">
                     <div class="col-md-6">
                         <label class="form-label">Booking Type</label>
-                        <select id="booking_type" class="form-select">
+                        <select id="booking_type" class="form-select" name="booking_type">
                             <option value="function_room" selected>Function Room</option>
                             <option value="amenity">Amenities</option>
-                             <option value="grease_trap">Grease Trap</option>
+                            <option value="grease_trap">Grease Trap</option>
+                            <option value="pest_control">Pest Control</option>
 
                         </select>
                     </div>
@@ -36,8 +37,9 @@
                         @include('frontend.resident-activity-booking-table')
                     @elseif($bookingType === 'grease_trap')
                         @include('frontend.resident-grease-trap-booking-table')
+                    @elseif($bookingType === 'pest_control')
+                        @include('frontend.resident-pest-control-booking-table')
                     @endif
-
 
                 </div>
                 @include('frontend.modal.user-view-function-room-booking-details-modal')

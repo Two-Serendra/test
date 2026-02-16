@@ -8,31 +8,55 @@
             </div>
 
             <div class="card-body">
+                @php $mainBooking = $bookings->first(); @endphp
 
-                <!-- Booking Info -->
                 <div class="border-bottom pb-2 mb-3">
                     <div class="row mb-2">
                         <div class="col-4 fw-bold">Transaction No:</div>
-                        <div class="col-8">{{ $booking->transaction_no }}</div>
+                        <div class="col-8">{{ $mainBooking->transaction_no }}</div>
                     </div>
                     <div class="row mb-2">
                         <div class="col-4 fw-bold">Name:</div>
-                        <div class="col-8">{{ $booking->user->name ?? 'N/A' }}</div>
+                        <div class="col-8">{{ $mainBooking->user->name ?? 'N/A' }}</div>
                     </div>
                     <div class="row mb-2">
                         <div class="col-4 fw-bold">Unit:</div>
-                        <div class="col-8">{{ $booking->unit_no ?? 'N/A' }}</div>
+                        <div class="col-8">{{ $mainBooking->unit_no ?? 'N/A' }}</div>
                     </div>
-                </div>
 
-                <!-- Event Details -->
-                <div class="border-bottom pb-2 mb-3">
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Resident Type:</div>
+                        <div class="col-8">
+                            @if($mainBooking->resident_type === 'TENANT')
+                                <span class="badge badge-forge bg-danger">TENANT</span>
+                            @elseif($mainBooking->resident_type === 'OWNER')
+                                <span class="badge badge-forge bg-primary">OWNER</span>
+                            @else
+                                <span class="badge bg-secondary">{{ $mainBooking->resident_type }}</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Function Room(s):</div>
+                        <div class="col-8">
+                            @foreach($bookings as $b)
+                                <span class="badge bg-primary badge-forge">{{ $b->functionRoom->function_room_name }}</span>
+                            @endforeach
+                        </div>
+                    </div>
+
+
                     <div class="row mb-2">
                         <div class="col-4 fw-bold">Status:</div>
                         <div class="col-8">
-                            @if($booking->booking_status == 0)
+                            @php
+                                $status = $bookings->every(fn($b) => $b->booking_status == 1) ? 1 :
+                                    ($bookings->every(fn($b) => $b->booking_status == 2) ? 2 : 0);
+                            @endphp
+                            @if($status == 0)
                                 <span class="badge badge-forge bg-warning text-light">Waiting</span>
-                            @elseif($booking->booking_status == 1)
+                            @elseif($status == 1)
                                 <span class="badge badge-forge bg-success">Confirmed</span>
                             @else
                                 <span class="badge badge-forge bg-danger">Cancelled</span>
@@ -40,224 +64,195 @@
                         </div>
                     </div>
 
-                    <div class="row mb-2">
-                        <div class="col-4 fw-bold">Function Room:</div>
-                        <div class="col-8">{{ $booking->functionRoom->function_room_name ?? 'N/A' }}</div>
-                    </div>
+                    <!-- Function Room Names -->
+
                     <div class="row mb-2">
                         <div class="col-4 fw-bold">Purpose:</div>
-                        <div class="col-8">{{ $booking->purpose_of_event }}</div>
+                        <div class="col-8">{{ $mainBooking->purpose_of_event }}</div>
+                    </div>
+
+
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Payment Mode:</div>
+                        <div class="col-8">{{ $mainBooking->payment_mode ?? 'N/A' }}</div>
                     </div>
                     <div class="row mb-2">
-                        <div class="col-4 fw-bold">Resident Type:</div>
-                        <div class="col-8">
-                            @if($booking->resident_type === 'TENANT')
-                                <span class="badge badge-forge bg-danger">TENANT</span>
-                            @elseif($booking->resident_type === 'OWNER')
-                                <span class="badge badge-forge bg-primary">OWNER</span>
-                            @else
-                                <span class="badge bg-secondary">{{ $booking->resident_type }}</span>
-                            @endif
-                        </div>
+                        <div class="col-4 fw-bold">Contact:</div>
+                        <div class="col-8">{{ $mainBooking->contact_number ?? 'N/A' }}</div>
                     </div>
+
+
+                    <!-- Authorization File -->
+                    @if(!empty($mainBooking->authorization_file))
+                        <div class="row mb-2">
+                            <div class="col-4 fw-bold">Authorization File:</div>
+                            <div class="col-8">
+                                <a href="{{ asset($mainBooking->authorization_file) }}" target="_blank"
+                                    class="text-decoration-none">
+                                    View File
+                                </a>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Suppliers -->
+                    @if($mainBooking->suppliers->isNotEmpty())
+                        <div class="row mb-2">
+                            <div class="col-4 fw-bold">Suppliers:</div>
+                            <div class="col-8">
+                                @foreach($mainBooking->suppliers as $supplier)
+                                    <div class="mb-1">
+                                        {{ $supplier->name }}
+                                        @if(!empty($supplier->attachment))
+                                            - <a href="{{ asset($supplier->attachment) }}" target="_blank"
+                                                class="text-decoration-none">View</a>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+
                 </div>
 
-                <!-- Schedule -->
-                <div class="border-bottom pb-2 mb-3">
-                    <div class="row mb-2">
-                        <div class="col-4 fw-bold">Booking Date:</div>
-                        <div class="col-8">
-                            {{ \Carbon\Carbon::parse($booking->function_room_booking_date)->format('F d, Y') }}
+                <!-- Per-room Details (keep visible) -->
+                @foreach($bookings as $booking)
+                    @php
+                        $start = \Carbon\Carbon::parse($booking->event_start_time);
+                        $end = \Carbon\Carbon::parse($booking->event_end_time);
+                        if ($end <= $start)
+                            $end->addDay();
+                        $hours = round($end->diffInMinutes($start) / 60, 2);
+                        if ($hours <= 0)
+                            $hours = 1;
+
+                        $ratePerHour = $booking->final_rate ?? $booking->functionRoom->function_room_rate ?? 0;
+                        $baseRate = $booking->functionRoom->function_room_rate ?? $ratePerHour;
+                        $roomTotal = round($hours * $ratePerHour, 2);
+
+                        $discountValue = floatval($booking->discount ?? 0);
+                        $discountRemarks = $booking->discount_remarks ?? '';
+                    @endphp
+
+                    <div class="border-bottom pb-2 mb-3">
+                        <h6 class="fw-bold">{{ $booking->functionRoom->function_room_name }}</h6>
+
+                        <div class="row mb-2">
+                            <div class="col-4 fw-bold">Booking Date:</div>
+                            <div class="col-8">
+                                {{ \Carbon\Carbon::parse($booking->function_room_booking_date)->format('F d, Y') }}
+                            </div>
                         </div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-4 fw-bold">Time:</div>
-                        <div class="col-8">
-                            {{ \Carbon\Carbon::parse($booking->event_start_time)->format('g:i A') }} -
-                            {{ \Carbon\Carbon::parse($booking->event_end_time)->format('g:i A') }}
+                        <div class="row mb-2">
+                            <div class="col-4 fw-bold">Time:</div>
+                            <div class="col-8">{{ $start->format('g:i A') }} - {{ $end->format('g:i A') }}</div>
                         </div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-4 fw-bold">Pax:</div>
-                        <div class="col-8">{{ $booking->pax }}</div>
-                    </div>
-                </div>
+                        <div class="row mb-2">
+                            <div class="col-4 fw-bold">Pax:</div>
+                            <div class="col-8">{{ $booking->pax }}</div>
+                        </div>
 
-                @php
-
-                    use Carbon\Carbon;
-
-                    $start = Carbon::parse($booking->event_start_time);
-                    $end = Carbon::parse($booking->event_end_time);
-
-                    if ($end <= $start) {
-                        $end->addDay();
-                    }
-
-                    $hours = round($end->diffInMinutes($start) / 60, 2);
-                    if ($hours <= 0)
-                        $hours = 1;
-
-                    $ratePerHour = $booking->final_rate ?? $booking->functionRoom->function_room_rate ?? 0;
-                    $baseRate = $booking->functionRoom->function_room_rate ?? $ratePerHour;
-                    $roomLineTotal = round($hours * $ratePerHour, 2);
-                @endphp
-
-                <div class="border-bottom pb-2 mb-3">
-
-                    <div class="row mb-2">
-                        <div class="col-4 fw-bold">Rate:</div>
-                        <div class="col-8">
-                            @if($baseRate > $ratePerHour)
-                                <div>
+                        <!-- Rate & Discount -->
+                        <div class="row mb-2">
+                            <div class="col-4 fw-bold">Rate:</div>
+                            <div class="col-8">
+                                @if($baseRate > $ratePerHour)
                                     <small class="text-muted"><s>₱{{ number_format($baseRate, 2) }}/hr</s></small>
                                     &nbsp; → &nbsp;
                                     <small class="fw-bold">₱{{ number_format($ratePerHour, 2) }}/hr</small>
                                     &nbsp; × &nbsp;
                                     <small>{{ $hours }} hr{{ $hours > 1 ? 's' : '' }}</small>
                                     &nbsp; = &nbsp;
-                                    <strong class="fw-bold">₱{{ number_format($roomLineTotal, 2) }}</strong>
-                                </div>
-                            @else
-                                <div>
-                                    <small class="text-muted">₱{{ number_format($ratePerHour, 2) }}/hr</small>
+                                    <strong>₱{{ number_format($roomTotal, 2) }}</strong>
+                                @else
+                                    <small>₱{{ number_format($ratePerHour, 2) }}/hr</small>
                                     &nbsp; × &nbsp;
                                     <small>{{ $hours }} hr{{ $hours > 1 ? 's' : '' }}</small>
                                     &nbsp; = &nbsp;
-                                    <strong>₱{{ number_format($roomLineTotal, 2) }}</strong>
-                                </div>
-                            @endif
+                                    <strong>₱{{ number_format($roomTotal, 2) }}</strong>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-4 fw-bold">Discount:</div>
+                            <div class="col-8">
+                                @if($discountValue > 0)
+                                    <strong
+                                        class="text-danger">{{ rtrim(rtrim(number_format($discountValue, 2), '0'), '.') }}%</strong>
+                                    @if(!empty($discountRemarks))
+                                        <span style="margin-left: 6px; color: #555;">{{ $discountRemarks }}</span>
+                                    @endif
+                                @else
+                                    <span class="text-muted">No discount</span>
+                                @endif
+                            </div>
                         </div>
                     </div>
+                @endforeach
 
-                      @php
-        $discountValue = floatval($booking->discount ?? 0);
-        $discountRemarks = $booking->discount_remarks ?? '';
-    @endphp
-
-    <div class="row mb-2">
-        <div class="col-4 fw-bold">Discount:</div>
-        <div class="col-8">
-            @if($discountValue > 0)
-                <div style="margin-top: 6px;">
-                    <strong class="text-danger">
-                        {{ rtrim(rtrim(number_format($discountValue, 2), '0'), '.') }}%
-                    </strong>
-                    @if(!empty($discountRemarks))
-                        <span style="margin-left: 6px; color: #555;">{{ $discountRemarks }}</span>
-                    @endif
-                </div>
-            @else
-                <span class="text-muted" style="margin-top: 6px;">No discount</span>
-            @endif
-        </div>
-    </div>
-                    <div class="row mb-2">
-                        <div class="col-4 fw-bold">Payment Mode:</div>
-                        <div class="col-8">{{ ucfirst($booking->payment_mode) }}</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-4 fw-bold">Contact:</div>
-                        <div class="col-8">{{ $booking->contact_number ?? 'N/A' }}</div>
-                    </div>
-                </div>
-
-                <!-- Suppliers & Authorization -->
-                <div class="border-bottom pb-2 mb-3">
-                    <div class="row mb-2">
-                        <div class="col-4 fw-bold">Suppliers:</div>
-                        <div class="col-8">
-                            @if($booking->suppliers->count() > 0)
-                                <ul class="mb-0">
-                                    @foreach($booking->suppliers as $supplier)
-                                        <li>
-                                            <strong>{{ $supplier->name ?? 'N/A' }}</strong> —
-                                            @if($supplier->attachment)
-                                                <a href="{{ asset($supplier->attachment) }}" target="_blank"
-                                                    class="custom-link">View</a>
-                                                <!-- <small class="text-muted">{{ basename($supplier->attachment) }}</small> -->
-                                            @else
-                                                N/A
-                                            @endif
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @else
-                                N/A
-                            @endif
-                        </div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-4 fw-bold">Authorization File:</div>
-                        <div class="col-8">
-                            @if($booking->authorization_file)
-                                <a href="{{ asset($booking->authorization_file) }}" target="_blank" class="custom-link">View</a>
-                                <!-- <small class="text-muted">{{ basename($booking->authorization_file) }}</small> -->
-                            @else
-                                N/A
-                            @endif
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Breakdown / Add-Ons -->
-
-                @php
-                    // Calculate duration in hours
-                    $start = Carbon::parse($booking->event_start_time);
-                    $end = Carbon::parse($booking->event_end_time);
-                    if ($end <= $start)
-                        $end->addDay();
-                    $hours = round($end->diffInMinutes($start) / 60, 2);
-                    if ($hours <= 0)
-                        $hours = 1;
-
-                    // Rates
-                    $ratePerHour = $booking->final_rate ?? $booking->functionRoom->function_room_rate ?? 0;
-                    $baseRate = $booking->functionRoom->function_room_rate ?? $ratePerHour;
-                    $roomTotal = round($hours * $ratePerHour, 2);
-
-                    // Add-ons
-                    $addOns = $booking->add_ons ?? [];
-                    $addonsTotal = 0;
-
-                    $breakdownTotal = $roomTotal;
-                @endphp
-
+                <!-- Unified Function Rooms Breakdown Table (with discount display) -->
+                @php $functionRoomsTotal = 0; @endphp
                 <h6 class="fw-bold">Breakdown</h6>
                 <div class="table-responsive mb-3">
                     <table class="table table-sm table-bordered">
                         <thead class="table-light">
                             <tr>
                                 <th>Item</th>
-                                <th class="text-center">Qty</th>
-                                <th class="text-end">Price</th>
+                                <th class="text-center">Qty/Hrs</th>
+                                <th class="text-end">Rate</th>
                                 <th class="text-end">Total</th>
                             </tr>
                         </thead>
+
                         <tbody>
-                            {{-- Function Room Rate --}}
-                            @if($ratePerHour > 0)
+                            @php
+                                $functionRoomsTotal = 0;
+                                $addonsTotal = 0;
+                            @endphp
+
+                            {{-- FUNCTION ROOM ENTRIES --}}
+                            @foreach($bookings as $booking)
+                                @php
+                                    $start = \Carbon\Carbon::parse($booking->event_start_time);
+                                    $end = \Carbon\Carbon::parse($booking->event_end_time);
+                                    if ($end <= $start)
+                                        $end->addDay();
+
+                                    $hours = round($end->diffInMinutes($start) / 60, 2);
+                                    if ($hours <= 0)
+                                        $hours = 1;
+
+                                    $ratePerHour = $booking->final_rate ?? $booking->functionRoom->function_room_rate ?? 0;
+                                    $baseRate = $booking->functionRoom->function_room_rate ?? $ratePerHour;
+
+                                    $roomTotal = round($hours * $ratePerHour, 2);
+                                    $functionRoomsTotal += $roomTotal;
+                                @endphp
+
                                 <tr>
-                                    <td>
-                                        {{ $booking->functionRoom->function_room_name ?? 'N/A' }} ({{ $hours }} hr{{ $hours > 1 ? 's' : '' }})
-                                        <!-- @if($baseRate > $ratePerHour)
-                                                                                    <br>
-                                                                                    <small class="text-muted">
-                                                                                        <s>₱{{ number_format($baseRate, decimals: 2) }}/hr</s>
-                                                                                    </small>
-                                                                                    &nbsp;→&nbsp;
-                                                                                    <small class="text-success">₱{{ number_format($ratePerHour, 2) }}/hr</small>
-                                                                                @endif -->
+                                    <td>{{ $booking->functionRoom->function_room_name }}</td>
+
+                                    <td class="text-center">{{ $hours }} hr{{ $hours > 1 ? 's' : '' }}</td>
+
+                                    <td class="text-end">
+                                        @if($baseRate > $ratePerHour)
+                                            <small class="text-muted"><s>₱{{ number_format($baseRate, 2) }}</s></small>
+                                            &nbsp;→&nbsp;
+                                            <small class="fw-bold">₱{{ number_format($ratePerHour, 2) }}</small>
+                                        @else
+                                            ₱{{ number_format($ratePerHour, 2) }}
+                                        @endif
                                     </td>
-                                    <td class="text-center">{{ $hours }}</td>
-                                    <td class="text-end">₱{{ number_format($ratePerHour, 2) }}/hr</td>
+
                                     <td class="text-end">₱{{ number_format($roomTotal, 2) }}</td>
                                 </tr>
-                            @endif
+                            @endforeach
 
-                            {{-- Add-ons --}}{{ $booking->functionRoom->function_room_name ?? 'N/A' }}
-                            @if($booking->addOns?->count() > 0)
+                            {{-- ADD-ONS ENTRIES (same table) --}}
+                            @foreach($bookings as $booking)
                                 @foreach($booking->addOns as $addon)
                                     @php
                                         $pivot = $addon->pivot ?? [];
@@ -265,36 +260,42 @@
                                         $price = $pivot->price ?? $addon->price ?? 0;
                                         $lineTotal = round($qty * $price, 2);
                                         $addonsTotal += $lineTotal;
-                                        $breakdownTotal += $lineTotal;
                                     @endphp
+
                                     <tr>
-                                        <td>{{ $addon->item ?? $addon->name ?? 'Add-on' }}</td>
+                                        <td>{{ $addon->item ?? $addon->name }}</td>
                                         <td class="text-center">{{ $qty }}</td>
                                         <td class="text-end">₱{{ number_format($price, 2) }}</td>
                                         <td class="text-end">₱{{ number_format($lineTotal, 2) }}</td>
                                     </tr>
                                 @endforeach
+                            @endforeach
+                        </tbody>
 
+                        {{-- SUBTOTALS + GRAND TOTAL --}}
+                        <tfoot>
+                            <tr class="table-light fw-bold">
+                                <td colspan="3" class="text-end">Function Rooms Subtotal</td>
+                                <td class="text-end">₱{{ number_format($functionRoomsTotal, 2) }}</td>
+                            </tr>
+
+                            @if($addonsTotal > 0)
                                 <tr class="table-light fw-bold">
-                                    <td colspan="3" class="text-end">Add-ons Subtotal</td>
+                                    <td colspan="3" class="text-end">Add-Ons Subtotal</td>
                                     <td class="text-end">₱{{ number_format($addonsTotal, 2) }}</td>
                                 </tr>
                             @endif
 
-                            @if($breakdownTotal == 0)
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted">No charges</td>
-                                </tr>
-                            @endif
-                        </tbody>
+                            <tr class="table-dark fw-bold">
+                                <td colspan="3" class="text-end">Grand Total</td>
+                                <td class="text-end">₱{{ number_format($functionRoomsTotal + $addonsTotal, 2) }}</td>
+                            </tr>
+                        </tfoot>
                     </table>
-                </div>
-
-                {{-- Grand Total --}}
-                <div class="d-flex justify-content-end border-top pt-2">
-                    <div class="fw-bold me-2">Grand Total:</div>
-                    <div>₱{{ number_format($breakdownTotal, 2) }}</div>
                 </div>
             </div>
         </div>
+    </div>
+
+
 @endsection

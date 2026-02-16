@@ -281,7 +281,6 @@ $(document).ready(function () {
                 error(xhr) {
                     const res = xhr.responseJSON || {};
 
-                    // Handle billable bookings first
                     if (res.requires_payment) {
                         Swal.fire({
                             icon: 'warning',
@@ -294,15 +293,14 @@ $(document).ready(function () {
                             cancelButtonColor: '#d33'
                         }).then(result => {
                             if (result.isConfirmed) {
-                                sendBooking(true); // force payment
+                                sendBooking(true); 
                             } else {
                                 unlockSubmitBtn();
                             }
                         });
-                        return; // stop further error handling
+                        return; 
                     }
 
-                    // Handle validation errors
                     if (xhr.status === 422) {
                         let msg = 'Please check the form fields.';
                         if (res.errors) {
@@ -318,7 +316,6 @@ $(document).ready(function () {
                         return;
                     }
 
-                    // Handle slot conflicts
                     if (xhr.status === 409) {
                         Swal.fire({
                             icon: 'error',
@@ -330,8 +327,7 @@ $(document).ready(function () {
                         updateSlots(selectedDate);
                         return;
                     }
-
-                    // Fallback
+                    
                     Swal.fire({
                         toast: true,
                         position: 'top-end',
@@ -354,11 +350,10 @@ $(document).ready(function () {
 
     $(document).on('click', '.grease-trap-booking-cancel', function () {
         const bookingId = $(this).data('id');
-        const swalText = "Are you sure you want to cancel this booking?";
 
         Swal.fire({
             title: 'Cancel Booking',
-            text: swalText,
+            text: "Are you sure you want to cancel this booking?",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
@@ -376,7 +371,11 @@ $(document).ready(function () {
                     success: function (res) {
                         if (res.success) {
                             Swal.fire('Cancelled!', 'The booking has been cancelled.', 'success')
-                                .then(() => location.reload());
+                                .then(() => {
+                                    // reload current filtered table
+                                    let page = $('.pagination .active span').text() || 1;
+                                    loadBookings(page);
+                                });
                         } else {
                             Swal.fire('Error', res.message || 'Failed to cancel booking.', 'error');
                         }
@@ -388,5 +387,6 @@ $(document).ready(function () {
             }
         });
     });
+
 
 });

@@ -19,7 +19,7 @@
             processed.</p>
 
         <p><strong>Transaction No:</strong> {{ $transaction_no }}</p>
-        <p><strong>Function Room:</strong> {{ $function_room}}</p>
+        <p><strong>Function Room(s):</strong> {{ $rooms }}</p>
         <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($date)->format('F d, Y') }}</p>
         <p><strong>Time:</strong> {{ \Carbon\Carbon::parse($start_time)->format('h:i A') }} - {{
             \Carbon\Carbon::parse($end_time)->format('h:i A') }}</p>

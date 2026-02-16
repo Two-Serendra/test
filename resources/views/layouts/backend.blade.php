@@ -44,6 +44,8 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@3.10.5/dist/fullcalendar.min.css">
+
 
 
 </head>
@@ -64,6 +66,41 @@
                 <div class="content-wrapper">
 
                     <div class="container-fluid flex-grow-1 container-p-y">
+                        @php
+                            $routeName = request()->route()?->getName();
+                            $breadcrumbs = config('breadcrumbs'); // full array
+                            $crumbs = $breadcrumbs[$routeName] ?? null;
+
+                            // Optional: map parent names to routes for clickable links
+                            $breadcrumbLinks = [
+                                'Function Rooms' => route('admin.show.function.rooms'),
+                                'Amenities' => route('admin.show.amenities'),
+                                'Grease Trap' => route('admin.booking.grease.trap'), // or main page for Grease Trap
+                            ];
+                        @endphp
+
+                        @if($crumbs)
+                            <nav aria-label="breadcrumb" class="mb-3">
+                                <ol class="breadcrumb">
+                                    @foreach($crumbs as $key => $crumb)
+                                        @if($key < count($crumbs) - 1)
+                                            <li class="breadcrumb-item">
+                                                @if(isset($breadcrumbLinks[$crumb]))
+                                                    <a href="{{ $breadcrumbLinks[$crumb] }}"
+                                                        class="text-decoration-none">{{ $crumb }}</a>
+                                                @else
+                                                    {{ $crumb }}
+                                                @endif
+                                            </li>
+                                        @else
+                                            <li class="breadcrumb-item active fw-bold text-dark" aria-current="page">{{ $crumb }}
+                                            </li>
+                                        @endif
+                                    @endforeach
+                                </ol>
+                            </nav>
+                        @endif
+
                         @yield('content')
                     </div>
 
@@ -99,6 +136,8 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@3.10.5/dist/fullcalendar.min.js"></script>
+
 
 
 
@@ -128,81 +167,123 @@
     <script src="{{ asset('assets/backend/js/calendar.js') }}"></script>
     <script src="{{ asset('assets/backend/js/blocking.js') }}"></script>
     <script src="{{ asset('assets/backend/js/activitiy-booking.js') }}"></script>
-
+    <script src="{{ asset('assets/backend/js/grease-trap-booking.js') }}"></script>
     @stack('scripts')
 
     @stack('js')
 
     <script>
-        const currentUserRoleId = {{ auth()->user()->role_id }};
+        $(document).ready(function () {
+            const currentUserRoleId = {{ auth()->user()->role_id }};
 
-        const pusher = new Pusher('c82d0ff4baaca9650c6f', {
-            cluster: 'ap1'
-        });
+            const pusher = new Pusher('c82d0ff4baaca9650c6f', {
+                cluster: 'ap1'
+            });
+            let refreshTimeout;
 
-        // 🔹 Existing listener (for Residence Requests)
-        const residenceChannel = pusher.subscribe('residence-requests');
-        residenceChannel.bind('ResidenceRequestSubmitted', function (data) {
-            toastr.success(
-                `Residence request from Unit ${data.unit_no}`,
-                'New Residence Request',
-                {
-                    timeOut: 5000,
-                    closeButton: true,
-                    progressBar: true
-                }
-            );
-            updateCounters();
-            prependNotification(`New request for unit ${data.unit_no}`);
-        });
 
-        function incrementFunctionRoomCounter() {
-            const counter = document.getElementById('function-room-counter');
-            let count = parseInt(counter.textContent);
-
-            if (isNaN(count)) {
-                count = 0;
-            }
-
-            count++;
-            counter.textContent = count;
-            counter.classList.remove('d-none');
-        }
-
-        // 🔹 Function Room Booking Notification
-        const functionRoomChannel = pusher.subscribe('function-room-bookings');
-        functionRoomChannel.bind('FunctionRoomBookingCreated', function (data) {
-            // ✅ FIXED: Proper role check (removed typo `|`)
-            if ([1, 2, 3, 5, 7, 6].includes(currentUserRoleId)) {
+            // 🔹 Existing listener (for Residence Requests)
+            const residenceChannel = pusher.subscribe('residence-requests');
+            residenceChannel.bind('ResidenceRequestSubmitted', function (data) {
                 toastr.success(
-                    `(Unit: ${data.unit_no})`,
-                    `New Booking - ${data.function_room}`,
+                    `Residence request from Unit ${data.unit_no}`,
+                    'New Residence Request',
                     {
                         timeOut: 5000,
                         closeButton: true,
                         progressBar: true
                     }
                 );
+                updateCounters();
+                prependNotification(`New request for unit ${data.unit_no}`);
+            });
 
-                incrementFunctionRoomCounter();
-                prependNotification(`New Function Room booking for ${data.function_room}`);
-            }
-        });
+            function incrementFunctionRoomCounter() {
+                const counter = document.getElementById('function-room-counter');
+                let count = parseInt(counter.textContent);
 
-        functionRoomChannel.bind('FunctionRoomBookingCancelled', function (data) {
-            if ([1, 2, 3, 5, 7, 6, 8].includes(currentUserRoleId)) {
-                toastr.warning(
-                    `(Unit: ${data.unit_no})`,
-                    `Booking Cancelled - ${data.function_room}`,
-                    {
-                        timeOut: 5000,
-                        closeButton: true,
-                        progressBar: true
-                    }
-                );
-                incrementFunctionRoomCounter();
-                prependNotification(`Function Room booking cancelled for ${data.function_room}`);
+                if (isNaN(count)) {
+                    count = 0;
+                }
+
+                count++;
+                counter.textContent = count;
+                counter.classList.remove('d-none');
             }
+
+            function incrementGreaseTrapBookingCounter() {
+                const counter = document.getElementById('grease-trap-booking-counter');
+                let count = parseInt(counter.textContent);
+
+                if (isNaN(count)) {
+                    count = 0;
+                }
+
+                count++;
+                counter.textContent = count;
+                counter.classList.remove('d-none');
+            }
+
+            const functionRoomChannel = pusher.subscribe('function-room-bookings');
+            functionRoomChannel.bind('FunctionRoomBookingCreated', function (data) {
+                if ([1, 2, 3, 5, 7, 6].includes(currentUserRoleId)) {
+                    toastr.success(`(Unit: ${data.unit_no})`, `New Booking - ${data.function_room}`);
+                    incrementFunctionRoomCounter();
+                    refreshTableDebounced();
+                }
+            });
+
+            functionRoomChannel.bind('FunctionRoomBookingCancelled', function (data) {
+                if ([1, 2, 3, 5, 7, 6, 8].includes(currentUserRoleId)) {
+                    toastr.warning(`(Unit: ${data.unit_no})`, `Booking Cancelled - ${data.function_room}`);
+                    incrementFunctionRoomCounter();
+                    refreshTableDebounced();
+                }
+            });
+
+            const greaseTrapChannel = pusher.subscribe('grease-trap-bookings');
+            greaseTrapChannel.bind('GreaseTrapBookingCreated', function (data) {
+                if ([1, 6].includes(currentUserRoleId)) {
+                    toastr.success(`(Unit: ${data.unit_no})`, `New Grease Trap Booking`);
+                    incrementGreaseTrapBookingCounter();
+                    refreshTableDebounced();
+                }
+            });
+
+            greaseTrapChannel.bind('GreaseTrapBookingCancellation', function (data) {
+                if ([1, 6].includes(currentUserRoleId)) {
+                    toastr.success(`(Unit: ${data.unit_no})`, `Grease Trap Booking Cancelled`);
+                    incrementGreaseTrapBookingCounter();
+                    refreshTableDebounced();
+                }
+            });
+
+            const pestControlChannel = pusher.subscribe('pest-control-bookings');
+            pestControlChannel.bind('PestContrtolBookingCreated', function (data) {
+                if ([1, 6].includes(currentUserRoleId)) {
+                    toastr.success(`(Unit: ${data.unit_no})`, `New Pest Control Booking`);
+                    incrementPestContrtolBookingCounter();
+                    refreshTableDebounced();
+                }
+            });
+
+            pestControlChannel.bind('PestContrtolBookingCancellation', function (data) {
+                if ([1, 6].includes(currentUserRoleId)) {
+                    toastr.success(`(Unit: ${data.unit_no})`, `Pest Control Booking Cancelled`);
+                    incrementPestContrtolBookingCounter();
+                    refreshTableDebounced();
+                }
+            });
+
+
+
+
+            refreshTableDebounced = () => {
+                clearTimeout(refreshTimeout);
+                refreshTimeout = setTimeout(() => {
+                    window.refreshFunctionRoomBookingsTable(window.currentFunctionRoomBookingPageUrl);
+                }, 300);
+            };
         });
     </script>
 

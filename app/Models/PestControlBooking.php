@@ -5,11 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class GreaseTrapBooking extends Model
+class PestControlBooking extends Model
 {
-    use HasFactory;
-
-    protected $table = 'grease_trap_bookings';
+    use HasFactory;    
+    protected $table = 'pest_control_bookings';
     protected $fillable = [
         'transaction_no',
         'user_id',
@@ -22,7 +21,8 @@ class GreaseTrapBooking extends Model
         'charged_type',
         'emergency',
         'booking_status',
-        'created_by',
+        'unit_area',
+        'created_by', 
     ];
 
     public function residentDetails()

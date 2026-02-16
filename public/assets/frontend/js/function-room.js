@@ -710,7 +710,8 @@ $(document).ready(function () {
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Yes, cancel it'
+            confirmButtonText: 'Yes, cancel it',
+            cancelButtonText: 'No, keep it'
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
@@ -720,10 +721,14 @@ $(document).ready(function () {
                         _token: $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function (res) {
-                        $("#functionRoomBookingModal").modal("hide");
+                        $("#userViewfunctionRoomBookingDetailsModal").modal("hide");
                         if (res.success) {
                             Swal.fire('Cancelled!', 'The booking has been cancelled.', 'success')
-                                .then(() => location.reload());
+                                .then(() => {
+                                    // reload current filtered table
+                                    let page = $('.pagination .active span').text() || 1;
+                                    loadBookings(page);
+                                });
                         } else {
                             Swal.fire('Error', res.message || 'Failed to cancel booking.', 'error');
                         }

@@ -3,22 +3,20 @@
 namespace App\Mail;
 
 use App\Models\FunctionRoomBooking;
-use App\Models\GreaseTrapBooking;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\SerializesModels;
+use App\Models\PestControlBooking;
 
-class ConciergeGreaseTrapBookingCancellation extends Mailable implements ShouldQueue
+class ConciergePestControlBookingConfirmation extends Mailable implements ShouldQueue
 {
-    use Queueable, SerializesModels;
-
-    public GreaseTrapBooking $booking;
+    public PestControlBooking  $booking;
 
     /**
      * Accept main booking + all linked bookings.
      */
-    public function __construct(GreaseTrapBooking $booking)
+    public function __construct(PestControlBooking $booking)
     {
         $this->booking = $booking;
 
@@ -30,13 +28,9 @@ class ConciergeGreaseTrapBookingCancellation extends Mailable implements ShouldQ
     public function build()
     {
         $name = $this->booking->user->name ?? 'Resident';
-
-        // Collect the names of ALL function rooms booked
-
-
         return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra')
-            ->subject('Grease Trap Booking has been Cancelled')
-            ->view('emails.concierge-grease-trap-booking-cancellation')
+            ->subject('New Pest Control Booking')
+            ->view('emails.concierge-pest-control-booking-cofirmation')
             ->with([
                 'name' => $name,
                 'transaction_no' => $this->booking->transaction_no,

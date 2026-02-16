@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('grease_trap_bookings', function (Blueprint $table) {
+        Schema::create('pest_control_bookings', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             $table->string('transaction_no')->unique();
@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->date('booking_date');
             $table->string('booking_time_slot');
             $table->string('srf_no')->nullable();
+            $table->string('unit_area');
             $table->text('remarks')->nullable();
             $table->tinyInteger('charged_type')->default('1'); // 1 = Free, 2 = Charged
             $table->tinyInteger('emergency')->default('0');
@@ -33,6 +34,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('grease_trap_bookings'); 
+        Schema::dropIfExists('pest_control_bookings');
     }
 };

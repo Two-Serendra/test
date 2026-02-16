@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\PestControlBooking;
 use Illuminate\Http\Request;
 use App\Models\ActivityBooking;
 use App\Models\FunctionRoomBooking;
@@ -71,16 +72,15 @@ class ResidentBookingHistoryController extends Controller
 
         $selectedUnit = $request->unit_no ?? $allResidences->first()->unit_no ?? null;
         $bookingType = $request->booking_type ?? 'function_room';
-
-        // Default empty collection
         $bookings = collect();
 
         if ($bookingType === 'function_room') {
 
             $bookings = FunctionRoomBooking::with('functionRoom')
                 ->when($selectedUnit, fn($q) => $q->where('unit_no', $selectedUnit))
-                ->orderBy('function_room_booking_date', 'desc')
-                ->paginate(5, ['*'], 'bookings_page');
+                ->latest('function_room_booking_date')
+                ->paginate(1)
+                ->withQueryString();
 
             if ($request->ajax()) {
                 return view(
@@ -93,8 +93,9 @@ class ResidentBookingHistoryController extends Controller
 
             $bookings = ActivityBooking::with('activity')
                 ->when($selectedUnit, fn($q) => $q->where('unit', $selectedUnit))
-                ->orderBy('booking_date', 'desc')
-                ->paginate(5, ['*'], 'bookings_page');
+                ->latest('booking_date')
+                ->paginate(1)
+                ->withQueryString();
 
             if ($request->ajax()) {
                 return view(
@@ -106,8 +107,9 @@ class ResidentBookingHistoryController extends Controller
         } elseif ($bookingType === 'grease_trap') {
 
             $bookings = GreaseTrapBooking::when($selectedUnit, fn($q) => $q->where('unit_no', $selectedUnit))
-                ->orderBy('booking_date', 'desc') // change if column is different
-                ->paginate(5, ['*'], 'bookings_page');
+                ->orderBy('booking_date', 'desc')
+                ->paginate(1)
+                ->withQueryString();
 
             if ($request->ajax()) {
                 return view(
@@ -115,8 +117,20 @@ class ResidentBookingHistoryController extends Controller
                     compact('bookings', 'selectedUnit', 'bookingType')
                 )->render();
             }
-        }
+        } elseif ($bookingType === 'pest_control') {
 
+            $bookings = PestControlBooking::when($selectedUnit, fn($q) => $q->where('unit_no', $selectedUnit))
+                ->orderBy('booking_date', 'desc')
+                ->paginate(1)
+                ->withQueryString();
+
+            if ($request->ajax()) {
+                return view(
+                    'frontend.resident-pest-control-booking-table',
+                    compact('bookings', 'selectedUnit', 'bookingType')
+                )->render();
+            }
+        }
         return view('frontend.resident-booking-history', [
             'user' => $request->user(),
             'allResidences' => $allResidences,

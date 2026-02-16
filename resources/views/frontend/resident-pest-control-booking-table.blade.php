@@ -30,14 +30,7 @@
                             @endif
                         </td>
 
-                        <!-- <td>
-                            @if ($b->emergency == 0)
-                                <span class="badge bg-secondary badge-forge ">No</span>
-                            @else
-                                <span class="badge bg-danger badge-forge ">Yes</span>
-                            @endif
-                        </td> -->
-
+                
                         <td>
                             @php
                                 $startTime = $b->booking_time_slot ? trim(explode('-', $b->booking_time_slot)[0]) : null;

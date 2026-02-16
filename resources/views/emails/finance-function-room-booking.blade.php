@@ -10,10 +10,10 @@
     <div style="max-width: 600px; margin: auto; border: 1px solid #eee; padding: 30px; background-color: #f9f9f9;">
         <h2 style="color: #0056b3;">📢 New Function Room Booking Received</h2>
 
-        <p>A new booking has been made by <strong>{{ $booking->user->name }}</strong>.</p>
+        <p>A new booking has been made by <strong>{{ $name }}</strong>.</p>
         <p><strong>Transaction No:</strong>{{ $booking->transaction_no }}.</p>
         <p><strong>Unit No:</strong>{{ $booking->unit_no }}</p>
-        <p><strong>Function Room:</strong> {{ $booking->functionRoom->function_room_name ?? 'N/A' }}</p>
+        <p><strong>Function Room(s):</strong> {{ $rooms }}</p>
         <p><strong>Event Purpose:</strong> {{ $booking->purpose_of_event }}</p>
         <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($booking->function_room_booking_date)->format('F d, Y') }}
         </p>

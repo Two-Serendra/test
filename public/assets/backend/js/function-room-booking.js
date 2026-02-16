@@ -8,6 +8,8 @@ $(document).ready(function () {
     let flatpickrInstance;
     let disabledDatesGlobal = [];
 
+
+
     let currentFunctionRoomBookingPageUrl = '/admin/admin-get-updated-function-room-bookings-table';
     let currentFunctionRoomBookingPage = 1;
     let currentFunctionRoomBookingSearchTerm = '';
@@ -161,6 +163,11 @@ $(document).ready(function () {
             }
         });
     }
+
+    window.refreshFunctionRoomBookingsTable = refreshFunctionRoomBookingsTable;
+    window.currentFunctionRoomBookingPageUrl = currentFunctionRoomBookingPageUrl;
+    window.currentFunctionRoomBookingPage = currentFunctionRoomBookingPage;
+    window.currentFunctionRoomBookingSearchTerm = currentFunctionRoomBookingSearchTerm;
 
 
     $('.AdminAddFunctionRoomBooking').on('click', function () {
@@ -1564,8 +1571,4 @@ $(document).ready(function () {
         if (status == 2) return '<span class="badge bg-danger">Cancelled</span>';
         return '<span class="badge bg-warning">Waiting</span>';
     }
-
-
-
-
 });

@@ -107,7 +107,7 @@ class FrontendActivityBookingController extends Controller
 
             $lastTransaction = ActivityBooking::lockForUpdate()->latest('id')->first();
             $lastNumber = $lastTransaction ? ((int) str_replace('2s-', '', $lastTransaction->transaction_no)) : 0;
-            $newTransactionNo = '2s-' . str_pad($lastNumber + 1, 6, '0', STR_PAD_LEFT);
+            $newTransactionNo = '2SAM-' . str_pad($lastNumber + 1, 6, '0', STR_PAD_LEFT);
             $resident = ResidentDetails::findOrFail($request->resident_email_id); // Selected resident
             $user = auth()->user();
             $firstBookingId = null;

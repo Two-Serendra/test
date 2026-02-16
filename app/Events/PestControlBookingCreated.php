@@ -3,7 +3,7 @@
 namespace App\Events;
 
 use App\Models\FunctionRoomBooking;
-use App\Models\GreaseTrapBooking;
+use App\Models\PestControlBooking;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -12,7 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class GreaseTrapBookingCreated implements ShouldBroadcast
+class PestControlBookingCreated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -23,7 +23,7 @@ class GreaseTrapBookingCreated implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(GreaseTrapBooking $booking)
+    public function __construct(PestControlBooking $booking)
     {
         $this->transaction_no = $booking->transaction_no;
         $this->unit_no = $booking->unit_no;
@@ -35,11 +35,11 @@ class GreaseTrapBookingCreated implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('grease-trap-bookings');
+        return new Channel('pest-control-bookings');
     }
 
     public function broadcastAs()
     {
-        return 'GreaseTrapBookingCreated';
+        return 'PestControlBookingCreated';
     }
 }

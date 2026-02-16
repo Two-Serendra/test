@@ -151,6 +151,19 @@
 
                         $('#display_resident_type_calendar').html(residentBadge);
 
+
+                        let chargedType = (data.charged_type || 'N/A').toString().toUpperCase();
+                        let chargedBadge = `<span class="badge bg-secondary">${chargedType}</span>`;
+
+                        // Handle numeric charged types first
+                        if (chargedType === '1') {
+                            chargedBadge = `<span class="badge bg-primary">FREE</span>`;
+                        } else if (chargedType === '2') {
+                            chargedBadge = `<span class="badge bg-danger">BILLABLE</span>`;
+                        }
+
+                        $('#display_charged_type_calendar').html(chargedBadge);
+
                     }).fail(function () {
                         alert("Failed to fetch data. Please try again.");
                     });

@@ -116,7 +116,9 @@
     <script src="{{ asset('assets/frontend/js/function-room.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/test-email.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/soa.js') }}?v=2"></script>
+    <script src="{{ asset('assets/frontend/js/resident-booking-history.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/grease-trap.js') }}"></script>
+    <script src="{{ asset('assets/frontend/js/pest-control.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/activity-booking.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/resident-booking-history.js') }}"></script>
 
@@ -161,7 +163,7 @@
                     tooltip.style.visibility = 'hidden';
                 });
             });
-            
+
             if (localStorage.getItem("redirect_after_login")) {
                 const url = localStorage.getItem("redirect_after_login");
                 localStorage.removeItem("redirect_after_login");
@@ -172,39 +174,89 @@
              * Add a notification to the dropdown
              * @param {Object} notification
              */
+            // function addNotification(notification) {
+            //     const payload = notification.data || notification;
+            //     const notifId = notification.id || payload.notification_id;
+            //     const bookingId = payload.booking_id;
+            //     const notifShowUrl = notifId ? `/notifications/${notifId}` : '#';
+
+            //     const notifItem = `
+            //     <a href="${notifShowUrl}" 
+            //     class="dropdown-item text-start mark-as-read fw-bold"
+            //     data-id="${notifId}" data-url="${notifShowUrl}"
+            //     style="white-space: normal; text-wrap: wrap;">
+            //     <i class="bx bx-bell me-2"></i> ${payload.message}
+            //     <br>
+            //     <small class="text-muted">Just now</small>
+            //     </a>
+            //     `;
+
+            //     const notifMenu = $('#notifDropdownMenu');
+            //     if (notifMenu.find('.dropdown-item').length > 0) {
+            //         notifMenu.prepend('<div class="dropdown-divider"></div>' + notifItem);
+            //     } else {
+            //         notifMenu.prepend(notifItem);
+            //     }
+            //     const items = notifMenu.find('.dropdown-item');
+            //     if (items.length > 5) {
+            //         items.slice(5).remove();
+            //     }
+
+            //     let badge = $('#notifDropdown .badge');
+            //     if (badge.length) {
+            //         badge.text(parseInt(badge.text()) + 1);
+            //     } else {
+            //         $('#notifDropdown').append(`
+            // <span class="position-absolute top-0 start-100 badge rounded-pill bg-danger"
+            //       style="transform: translate(-60%, -35%);">1</span>
+            //     `);
+            //     }
+            // }
+
+
             function addNotification(notification) {
                 const payload = notification.data || notification;
                 const notifId = notification.id || payload.notification_id;
-                const bookingId = payload.booking_id;
                 const notifShowUrl = notifId ? `/notifications/${notifId}` : '#';
 
                 const notifItem = `
         <a href="${notifShowUrl}" 
-           class="dropdown-item text-start mark-as-read fw-bold"
-           data-id="${notifId}" data-url="${notifShowUrl}"
-           style="white-space: normal; text-wrap: wrap;">
-           <i class="bx bx-bell me-2"></i> ${payload.message}
-           <br>
-           <small class="text-muted">Just now</small>
+        class="dropdown-item text-start mark-as-read fw-bold"
+        data-id="${notifId}" data-url="${notifShowUrl}"
+        style="white-space: normal; text-wrap: wrap;">
+        <i class="bx bx-bell me-2"></i> ${payload.message}
+        <br>
+        <small class="text-muted">Just now</small>
         </a>
     `;
 
                 const notifMenu = $('#notifDropdownMenu');
 
-                // Only add divider if there are already items
                 if (notifMenu.find('.dropdown-item').length > 0) {
                     notifMenu.prepend('<div class="dropdown-divider"></div>' + notifItem);
                 } else {
                     notifMenu.prepend(notifItem);
                 }
 
-                // Limit dropdown to 5 notifications
-                const items = notifMenu.find('.dropdown-item');
-                if (items.length > 5) {
-                    items.slice(5).remove();
+                // Count items
+                const unreadItems = notifMenu.find('.dropdown-item.fw-bold');
+                const readItems = notifMenu.find('.dropdown-item.notification-read');
+                const totalItems = unreadItems.length + readItems.length;
+
+                // Keep only 5 items
+                if (totalItems > 5) {
+
+                    // Remove READ first
+                    if (readItems.length > 0) {
+                        readItems.last().remove();
+                    }
+                    // If no read, remove oldest UNREAD (rare but safe)
+                    else {
+                        unreadItems.last().remove();
+                    }
                 }
 
-                // Update badge
+                // Badge counter
                 let badge = $('#notifDropdown .badge');
                 if (badge.length) {
                     badge.text(parseInt(badge.text()) + 1);
@@ -217,7 +269,8 @@
             }
 
 
-            // Real-time notifications via Echo
+
+
             if (typeof window.Echo !== 'undefined') {
                 window.Echo.private(`App.Models.User.{{ auth()->id() }}`)
                     .notification((notification) => {

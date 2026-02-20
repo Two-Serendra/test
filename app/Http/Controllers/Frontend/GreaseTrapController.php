@@ -182,7 +182,7 @@ class GreaseTrapController extends Controller
                 if ($chargedType == 2 && !$request->force_payment) {
                     DB::rollBack();
                     return response()->json([
-                        'message' => "You have {$remainingFreeBookings} free bookings remaining. This booking will require payment. Do you want to continue?",
+                        'message' => "You already used your free grease trap booking for this year. This booking will require payment. Continue?",
                         'requires_payment' => true,
                         'remaining_free_bookings' => $remainingFreeBookings
                     ], 409);
@@ -197,7 +197,7 @@ class GreaseTrapController extends Controller
                 if ($isAlreadyBooked) {
                     DB::rollBack();
                     return response()->json([
-                        'message' => 'This time slot is already booked.'
+                        'message' => 'Slot already taken just now.'
                     ], 409);
                 }
                 $booking = GreaseTrapBooking::create([

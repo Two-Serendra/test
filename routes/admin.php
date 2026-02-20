@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Backend\FunctionRoomBookingController;
 use App\Http\Controllers\Backend\GreaseTrapBookingController;
 use App\Http\Controllers\Backend\AddOnsController;
+use App\Http\Controllers\Backend\PestControlController;
 use App\Http\Controllers\Frontend\FrontendFunctionRoomBookingController;
 
 Route::middleware('guest:admin')->group(function () {
@@ -152,6 +153,8 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/admin-function-rooms/enable/{id}', [FunctionRoomsController::class, 'enable']);
     Route::get('/get-updated-function-rooms-table', [FunctionRoomsController::class, 'getUpdatedFunctionRoomsTable'])->name('get.updated.function.rooms.table');
 
+
+
     //Function Rooms Discounts
     Route::get('/admin-function-room-discounts', [FunctionRoomDiscountController::class, 'showFunctionRoomDiscounts'])->name('admin.show.function.room.discounts');
     Route::post('/admin-create-function-room-discounts', [FunctionRoomDiscountController::class, 'createFunctionRoomDiscounts'])->name('create.function.room.discounts');
@@ -184,6 +187,7 @@ Route::middleware('auth:admin')->group(function () {
 
     //Function Room Bookings
     Route::get('/admin-function-room-bookings', [FunctionRoomBookingController::class, 'showFunctionRoomBookings'])->name('admin.show.function.room.bookings');
+
     // Route::get('/admin-function-room-bookings-store', [FunctionRoomBookingController::class, 'adminBookingStore'])->name('admin.booking.store');
 
     Route::post('/admin-function-room-bookings-approval', [FunctionRoomBookingController::class, 'FunctionRoomBookingApproval'])->name('admin.function.room.booking.approvals');
@@ -218,7 +222,6 @@ Route::middleware('auth:admin')->group(function () {
     //Grease Trap Bookings
     Route::get('/admin-booking-grease-trap', [GreaseTrapBookingController::class, 'AdminBookingGreaseTrap'])->name('admin.booking.grease.trap');
     Route::post('/admin/grease-trap/booking/store', [GreaseTrapBookingController::class, 'AdminStoreGreaseTrapBooking'])->name('admin.grease.trap.booking.store');
-
     Route::get('/grease-trap/booked-slots', [GreaseTrapBookingController::class, 'getBookedSlotsAdmin'])
         ->name('admin.grease.trap.booked.slots');
     Route::get('/admin-get-updated-grease-trap-table', [GreaseTrapBookingController::class, 'getUpdatedGreaseTrapTable']);
@@ -231,11 +234,31 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/admin-booking-grease-trap-calendar', [GreaseTrapBookingController::class, 'AdminBookingGreaseTrapCalendar'])->name('admin.booking.grease.trap.calendar');
     Route::get('/fetch/grease-trap-calendar-details/{id}', [GreaseTrapBookingController::class, 'fetchGreaseTrapCalendarSchedule'])->name("admin.fetch.booking.grease.trap.calendar");
 
+    //Pest Control
+    Route::get('/admin-booking-pest-control', [PestControlController::class, 'AdminBookingPestControl'])->name('admin.booking.pest.control');
+    Route::post('/admin-pest-control-booking-store', [PestControlController::class, 'AdminStorePestControlBooking'])->name('admin.pest.control.booking.store');
+    Route::get('/admin-get-updated-pest-control-table', [PestControlController::class, 'getUpdatedPestControlTable']);
+    Route::post('/admin/pest-control/emergency-booking/store', [PestControlController::class, 'AdminStoreEmergencyPestControl'])->name('admin.pest.control.emergency.booking.store');
+    Route::get('/admin-fetch-pest-control-booking/{id}', [PestControlController::class, 'fetchPestControlBooking'])->name('admin.fetch.pest.control.booking');
+    Route::post('/admin/pest-control/booking/update', [PestControlController::class, 'AdminUpdatePestControlBooking'])->name('admin.pest.control.booking.update');
+    Route::post('/admin-pest-control-booking/cancel/{booking}', [PestControlController::class, 'CancelPestControlBookingAdmin'])
+        ->name('admin.pest.control.booking.cancel');
+
+    Route::get('/admin-pest-control-trap-calendar', [PestControlController::class, 'AdminBookingPestControlCalendar'])->name('admin.booking.pest.control.calendar');
+    Route::get('/fetch/pest-control-calendar-details/{id}', [PestControlController::class, 'fetchPestControlCalendarSchedule'])->name("admin.fetch.booking.pest.control.calendar");
+
+    Route::get('/search-pest-control-booking', [PestControlController::class, 'searchPestControlBooking'])->name('admin.search.pest.control.booking');
+
+    Route::get('/admin-pest-control/booked-slots', [PestControlController::class, 'getBookedSlotsAdminPestControl'])
+        ->name('admin.pest.control.booked.slots');
+
+
 
 
     Route::get('/admin-gallery', [GalleryController::class, 'showGallery'])->name('admin.show.gallery');
     Route::post('/admin/gallery/upload', [GalleryController::class, 'uploadGalleryImages'])->name('admin.gallery.upload');
     Route::get('/get-updated-gallery-table', [GalleryController::class, 'getUpdatedGalleryTable'])->name('get.updated.gallery.table');
+
 
     //Event
     Route::get('/admin-events', [EventsController::class, 'showEvents'])->name('admin.show.events');

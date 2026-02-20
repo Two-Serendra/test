@@ -219,7 +219,7 @@ class PestControlController extends Controller
                 if ($slotTaken) {
                     DB::rollBack();
                     return response()->json(['message' => 'Slot already taken just now'], 409);
-                }
+                } 
 
                 // Check free booking quota safely (resident row is locked)
                 $monthStart = Carbon::parse($bookingDate)->startOfMonth()->toDateString();

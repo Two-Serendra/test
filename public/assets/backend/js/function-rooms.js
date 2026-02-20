@@ -556,7 +556,9 @@ $(document).ready(function () {
                     var function_room_capacity = functionRoom.function_room_capacity ? functionRoom.function_room_capacity : 'N/A';
                     var function_room_short_description = functionRoom.function_room_short_description ? functionRoom.function_room_short_description.toUpperCase() : 'N/A';
                     var function_room_description = functionRoom.function_room_description ? functionRoom.function_room_description.toUpperCase() : 'N/A';
-                    var function_room_policy = functionRoom.function_room_policy ? functionRoom.function_room_policy : 'N/A';
+                    var function_room_policy = functionRoom.function_room_policy
+                        ? limitText(stripHtml(functionRoom.function_room_policy), 100)
+                        : 'N/A';
                     var function_room_360 = functionRoom.function_room_360
                     var function_room_remarks = functionRoom.function_room_remarks ? functionRoom.function_room_remarks : 'N/A';
                     var discountDisplay = 'N/A';

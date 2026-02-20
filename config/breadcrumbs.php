@@ -18,6 +18,11 @@ return [
 
     // Grease Trap
     'admin.booking.grease.trap' => ['Grease Trap', 'Booking'],
+    'admin.booking.grease.trap.calendar' => ['Grease Trap', 'Calendar'],
+
+    // Pest Control
+    'admin.booking.pest.control' => ['Pest Control', 'Booking'],
+    'admin.booking.pest.control.calendar' => ['Pest Control', 'Calendar'],
 
     // Manage Section
     'admin.show.user' => ['Manage', 'User'],

@@ -258,6 +258,7 @@ class GreaseTrapBookingController extends Controller
          'booking_date' => Carbon::parse($greaseTrapBooking->booking_date)->format('F d, Y'),
          'booking_time_slot' => $greaseTrapBooking->booking_time_slot,
          'srf_no' => $greaseTrapBooking->srf_no,
+         'charged_type' => $greaseTrapBooking->charged_type, // <-- add this
       ]);
    }
 

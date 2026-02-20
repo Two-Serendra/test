@@ -192,7 +192,14 @@
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-wrench"></i>
-                <div data-i18n="Form Elements">Grease Trap</div>
+                <div data-i18n="Form Elements">
+                    Grease Trap
+                    <span id="grease-trap-booking-counter" class="badge bg-danger d-none"
+                        style="min-width: 22px; text-align: center; display: inline-flex; justify-content: center; align-items: center;">
+                        0
+                    </span>
+
+                </div>
             </a>
             <ul class="menu-sub">
                 <li class="menu-item {{ request()->routeIs('admin.booking.grease.trap') ? 'active' : '' }}">
@@ -210,6 +217,36 @@
                 </li>
             </ul>
         </li>
+
+        <li class="menu-item">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-wrench"></i>
+                <div data-i18n="Form Elements">
+                    Pest Control
+                    <span id="pest-control-booking-counter" class="badge bg-danger d-none"
+                        style="min-width: 22px; text-align: center; display: inline-flex; justify-content: center; align-items: center;">
+                        0
+                    </span>
+
+                </div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('admin.booking.pest.control') ? 'active' : '' }}">
+                    <a href="{{ route('admin.booking.pest.control') }}" class="menu-link">
+                        <div data-i18n="Typography">Booking</div>
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('admin.booking.pest.control.calendar') ? 'active' : '' }}">
+                    <a href="{{ route('admin.booking.pest.control.calendar') }}" class="menu-link">
+                        <div data-i18n="Typography">Calendar</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
         @endroles
 
         <!-- Manage -->

@@ -1,85 +1,125 @@
 $(document).ready(function () {
-    $(document).on('click', '.AddGreaseTrapBookingAdmin', function () {
-        $('#greastrapAdd').modal('show');
+
+
+    $(document).on('click', '.AddPesControlBookingAdmin', function () {
+        $('#pestcontrolAdd').modal('show');
+        disableCreateBtn();
+        $('.booking-slot-admin-pest-control').prop('disabled', true).prop('checked', false);
     });
 
+    $(document).on('click', '.AddEmergencyPesControlBooking', function () {
+        $('#emergencyPestControlBooking').modal('show');
 
-    flatpickr("#GreaseTrapBookingDateAdmin, #GreaseTrapBookingDateAdminEmergency", {
+    });
+
+    $('#unit, #PestControlBookingDateAdmin').on('change keyup', function () {
+        disableCreateBtn('Input changed');
+        $bookingSlots.prop('disabled', true).prop('checked', false);
+    });
+
+    let slotsLoaded = false;
+
+    function disableCreateBtn(reason = '') {
+        slotsLoaded = false;
+        $('#saveAdminPestControlBtn')
+            .prop('disabled', true)
+            .removeClass('btn-success')
+            .addClass('btn-secondary');
+
+        $('#slotStatusBadge')
+            .removeClass('bg-success bg-warning')
+            .addClass('bg-secondary')
+            .text(reason || 'Not checked');
+    }
+
+    function enableCreateBtn() {
+        slotsLoaded = true;
+        $('#saveAdminPestControlBtn')
+            .prop('disabled', false)
+            .removeClass('btn-secondary')
+            .addClass('btn-success');
+
+        $('#slotStatusBadge')
+            .removeClass('bg-secondary bg-warning')
+            .addClass('bg-success')
+            .text('Slots loaded');
+    }
+
+    disableCreateBtn();
+
+
+
+
+    flatpickr("#PestControlBookingDateAdmin, #PestControlBookingDateAdminEmergency", {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(1)
     });
 
 
-    const $bookingDate = $('#GreaseTrapBookingDateAdmin');
-    const $bookingSlots = $('.booking-slot-admin');
-    const $submitBtn = $('#saveUserGreaseTrapBtn');
+    const $bookingSlots = $('.booking-slot-admin-pest-control');
+    $bookingSlots.prop('disabled', true);
 
-    function updateSlots(date) {
-        if (!date) return;
+    const $bookingDate = $('#PestControlBookingDateAdmin');
+    const $submitBtn = $('#saveAdminPestControlBtn');
 
+    $('#checkPestControlSlots').on('click', function () {
+
+        let date = $('#PestControlBookingDateAdmin').val();
+        let unit = $('#unit').val();
+
+        if (!date || !unit) {
+            Swal.fire('Missing Info', 'Enter Unit and Date first', 'warning');
+            return;
+        }
+
+        $('#slotStatusBadge').removeClass().addClass('badge bg-warning').text('Checking...');
+        $(this).prop('disabled', true).text('Checking...');
+
+        updateSlots(date, unit);
+    });
+
+
+
+    function updateSlots(date, unit) {
         $.ajax({
-            url: '/admin/grease-trap/booked-slots',
+            url: '/admin/admin-pest-control/booked-slots',
             type: 'GET',
-            data: { date },
+            data: { date, unit },
             success: function (res) {
                 resetSlots();
                 disableBookedSlots(res.booked_slots);
+                enableCreateBtn();
             },
-            error: function () {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Unable to load available slots.'
-                });
+            complete: function () {
+                $('#checkPestControlSlots').prop('disabled', false).html('<i class="bx bx-search"></i> Refresh Slots');
             }
         });
     }
 
     function resetSlots() {
+        const $bookingSlots = $('.booking-slot-admin-pest-control');
+        $bookingSlots.prop('disabled', false).prop('checked', false);
         $bookingSlots.each(function () {
-            $(this).prop('disabled', false).prop('checked', false);
-            $('label[for="' + this.id + '"]')
-                .removeClass('disabled btn-secondary')
-                .addClass('btn-outline-primary')
-                .css('cursor', 'pointer');
+            $('label[for="' + this.id + '"]').removeClass('btn-secondary disabled').addClass('btn-outline-primary');
         });
     }
 
     function disableBookedSlots(bookedSlots) {
         bookedSlots.forEach(slot => {
-            const $radio = $('.booking-slot-admin[data-slot="' + slot + '"]');
-
+            const $radio = $('.booking-slot-admin-pest-control[data-slot="' + slot + '"]');
             if ($radio.length) {
                 $radio.prop('disabled', true);
-                $('label[for="' + $radio.attr('id') + '"]')
-                    .removeClass('btn-outline-primary')
-                    .addClass('btn-secondary disabled')
-                    .css('cursor', 'not-allowed');
+                $('label[for="' + $radio.attr('id') + '"]').removeClass('btn-outline-primary').addClass('btn-secondary disabled');
             }
         });
     }
 
-    $bookingSlots.prop('disabled', true);
-
-
-    $bookingDate.on('change', function () {
-        const selectedDate = $(this).val();
-        updateSlots(selectedDate);
-    });
-
-    $('.AddEmergencyGreaseTrapBooking').on('click', function () {
-        $('#emergencyGreaseTrapBooking').modal('show');
-    });
-
-
-
-
-    $('#greaseTrapBookingFormAdmin').submit(function (event) {
+    $('#pestControlBookingFormAdmin').submit(function (event) {
         event.preventDefault();
 
         const form = this;
-        const $submitBtn = $('#saveUserGreaseTrapBtn');
-        const $bookingDate = $('#GreaseTrapBookingDateAdmin');
+        const $submitBtn = $('#saveAdminPestControlBtn');
+        const $bookingDate = $('#PestControlBookingDateAdmin');
         const modal = $bookingDate.val();
 
         if (!form.checkValidity()) {
@@ -100,7 +140,7 @@ $(document).ready(function () {
         const unlockSubmitBtn = () => {
             $submitBtn
                 .attr('disabled', false)
-                .html(`<span class="btn-text">Submit</span>`)
+                .html(`<span class="btn-text">Create</span>`)
                 .css('width', '');
         };
 
@@ -136,11 +176,10 @@ $(document).ready(function () {
                     form.reset();
                     $(form).removeClass('was-validated');
 
-                    flatpickr('#GreaseTrapBookingDateAdmin', {
+                    flatpickr('#PestControlBookingDateAdmin', {
                         dateFormat: 'Y-m-d',
                         minDate: new Date().fp_incr(1)
                     });
-
                     updateSlots(selectedDate);
                 },
 
@@ -198,8 +237,8 @@ $(document).ready(function () {
 
                 complete() {
                     unlockSubmitBtn();
-                    refreshGreaseTrapTableBookings()
-                    $('#greastrapAdd').modal('hide');
+                    refreshPestControlTableBookings()
+                    $('#pestcontrolAdd').modal('hide');
                 }
             });
         };
@@ -208,14 +247,15 @@ $(document).ready(function () {
 
 
 
-    function refreshGreaseTrapTableBookings() {
+
+    function refreshPestControlTableBookings() {
         $.ajax({
-            url: '/admin/admin-get-updated-grease-trap-table',
+            url: '/admin/admin-get-updated-pest-control-table',
             type: 'GET',
             dataType: 'json',
             success: function (response) {
                 var bookings = response.data;
-                var tableBody = $('#greaseTrapBookingTable tbody');
+                var tableBody = $('#pestControlBookingTable tbody');
 
                 $('[data-bs-toggle="tooltip"]').tooltip('dispose');
                 tableBody.empty();
@@ -226,14 +266,14 @@ $(document).ready(function () {
 
                     var actionButtons = `
                         <div class="d-flex gap-1 justify-content-center">
-                            <button type="button" class="btn btn-primary edit_grease_trap_booking btn-sm btn-equal"
+                            <button type="button" class="btn btn-primary edit_pest_control_booking btn-sm btn-equal"
                                 data-bs-toggle="tooltip" data-bs-placement="left" title="View"
                                 data-id="${booking.id}">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
 
                             <button type="button"
-                                class="btn btn-sm btn-equal ${isCancelled ? 'btn-secondary cancel-booking' : 'btn-danger admin-grease-trap-booking-cancel'}"
+                                class="btn btn-sm btn-equal ${isCancelled ? 'btn-secondary cancel-booking' : 'btn-danger admin-pest-control-booking-cancel'}"
                                 data-bs-toggle="tooltip" data-bs-placement="right"
                                 title="${isCancelled ? 'Cancelled' : 'Cancel'}"
                                 data-id="${booking.id}" ${isCancelled ? 'disabled' : ''}>
@@ -294,7 +334,7 @@ $(document).ready(function () {
         });
     }
 
-    $(document).on('click', '.admin-grease-trap-booking-cancel', function () {
+    $(document).on('click', '.admin-pest-control-booking-cancel', function () {
         const bookingId = $(this).data('id');
         const swalText = "Are you sure you want to cancel this booking?";
 
@@ -310,7 +350,7 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/admin/admin-grease-trap-booking/cancel/' + bookingId,
+                    url: '/admin/admin-pest-control-booking/cancel/' + bookingId,
                     type: 'POST',
                     data: {
                         _token: $('meta[name="csrf-token"]').attr('content')
@@ -331,10 +371,10 @@ $(document).ready(function () {
         });
     });
 
-    $('#greaseTrapBookingEmergencyForm').on('submit', function (e) {
+    $('#pestControlBookingEmergencyForm').on('submit', function (e) {
         e.preventDefault();
         const form = this;
-        const $submitBtn = $('#saveEmergencyGreaseTrapBtn');
+        const $submitBtn = $('#saveEmergencyPestControlBtn');
 
         if (!form.checkValidity()) {
             form.classList.add('was-validated');
@@ -390,7 +430,7 @@ $(document).ready(function () {
                     form.reset();
                     $(form).removeClass('was-validated');
 
-                    flatpickr('#GreaseTrapBookingDateAdmin', {
+                    flatpickr('#PestControlBookingDateAdmin', {
                         dateFormat: 'Y-m-d',
                         minDate: new Date().fp_incr(1)
                     });
@@ -440,9 +480,6 @@ $(document).ready(function () {
                         return;
                     }
 
-                    /** -------------------------------
-                     * Fallback error
-                     * ------------------------------- */
                     Swal.fire({
                         toast: true,
                         position: 'top-end',
@@ -455,8 +492,8 @@ $(document).ready(function () {
 
                 complete() {
                     unlockSubmitBtn();
-                    refreshGreaseTrapTableBookings()
-                    $('#emergencyGreaseTrapBooking').modal('hide');
+                    refreshPestControlTableBookings()
+                    $('#emergencyPestControlBooking').modal('hide');
                 }
             });
         };
@@ -466,13 +503,13 @@ $(document).ready(function () {
     });
 
 
-    $('#greaseTrapBookingTable').on('click', '.edit_grease_trap_booking', function () {
+    $('#pestControlBookingTable').on('click', '.edit_pest_control_booking', function () {
 
         let info_id = $(this).data("id");
 
-        $.get('/admin/admin-fetch-grease-trap-booking/' + info_id, function (data) {
+        $.get('/admin/admin-fetch-pest-control-booking/' + info_id, function (data) {
 
-            $('#greastrapEdit').modal('show');
+
 
             $('#display_name').text(data.name);
             $('#display_unit').text(data.unit_no);
@@ -484,13 +521,10 @@ $(document).ready(function () {
             if (residentType === 'TENANT') residentBadge = `<span class="badge bg-danger">TENANT</span>`;
             if (residentType === 'OWNER') residentBadge = `<span class="badge bg-primary">OWNER</span>`;
 
-
             $('#display_resident_type').html(residentBadge);
 
             $('#display_booking_date').text(data.booking_date);
-
-
-            let chargedType = data.charged_type; 
+            let chargedType = data.charged_type;
             let chargedBadge = `<span class="badge bg-secondary">N/A</span>`;
 
             // Map types
@@ -499,13 +533,15 @@ $(document).ready(function () {
 
             $('#display_charged_type').html(chargedBadge);
 
+            // Time slot badge
             $('#display_time_slot').text(data.booking_time_slot);
             $('#display_transaction_no').text(data.transaction_no);
 
-
+            // Editable fields
             $('#srf_no').val(data.srf_no);
             $('#remarks_grease_trap').val(data.remarks);
             $('#info_id').val(info_id);
+            $('#pestcontrolEdit').modal('show'); 
         })
             .fail(function () {
                 alert("Data not found");
@@ -513,7 +549,7 @@ $(document).ready(function () {
     });
 
 
-    $('#updateGreaseTrapBookingFormAdmin').submit(function (event) {
+    $('#updatePestControlBookingFormAdmin').submit(function (event) {
         event.preventDefault();
 
         if (!this.checkValidity()) {
@@ -522,7 +558,7 @@ $(document).ready(function () {
         }
         this.classList.remove('was-validated');
 
-        const $btn = $('#UpdateGreaseTrapBookingBtn');
+        const $btn = $('#UpdatePestControlBookingBtn');
         const originalWidth = $btn.outerWidth();
         $btn
             .attr('disabled', true)
@@ -542,7 +578,7 @@ $(document).ready(function () {
             processData: false,
             contentType: false,
             success: function (response) {
-                $('#greastrapEdit').modal('hide');
+                $('#pestcontrolEdit').modal('hide');
                 form.reset();
                 const Toast = Swal.mixin({
                     toast: true,
@@ -566,7 +602,7 @@ $(document).ready(function () {
 
                 form.reset();
                 $(form).removeClass('was-validated');
-                refreshGreaseTrapTableBookings();
+                refreshPestControlTableBookings()
             },
             error: function (xhr, status, error) {
                 const Toast = Swal.mixin({

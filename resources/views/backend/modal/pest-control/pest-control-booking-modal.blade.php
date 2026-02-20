@@ -1,26 +1,19 @@
-<div class="modal fade" id="greastrapAdd" data-bs-backdrop="static" data-bs-keyboard="false">
+<div class="modal fade" id="pestcontrolAdd" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-3" id="staticBackdropLabel">ADD NEW GREASE TRAP BOOKING</h1>
+                <h1 class="modal-title fs-3" id="staticBackdropLabel">ADD NEW PEST CONTROL BOOKING</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="{{ route('admin.grease.trap.booking.store') }}" id="greaseTrapBookingFormAdmin"
-                    method="POST" enctype="multipart/form-data" class="AdminNewGreaseTrapBooking needs-validation"
+                <form action="{{ route('admin.pest.control.booking.store') }}" id="pestControlBookingFormAdmin"
+                    method="POST" enctype="multipart/form-data" class="AdminNewPestControlBooking needs-validation"
                     novalidate>
                     @csrf
 
                     <div class="row g-3">
-
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Name *</label>
-                                <input type="text" class="form-control" id="name" name="name" required>
-                                <div class="invalid-feedback">Required</div>
-
-                            </div>
-
+                        <!-- Time Slots -->
+                        <div class="col-6">
                             <div class="mb-3">
                                 <label for="unit" class="form-label">Unit *</label>
                                 <input type="text" class="form-control" id="unit" name="unit" oninput="
@@ -29,6 +22,63 @@
                                     .replace(/[^0-9A-I]/g,'');
                                 " required>
                                 <div class="invalid-feedback">Format: 304A, 1203B, 2501H</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="PestControlBookingDate" class="form-label">Date</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="bx bx-calendar"></i></span>
+                                    <input type="text" class="form-control bg-white text-dark"
+                                        id="PestControlBookingDateAdmin" name="booking_date" required>
+                                </div>
+                                <div class="invalid-feedback">Required</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <button type="button" id="checkPestControlSlots" class="btn btn-outline-primary w-100">
+                                    <i class="bx bx-search"></i> Check Available Slots
+                                </button>
+                            </div>
+
+                           <label class="form-label d-flex justify-content-between align-items-center">
+                                <span>Select Time Slot *</span>
+                                <span id="slotStatusBadge" class="badge bg-secondary">Not checked</span>
+                            
+                            </label>
+                            <div class="row g-2">
+                                @php
+                                    $slots = [
+                                        '08:00 AM - 9:00 AM',
+                                        '09:00 AM - 10:00 AM',
+                                        '10:00 AM - 11:00 AM',
+                                        '11:00 AM - 12:00 NN',
+                                        '01:00 PM - 02:00 PM',
+                                        '02:00 PM - 03:00 PM',
+                                        '03:00 PM - 04:00 PM',
+                                        '04:00 PM - 05:00 PM',
+                                    ];
+                                @endphp
+
+                                @foreach ($slots as $slot)
+                                    <div class="col-12">
+                                        <input type="radio" class="btn-check booking-slot-admin-pest-control" name="booking_time_slot"
+                                            id="slot{{ $loop->index }}" value="{{ $slot }}" data-slot="{{ $slot }}"
+                                            required>
+                                        <label class="btn btn-outline-primary w-100" for="slot{{ $loop->index }}">
+                                            {{ $slot }}
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Name *</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                                <div class="invalid-feedback">Required</div>
+
                             </div>
 
                             <div class="mb-3">
@@ -50,75 +100,33 @@
                             </div>
                         </div>
 
-                        <!-- Time Slots -->
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label for="GreaseTrapBookingDate" class="form-label">Date</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-white"><i class="bx bx-calendar"></i></span>
-                                    <input type="text" class="form-control bg-white text-dark"
-                                        id="GreaseTrapBookingDateAdmin" name="booking_date" required>
-                                </div>
-                                <div class="invalid-feedback">Required</div>
-                            </div>
-
-
-                            <label class="form-label">Select Time Slot *</label>
-                            <div class="row g-2">
-                                @php
-                                    $slots = [
-                                        '09:00 AM - 10:00 AM',
-                                        '10:00 AM - 11:00 AM',
-                                        '11:00 AM - 12:00 NN',
-                                        '01:00 PM - 02:00 PM',
-                                        '02:00 PM - 03:00 PM',
-                                        '03:00 PM - 04:00 PM',
-                                        '04:00 PM - 05:00 PM',
-                                    ];
-                                @endphp
-
-                                @foreach ($slots as $slot)
-                                    <div class="col-12">
-                                        <input type="radio" class="btn-check booking-slot-admin" name="booking_time_slot"
-                                            id="slot{{ $loop->index }}" value="{{ $slot }}" data-slot="{{ $slot }}"
-                                            required>
-                                        <label class="btn btn-outline-primary w-100" for="slot{{ $loop->index }}">
-                                            {{ $slot }}
-                                        </label>
-                                    </div>
-                                @endforeach
-                            </div>
-
-                        </div>
+                        
                     </div>
                 </form>
             </div>
 
             <div class="modal-footer">
-                <button type="submit" form="greaseTrapBookingFormAdmin" id="saveUserGreaseTrapBtn"
+                <button type="submit" form="pestControlBookingFormAdmin" id="saveAdminPestControlBtn"
                     class="btn btn-primary d-flex align-items-center justify-content-center"
                     style="min-width: 100px; height: 38px;">
                     <span class="btn-text">Create</span>
                 </button>
             </div>
-
-
         </div>
-
     </div>
 </div>
 
 
-<div class="modal fade" id="emergencyGreaseTrapBooking" data-bs-backdrop="static" data-bs-keyboard="false">
+<div class="modal fade" id="emergencyPestControlBooking" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-3" id="staticBackdropLabel">ADD EMERGENCY GREASE TRAP BOOKING</h1>
+                <h1 class="modal-title fs-3" id="staticBackdropLabel">ADD EMERGENCY PEST CONTROL BOOKING</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="{{ route('admin.grease.trap.emergency.booking.store') }}"
-                    id="greaseTrapBookingEmergencyForm" method="POST" enctype="multipart/form-data"
+                <form action="{{ route('admin.pest.control.emergency.booking.store') }}"
+                    id="pestControlBookingEmergencyForm" method="POST" enctype="multipart/form-data"
                     class="needs-validation" novalidate>
                     @csrf
 
@@ -144,11 +152,11 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="GreaseTrapBookingDate" class="form-label">Date</label>
+                                <label for="pestControlBookingDateAdminEmergency" class="form-label">Date</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white"><i class="bx bx-calendar"></i></span>
                                     <input type="text" class="form-control bg-white text-dark"
-                                        id="GreaseTrapBookingDateAdminEmergency" name="booking_date" required>
+                                        id="PestControlBookingDateAdminEmergency" name="booking_date" required>
                                 </div>
                                 <div class="invalid-feedback">Required</div>
                             </div>
@@ -207,7 +215,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="submit" form="greaseTrapBookingEmergencyForm" id="saveEmergencyGreaseTrapBtn"
+                <button type="submit" form="pestControlBookingEmergencyForm" id="saveEmergencyPestControlBtn"
                     class="btn btn-primary d-flex align-items-center justify-content-center"
                     style="min-width: 100px; height: 38px;">
                     <span class="btn-text">Create</span>
@@ -218,16 +226,16 @@
 </div>
 
 
-<div class="modal fade" id="greastrapEdit" data-bs-backdrop="static" data-bs-keyboard="false">
+<div class="modal fade" id="pestcontrolEdit" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-3" id="staticBackdropLabel">EDIT GREASE TRAP BOOKING</h1>
+                <h1 class="modal-title fs-3" id="staticBackdropLabel">EDIT PEST CONTROL BOOKING</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="{{ route('admin.grease.trap.booking.update') }}" id="updateGreaseTrapBookingFormAdmin"
-                    method="POST" enctype="multipart/form-data" class="AdminNewGreaseTrapBooking needs-validation"
+                <form action="{{ route('admin.pest.control.booking.update') }}" id="updatePestControlBookingFormAdmin"
+                    method="POST" enctype="multipart/form-data" class="AdminNewPestControlBooking needs-validation"
                     novalidate>
                     @csrf
                     <input type="hidden" id="info_id" name="id">
@@ -270,7 +278,6 @@
                                 <p class="form-control-plaintext" id="display_charged_type"></p>
                             </div>
 
-
                             <div class="mb-3">
                                 <label class="form-label">Time Slot</label>
                                 <p class="form-control-plaintext" id="display_time_slot"></p>
@@ -293,7 +300,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="submit" form="updateGreaseTrapBookingFormAdmin" id="UpdateGreaseTrapBookingBtn"
+                <button type="submit" form="updatePestControlBookingFormAdmin" id="UpdatePestControlBookingBtn"
                     class="btn btn-primary d-flex align-items-center justify-content-center"
                     style="min-width: 100px; height: 38px;">
                     <span class="btn-text">Update</span>
@@ -308,7 +315,7 @@
 
 
 {{-- Calendar Modal --}}
-<div class="modal fade" id="calendarModalGreaseTrap" tabindex="-1" aria-labelledby="editProductModalLabel"
+<div class="modal fade" id="calendarModalPestControl" tabindex="-1" aria-labelledby="editProductModalLabel"
     aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

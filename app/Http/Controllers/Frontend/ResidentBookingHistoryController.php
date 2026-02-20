@@ -79,7 +79,7 @@ class ResidentBookingHistoryController extends Controller
             $bookings = FunctionRoomBooking::with('functionRoom')
                 ->when($selectedUnit, fn($q) => $q->where('unit_no', $selectedUnit))
                 ->latest('function_room_booking_date')
-                ->paginate(1)
+                ->paginate(5)
                 ->withQueryString();
 
             if ($request->ajax()) {
@@ -94,7 +94,7 @@ class ResidentBookingHistoryController extends Controller
             $bookings = ActivityBooking::with('activity')
                 ->when($selectedUnit, fn($q) => $q->where('unit', $selectedUnit))
                 ->latest('booking_date')
-                ->paginate(1)
+                ->paginate(5)
                 ->withQueryString();
 
             if ($request->ajax()) {
@@ -108,7 +108,7 @@ class ResidentBookingHistoryController extends Controller
 
             $bookings = GreaseTrapBooking::when($selectedUnit, fn($q) => $q->where('unit_no', $selectedUnit))
                 ->orderBy('booking_date', 'desc')
-                ->paginate(1)
+                ->paginate(5)
                 ->withQueryString();
 
             if ($request->ajax()) {
@@ -121,7 +121,7 @@ class ResidentBookingHistoryController extends Controller
 
             $bookings = PestControlBooking::when($selectedUnit, fn($q) => $q->where('unit_no', $selectedUnit))
                 ->orderBy('booking_date', 'desc')
-                ->paginate(1)
+                ->paginate(5)
                 ->withQueryString();
 
             if ($request->ajax()) {

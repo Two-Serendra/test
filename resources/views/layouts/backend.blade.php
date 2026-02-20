@@ -168,6 +168,7 @@
     <script src="{{ asset('assets/backend/js/blocking.js') }}"></script>
     <script src="{{ asset('assets/backend/js/activitiy-booking.js') }}"></script>
     <script src="{{ asset('assets/backend/js/grease-trap-booking.js') }}"></script>
+    <script src="{{ asset('assets/backend/js/pest-control-booking.js') }}"></script>
     @stack('scripts')
 
     @stack('js')

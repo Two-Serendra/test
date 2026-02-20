@@ -220,7 +220,7 @@
 
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bx-wrench"></i>
+                <i class="menu-icon tf-icons bx bx-bug"></i>
                 <div data-i18n="Form Elements">
                     Pest Control
                     <span id="pest-control-booking-counter" class="badge bg-danger d-none"

@@ -391,3 +391,52 @@
         </div>
     </div>
 </div>
+
+
+<div class="modal fade" id="DownloadPestControlBookingReports" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-3" id="staticBackdropLabel">Download Pest Control Reports</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ route('download.pest.control.booking.reports')}}"
+                    id="download-pest-control-booking-reports" method="POST" enctype="multipart/form-data"
+                    class="needs-validation" novalidate>
+                    @csrf
+                    <div class="row">
+                        <div class="col-6 ">
+                            <div class="mb-3 position-relative">
+                                <label for="DownloadStartDatePC" class="form-label">Start Date *</label>
+                                <input type="text" id="DownloadStartDatePC" class="form-control"
+                                    name="download_start_date_pc">
+                                <i class="fa-regular fa-calendar position-absolute"
+                                    style="top: 73%; right: 8px; transform: translateY(-50%);"></i>
+                            </div>
+                        </div>
+
+                        <div class="col-6 ">
+                            <div class="mb-3 position-relative">
+                                <label for="DownloadEndDatePC" class="form-label">End Date *</label>
+                                <input type="text" id="DownloadEndDatePC" class="form-control" name="download_end_date_pc">
+                                <i class="fa-regular fa-calendar position-absolute"
+                                    style="top: 73%; right: 8px; transform: translateY(-50%);"></i>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" form="download-pest-control-booking-reports"
+                    id="download-pest-control-booking-reports"
+                    class="btn btn-primary d-flex align-items-center justify-content-center"
+                    style="min-width: 100px; height: 38px;">
+                    <span class="btn-text">Download</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -21,15 +21,32 @@
                             {{ \Carbon\Carbon::parse($b->booking_start_time)->format('g:i A') }} 
                             {{ \Carbon\Carbon::parse($b->booking_end_time)->format('g:i A') }}
                         </td>
-                        <td>
-                            @if ($b->booking_status == 0)
-                                <span class="badge bg-warning text-white badge-forge">Waiting</span>
-                            @elseif ($b->booking_status == 1)
-                                <span class="badge bg-success badge-forge">Confirmed</span>
-                            @else
-                                <span class="badge bg-danger badge-forge">Cancelled</span>
-                            @endif
-                        </td>
+                       <td>
+    @php
+        $bookingDate = \Carbon\Carbon::parse($b->booking_date);
+        $today = \Carbon\Carbon::today();
+
+        if ($bookingDate->lt($today)) {
+            $statusText = 'Completed';
+            $statusClass = 'badge bg-success badge-forge';
+        } else {
+            switch ($b->booking_status) {
+                case 0:
+                    $statusText = 'Waiting';
+                    $statusClass = 'badge bg-warning text-white badge-forge';
+                    break;
+                case 1:
+                    $statusText = 'Confirmed';
+                    $statusClass = 'badge bg-success badge-forge';
+                    break;
+                default:
+                    $statusText = 'Cancelled';
+                    $statusClass = 'badge bg-danger badge-forge';
+            }
+        }
+    @endphp
+    <span class="{{ $statusClass }}">{{ $statusText }}</span>
+</td>
                         <td>
                             <button class="btn btn-sm btn-info activity-booking-details badge-forge text-white"
                                 data-id="{{ $b->id }}">

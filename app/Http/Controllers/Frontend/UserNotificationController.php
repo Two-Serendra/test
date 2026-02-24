@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Notifications\UserAmenityBookingBellNotification;
 use App\Notifications\UserFunctionRoomBookingBellNotification;
 use App\Notifications\UserGreaseTrapBookingBellNotification;
-
+use App\Notifications\UserPestControlBookingBellNotification;
 class UserNotificationController extends Controller
 {
     // public function index()
@@ -50,6 +50,10 @@ class UserNotificationController extends Controller
 
             UserGreaseTrapBookingBellNotification::class
             => redirect()->route('show.grease.trap.booking.details', $bookingId),
+
+            UserPestControlBookingBellNotification::class
+            => redirect()->route('show.pest.control.booking.details', $bookingId),
+
 
 
             //    UserOtherBookingBellNotification::class

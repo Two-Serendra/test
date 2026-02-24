@@ -13,7 +13,7 @@ class UserGreaseTrapBookingConfirmation extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public GreaseTrapBooking  $booking;
+    public GreaseTrapBooking $booking;
 
     /**
      * Accept main booking + all linked bookings.
@@ -30,8 +30,7 @@ class UserGreaseTrapBookingConfirmation extends Mailable implements ShouldQueue
     public function build()
     {
         $name = $this->booking->user->name ?? 'Resident';
-
-        // Collect the names of ALL function rooms booked
+        $fee = 448;
 
 
         return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra')
@@ -43,6 +42,8 @@ class UserGreaseTrapBookingConfirmation extends Mailable implements ShouldQueue
                 'unit_no' => $this->booking->unit_no,
                 'booking_date' => $this->booking->booking_date,
                 'booking_time_slot' => $this->booking->booking_time_slot,
+                'charged_type' => $this->booking->charged_type,
+                'fee' => $fee,
 
             ]);
     }

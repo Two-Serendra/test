@@ -3,7 +3,7 @@
 return [
     // Function Rooms
     'admin.show.function.room.bookings' => ['Function Rooms', 'Booking'],
-    'admin.show.function.room.booking.records' => ['Function Rooms', 'Records'],
+    'admin.show.function.room.booking.records' => ['Function Rooms', 'Reports'],
     'admin.show.function.rooms.date.blocking' => ['Function Rooms', 'Date Blocking'],
     'admin.show.function.room.discounts' => ['Function Rooms', 'Discounts'],
     'admin.show.add.ons' => ['Function Rooms', 'Add Ons'],
@@ -11,7 +11,7 @@ return [
 
     // Amenities
     'admin.booking.activities' => ['Amenities', 'Booking'],
-    'admin.activity.history' => ['Amenities', 'History'],
+    'admin.activity.history' => ['Amenities', 'Reports'],
     'admin.show.date.blocking' => ['Amenities', 'Date Blocking'],
     'admin.show.amenities' => ['Amenities', 'Add Amenities'],
     'admin.show.activities' => ['Amenities', 'Add Activities'],
@@ -19,6 +19,8 @@ return [
     // Grease Trap
     'admin.booking.grease.trap' => ['Grease Trap', 'Booking'],
     'admin.booking.grease.trap.calendar' => ['Grease Trap', 'Calendar'],
+    'admin.report.grease.trap' => ['Grease Trap', 'Reports'],
+
 
     // Pest Control
     'admin.booking.pest.control' => ['Pest Control', 'Booking'],

@@ -232,7 +232,11 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/admin/grease-trap/booking/update', [GreaseTrapBookingController::class, 'AdminUpdateGreaseTrapBooking'])->name('admin.grease.trap.booking.update');
     Route::get('/search-greast-trap-booking', [GreaseTrapBookingController::class, 'searchGreaseTrapBooking'])->name('admin.search.grease.trap.booking');
     Route::get('/admin-booking-grease-trap-calendar', [GreaseTrapBookingController::class, 'AdminBookingGreaseTrapCalendar'])->name('admin.booking.grease.trap.calendar');
+    Route::get('/admin-report-grease-trap', [GreaseTrapBookingController::class, 'AdminReportGreaseTrap'])->name('admin.report.grease.trap');
     Route::get('/fetch/grease-trap-calendar-details/{id}', [GreaseTrapBookingController::class, 'fetchGreaseTrapCalendarSchedule'])->name("admin.fetch.booking.grease.trap.calendar");
+    Route::post('/admin-download-grease-trap-booking-records', [GreaseTrapBookingController::class, 'downloadGreaseTrapBookingRecords'])
+        ->name('download.grease.trap.booking.reports');
+
 
     //Pest Control
     Route::get('/admin-booking-pest-control', [PestControlController::class, 'AdminBookingPestControl'])->name('admin.booking.pest.control');
@@ -251,6 +255,10 @@ Route::middleware('auth:admin')->group(function () {
 
     Route::get('/admin-pest-control/booked-slots', [PestControlController::class, 'getBookedSlotsAdminPestControl'])
         ->name('admin.pest.control.booked.slots');
+    Route::get('/admin-report-pest-control', [PestControlController::class, 'AdminReportPestControl'])->name('admin.report.pest.control');
+
+    Route::post('/admin-download-pest-control-booking-records', [PestControlController::class, 'downloadPestControlBookingReports'])
+        ->name('download.pest.control.booking.reports');
 
 
 

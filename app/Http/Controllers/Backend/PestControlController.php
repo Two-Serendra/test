@@ -10,7 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PestControlController extends Controller
 {
@@ -159,7 +159,7 @@ class PestControlController extends Controller
                 if ($chargedType == 2 && !$request->force_payment) {
                     DB::rollBack();
                     return response()->json([
-                        'message' => "You already used your free pest control booking for this month. This booking will require payment. Continue?",
+                        'message' => "This unit has reached the monthly free pest control booking limit. This booking will cost ₱350.00. Do you want to continue?",
                         'requires_payment' => true,
                         'remaining_free_bookings' => max($freeBookingLimit - $unitBookingsThisMonth, 0)
                     ], 409);
@@ -247,7 +247,7 @@ class PestControlController extends Controller
             if ($chargedType == 2 && !$request->force_payment) {
                 DB::rollBack();
                 return response()->json([
-                    'message' => "You have already used your free pest control booking for this month. This emergency booking will require payment. Continue?",
+                    'message' => "This unit has reached the monthly free pest control booking limit. This booking will cost ₱350.00. Do you want to continue?",
                     'requires_payment' => true,
                     'remaining_free_bookings' => max($freeBookingLimit - $unitBookingsThisMonth, 0)
                 ], 409);
@@ -400,5 +400,125 @@ class PestControlController extends Controller
             'srf_no' => $schedule->srf_no ?? 'N/A',
             'charged_type' => $schedule->charged_type,
         ]);
+    }
+
+    public function AdminReportPestControl()
+    {
+        $pestControlBookings = PestControlBooking::whereDate('booking_date', '<', now()->toDateString())
+            ->orderBy('booking_date', 'desc')
+            ->paginate(10);
+        return view('backend.pest-control.pest-control-report', compact('pestControlBookings'));
+
+    }
+
+    public function downloadPestControlBookingReports(Request $request)
+    {
+        $fromDate = $request->input('download_start_date_pc');
+        $toDate = $request->input('download_end_date_pc');
+
+        Log::info("Grease Trap Download request", [
+            'download_start_date_pc' => $fromDate,
+            'download_end_date_pc' => $toDate
+        ]);
+
+        $formattedFromDate = Carbon::parse($fromDate)->format('m-d-Y');
+        $formattedToDate = Carbon::parse($toDate)->format('m-d-Y');
+
+        // Fetch data (PAST BOOKINGS ONLY)
+        $data = DB::table('pest_control_bookings')
+            ->join('users', 'pest_control_bookings.user_id', '=', 'users.id')
+            ->select(
+                'pest_control_bookings.transaction_no',
+                'pest_control_bookings.unit_no',
+                'pest_control_bookings.resident_type',
+                'users.name',
+                'pest_control_bookings.booking_date',
+                'pest_control_bookings.booking_time_slot',
+                'pest_control_bookings.srf_no',
+                'pest_control_bookings.remarks',
+                'pest_control_bookings.charged_type',
+                'pest_control_bookings.emergency',
+                'pest_control_bookings.booking_status',
+                'pest_control_bookings.created_at',
+                'pest_control_bookings.updated_at'
+            )
+            ->whereBetween('booking_date', [$fromDate, $toDate])
+            ->whereDate('booking_date', '<', now()->toDateString()) // ONLY PAST BOOKINGS
+            ->orderBy('booking_date', 'desc')
+            ->get();
+
+        Log::info("Pest Control Data fetched", [
+            'total_records' => count($data),
+        ]);
+
+        $fileName = "PestControl_Booking_Report_{$formattedFromDate}_to_{$formattedToDate}.csv";
+
+        $response = new StreamedResponse(function () use ($data) {
+
+            $handle = fopen('php://output', 'w');
+
+            // CSV HEADER
+            fputcsv($handle, [
+                'Transaction No',
+                'Resident Name',
+                'Unit No',
+                'Resident Type',
+                'Booking Date',
+                'Time Slot',
+                'SRF No',
+                'Remarks',
+                'Charged Type',
+                'Emergency',
+                'Status',
+                'Created At',
+                'Updated At'
+            ]);
+
+            foreach ($data as $row) {
+
+                $bookingDate = Carbon::parse($row->booking_date)->format('F j, Y');
+
+                // Charge Type
+                $chargeType = $row->charged_type == 1 ? 'Free' : 'Billable';
+
+                // Emergency
+                $emergency = $row->emergency == 1 ? 'Yes' : 'No';
+
+                // Status
+                $status = match ($row->booking_status) {
+                    1 => 'Completed',
+                    2 => 'Cancelled',
+                    default => 'Booked'
+                };
+
+                fputcsv($handle, [
+                    $row->transaction_no,
+                    $row->name,
+                    $row->unit_no,
+                    $row->resident_type,
+                    $bookingDate,
+                    $row->booking_time_slot,
+                    $row->srf_no,
+                    $row->remarks,
+                    $chargeType,
+                    $emergency,
+                    $status,
+                    $row->created_at,
+                    $row->updated_at
+                ]);
+
+                ob_flush();
+                flush();
+            }
+
+            fclose($handle);
+        });
+
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
+
+        Log::info("Pest Control CSV Export Completed", ['filename' => $fileName]);
+
+        return $response;
     }
 }

@@ -11,7 +11,7 @@ use App\Models\PestControlBooking;
 
 class ConciergePestControlBookingConfirmation extends Mailable implements ShouldQueue
 {
-    public PestControlBooking  $booking;
+    public PestControlBooking $booking;
 
     /**
      * Accept main booking + all linked bookings.
@@ -28,16 +28,19 @@ class ConciergePestControlBookingConfirmation extends Mailable implements Should
     public function build()
     {
         $name = $this->booking->user->name ?? 'Resident';
+        $fee = 350; 
+
         return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra')
-            ->subject('New Pest Control Booking')
-            ->view('emails.concierge-pest-control-booking-cofirmation')
+            ->subject('New Pest Control Booking Received')
+            ->view('emails.concierge-pest-control-booking-confirmation')
             ->with([
                 'name' => $name,
                 'transaction_no' => $this->booking->transaction_no,
                 'unit_no' => $this->booking->unit_no,
                 'booking_date' => $this->booking->booking_date,
                 'booking_time_slot' => $this->booking->booking_time_slot,
-
+                'charged_type' => $this->booking->charged_type,
+                'fee' => $fee,
             ]);
     }
 }

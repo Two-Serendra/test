@@ -541,7 +541,7 @@ $(document).ready(function () {
             $('#srf_no').val(data.srf_no);
             $('#remarks_grease_trap').val(data.remarks);
             $('#info_id').val(info_id);
-            $('#pestcontrolEdit').modal('show'); 
+            $('#pestcontrolEdit').modal('show');
         })
             .fail(function () {
                 alert("Data not found");
@@ -629,6 +629,75 @@ $(document).ready(function () {
                     .attr('disabled', false)
                     .html(`<span class="btn-text">Update</span>`)
                     .css('width', '');
+            }
+        });
+    });
+
+
+    flatpickr("#DownloadStartDatePC,#DownloadEndDatePC", {
+        enableTime: false,
+        dateFormat: "Y-m-d",
+        time_24hr: false,
+        allowInput: true,
+        defaultHour: 8,
+        defaultMinute: 0
+    });
+
+
+
+    $('.DownloadPestControlBookingReports').on('click', function () {
+        $('#DownloadPestControlBookingReports').modal('show');
+    });
+
+    $('#download-pest-control-booking-reports').submit(function (e) {
+        e.preventDefault();
+
+        const $btn = $('#DownloadPestControlBookingReportsBtn');
+        const originalWidth = $btn.outerWidth();
+
+        $btn.attr('disabled', true)
+            .html('<div class="spinner-border spinner-border-sm text-light"></div>')
+            .css('width', originalWidth + 'px');
+
+        const formData = $(this).serialize();
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: formData,
+            xhrFields: {
+                responseType: 'blob' // Important to handle file download
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response, status, xhr) {
+                const filename = xhr.getResponseHeader('Content-Disposition')
+                    .split('filename=')[1]
+                    .replace(/"/g, '');
+
+                const blob = new Blob([response], { type: 'text/csv' });
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                $('#DownloadPestControlBookingReports').modal('hide');
+                $('#download-pest-control-booking-reports')[0].reset();
+
+            },
+            error: function (xhr) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Download Failed',
+                    text: xhr.responseJSON?.message || 'Something went wrong. Please try again.',
+                    confirmButtonColor: '#d33'
+                });
+            },
+            complete: function () {
+                $btn.attr('disabled', false).html('Download').css('width', '');
             }
         });
     });

@@ -186,7 +186,6 @@ class PestControlController extends Controller
             try {
                 DB::beginTransaction();
 
-                // Lock resident row to safely check monthly free bookings
                 $resident = ResidentDetails::where('id', $request->resident_id_pest_control)
                     ->lockForUpdate()
                     ->first();
@@ -205,8 +204,6 @@ class PestControlController extends Controller
                     DB::rollBack();
                     return response()->json(['message' => 'Unknown area for your unit.'], 422);
                 }
-
-                // Lock all bookings for the same date + tower group to avoid race
                 $towerAreas = $towerGroup == 'lowrise' ? ['A', 'B', 'C', 'D', 'E'] : ['F', 'G', 'H', 'I'];
                 $existingBookings = PestControlBooking::whereDate('booking_date', $bookingDate)
                     ->whereIn('unit_area', $towerAreas)
@@ -214,21 +211,20 @@ class PestControlController extends Controller
                     ->lockForUpdate()
                     ->get();
 
-                // Check if requested slot is already taken
+
                 $slotTaken = $existingBookings->contains('booking_time_slot', $request->booking_time_slot);
                 if ($slotTaken) {
                     DB::rollBack();
                     return response()->json(['message' => 'Slot already taken just now'], 409);
-                } 
+                }
 
-                // Check free booking quota safely (resident row is locked)
                 $monthStart = Carbon::parse($bookingDate)->startOfMonth()->toDateString();
                 $monthEnd = Carbon::parse($bookingDate)->endOfMonth()->toDateString();
 
                 $unitBookingsThisMonth = PestControlBooking::where('unit_no', $resident->unit_no)
                     ->where('booking_status', 1)
                     ->whereBetween('booking_date', [$monthStart, $monthEnd])
-                    ->lockForUpdate() // lock all month bookings for this unit
+                    ->lockForUpdate()
                     ->count();
 
                 $freeBookingLimit = 1;
@@ -237,16 +233,16 @@ class PestControlController extends Controller
                 if ($chargedType == 2 && !$request->force_payment) {
                     DB::rollBack();
                     return response()->json([
-                        'message' => "You already used your free pest control booking for this month. This booking will require payment. Continue?",
+                        'message' => "You’ve used your free pest control booking for this month. This booking will cost ₱350.00. Continue with the booking?",
                         'requires_payment' => true,
                         'remaining_free_bookings' => max($freeBookingLimit - $unitBookingsThisMonth, 0)
                     ], 409);
                 }
 
-                // Create booking
+
                 $booking = PestControlBooking::create([
                     'user_id' => auth()->id(),
-                    'transaction_no' => '', // will set after insert
+                    'transaction_no' => '', 
                     'unit_no' => $resident->unit_no,
                     'resident_type' => $resident->resident_type,
                     'booking_date' => $bookingDate,
@@ -255,13 +251,11 @@ class PestControlController extends Controller
                     'charged_type' => $chargedType,
                 ]);
 
-                // Set transaction number based on actual ID
                 $booking->transaction_no = '2SPC-' . str_pad($booking->id, 5, '0', STR_PAD_LEFT);
                 $booking->save();
 
                 DB::commit();
 
-                // Dispatch emails / notifications AFTER commit
                 $booking->load('user');
                 DB::afterCommit(function () use ($booking) {
                     if ($booking->user?->email) {
@@ -280,7 +274,7 @@ class PestControlController extends Controller
 
             } catch (\Illuminate\Database\QueryException $e) {
                 DB::rollBack();
-                // deadlock / lock wait retry
+
                 if (in_array($e->errorInfo[1], [1213, 1205])) {
                     $attempt++;
                     usleep(100000);

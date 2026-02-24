@@ -11,7 +11,7 @@ use App\Models\GreaseTrapBooking;
 
 class ConciergeGreaseTrapBookingConfirmation extends Mailable implements ShouldQueue
 {
-    public GreaseTrapBooking  $booking;
+    public GreaseTrapBooking $booking;
 
     /**
      * Accept main booking + all linked bookings.
@@ -28,6 +28,8 @@ class ConciergeGreaseTrapBookingConfirmation extends Mailable implements ShouldQ
     public function build()
     {
         $name = $this->booking->user->name ?? 'Resident';
+        $fee = 448;
+
         return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra')
             ->subject('New Grease Trap Booking')
             ->view('emails.concierge-grease-trap-booking-cofirmation')
@@ -37,7 +39,8 @@ class ConciergeGreaseTrapBookingConfirmation extends Mailable implements ShouldQ
                 'unit_no' => $this->booking->unit_no,
                 'booking_date' => $this->booking->booking_date,
                 'booking_time_slot' => $this->booking->booking_time_slot,
-
+                'charged_type' => $this->booking->charged_type,
+                'fee' => $fee,
             ]);
     }
 }

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>New Grease Trap Booking</title>
+    <title>New Pest Control Booking</title>
 </head>
 
 <body style="font-family: Arial, sans-serif; background:#f4f6f8; padding:20px; color:#333;">
@@ -17,9 +17,9 @@
 
         <!-- Body -->
         <div style="padding:25px;">
-            <h2>📢 New Grease Trap Booking Received</h2>
+            <h2>📢 New Pest Control Booking Received</h2>
 
-            <p>A new grease trap booking has been submitted by a resident.</p>
+            <p>A new pest control booking has been submitted by a resident.</p>
 
             <table style="width:100%; border-collapse:collapse; margin-top:15px; font-size:14px;">
                 <tr>
@@ -52,12 +52,12 @@
                 </div>
             @else
                 <div style="margin-top:15px; padding:12px; background:#e6fffa; border-left:5px solid #28a745;">
-                    <strong>Billing Status:</strong> FREE (Yearly Complimentary Booking)
+                    <strong>Billing Status:</strong> FREE (Monthly Complimentary Booking)
                 </div>
             @endif
 
             <p style="margin-top:20px;">
-                Please assign this request to the grease trap service provider and update the booking status
+                Please assign this request to the pest control service provider and update the booking status
                 accordingly.
             </p>
 

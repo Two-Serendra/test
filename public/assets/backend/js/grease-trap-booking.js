@@ -490,7 +490,7 @@ $(document).ready(function () {
             $('#display_booking_date').text(data.booking_date);
 
 
-            let chargedType = data.charged_type; 
+            let chargedType = data.charged_type;
             let chargedBadge = `<span class="badge bg-secondary">N/A</span>`;
 
             // Map types
@@ -597,6 +597,74 @@ $(document).ready(function () {
         });
     });
 
+    flatpickr("#DownloadStartDateGT,#DownloadEndDateGT", {
+        enableTime: false,
+        dateFormat: "Y-m-d",
+        time_24hr: false,
+        allowInput: true,
+        defaultHour: 8,
+        defaultMinute: 0
+    });
 
 
+
+    $('.DownloadGreaseTrapBookingReports').on('click', function () {
+        $('#DownloadGreaseTrapBookingRecords').modal('show');
+    });
+
+    $('#download-grease-trap-booking-reports').submit(function (e) {
+        e.preventDefault();
+
+        const $btn = $('#DownloadGreaseTrapBookingReportsBtn');
+        const originalWidth = $btn.outerWidth();
+
+        $btn.attr('disabled', true)
+            .html('<div class="spinner-border spinner-border-sm text-light"></div>')
+            .css('width', originalWidth + 'px');
+
+        const formData = $(this).serialize();
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: formData,
+            xhrFields: {
+                responseType: 'blob' // Important to handle file download
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response, status, xhr) {
+                const filename = xhr.getResponseHeader('Content-Disposition')
+                    .split('filename=')[1]
+                    .replace(/"/g, '');
+
+                const blob = new Blob([response], { type: 'text/csv' });
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                $('#DownloadGreaseTrapBookingRecords').modal('hide');
+                $('#download-grease-trap-booking-reports')[0].reset();
+
+            },
+            error: function (xhr) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Download Failed',
+                    text: xhr.responseJSON?.message || 'Something went wrong. Please try again.',
+                    confirmButtonColor: '#d33'
+                });
+            },
+            complete: function () {
+                $btn.attr('disabled', false).html('Download').css('width', '');
+            }
+        });
+    });
+
+
+    
 });

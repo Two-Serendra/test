@@ -139,8 +139,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/pest-control/booked-slots', [PestControlController::class, 'getBookedSlotsPestControl'])
         ->name('pest.control.booked.slots');
-    Route::get('/grease-trap-booking-details/{id}', [PestControlController::class, 'showPestControlBookingDetails'])
-        ->name('show.grease.trap.booking.details');
+    Route::get('/pest-control-booking-details/{id}', [PestControlController::class, 'showPestControlBookingDetails'])
+        ->name('show.pest.control.booking.details');
 
         
     // Function Room Booking

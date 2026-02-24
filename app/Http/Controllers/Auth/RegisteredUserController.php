@@ -48,7 +48,7 @@ class RegisteredUserController extends Controller
 
         if (!$emailRow) {
             throw ValidationException::withMessages([
-                'email' => 'This email is not authorized to register. Please contact admin.',
+                'email' => 'This email is not authorized to register. Please contact the administation office.',
             ]);
         }
 

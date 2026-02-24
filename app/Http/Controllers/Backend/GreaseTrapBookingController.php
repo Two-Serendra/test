@@ -9,12 +9,15 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class GreaseTrapBookingController extends Controller
 {
    public function AdminBookingGreaseTrap()
    {
-      $greaseTrapBookings = GreaseTrapBooking::orderBy('created_at', 'DESC')->paginate(10);
+      $greaseTrapBookings = GreaseTrapBooking::whereDate('booking_date', '>=', now()->toDateString())
+         ->orderBy('booking_date', 'asc')
+         ->paginate(10);
       return view('backend.grease-trap.grease-trap-booking', compact('greaseTrapBookings'));
 
    }
@@ -192,7 +195,7 @@ class GreaseTrapBookingController extends Controller
             if ($chargedType == 2 && !$request->force_payment) {
                DB::rollBack();
                return response()->json([
-                  'message' => "The Unit have {$remainingFreeBookings} free bookings remaining. This booking will require payment. Do you want to continue?",
+                  'message' => "This unit has reached the monthly free grease trap booking limit. This booking will cost ₱448.00. Do you want to continue?",
                   'requires_payment' => true,
                   'remaining_free_bookings' => $remainingFreeBookings
                ], 409);
@@ -360,5 +363,123 @@ class GreaseTrapBookingController extends Controller
       ]);
    }
 
+   public function AdminReportGreaseTrap()
+   {
+      $greaseTrapBookings = GreaseTrapBooking::whereDate('booking_date', '<', now()->toDateString())
+         ->orderBy('booking_date', 'desc')
+         ->paginate(10);
+      return view('backend.grease-trap.grease-trap-report', compact('greaseTrapBookings'));
 
+   }
+
+   public function downloadGreaseTrapBookingRecords(Request $request)
+   {
+      $fromDate = $request->input('download_start_date_gt');
+      $toDate = $request->input('download_end_date_gt');
+
+      Log::info("Grease Trap Download request", [
+         'download_start_date_gt' => $fromDate,
+         'download_end_date_gt' => $toDate
+      ]);
+
+      $formattedFromDate = Carbon::parse($fromDate)->format('m-d-Y');
+      $formattedToDate = Carbon::parse($toDate)->format('m-d-Y');
+
+      // Fetch data (PAST BOOKINGS ONLY)
+      $data = DB::table('grease_trap_bookings')
+         ->join('users', 'grease_trap_bookings.user_id', '=', 'users.id')
+         ->select(
+            'grease_trap_bookings.transaction_no',
+            'grease_trap_bookings.unit_no',
+            'grease_trap_bookings.resident_type',
+            'users.name',
+            'grease_trap_bookings.booking_date',
+            'grease_trap_bookings.booking_time_slot',
+            'grease_trap_bookings.srf_no',
+            'grease_trap_bookings.remarks',
+            'grease_trap_bookings.charged_type',
+            'grease_trap_bookings.emergency',
+            'grease_trap_bookings.booking_status',
+            'grease_trap_bookings.created_at',
+            'grease_trap_bookings.updated_at'
+         )
+         ->whereBetween('booking_date', [$fromDate, $toDate])
+         ->whereDate('booking_date', '<', now()->toDateString()) // ONLY PAST BOOKINGS
+         ->orderBy('booking_date', 'desc')
+         ->get();
+
+      Log::info("Grease Trap Data fetched", [
+         'total_records' => count($data),
+      ]);
+
+      $fileName = "GreaseTrap_Booking_Report_{$formattedFromDate}_to_{$formattedToDate}.csv";
+
+      $response = new StreamedResponse(function () use ($data) {
+
+         $handle = fopen('php://output', 'w');
+
+         // CSV HEADER
+         fputcsv($handle, [
+            'Transaction No',
+            'Resident Name',
+            'Unit No',
+            'Resident Type',
+            'Booking Date',
+            'Time Slot',
+            'SRF No',
+            'Remarks',
+            'Charged Type',
+            'Emergency',
+            'Status',
+            'Created At',
+            'Updated At'
+         ]);
+
+         foreach ($data as $row) {
+
+            $bookingDate = Carbon::parse($row->booking_date)->format('F j, Y');
+
+            // Charge Type
+            $chargeType = $row->charged_type == 1 ? 'Free' : 'Billable';
+
+            // Emergency
+            $emergency = $row->emergency == 1 ? 'Yes' : 'No';
+
+            // Status
+            $status = match ($row->booking_status) {
+               1 => 'Completed',
+               2 => 'Cancelled',
+               default => 'Booked'
+            };
+
+            fputcsv($handle, [
+               $row->transaction_no,
+               $row->name,
+               $row->unit_no,
+               $row->resident_type,
+               $bookingDate,
+               $row->booking_time_slot,
+               $row->srf_no,
+               $row->remarks,
+               $chargeType,
+               $emergency,
+               $status,
+               $row->created_at,
+               $row->updated_at
+            ]);
+
+            ob_flush();
+            flush();
+         }
+
+         fclose($handle);
+      });
+
+      $response->headers->set('Content-Type', 'text/csv');
+      $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
+
+      Log::info("Grease Trap CSV Export Completed", ['filename' => $fileName]);
+
+      return $response;
+   }
 }

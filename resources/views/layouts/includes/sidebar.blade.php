@@ -62,7 +62,7 @@
 
                 <li class="menu-item {{ request()->routeIs('admin.activity.history') ? 'active' : '' }}">
                     <a href="{{ route('admin.activity.history') }}" class="menu-link">
-                        <div data-i18n="Typography">History</div>
+                        <div data-i18n="Typography">Reports</div>
                     </a>
                 </li>
 
@@ -118,7 +118,7 @@
                 <li
                     class="menu-item {{ request()->routeIs('admin.show.function.room.booking.records') ? 'active' : '' }}">
                     <a href="{{ route('admin.show.function.room.booking.records') }}" class="menu-link">
-                        <div data-i18n="Typography">Records</div>
+                        <div data-i18n="Typography">Reports</div>
                     </a>
                 </li>
 
@@ -216,6 +216,14 @@
                     </a>
                 </li>
             </ul>
+
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('admin.report.grease.trap') ? 'active' : '' }}">
+                    <a href="{{ route('admin.report.grease.trap') }}" class="menu-link">
+                        <div data-i18n="Typography">Reports</div>
+                    </a>
+                </li>
+            </ul>
         </li>
 
         <li class="menu-item">
@@ -245,8 +253,15 @@
                     </a>
                 </li>
             </ul>
-        </li>
 
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('admin.report.pest.control') ? 'active' : '' }}">
+                    <a href="{{ route('admin.report.pest.control') }}" class="menu-link">
+                        <div data-i18n="Typography">Reports</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
         @endroles
 
         <!-- Manage -->

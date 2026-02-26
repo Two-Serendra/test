@@ -29,9 +29,9 @@
                                         <option value="circulars">
                                             circulars@twoserendra.com
                                         </option>
-                                        <option value="finance">
+                                        <!-- <option value="finance">
                                             finance@twoserendra.com
-                                        </option>
+                                        </option> -->
                                     </select>
                                     <div class="invalid-feedback">
                                         Please select a sender email.

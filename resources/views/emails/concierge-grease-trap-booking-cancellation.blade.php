@@ -3,31 +3,74 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Booking Confirmed</title>
+    <title>Grease Trap Booking Cancelled</title>
 </head>
 
-<body style="font-family: Arial, sans-serif; color: #333;">
-    <div style="max-width: 600px; margin: auto; border: 1px solid #eee; padding: 30px; background-color: #f9f9f9;">
-        <div style="text-align: center; margin-bottom: 20px;">
-            <img src="https://twoserendra.com/assets/images/twoserendraemaillogo.png" alt="Two Serendra Logo"
-                style="max-width: 180px;">
+<body style="font-family: Arial, sans-serif; background:#f4f6f8; padding:20px; color:#333;">
+    <div style="max-width:700px; margin:auto; background:#ffffff; border-radius:6px; border:1px solid #e5e5e5;">
+
+        <!-- Header -->
+        <div style="padding:15px; text-align:center;">
+            <img src="https://twoserendra.com/assets/images/twoserendraemaillogo.png" alt="Two Serendra"
+                style="max-width:160px;">
         </div>
 
+        <!-- Body -->
+        <div style="padding:25px;">
+            <h2 style="color:#dc3545;">Grease Trap Booking Cancelled</h2>
 
-        <h2 style="color: #dc3545;">Grease Trap Booking Cancelled</h2>
+            <p>A resident grease trap booking has been <strong>cancelled</strong>. Please review the details below:</p>
 
-        <p>
-            A resident grease trap booking has been <strong>cancelled</strong>.
-        </p>
+            <table style="width:100%; border-collapse:collapse; margin-top:15px; font-size:14px;">
+                <tr>
+                    <td style="padding:8px; font-weight:bold;">Resident Name:</td>
+                    <td>{{ $name }}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px; font-weight:bold;">Transaction No:</td>
+                    <td>{{ $transaction_no }}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px; font-weight:bold;">Unit No:</td>
+                    <td>{{ $unit_no }}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px; font-weight:bold;">Date:</td>
+                    <td>{{ \Carbon\Carbon::parse($booking_date)->format('F d, Y') }}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px; font-weight:bold;">Time Slot:</td>
+                    <td>{{ $booking_time_slot }}</td>
+                </tr>
+            </table>
 
-        <p><strong>Transaction No:</strong> {{ $transaction_no }}</p>
-        <p><strong>Unit No:</strong> {{ $unit_no }}</p>
-        <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($booking_date)->format('F d, Y') }}</p>
-        <p><strong>Time:</strong> {{ $booking_time_slot }}</p>
-        <br>
+            <!-- Cancellation Penalty -->
+            @if($has_penalty)
+                <div style="margin-top:15px; padding:12px; background:#ffecec; border-left:5px solid #dc3545;">
+                    <strong>Cancellation Penalty Applied:</strong> ₱{{ number_format($penalty_amount, 2) }}
+                    <br>This penalty is applied because the booking was cancelled within 24 hours.
+                </div>
+            @else
+                <div style="margin-top:15px; padding:12px; background:#e6fffa; border-left:5px solid #28a745;">
+                    <strong>No Cancellation Penalty</strong>
+                    <br>This booking was cancelled outside the 24-hour window.
+                </div>
+            @endif
 
-        <p style="margin-top: 30px;">Best regards,</p>
-        <p><strong>Two Serendra Concierge Team</strong></p>
+            <p style="margin-top:20px;">
+                Please take necessary action or update the service provider accordingly.
+            </p>
+
+            <p style="margin-top:25px;">
+                Regards,<br>
+                <strong>Two Serendra</strong>
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div style="background:#f1f1f1; padding:15px; text-align:center; font-size:12px; color:#777;">
+            © {{ date('Y') }} Two Serendra. All rights reserved.
+        </div>
     </div>
 </body>
 

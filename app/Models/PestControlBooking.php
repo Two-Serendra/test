@@ -33,4 +33,6 @@ class PestControlBooking extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    
 }

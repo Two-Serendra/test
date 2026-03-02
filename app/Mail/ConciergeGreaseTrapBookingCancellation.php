@@ -31,7 +31,8 @@ class ConciergeGreaseTrapBookingCancellation extends Mailable implements ShouldQ
     {
         $name = $this->booking->user->name ?? 'Resident';
 
-        // Collect the names of ALL function rooms booked
+        $hasPenalty = $this->booking->has_penalty; // true/false
+        $penaltyAmount = $this->booking->penalty_amount ?? 0; // actual penalty amount
 
 
         return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra')
@@ -43,6 +44,8 @@ class ConciergeGreaseTrapBookingCancellation extends Mailable implements ShouldQ
                 'unit_no' => $this->booking->unit_no,
                 'booking_date' => $this->booking->booking_date,
                 'booking_time_slot' => $this->booking->booking_time_slot,
+                'has_penalty' => $hasPenalty,
+                'penalty_amount' => $penaltyAmount,
 
             ]);
     }

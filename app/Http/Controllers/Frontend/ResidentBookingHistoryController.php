@@ -106,8 +106,10 @@ class ResidentBookingHistoryController extends Controller
 
         } elseif ($bookingType === 'grease_trap') {
 
-            $bookings = GreaseTrapBooking::when($selectedUnit, fn($q) => $q->where('unit_no', $selectedUnit))
+            $bookings = GreaseTrapBooking::with(['cancelledBy'])
+                ->when($selectedUnit, fn($q) => $q->where('unit_no', $selectedUnit))
                 ->orderBy('booking_date', 'desc')
+                ->orderBy('booking_time_slot', 'desc')
                 ->paginate(5)
                 ->withQueryString();
 
@@ -121,6 +123,7 @@ class ResidentBookingHistoryController extends Controller
 
             $bookings = PestControlBooking::when($selectedUnit, fn($q) => $q->where('unit_no', $selectedUnit))
                 ->orderBy('booking_date', 'desc')
+                ->orderBy('booking_time_slot', 'desc')
                 ->paginate(5)
                 ->withQueryString();
 

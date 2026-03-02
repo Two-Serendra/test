@@ -2,7 +2,6 @@
 
 namespace App\Mail;
 
-use App\Models\FunctionRoomBooking;
 use App\Models\GreaseTrapBooking;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -16,12 +15,11 @@ class UserGreaseTrapBookingCancellation extends Mailable implements ShouldQueue
     public GreaseTrapBooking $booking;
 
     /**
-     * Accept main booking + all linked bookings.
+     * Accept the main booking.
      */
     public function __construct(GreaseTrapBooking $booking)
     {
         $this->booking = $booking;
-
     }
 
     /**
@@ -30,9 +28,8 @@ class UserGreaseTrapBookingCancellation extends Mailable implements ShouldQueue
     public function build()
     {
         $name = $this->booking->user->name ?? 'Resident';
-
-        // Collect the names of ALL function rooms booked
-
+        $hasPenalty = $this->booking->has_penalty; // true/false
+        $penaltyAmount = $this->booking->penalty_amount ?? 0; // actual penalty amount
 
         return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra')
             ->subject('Grease Trap Booking has been Cancelled')
@@ -43,7 +40,8 @@ class UserGreaseTrapBookingCancellation extends Mailable implements ShouldQueue
                 'unit_no' => $this->booking->unit_no,
                 'booking_date' => $this->booking->booking_date,
                 'booking_time_slot' => $this->booking->booking_time_slot,
-
+                'has_penalty' => $hasPenalty,
+                'penalty_amount' => $penaltyAmount, // pass the amount
             ]);
     }
 }

@@ -319,38 +319,65 @@ class GreaseTrapController extends Controller
     // }
 
 
-    public function cancelGreaseTrapBooking(GreaseTrapBooking $booking)
+    public function cancelGreaseTrapBooking(GreaseTrapBooking $booking, Request $request)
     {
         try {
             $booking->load('user');
 
-            $booking->booking_status = 2;
-            $booking->save();
+            if ($booking->booking_status == GreaseTrapBooking::STATUS_CANCELLED) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Booking already cancelled.'
+                ], 400);
+            }
 
+            if ($booking->getBookingDateTime()->lt(now())) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot cancel a completed booking.'
+                ], 400);
+            }
+
+            $within24Hours = $booking->isWithin24Hours();
+            if (!$request->has('confirm')) {
+                return response()->json([
+                    'success' => true,
+                    'requires_confirmation' => true, // ALWAYS require confirmation
+                    'message' => $within24Hours
+                        ? 'Cancelling this booking within 24 hours will incur a penalty of ₱448.'
+                        : '<br>No penalty will be applied.'
+                ]);
+            }
+
+            $booking->booking_status = GreaseTrapBooking::STATUS_CANCELLED;
+            $booking->cancelled_at = now();
+            $booking->cancelled_by = auth()->id();
+
+            $booking->applyCancellationPenalty();
+            $booking->save();
 
             if ($booking->user) {
                 $booking->user->notify(new UserGreaseTrapBookingBellNotification($booking));
             }
 
             if ($booking->user?->email) {
-                Mail::to($booking->user->email)->queue(
-                    new UserGreaseTrapBookingCancellation($booking)
-                );
+                Mail::to($booking->user->email)->queue(new UserGreaseTrapBookingCancellation($booking));
             }
 
-            Mail::to('concierge@twoserendra.com')->queue(
-                new ConciergeGreaseTrapBookingCancellation($booking)
-            );
+            Mail::to('concierge@twoserendra.com')->queue(new ConciergeGreaseTrapBookingCancellation($booking));
 
             return response()->json([
                 'success' => true,
-                'message' => 'Booking has been cancelled successfully.'
+                'message' => $booking->has_penalty
+                    ? 'Booking cancelled. Penalty has been applied.'
+                    : 'Booking has been cancelled successfully.'
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to cancel booking.'
+                'message' => 'Failed to cancel booking.',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

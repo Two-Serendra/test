@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class GreaseTrapBooking extends Model
 {
     use HasFactory;
 
     protected $table = 'grease_trap_bookings';
+
     protected $fillable = [
         'transaction_no',
         'user_id',
@@ -23,14 +25,54 @@ class GreaseTrapBooking extends Model
         'emergency',
         'booking_status',
         'created_by',
+        'cancelled_at',
+        'cancelled_by',
+        'has_penalty',
+        'penalty_amount',
     ];
+
+    const STATUS_CONFIRMED = 1;
+    const STATUS_CANCELLED = 2;
+    const CHARGE_FREE = 1;
+    const CHARGE_BILLABLE = 2;
+
 
     public function residentDetails()
     {
         return $this->belongsTo(ResidentDetails::class);
     }
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
+    public function cancelledBy()
+    {
+        return $this->belongsTo(User::class, 'cancelled_by');
+    }
+
+
+    public function isWithin24Hours()
+    {
+        return now()->diffInHours($this->getBookingDateTime(), false) < 24;
+    }
+
+    public function applyCancellationPenalty()
+    {
+        if ($this->isWithin24Hours()) {
+            $this->has_penalty = true;
+            $this->penalty_amount = 448;
+        }
+    }
+
+    public function getBookingDateTime()
+    {
+        // Extract start time from the time slot (before the ' - ')
+        $startTime = explode(' - ', $this->booking_time_slot)[0] ?? '00:00';
+
+        // Combine booking_date and start time
+        return Carbon::parse($this->booking_date . ' ' . $startTime);
+    }
 }
+

@@ -62,7 +62,7 @@
 
             <p style="margin-top:30px;">
                 Regards,<br>
-                <strong>Two Serendra Admin Team</strong>
+                <strong>Two Serendra</strong>
             </p>
         </div>
 

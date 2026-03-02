@@ -40,10 +40,10 @@ class GreaseTrapBookingController extends Controller
 
    public function getUpdatedGreaseTrapTable()
    {
-      $bookings = GreaseTrapBooking::with('user')
-         ->orderByDesc('created_at') // newest first
-         ->paginate(10); // 10 per page
-
+      $bookings = GreaseTrapBooking::with(['user', 'cancelledBy'])
+         ->whereDate('booking_date', '>=', now()->toDateString())
+         ->orderBy('booking_date', 'asc')
+         ->paginate(10);
       return response()->json($bookings);
    }
 
@@ -63,8 +63,6 @@ class GreaseTrapBookingController extends Controller
             $lastId = (GreaseTrapBooking::max('id') ?? 0) + 1;
             $transactionNo = '2SGT-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
             $unitNo = strtoupper(trim($request->unit));
-
-            // Yearly Free Booking Logic
             $freeBookingLimit = 2;
             $yearStart = Carbon::now()->startOfYear()->toDateString();
             $yearEnd = Carbon::now()->endOfYear()->toDateString();
@@ -86,7 +84,6 @@ class GreaseTrapBookingController extends Controller
                ], 409);
             }
 
-            // Prevent double slot booking
             $isAlreadyBooked = GreaseTrapBooking::whereDate('booking_date', $bookingDate)
                ->where('booking_time_slot', $request->booking_time_slot)
                ->where('booking_status', 1)
@@ -100,7 +97,6 @@ class GreaseTrapBookingController extends Controller
                ], 409);
             }
 
-            // Create Booking (Admin booking, no user_id)
             $booking = GreaseTrapBooking::create([
                'user_id' => Auth::id(),
                'name' => $request->name,
@@ -143,23 +139,56 @@ class GreaseTrapBookingController extends Controller
       return response()->json(['message' => 'Could not complete booking. Try again.'], 500);
    }
 
-   public function CancelGreaseTrapBookingAdmin(GreaseTrapBooking $booking)
+   public function CancelGreaseTrapBookingAdmin(GreaseTrapBooking $booking, Request $request)
    {
       try {
-         $booking->load('user');
 
-         $booking->booking_status = 2;
+         if ($booking->booking_status == GreaseTrapBooking::STATUS_CANCELLED) {
+            return response()->json([
+               'success' => false,
+               'message' => 'Booking already cancelled.'
+            ], 400);
+         }
+
+         if ($booking->getBookingDateTime()->lt(now())) {
+            return response()->json([
+               'success' => false,
+               'message' => 'Cannot cancel a completed booking.'
+            ], 400);
+         }
+
+         $within24Hours = $booking->isWithin24Hours();
+
+         if (!$request->has('confirm')) {
+            return response()->json([
+               'success' => true,
+               'requires_confirmation' => $within24Hours,
+               'message' => $within24Hours
+                  ? 'Cancelling this booking within 24 hours will incur a penalty of ₱448.'
+                  : 'No penalty will be applied if you cancel this booking.'
+            ]);
+         }
+
+         $booking->booking_status = GreaseTrapBooking::STATUS_CANCELLED;
+         $booking->cancelled_at = now();
+         $booking->cancelled_by = auth()->id();
+
+         $booking->applyCancellationPenalty();
          $booking->save();
 
          return response()->json([
             'success' => true,
-            'message' => 'Booking has been cancelled successfully.'
+            'message' => $booking->has_penalty
+               ? 'Booking cancelled. Penalty has been applied.'
+               : 'Booking has been cancelled successfully.'
          ]);
 
       } catch (\Exception $e) {
+
          return response()->json([
             'success' => false,
-            'message' => 'Failed to cancel booking.'
+            'message' => 'Failed to cancel booking.',
+            'error' => $e->getMessage(),
          ], 500);
       }
    }
@@ -178,8 +207,6 @@ class GreaseTrapBookingController extends Controller
             $bookingDate = Carbon::parse($request->booking_date)->toDateString();
             $lastId = (GreaseTrapBooking::max('id') ?? 0) + 1;
             $transactionNo = '2SGT-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
-
-            // Yearly Free Booking Logic
             $freeBookingLimit = 2;
             $yearStart = Carbon::now()->startOfYear()->toDateString();
             $yearEnd = Carbon::now()->endOfYear()->toDateString();

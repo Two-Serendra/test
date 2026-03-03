@@ -46,6 +46,9 @@
                             <th class="text-dark">Emergency</th>
                             <th class="text-dark">Remarks</th>
                             <th class="text-dark">Status</th>
+                            <th class="text-dark">Cancelled_at</th>
+                            <th class="text-dark">Penalty</th>
+                            <th class="text-dark">Cancelled_by</th>
                             <th class="text-dark">Action</th>
 
 
@@ -105,6 +108,20 @@
                                             <span class="badge bg-danger custom-badge">Cancelled</span>
                                         @endif
                                     </td>
+                                    <td>{{ $greaseTrapBooking->cancelled_at ?? 'N/A' }}</td>
+                                    <td>
+                                        @if ($greaseTrapBooking->has_penalty)
+                                            <span
+                                                class="text-warning fw-bold">₱{{ number_format($greaseTrapBooking->penalty_amount, 2) }}</span>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+
+                                    <td>{{ $greaseTrapBooking->cancelledBy->name ?? 'N/A' }}</td>
+
+
+
 
                                     <td class="sticky-col sticky-col-color">
                                         <div class="d-flex gap-1 justify-content-center">

@@ -266,6 +266,16 @@ $(document).ready(function () {
                         ? `<span class="badge bg-danger">Yes</span>`
                         : `<span class="badge bg-secondary">No</span>`;
 
+                    var cancelledAt = booking.cancelled_at ? booking.cancelled_at : 'N/A';
+
+                    // Penalty column
+                    var penaltyHtml = booking.has_penalty
+                        ? `<span class="text-warning fw-bold">₱${parseFloat(booking.penalty_amount).toFixed(2)}</span>`
+                        : `-`;
+
+                    // Cancelled By column
+                    var cancelledBy = booking.cancelled_by?.name ?? 'N/A';
+
                     var row = `
                     <tr>
                         <td>${booking.transaction_no ?? 'N/A'}</td>
@@ -279,6 +289,9 @@ $(document).ready(function () {
                         <td>${emergency}</td>
                         <td>${booking.remarks ?? 'N/A'}</td>
                         <td>${bookingStatus}</td>
+                        <td>${cancelledAt}</td>
+                        <td>${penaltyHtml}</td>
+                        <td>${cancelledBy}</td>
                         <td class="sticky-col sticky-col-color">${actionButtons}</td>
                     </tr>
                 `;
@@ -287,6 +300,7 @@ $(document).ready(function () {
                 });
 
                 $('[data-bs-toggle="tooltip"]').tooltip();
+                console.log(response.data);
             },
             error: function (xhr, status, error) {
                 console.error('Error refreshing grease trap table:', error);
@@ -296,37 +310,72 @@ $(document).ready(function () {
 
     $(document).on('click', '.admin-grease-trap-booking-cancel', function () {
         const bookingId = $(this).data('id');
-        const swalText = "Are you sure you want to cancel this booking?";
 
-        Swal.fire({
-            title: 'Cancel Booking',
-            text: swalText,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Yes, cancel it',
-            cancelButtonText: 'No, keep it'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: '/admin/admin-grease-trap-booking/cancel/' + bookingId,
-                    type: 'POST',
-                    data: {
-                        _token: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function (res) {
-                        if (res.success) {
-                            Swal.fire('Cancelled!', 'The booking has been cancelled.', 'success')
-                                .then(() => location.reload());
-                        } else {
-                            Swal.fire('Error', res.message || 'Failed to cancel booking.', 'error');
+        // STEP 1: Check if penalty applies
+        $.ajax({
+            url: '/admin/admin-grease-trap-booking/cancel/' + bookingId,
+            type: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (res) {
+
+                if (!res.success) {
+                    Swal.fire('Error', res.message || 'Failed to cancel booking.', 'error');
+                    return;
+                }
+
+                // If cancellation requires confirmation (penalty applies)
+                if (res.requires_confirmation) {
+
+                    Swal.fire({
+                        title: 'Cancel Booking',
+                        html: res.message + '<br><br>Are you sure you want to cancel this booking?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Yes, cancel it',
+                        cancelButtonText: 'No, keep it'
+                    }).then((result) => {
+
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: '/admin/admin-grease-trap-booking/cancel/' + bookingId,
+                                type: 'POST',
+                                data: {
+                                    _token: $('meta[name="csrf-token"]').attr('content'),
+                                    confirm: 1
+                                },
+                                success: function (res2) {
+
+                                    if (res2.success) {
+                                        Swal.fire('Cancelled!', res2.message, 'success')
+                                            .then(() => {
+                                                refreshGreaseTrapTableBookings();
+                                            });
+                                    } else {
+                                        Swal.fire('Error', res2.message || 'Failed to cancel booking.', 'error');
+                                    }
+
+                                },
+                                error: function () {
+                                    Swal.fire('Error', 'Something went wrong while cancelling.', 'error');
+                                }
+                            });
                         }
-                    },
-                    error: function () {
-                        Swal.fire('Error', 'Something went wrong while cancelling.', 'error');
-                    }
-                });
+                    });
+
+                } else {
+
+                    Swal.fire('Cancelled!', res.message, 'success')
+                        .then(() => {
+                            refreshGreaseTrapTableBookings();
+                        });
+                }
+            },
+            error: function () {
+                Swal.fire('Error', 'Something went wrong while cancelling.', 'error');
             }
         });
     });
@@ -666,5 +715,5 @@ $(document).ready(function () {
     });
 
 
-    
+
 });

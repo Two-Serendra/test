@@ -91,8 +91,10 @@
     </script>
 
 
+
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script src="{{ asset('assets/frontend/lib/wow/wow.min.js') }}"></script>
     <script src="{{ asset('assets/frontend/lib/easing/easing.min.js') }}"></script>
@@ -106,7 +108,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/laravel-echo/1.15.2/echo.iife.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                new bootstrap.Tooltip(tooltipTriggerEl)
+            })
+        });
+    </script>
 
     <!-- Template Javascript -->
     <script src="{{ asset('assets/frontend/js/main.js') }}"></script>
@@ -121,7 +130,6 @@
     <script src="{{ asset('assets/frontend/js/pest-control.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/activity-booking.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/resident-booking-history.js') }}"></script>
-
 
     <script>
         Pusher.logToConsole = false;
@@ -138,7 +146,23 @@
                 }
             }
         });
+
+
+        $('#summernote').summernote({
+            height: 200,
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['insert', ['link', 'table', 'hr']],
+                ['view', ['fullscreen', 'codeview']]
+            ],
+            fontNames: [], // disables font family dropdown
+            fontSizes: [], // disables font size dropdown
+            dialogsInBody: true
+        });
     </script>
+
+
 
     <script>
         // $(document).ready(function () {

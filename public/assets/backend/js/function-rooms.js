@@ -201,7 +201,8 @@ $(document).ready(function () {
             $('#editFunctionRoomRate').val(data.function_room_rate);
             $('#editFunctionRoomDiscount').val(data.discount);
             $('#editFunctionRoomCapacity').val(data.function_room_capacity);
-            $('#editFunctionRoomDescription').val(data.function_room_description);
+            // $('#editFunctionRoomDescription').val(data.function_room_description);
+            $('#editFunctionRoomDescription').summernote('code', data.function_room_description);
             $('#editFunctionRoomShortDescription').val(data.function_room_short_description);
             // $('#editFunctionRoomPolicy').val(data.function_room_policy);
             $('#editFunctionRoomPolicy').summernote('code', data.function_room_policy);
@@ -507,6 +508,20 @@ $(document).ready(function () {
         });
     });
 
+    function stripHtml(html) {
+        var tmp = document.createElement("DIV");
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || "";
+    }
+
+    // Limit text to n characters
+    function limitText(text, maxLength = 100) {
+        if (!text) return "N/A";
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + "...";
+    }
+
+
     function refreshTableFunctionRooms() {
         $.ajax({
             url: '/admin/get-updated-function-rooms-table',
@@ -555,10 +570,8 @@ $(document).ready(function () {
                     var function_room_rate = functionRoom.function_room_rate ? functionRoom.function_room_rate : 'N/A';
                     var function_room_capacity = functionRoom.function_room_capacity ? functionRoom.function_room_capacity : 'N/A';
                     var function_room_short_description = functionRoom.function_room_short_description ? functionRoom.function_room_short_description.toUpperCase() : 'N/A';
-                    var function_room_description = functionRoom.function_room_description ? functionRoom.function_room_description.toUpperCase() : 'N/A';
-                    var function_room_policy = functionRoom.function_room_policy
-                        ? limitText(stripHtml(functionRoom.function_room_policy), 100)
-                        : 'N/A';
+                    var function_room_description = limitText(stripHtml(functionRoom.function_room_description), 100);
+                    var function_room_policy = limitText(stripHtml(functionRoom.function_room_policy), 100);
                     var function_room_360 = functionRoom.function_room_360
                     var function_room_remarks = functionRoom.function_room_remarks ? functionRoom.function_room_remarks : 'N/A';
                     var discountDisplay = 'N/A';

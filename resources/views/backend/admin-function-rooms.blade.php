@@ -68,7 +68,7 @@
                                         {{ strtoupper($functionRoom->function_room_short_description ?: 'N/A') }}
                                     </td>
                                     <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                        {{ strtoupper($functionRoom->function_room_description ?: 'N/A') }}
+                                        {!! Str::limit(strip_tags($functionRoom->function_room_description ?: 'N/A'), 100, '...') !!}
                                     </td>
                                     <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                         {!! Str::limit(strip_tags($functionRoom->function_room_policy ?: 'N/A'), 100, '...') !!}

@@ -166,6 +166,17 @@
                     height: 300,
                     placeholder: 'Enter function room policy here...'
                 });
+
+
+                $('#functionRoomDescription').summernote({
+                    height: 300,
+                    placeholder: 'Enter function room description here...'
+                });
+
+                $('#editFunctionRoomDescription').summernote({
+                    height: 300,
+                    placeholder: 'Enter function room description here...'
+                });
             });
         </script>
     @endpush

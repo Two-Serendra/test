@@ -660,3 +660,17 @@ select.form-select:not(:disabled) {
     text-align: center;
     vertical-align: middle;
 }
+
+.grease-trap-booking-cancellled  {
+    pointer-events: none;
+    /* disables clicks */
+    opacity: 0.65;
+    /* slightly faded */
+    cursor: not-allowed;
+    /* shows not-allowed cursor */
+}
+
+.grease-trap-booking-cancellled :hover {
+    background-color: #6c757d !important;
+    /* keep grey on hover */
+}

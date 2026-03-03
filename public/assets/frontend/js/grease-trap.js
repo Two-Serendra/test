@@ -1,5 +1,8 @@
 $(document).ready(function () {
 
+
+
+
     flatpickr("#GreaseTrapBookingDate", {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(1)
@@ -270,12 +273,13 @@ $(document).ready(function () {
                     form.reset();
                     $(form).removeClass('was-validated');
 
+                    resetSlots();
+                    $bookingSlots.prop('disabled', true);
+
                     flatpickr('#GreaseTrapBookingDate', {
                         dateFormat: 'Y-m-d',
                         minDate: new Date().fp_incr(1)
                     });
-
-                    updateSlots(selectedDate);
                 },
 
                 error(xhr) {
@@ -293,12 +297,12 @@ $(document).ready(function () {
                             cancelButtonColor: '#d33'
                         }).then(result => {
                             if (result.isConfirmed) {
-                                sendBooking(true); 
+                                sendBooking(true);
                             } else {
                                 unlockSubmitBtn();
                             }
                         });
-                        return; 
+                        return;
                     }
 
                     if (xhr.status === 422) {
@@ -327,7 +331,7 @@ $(document).ready(function () {
                         updateSlots(selectedDate);
                         return;
                     }
-                    
+
                     Swal.fire({
                         toast: true,
                         position: 'top-end',
@@ -351,39 +355,64 @@ $(document).ready(function () {
     $(document).on('click', '.grease-trap-booking-cancel', function () {
         const bookingId = $(this).data('id');
 
-        Swal.fire({
-            title: 'Cancel Booking',
-            text: "Are you sure you want to cancel this booking?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Yes, cancel it',
-            cancelButtonText: 'No, keep it'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: '/grease-trap-booking/cancel/' + bookingId,
-                    type: 'POST',
-                    data: {
-                        _token: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function (res) {
-                        if (res.success) {
-                            Swal.fire('Cancelled!', 'The booking has been cancelled.', 'success')
-                                .then(() => {
-                                    // reload current filtered table
-                                    let page = $('.pagination .active span').text() || 1;
-                                    loadBookings(page);
-                                });
-                        } else {
-                            Swal.fire('Error', res.message || 'Failed to cancel booking.', 'error');
+        $.ajax({
+            url: '/grease-trap-booking/cancel/' + bookingId,
+            type: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (res) {
+                if (!res.success) {
+                    Swal.fire('Error', res.message || 'Failed to cancel booking.', 'error');
+                    return;
+                }
+
+
+                if (res.requires_confirmation) {
+                    Swal.fire({
+                        title: 'Cancel Booking',
+                        html:
+                            'Are you sure you want to cancel this booking?' +
+                            res.message,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Yes, cancel it',
+                        cancelButtonText: 'No, keep it'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: '/grease-trap-booking/cancel/' + bookingId,
+                                type: 'POST',
+                                data: {
+                                    _token: $('meta[name="csrf-token"]').attr('content'),
+                                    confirm: 1
+                                },
+                                success: function (res2) {
+                                    Swal.fire('Cancelled!', res2.message, 'success')
+                                        .then(() => {
+                                            let page = $('.pagination .active span').text() || 1;
+                                            loadBookings(page);
+                                        });
+                                },
+                                error: function () {
+                                    Swal.fire('Error', 'Something went wrong while cancelling.', 'error');
+                                }
+                            });
                         }
-                    },
-                    error: function () {
-                        Swal.fire('Error', 'Something went wrong while cancelling.', 'error');
-                    }
-                });
+                    });
+                } else {
+
+                    Swal.fire('Cancelled!', res.message, 'success')
+                        .then(() => {
+                            let page = $('.pagination .active span').text() || 1;
+                            loadBookings(page);
+                        });
+                }
+            },
+            error: function () {
+                Swal.fire('Error', 'Something went wrong while cancelling.', 'error');
             }
         });
     });

@@ -11,7 +11,7 @@
         font-weight: 600;
         /* Make it bolder */
         color: #222;
-        /* Darker text */
+        /* Darker text */ 
     }
 </style>
 

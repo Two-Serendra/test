@@ -1,9 +1,22 @@
 @extends('layouts.frontend')
 
 <style>
-    .text-justified {
-        text-align: justify !important;
-        text-justify: inter-word !important;
+    .editor-content {
+        font-family: 'Poppins', sans-serif;
+        /* your website font */
+        font-size: 16px;
+        /* adjust as needed */
+        line-height: 1.6;
+        /* nice readability */
+        color: #212529;
+        /* dark color, not muted */
+    }
+
+    /* Make sure all child elements inherit the font */
+    .editor-content * {
+        font-family: inherit !important;
+        font-size: inherit !important;
+        color: inherit !important;
     }
 </style>
 
@@ -67,11 +80,11 @@
                             @endif
 
                             @if($type === 'function_room')
-                                <div class="mt-5">
+                                <div class="mt-5 mb-3">
                                     <h6 class="fw-semibold mb-1">Description</h6>
-                                    <p class="text-muted text-justified">
-                                        {{ $item->function_room_description ?? 'No description available.' }}
-                                    </p>
+                                    <div class=" editor-content text-justified">
+                                        {!! $item->function_room_description ?? 'No description available.' !!}
+                                    </div>
                                 </div>
 
                                 <h6 class="fw-semibold mb-2">Capacity:{{ $item->function_room_capacity }}</h6>
@@ -79,7 +92,7 @@
                             @else
                                 <div class="mt-2">
                                     <h6 class="fw-semibold mb-1">Description</h6>
-                                    <p class="text-muted text-justified">
+                                    <p class="text-justified">
                                         {{ $item->amenity_description ?? 'No description available.' }}
                                     </p>
                                 </div>
@@ -104,11 +117,8 @@
                                     ₱{{ number_format($item->discounted_rate, 2) }}/hr
                                 </h3>
 
-                                <!-- ➤ Discount Duration -->
                                 <p class="text-muted mb-3" style="font-size: 0.9rem;">
                                     Discount valid until
-                                    <!-- <strong>{{ \Carbon\Carbon::parse($item->discount_start)->format('M d, Y') }}</strong>
-                                                                                            to -->
                                     <strong>{{ \Carbon\Carbon::parse($item->discount_end)->format('M d, Y') }}</strong>
                                 </p>
 
@@ -118,7 +128,6 @@
                                 </h3>
                             @endif
 
-                            <!-- 360 View Button -->
                             @if($type === 'function_room' && !empty($item->function_room_360))
                                 <button type="button" class="btn btn-secondary text-white me-2 360View customBtn mb-2"
                                     data-img="{{ asset('assets/images/uploads/function-rooms/360/' . $item->function_room_360) }}"
@@ -127,7 +136,6 @@
                                 </button>
                             @endif
 
-                            <!-- Book Now -->
                             @auth
                                 @php
                                     $linkedRoomNames = collect($linkedToThisRoom[$item->id] ?? [])->map(function ($id) {
@@ -155,7 +163,6 @@
             </div>
         </div>
 
-        <!-- Description + Policy Card -->
         <div class="card border rounded-4 shadow-sm mt-3" style="background-color: #f4faff52;">
             <div class="card-body p-4">
 
@@ -163,7 +170,7 @@
 
                     <div class="mb-3">
                         <h6 class="fw-semibold">Policy</h6>
-                        <div class="text-muted text-justified">
+                        <div class="editor-content text-justified">
                             {!! $item->function_room_policy ?? 'No policy information available.' !!}
                         </div>
                     </div>
@@ -188,10 +195,10 @@
                 <h5 class="fw-bold mb-4">
                     You may also like
                     <!-- @if($type === 'function_room')
-                                                                                                                                        Function Rooms
-                                                                                                                                    @else
-                                                                                                                                        Amenities
-                                                                                                                                    @endif -->
+                                                                                                                                                        Function Rooms
+                                                                                                                                                    @else
+                                                                                                                                                        Amenities
+                                                                                                                                                    @endif -->
                 </h5>
                 <div class="row z-1 position-relative">
                     @foreach($suggestions as $suggestion)

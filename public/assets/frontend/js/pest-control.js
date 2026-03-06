@@ -210,4 +210,48 @@ $(document).ready(function () {
     });
 
 
+    $(document).on('click', '.pest-control-booking-cancel', function () {
+
+        const bookingId = $(this).data('id');
+        // console.log("Cancel clicked", bookingId);
+
+        Swal.fire({
+            title: 'Cancel Booking',
+            text: 'Are you sure you want to cancel this booking?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, cancel it',
+            cancelButtonText: 'No, keep it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                $.ajax({
+                    url: '/pest-control-booking/cancel/' + bookingId,
+                    type: 'POST',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (res) {
+
+                        Swal.fire('Cancelled!', res.message, 'success')
+                            .then(() => {
+                                let page = $('.pagination .active span').text() || 1;
+                                loadBookings(page);
+                            });
+
+                    },
+                    error: function (xhr) {
+                        Swal.fire('Error',
+                            xhr.responseJSON?.message || 'Something went wrong while cancelling.',
+                            'error'
+                        );
+                    }
+                });
+
+            }
+        });
+    });
+
 });

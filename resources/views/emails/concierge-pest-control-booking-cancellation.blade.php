@@ -17,65 +17,48 @@
 
         <!-- Body -->
         <div style="padding:25px;">
-            <h2 style="color:#dc3545;">Grease Trap Booking Cancelled</h2>
+            <h2 style="color:#dc3545;">Pest Control Booking Cancelled</h2>
 
-            <p>Your grease trap booking has been <strong>cancelled</strong>.</p>
+            <p>A resident pest control booking has been <strong>cancelled</strong>. Please review the details below:</p>
 
             <table style="width:100%; border-collapse:collapse; margin-top:15px; font-size:14px;">
                 <tr>
-                    <td style="padding:8px;"><strong>Resident Name:</strong></td>
+                    <td style="padding:8px; font-weight:bold;">Resident Name:</td>
                     <td>{{ $name }}</td>
                 </tr>
                 <tr>
-                    <td style="padding:8px;"><strong>Transaction No:</strong></td>
+                    <td style="padding:8px; font-weight:bold;">Transaction No:</td>
                     <td>{{ $transaction_no }}</td>
                 </tr>
                 <tr>
-                    <td style="padding:8px;"><strong>Unit No:</strong></td>
+                    <td style="padding:8px; font-weight:bold;">Unit No:</td>
                     <td>{{ $unit_no }}</td>
                 </tr>
                 <tr>
-                    <td style="padding:8px;"><strong>Date:</strong></td>
+                    <td style="padding:8px; font-weight:bold;">Date:</td>
                     <td>{{ \Carbon\Carbon::parse($booking_date)->format('F d, Y') }}</td>
                 </tr>
                 <tr>
-                    <td style="padding:8px;"><strong>Time Slot:</strong></td>
+                    <td style="padding:8px; font-weight:bold;">Time Slot:</td>
                     <td>{{ $booking_time_slot }}</td>
                 </tr>
             </table>
 
             <!-- Cancellation Penalty -->
-            <!-- Cancellation Result -->
-            @if($has_penalty)
-
+            <!-- @if($has_penalty)
                 <div style="margin-top:15px; padding:12px; background:#ffecec; border-left:5px solid #dc3545;">
-                    <strong>Cancellation Penalty Applied:</strong><br>
-                    ₱{{ number_format($penalty_amount, 2) }} will be billed to your account.
-                    <br><br>
-                    This penalty was applied because the booking was cancelled within 24 hours
-                    and the unit has already used its 2 free grease trap bookings for the year.
+                    <strong>Cancellation Penalty Applied:</strong> ₱{{ number_format($penalty_amount, 2) }}
+                    <br>This penalty is applied because the booking was cancelled within 24 hours.
                 </div>
-
-            @elseif($booking->cancelled_within_24hrs)
-
-                <div style="margin-top:15px; padding:12px; background:#fff3cd; border-left:5px solid #ffc107;">
-                    <strong>Free Booking Forfeited</strong><br>
-                    This cancellation was made within 24 hours of the scheduled booking.
-                    One of your complimentary grease trap bookings for this year has been used.
-                </div>
-
             @else
-
                 <div style="margin-top:15px; padding:12px; background:#e6fffa; border-left:5px solid #28a745;">
-                    <strong>No Cancellation Penalty</strong><br>
-                    This booking was cancelled more than 24 hours before the scheduled time.
-                    No penalty has been applied.
+                    <strong>No Cancellation Penalty</strong>
+                    <br>This booking was cancelled outside the 24-hour window.
                 </div>
-
-            @endif
+            @endif -->
 
             <p style="margin-top:20px;">
-                For further assistance, please contact the concierge team.
+                Please take necessary action or update the service provider accordingly.
             </p>
 
             <p style="margin-top:25px;">
@@ -88,7 +71,6 @@
         <div style="background:#f1f1f1; padding:15px; text-align:center; font-size:12px; color:#777;">
             © {{ date('Y') }} Two Serendra. All rights reserved.
         </div>
-
     </div>
 </body>
 

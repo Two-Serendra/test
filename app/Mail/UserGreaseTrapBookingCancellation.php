@@ -42,6 +42,7 @@ class UserGreaseTrapBookingCancellation extends Mailable implements ShouldQueue
                 'booking_time_slot' => $this->booking->booking_time_slot,
                 'has_penalty' => $hasPenalty,
                 'penalty_amount' => $penaltyAmount, // pass the amount
+                'cancelled_within_24hrs' => $this->booking->cancelled_within_24hrs, // pass the 24-hour flag  
             ]);
     }
 }

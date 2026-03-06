@@ -24,13 +24,15 @@
 
                         <td>
                             @if ($b->charged_type === 1)
-                                <span class="badge bg-primary text-white badge-forge ">Free</span>
+                                <span class="text-primary">
+                                    Free
+                                </span>
                             @else
-                                <span class="badge bg-danger badge-forge ">Billable</span>
+                                <span class="text-danger">
+                                    ₱{{ number_format(350, 2) }}
+                                </span>
                             @endif
-                        </td>
 
-                
                         <td>
                             @php
                                 $startTime = $b->booking_time_slot ? trim(explode('-', $b->booking_time_slot)[0]) : null;
@@ -40,14 +42,15 @@
                                 $isPast = $bookingDateTime ? $bookingDateTime->lt(now()) : false;
                             @endphp
 
+
                             @if ($b->booking_status == 2)
-                                <span class="badge bg-danger badge-forge">Cancelled</span>
+                                <span class="text-danger">Cancelled</span>
                             @elseif ($b->booking_status == 1 && $isPast)
-                                <span class="badge bg-success badge-forge">Completed</span>
+                                <span class="text-success">Completed</span>
                             @elseif ($b->booking_status == 1)
-                                <span class="badge badge-forge bg-primary">Confirmed</span>
+                                <span class="text-primary">Confirmed</span>
                             @else
-                                <span class="badge bg-warning badge-forge">Pending</span>
+                                <span class="text-warning">Pending</span>
                             @endif
                         </td>
 
@@ -63,19 +66,34 @@
                         @endphp
 
                         <td>
+                            @php
+                                $disabled = $isPast ? 'disabled' : '';
+                            @endphp
+
                             @if ($b->booking_status == 2)
-                                <span class="badge bg-secondary badge-forge activity-booking-cancel" data-id="{{ $b->id }}">
-                                    Cancel
-                                </span>
+                                {{-- Cancelled: disabled button --}}
+                                <div data-bs-toggle="tooltip" title="Cancelled">
+                                    <button class="btn btn-secondary text-white badge-forge pest-control-booking-cancelled" disabled>
+                                        <i class="fa-solid fa-ban"></i>
+                                    </button>
+                                </div>
 
                             @elseif ($b->booking_status == 1)
-                                <button class="btn btn-sm btn-danger grease-trap-booking-cancel text-white badge-forge"
-                                    data-id="{{ $b->id }}" @if(\Carbon\Carbon::parse($b->booking_date . ' ' . explode('-', $b->booking_time_slot)[0])->lt(now())) disabled @endif>
-                                    Cancel
-                                </button>
+                                {{-- Active: wrap button in div so tooltip works even if disabled --}}
+                                <div data-bs-toggle="tooltip" title="Cancel">
+                                    <button class="btn btn-danger pest-control-booking-cancel text-white badge-forge"
+                                        data-id="{{ $b->id }}" {{ $disabled }}>
+                                        <i class="fa-solid fa-ban"></i>
+                                    </button>
+                                </div>
 
                             @else
-                                <span class="badge bg-warning badge-forge">Pending</span>
+                                {{-- Pending --}}
+                                <div data-bs-toggle="tooltip" title="Pending">
+                                    <button class="btn btn-sm btn-warning badge-forge" data-id="{{ $b->id }}" {{ $disabled }}>
+                                        <i class="bi bi-clock"></i>
+                                    </button>
+                                </div>
                             @endif
                         </td>
 

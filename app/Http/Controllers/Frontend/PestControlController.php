@@ -242,7 +242,8 @@ class PestControlController extends Controller
 
                 $booking = PestControlBooking::create([
                     'user_id' => auth()->id(),
-                    'transaction_no' => '', 
+                    'created_by' => auth()->id(),
+                    'transaction_no' => '',
                     'unit_no' => $resident->unit_no,
                     'resident_type' => $resident->resident_type,
                     'booking_date' => $bookingDate,
@@ -346,4 +347,58 @@ class PestControlController extends Controller
         return view('frontend.user-pest-control-booking-details', compact('booking'));
     }
 
+
+    public function CancelPestControlBooking(PestControlBooking $booking)
+    {
+        try {
+            $booking->load('user');
+
+            if ($booking->booking_status == PestControlBooking::STATUS_CANCELLED) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Booking already cancelled.'
+                ], 400);
+            }
+
+            if ($booking->getBookingDateTime()->lt(now())) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot cancel a completed booking.'
+                ], 400);
+            }
+
+
+            $booking->booking_status = PestControlBooking::STATUS_CANCELLED; // or 2
+            $booking->cancelled_at = now();
+            $booking->cancelled_by = auth()->id();
+            $booking->save();
+
+            if ($booking->user) {
+                $booking->user->notify(
+                    new UserPestControlBookingBellNotification($booking)
+                );
+            }
+
+
+            if ($booking->user?->email) {
+                Mail::to($booking->user->email)
+                    ->queue(new UserPestControlBookingCancellation($booking));
+            }
+
+            Mail::to('concierge@twoserendra.com')
+                ->queue(new ConciergePestControlBookingCancellation($booking));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Booking has been cancelled successfully.'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to cancel booking.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

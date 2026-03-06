@@ -49,9 +49,99 @@ class GreaseTrapBookingController extends Controller
 
 
 
+   // public function AdminStoreGreaseTrapBooking(Request $request)
+   // {
+
+   //    $maxRetries = 3;
+   //    $attempt = 0;
+
+   //    while ($attempt < $maxRetries) {
+   //       try {
+   //          DB::beginTransaction();
+
+   //          $bookingDate = Carbon::parse($request->booking_date)->toDateString();
+   //          $lastId = (GreaseTrapBooking::max('id') ?? 0) + 1;
+   //          $transactionNo = '2SGT-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
+   //          $unitNo = strtoupper(trim($request->unit));
+   //          $freeBookingLimit = 2;
+   //          $yearStart = Carbon::now()->startOfYear()->toDateString();
+   //          $yearEnd = Carbon::now()->endOfYear()->toDateString();
+
+   //          $unitBookingsCount = GreaseTrapBooking::where('unit_no', $request->unit)
+   //             ->where('booking_status', 1)
+   //             ->whereBetween('booking_date', [$yearStart, $yearEnd])
+   //             ->count();
+
+   //          $remainingFreeBookings = max($freeBookingLimit - $unitBookingsCount, 0);
+   //          $chargedType = $unitBookingsCount < $freeBookingLimit ? 1 : 2;
+
+   //          if ($chargedType == 2 && !$request->force_payment) {
+   //             DB::rollBack();
+   //             return response()->json([
+   //                'message' => "You have {$remainingFreeBookings} free bookings remaining. This booking will require payment. Do you want to continue?",
+   //                'requires_payment' => true,
+   //                'remaining_free_bookings' => $remainingFreeBookings
+   //             ], 409);
+   //          }
+
+   //          $isAlreadyBooked = GreaseTrapBooking::whereDate('booking_date', $bookingDate)
+   //             ->where('booking_time_slot', $request->booking_time_slot)
+   //             ->where('booking_status', 1)
+   //             ->lockForUpdate()
+   //             ->exists();
+
+   //          if ($isAlreadyBooked) {
+   //             DB::rollBack();
+   //             return response()->json([
+   //                'message' => 'This time slot is already booked.'
+   //             ], 409);
+   //          }
+
+   //          $booking = GreaseTrapBooking::create([
+   //             'user_id' => Auth::id(),
+   //             'name' => $request->name,
+   //             'unit_no' => $unitNo,
+   //             'resident_type' => strtoupper($request->selectResidentType),
+   //             'transaction_no' => $transactionNo,
+   //             'booking_date' => $bookingDate,
+   //             'booking_time_slot' => $request->booking_time_slot,
+   //             'charged_type' => $chargedType,
+   //             'remarks' => $request->remarks,
+   //             'booking_status' => 1,
+   //          ]);
+
+   //          DB::commit();
+
+   //          return response()->json([
+   //             'message' => 'Grease trap booking created successfully.',
+   //             'charged_type' => $chargedType
+   //          ]);
+
+   //       } catch (\Illuminate\Database\QueryException $e) {
+   //          DB::rollBack();
+
+   //          if (in_array($e->errorInfo[1], [1213, 1205])) {
+   //             $attempt++;
+   //             usleep(100000);
+   //             continue;
+   //          }
+
+   //          Log::error('Admin Grease Trap Booking Error', ['error' => $e->getMessage()]);
+   //          return response()->json(['message' => 'Something went wrong.'], 500);
+
+   //       } catch (\Throwable $e) {
+   //          DB::rollBack();
+   //          Log::error('Admin Grease Trap Booking Fatal', ['error' => $e->getMessage()]);
+   //          return response()->json(['message' => 'Something went wrong.'], 500);
+   //       }
+   //    }
+
+   //    return response()->json(['message' => 'Could not complete booking. Try again.'], 500);
+   // }
+
+
    public function AdminStoreGreaseTrapBooking(Request $request)
    {
-
       $maxRetries = 3;
       $attempt = 0;
 
@@ -60,16 +150,18 @@ class GreaseTrapBookingController extends Controller
             DB::beginTransaction();
 
             $bookingDate = Carbon::parse($request->booking_date)->toDateString();
-            $lastId = (GreaseTrapBooking::max('id') ?? 0) + 1;
-            $transactionNo = '2SGT-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
             $unitNo = strtoupper(trim($request->unit));
             $freeBookingLimit = 2;
             $yearStart = Carbon::now()->startOfYear()->toDateString();
             $yearEnd = Carbon::now()->endOfYear()->toDateString();
 
-            $unitBookingsCount = GreaseTrapBooking::where('unit_no', $request->unit)
-               ->where('booking_status', 1)
+            // Include cancelled_within_24hrs in the count
+            $unitBookingsCount = GreaseTrapBooking::where('unit_no', $unitNo)
                ->whereBetween('booking_date', [$yearStart, $yearEnd])
+               ->where(function ($q) {
+                  $q->where('booking_status', 1)
+                     ->orWhere('cancelled_within_24hrs', 1);
+               })
                ->count();
 
             $remainingFreeBookings = max($freeBookingLimit - $unitBookingsCount, 0);
@@ -78,7 +170,7 @@ class GreaseTrapBookingController extends Controller
             if ($chargedType == 2 && !$request->force_payment) {
                DB::rollBack();
                return response()->json([
-                  'message' => "You have {$remainingFreeBookings} free bookings remaining. This booking will require payment. Do you want to continue?",
+                  'message' => "The unit has used all its free grease trap bookings for this year. This booking will cost ₱448.00. Continue with the booking?",
                   'requires_payment' => true,
                   'remaining_free_bookings' => $remainingFreeBookings
                ], 409);
@@ -96,6 +188,9 @@ class GreaseTrapBookingController extends Controller
                   'message' => 'This time slot is already booked.'
                ], 409);
             }
+
+            $lastId = (GreaseTrapBooking::max('id') ?? 0) + 1;
+            $transactionNo = '2SGT-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
 
             $booking = GreaseTrapBooking::create([
                'user_id' => Auth::id(),
@@ -139,10 +234,65 @@ class GreaseTrapBookingController extends Controller
       return response()->json(['message' => 'Could not complete booking. Try again.'], 500);
    }
 
+   // public function CancelGreaseTrapBookingAdmin(GreaseTrapBooking $booking, Request $request)
+   // {
+   //    try {
+
+   //       if ($booking->booking_status == GreaseTrapBooking::STATUS_CANCELLED) {
+   //          return response()->json([
+   //             'success' => false,
+   //             'message' => 'Booking already cancelled.'
+   //          ], 400);
+   //       }
+
+   //       if ($booking->getBookingDateTime()->lt(now())) {
+   //          return response()->json([
+   //             'success' => false,
+   //             'message' => 'Cannot cancel a completed booking.'
+   //          ], 400);
+   //       }
+
+   //       $within24Hours = $booking->isWithin24Hours();
+
+   //       if (!$request->has('confirm')) {
+   //          return response()->json([
+   //             'success' => true,
+   //             'requires_confirmation' => $within24Hours,
+   //             'message' => $within24Hours
+   //                ? 'Cancelling this booking within 24 hours will incur a penalty of ₱448.'
+   //                : 'No penalty will be applied if you cancel this booking.'
+   //          ]);
+   //       }
+
+   //       $booking->booking_status = GreaseTrapBooking::STATUS_CANCELLED;
+   //       $booking->cancelled_at = now();
+   //       $booking->cancelled_by = auth()->id();
+
+   //       $booking->applyCancellationPenalty();
+   //       $booking->save();
+
+   //       return response()->json([
+   //          'success' => true,
+   //          'message' => $booking->has_penalty
+   //             ? 'Booking cancelled. Penalty has been applied.'
+   //             : 'Booking has been cancelled successfully.'
+   //       ]);
+
+   //    } catch (\Exception $e) {
+
+   //       return response()->json([
+   //          'success' => false,
+   //          'message' => 'Failed to cancel booking.',
+   //          'error' => $e->getMessage(),
+   //       ], 500);
+   //    }
+   // }
+
    public function CancelGreaseTrapBookingAdmin(GreaseTrapBooking $booking, Request $request)
    {
       try {
 
+         // Already cancelled
          if ($booking->booking_status == GreaseTrapBooking::STATUS_CANCELLED) {
             return response()->json([
                'success' => false,
@@ -150,6 +300,7 @@ class GreaseTrapBookingController extends Controller
             ], 400);
          }
 
+         // Booking already completed
          if ($booking->getBookingDateTime()->lt(now())) {
             return response()->json([
                'success' => false,
@@ -159,21 +310,48 @@ class GreaseTrapBookingController extends Controller
 
          $within24Hours = $booking->isWithin24Hours();
 
+         // Count used free bookings for this unit
+         $usedFree = GreaseTrapBooking::getUsedFreeBookings($booking->unit_no);
+         $freeLimit = 2;
+
+         // Confirmation step before actually cancelling
          if (!$request->has('confirm')) {
+
+            $message = '';
+
+            if ($within24Hours) {
+               if ($usedFree >= $freeLimit) {
+                  $message = 'Cancelling within 24 hours will incur a penalty of ₱448 because the unit has already used its 2 free bookings.';
+               } else {
+                  $remaining = $freeLimit - $usedFree;
+                  $message = "Cancelling within 24 hours will forfeit one of the remaining {$remaining} free grease trap bookings for this year.";
+               }
+            } else {
+               $message = 'No penalty will be applied if you cancel this booking.';
+            }
+
             return response()->json([
                'success' => true,
-               'requires_confirmation' => $within24Hours,
-               'message' => $within24Hours
-                  ? 'Cancelling this booking within 24 hours will incur a penalty of ₱448.'
-                  : 'No penalty will be applied if you cancel this booking.'
+               'requires_confirmation' => true,
+               'message' => $message
             ]);
          }
 
+         // Apply cancellation
          $booking->booking_status = GreaseTrapBooking::STATUS_CANCELLED;
          $booking->cancelled_at = now();
          $booking->cancelled_by = auth()->id();
 
-         $booking->applyCancellationPenalty();
+         if ($within24Hours) {
+            if ($usedFree >= $freeLimit) {
+               // Apply penalty
+               $booking->applyCancellationPenalty();
+            } else {
+               // Mark as cancelled within 24hrs but no penalty
+               $booking->cancelled_within_24hrs = 1;
+            }
+         }
+
          $booking->save();
 
          return response()->json([
@@ -194,9 +372,86 @@ class GreaseTrapBookingController extends Controller
    }
 
 
+   // public function AdminStoreEmergencyGreaseTrapBooking(Request $request)
+   // {
+
+   //    $maxRetries = 3;
+   //    $attempt = 0;
+
+   //    while ($attempt < $maxRetries) {
+   //       try {
+   //          DB::beginTransaction();
+
+   //          $bookingDate = Carbon::parse($request->booking_date)->toDateString();
+   //          $lastId = (GreaseTrapBooking::max('id') ?? 0) + 1;
+   //          $transactionNo = '2SGT-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
+   //          $freeBookingLimit = 2;
+   //          $yearStart = Carbon::now()->startOfYear()->toDateString();
+   //          $yearEnd = Carbon::now()->endOfYear()->toDateString();
+   //          $unitNo = strtoupper(trim($request->unit));
+   //          $unitBookingsCount = GreaseTrapBooking::where('unit_no', $unitNo)
+   //             ->where('booking_status', 1)
+   //             ->whereBetween('booking_date', [$yearStart, $yearEnd])
+   //             ->count();
+
+   //          $remainingFreeBookings = max($freeBookingLimit - $unitBookingsCount, 0);
+   //          $chargedType = $unitBookingsCount < $freeBookingLimit ? 1 : 2;
+
+   //          if ($chargedType == 2 && !$request->force_payment) {
+   //             DB::rollBack();
+   //             return response()->json([
+   //                'message' => "This unit has reached the monthly free grease trap booking limit. This booking will cost ₱448.00. Do you want to continue?",
+   //                'requires_payment' => true,
+   //                'remaining_free_bookings' => $remainingFreeBookings
+   //             ], 409);
+   //          }
+
+   //          $booking = GreaseTrapBooking::create([
+   //             'user_id' => Auth::id(),
+   //             'name' => $request->name,
+   //             'unit_no' => $unitNo,
+   //             'resident_type' => strtoupper($request->selectResidentType),
+   //             'transaction_no' => $transactionNo,
+   //             'booking_date' => $bookingDate,
+   //             'booking_time_slot' => $request->booking_time_slot,
+   //             'charged_type' => $chargedType,
+   //             'remarks' => $request->remarks,
+   //             'emergency' => 2,
+   //             'booking_status' => 1,
+   //          ]);
+
+   //          DB::commit();
+
+   //          return response()->json([
+   //             'message' => 'Grease trap booking created successfully.',
+   //             'charged_type' => $chargedType
+   //          ]);
+
+   //       } catch (\Illuminate\Database\QueryException $e) {
+   //          DB::rollBack();
+
+   //          if (in_array($e->errorInfo[1], [1213, 1205])) {
+   //             $attempt++;
+   //             usleep(100000);
+   //             continue;
+   //          }
+
+   //          Log::error('Admin Grease Trap Booking Error', ['error' => $e->getMessage()]);
+   //          return response()->json(['message' => 'Something went wrong.'], 500);
+
+   //       } catch (\Throwable $e) {
+   //          DB::rollBack();
+   //          Log::error('Admin Grease Trap Booking Fatal', ['error' => $e->getMessage()]);
+   //          return response()->json(['message' => 'Something went wrong.'], 500);
+   //       }
+   //    }
+
+   //    return response()->json(['message' => 'Could not complete booking. Try again.'], 500);
+   // }
+
+
    public function AdminStoreEmergencyGreaseTrapBooking(Request $request)
    {
-
       $maxRetries = 3;
       $attempt = 0;
 
@@ -205,29 +460,40 @@ class GreaseTrapBookingController extends Controller
             DB::beginTransaction();
 
             $bookingDate = Carbon::parse($request->booking_date)->toDateString();
-            $lastId = (GreaseTrapBooking::max('id') ?? 0) + 1;
-            $transactionNo = '2SGT-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
+            $unitNo = strtoupper(trim($request->unit));
+
+            // Free booking limit
             $freeBookingLimit = 2;
             $yearStart = Carbon::now()->startOfYear()->toDateString();
             $yearEnd = Carbon::now()->endOfYear()->toDateString();
-            $unitNo = strtoupper(trim($request->unit));
+
+            // Count existing bookings for the unit this year
             $unitBookingsCount = GreaseTrapBooking::where('unit_no', $unitNo)
-               ->where('booking_status', 1)
                ->whereBetween('booking_date', [$yearStart, $yearEnd])
+               ->where(function ($q) {
+                  $q->where('booking_status', 1)
+                     ->orWhere('cancelled_within_24hrs', 1);
+               })
                ->count();
 
             $remainingFreeBookings = max($freeBookingLimit - $unitBookingsCount, 0);
             $chargedType = $unitBookingsCount < $freeBookingLimit ? 1 : 2;
 
+            // If exceeded free bookings and no force payment, ask for confirmation
             if ($chargedType == 2 && !$request->force_payment) {
                DB::rollBack();
                return response()->json([
-                  'message' => "This unit has reached the monthly free grease trap booking limit. This booking will cost ₱448.00. Do you want to continue?",
+                  'message' => "This unit has reached the free grease trap booking limit for the year. This booking will cost ₱448.00. Do you want to continue?",
                   'requires_payment' => true,
                   'remaining_free_bookings' => $remainingFreeBookings
                ], 409);
             }
 
+            // Generate transaction number
+            $lastId = (GreaseTrapBooking::max('id') ?? 0) + 1;
+            $transactionNo = '2SGT-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
+
+            // Create emergency booking (no conflict checking)
             $booking = GreaseTrapBooking::create([
                'user_id' => Auth::id(),
                'name' => $request->name,
@@ -245,7 +511,7 @@ class GreaseTrapBookingController extends Controller
             DB::commit();
 
             return response()->json([
-               'message' => 'Grease trap booking created successfully.',
+               'message' => 'Emergency grease trap booking created successfully.',
                'charged_type' => $chargedType
             ]);
 
@@ -258,19 +524,19 @@ class GreaseTrapBookingController extends Controller
                continue;
             }
 
-            Log::error('Admin Grease Trap Booking Error', ['error' => $e->getMessage()]);
+            Log::error('Admin Emergency Grease Trap Booking Error', ['error' => $e->getMessage()]);
             return response()->json(['message' => 'Something went wrong.'], 500);
+
 
          } catch (\Throwable $e) {
             DB::rollBack();
-            Log::error('Admin Grease Trap Booking Fatal', ['error' => $e->getMessage()]);
+            Log::error('Admin Emergency Grease Trap Booking Fatal', ['error' => $e->getMessage()]);
             return response()->json(['message' => 'Something went wrong.'], 500);
          }
       }
 
       return response()->json(['message' => 'Could not complete booking. Try again.'], 500);
    }
-
    public function fetchGreaseTrapBooking($id)
    {
       $greaseTrapBooking = GreaseTrapBooking::with('user')->find($id);
@@ -336,7 +602,8 @@ class GreaseTrapBookingController extends Controller
 
       $greaseTrapBookings->appends(['searchGreaseTrapBooking' => $searchBooking]);
 
-      return view('backend.grease-trap.grease-trap-booking', compact('greaseTrapBookings'));
+      return view('backend.grease-trap.grease-trap-booking', compact('greaseTrapBookings', 'searchBooking'))
+         ->with('searchGreaseTrapBooking', $searchBooking);
    }
 
 

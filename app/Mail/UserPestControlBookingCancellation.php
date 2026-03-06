@@ -30,8 +30,9 @@ class UserPestControlBookingCancellation extends Mailable implements ShouldQueue
     public function build()
     {
         $name = $this->booking->user->name ?? 'Resident';
+        $hasPenalty = $this->booking->has_penalty; // true/false
+        $penaltyAmount = $this->booking->penalty_amount ?? 0; // actual penalty amount
 
-        // Collect the names of ALL function rooms booked
 
 
         return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra')
@@ -43,6 +44,8 @@ class UserPestControlBookingCancellation extends Mailable implements ShouldQueue
                 'unit_no' => $this->booking->unit_no,
                 'booking_date' => $this->booking->booking_date,
                 'booking_time_slot' => $this->booking->booking_time_slot,
+                'has_penalty' => $hasPenalty,
+                'penalty_amount' => $penaltyAmount, // pass the amount
 
             ]);
     }

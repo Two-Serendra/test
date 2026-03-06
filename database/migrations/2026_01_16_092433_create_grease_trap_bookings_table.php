@@ -21,10 +21,15 @@ return new class extends Migration {
             $table->string('booking_time_slot');
             $table->string('srf_no')->nullable();
             $table->text('remarks')->nullable();
-            $table->tinyInteger('charged_type')->default('1'); // 1 = Free, 2 = Charged
+            $table->tinyInteger('charged_type')->default('1');
             $table->tinyInteger('emergency')->default('0');
             $table->tinyInteger('booking_status')->default('1');
+            $table->timestamp('cancelled_at')->nullable();
+            $table->boolean('has_penalty')->default(false);
+            $table->decimal('penalty_amount', 10, 2)->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('cancelled_by')->nullable();
+            $table->boolean('cancelled_within_24hrs')->default(0);
         });
     }
 
@@ -33,6 +38,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('grease_trap_bookings'); 
+        Schema::dropIfExists('grease_trap_bookings');
     }
 };

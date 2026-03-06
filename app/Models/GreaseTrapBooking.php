@@ -29,6 +29,7 @@ class GreaseTrapBooking extends Model
         'cancelled_by',
         'has_penalty',
         'penalty_amount',
+        'cancelled_within_24hrs',
     ];
 
     const STATUS_CONFIRMED = 1;
@@ -55,7 +56,8 @@ class GreaseTrapBooking extends Model
 
     public function isWithin24Hours()
     {
-        return now()->diffInHours($this->getBookingDateTime(), false) < 24;
+        // return now()->diffInHours($this->getBookingDateTime(), false) < 24;
+        return now()->diffInHours($this->getBookingDateTime()) < 24;
     }
 
     public function applyCancellationPenalty()
@@ -68,11 +70,26 @@ class GreaseTrapBooking extends Model
 
     public function getBookingDateTime()
     {
-        // Extract start time from the time slot (before the ' - ')
         $startTime = explode(' - ', $this->booking_time_slot)[0] ?? '00:00';
-
-        // Combine booking_date and start time
         return Carbon::parse($this->booking_date . ' ' . $startTime);
+    }
+
+    public static function getUsedFreeBookings($unitNo)
+    {
+        return self::where('unit_no', $unitNo)
+            ->whereYear('booking_date', now()->year)
+            ->where(function ($q) {
+                $q->where(function ($q2) {
+                    $q2->where('booking_status', self::STATUS_CONFIRMED)
+                        ->where('booking_date', '<', now()->toDateString());
+                })
+                    ->orWhere(function ($q3) {
+                        $q3->where('booking_status', self::STATUS_CANCELLED)
+                            ->where('cancelled_within_24hrs', 1);
+                    });
+
+            })
+            ->count();
     }
 }
 

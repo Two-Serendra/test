@@ -47,7 +47,7 @@
                             @if(!empty($activity->activity_description))
                                 <div class="mt-3 mb-3 p-3">
                                     <p class="text-muted mb-0" style="line-height: 1.7; text-align: justify;">
-                                        {{ $activity->activity_description }}
+                                         {!! $activity->activity_description ?? 'No description available.' !!}
                                     </p>
                                 </div>
                             @endif

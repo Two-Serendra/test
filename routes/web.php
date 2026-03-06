@@ -141,8 +141,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('pest.control.booked.slots');
     Route::get('/pest-control-booking-details/{id}', [PestControlController::class, 'showPestControlBookingDetails'])
         ->name('show.pest.control.booking.details');
+    Route::post('/pest-control-booking/cancel/{booking}', [PestControlController::class, 'CancelPestControlBooking'])
+        ->name('pest.control.booking.cancel');
 
-        
+
     // Function Room Booking
     Route::post('/booking/store', [FrontendFunctionRoomBookingController::class, 'store'])->name('booking.store');
     Route::get('/booking-details/{id}', [FrontendFunctionRoomBookingController::class, 'showFunctionRoomBookingDetails'])

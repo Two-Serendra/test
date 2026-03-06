@@ -201,6 +201,9 @@ class GreaseTrapController extends Controller
                         'message' => 'Slot already taken just now.'
                     ], 409);
                 }
+                $lastId = (GreaseTrapBooking::max('id') ?? 0) + 1;
+                $transactionNo = '2SGT-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
+
                 $booking = GreaseTrapBooking::create([
                     'user_id' => auth()->id(),
                     'unit_no' => $resident->unit_no,
@@ -208,12 +211,10 @@ class GreaseTrapController extends Controller
                     'booking_date' => $bookingDate,
                     'booking_time_slot' => $request->booking_time_slot,
                     'charged_type' => $chargedType,
+                    'transaction_no' => $transactionNo,
                 ]);
 
-                $transactionNo = '2SGT-' . str_pad($booking->id, 5, '0', STR_PAD_LEFT);
-                $booking->transaction_no = $transactionNo;
-                $booking->save();
-
+     
                 $booking->load('user');
                 if ($booking->user?->email) {
                     Mail::to($booking->user->email)

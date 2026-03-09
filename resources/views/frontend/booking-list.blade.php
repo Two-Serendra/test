@@ -21,7 +21,7 @@
                         <label class="form-check-label" for="category_amenity">Amenities</label>
                     </div>
 
-                    <div class="form-check">
+                    <!-- <div class="form-check">
                         <input class="form-check-input" type="radio" name="category" id="category_grease_trap"
                             value="grease_trap" {{ $category == 'grease_trap' ? 'checked' : '' }}
                             onchange="this.form.submit()">
@@ -33,7 +33,7 @@
                             value="pest_control" {{ $category == 'pest_control' ? 'checked' : '' }}
                             onchange="this.form.submit()">
                         <label class="form-check-label" for="category_pest_control">Pest Control</label>
-                    </div>
+                    </div> -->
                 </form>
             </div>
 

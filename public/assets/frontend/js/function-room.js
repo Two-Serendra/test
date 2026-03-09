@@ -1,4 +1,17 @@
 $(document).ready(function () {
+    $('#summernote').summernote({
+        height: 200,
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline', 'clear']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['insert', ['link', 'table', 'hr']],
+            ['view', ['fullscreen', 'codeview']]
+        ],
+        fontNames: [], // disables font family dropdown
+        fontSizes: [], // disables font size dropdown
+        dialogsInBody: true
+    });
+    
     flatpickr("#functionRoomBookingDate", {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(6)

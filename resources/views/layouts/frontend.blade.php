@@ -108,6 +108,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/laravel-echo/1.15.2/echo.iife.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
@@ -148,18 +149,7 @@
         });
 
 
-        $('#summernote').summernote({
-            height: 200,
-            toolbar: [
-                ['style', ['bold', 'italic', 'underline', 'clear']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['insert', ['link', 'table', 'hr']],
-                ['view', ['fullscreen', 'codeview']]
-            ],
-            fontNames: [], // disables font family dropdown
-            fontSizes: [], // disables font size dropdown
-            dialogsInBody: true
-        });
+
     </script>
 
 

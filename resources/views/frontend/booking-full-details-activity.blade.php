@@ -10,9 +10,11 @@
         background-color: #fff !important;
         cursor: pointer;
     }
+
 </style>
 
 @section('content')
+
 
     <div class="container my-5">
 
@@ -45,10 +47,8 @@
                             @endif
 
                             @if(!empty($activity->activity_description))
-                                <div class="mt-3 mb-3 p-3">
-                                    <p class="text-muted mb-0" style="line-height: 1.7; text-align: justify;">
-                                         {!! $activity->activity_description ?? 'No description available.' !!}
-                                    </p>
+                                <div class="mt-3 mb-3 p-3 activity-description editor-content">
+                                    {!! $activity->activity_description !!}
                                 </div>
                             @endif
 
@@ -57,7 +57,7 @@
                             @auth
                                 <button type="button"
                                     class="btn customBtn AddNewBooking 
-                                                                    @if ($activity->activity_status == 0) btn-secondary @else btn-outline-primary @endif"
+                                                                                    @if ($activity->activity_status == 0) btn-secondary @else btn-outline-primary @endif"
                                     style="@if ($activity->activity_status == 0) cursor: not-allowed; opacity: 0.6; @else background-color: #008b26; border-color: #008b26; color: white; font-weight: bold; @endif"
                                     @if ($activity->activity_status == 0) disabled @endif
                                     data-bs-target="#modalActivity{{ $activity->id }}" data-activity-id="{{ $activity->id }}">
@@ -120,23 +120,23 @@
     </div>
 
     <!-- <div id="loadingOverlay"
-        style="
-            display: none; /* 🔥 Keep this as default */
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.7);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-                                                                                                                            ">
-        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    </div>
- -->
+                style="
+                    display: none; /* 🔥 Keep this as default */
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(255, 255, 255, 0.7);
+                    z-index: 2000;
+                    justify-content: center;
+                    align-items: center;
+                                                                                                                                    ">
+                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+         -->
 
 
     <style>
@@ -146,19 +146,19 @@
         }
 
         /* #loadingOverlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.7);
-            z-index: 2000;
-            display: flex;
-          
-            justify-content: center;
-            align-items: center;
-        } */
+                    display: none;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(255, 255, 255, 0.7);
+                    z-index: 2000;
+                    display: flex;
+
+                    justify-content: center;
+                    align-items: center;
+                } */
     </style>
 
     @include('frontend.modal.360-modal-view')

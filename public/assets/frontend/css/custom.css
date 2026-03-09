@@ -661,7 +661,8 @@ select.form-select:not(:disabled) {
     vertical-align: middle;
 }
 
-.grease-trap-booking-cancellled  {
+.grease-trap-booking-cancellled,
+.pest-control-booking-cancelled {
     pointer-events: none;
     /* disables clicks */
     opacity: 0.65;
@@ -670,7 +671,26 @@ select.form-select:not(:disabled) {
     /* shows not-allowed cursor */
 }
 
-.grease-trap-booking-cancellled :hover {
+.grease-trap-booking-cancellled,
+.pest-control-booking-cancelled :hover {
     background-color: #6c757d !important;
     /* keep grey on hover */
+}
+
+.editor-content {
+    font-family: 'Poppins', sans-serif;
+    /* your website font */
+    font-size: 16px;
+    /* adjust as needed */
+    line-height: 1.6;
+    /* nice readability */
+    color: #212529;
+    /* dark color, not muted */
+}
+
+/* Make sure all child elements inherit the font */
+.editor-content * {
+    font-family: inherit !important;
+    font-size: inherit !important;
+    color: inherit !important;
 }

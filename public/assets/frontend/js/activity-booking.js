@@ -814,6 +814,8 @@ $(document).ready(function () {
                 const booking = response.booking;
 
                 const bookingDate = new Date(booking.booking_date);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Reset time for accurate comparison
                 const optionsDate = { year: 'numeric', month: 'long', day: '2-digit' };
                 const formattedDate = bookingDate.toLocaleDateString(undefined, optionsDate);
 
@@ -851,26 +853,34 @@ $(document).ready(function () {
                     `<span class="badge ${residentBadgeClass}">${booking.resident_type ?? 'N/A'}</span>`
                 );
 
+                // Booking Status
                 let statusText = '';
                 let statusClass = '';
 
-                switch (booking.booking_status) {
-                    case 1:
-                        statusText = 'Confirmed';
-                        statusClass = 'badge bg-success';
-                        break;
-                    case 2:
-                        statusText = 'Cancelled';
-                        statusClass = 'badge bg-danger';
-                        break;
-                    default:
-                        statusText = 'N/A';
-                        statusClass = 'badge bg-secondary';
+                if (bookingDate < today) {
+                    statusText = 'Completed';
+                    statusClass = 'badge bg-success';
+                    $('#cancelAmenityBookingBtn').hide(); // hide cancel button for past bookings
+                } else {
+                    switch (booking.booking_status) {
+                        case 1:
+                            statusText = 'Confirmed';
+                            statusClass = 'badge bg-success';
+                            $('#cancelAmenityBookingBtn').show(); // show cancel button
+                            break;
+                        case 2:
+                            statusText = 'Cancelled';
+                            statusClass = 'badge bg-danger';
+                            $('#cancelAmenityBookingBtn').hide(); // hide cancel button if cancelled
+                            break;
+                        default:
+                            statusText = 'N/A';
+                            statusClass = 'badge bg-secondary';
+                            $('#cancelAmenityBookingBtn').hide();
+                    }
                 }
 
                 $('#detail-booking-status').html(`<span class="${statusClass} badge badge-forge">${statusText}</span>`);
-
-
 
                 $('#residentActivityBookingDetailsModal').modal('show');
             },

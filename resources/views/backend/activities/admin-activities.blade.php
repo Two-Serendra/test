@@ -26,7 +26,7 @@
                     </form>
 
                     <div class="mb-2 mb-md-0">
-                        <button type="button" class="btn btn-primary badge AddActivity" >
+                        <button type="button" class="btn btn-primary badge AddActivity">
                             <i class='bx bx-plus'></i> New Activity
                         </button>
                     </div>
@@ -67,7 +67,7 @@
                                         @endif
                                     </td>
                                     <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                        {{ strtoupper($activity->activity_description ?: 'N/A') }}
+                                        {!! Str::limit(strip_tags($activity->activity_description ?: 'N/A'), 100, '...') !!}
                                     </td>
                                     <td>
                                         @if ($activity->activity_status == 1)
@@ -121,4 +121,20 @@
         </div>
     </div>
     @include('backend.modal.activities.activities-modal')
+
+    @push('scripts')
+        <script>
+            $(document).ready(function () {
+                $('#activityDescription').summernote({
+                    height: 300,
+                    placeholder: 'Enter activity description here...'
+                });
+                $('#edit_activity_description').summernote({
+                    height: 300,
+                    placeholder: 'Enter activity description here...'
+                });
+            });
+        </script>
+    @endpush
+
 @endsection

@@ -1,25 +1,5 @@
 @extends('layouts.frontend')
 
-<style>
-    .editor-content {
-        font-family: 'Poppins', sans-serif;
-        /* your website font */
-        font-size: 16px;
-        /* adjust as needed */
-        line-height: 1.6;
-        /* nice readability */
-        color: #212529;
-        /* dark color, not muted */
-    }
-
-    /* Make sure all child elements inherit the font */
-    .editor-content * {
-        font-family: inherit !important;
-        font-size: inherit !important;
-        color: inherit !important;
-    }
-</style>
-
 @section('content')
     <div class="container my-5">
         <!-- Go Back -->

@@ -19,7 +19,7 @@
                     <div class="row">
                         <div class="col-lg-7 border-end pe-4">
                             <div class="row g-3 mb-">
-                                <div class="col-md-6">
+                                <div class="col-md-6"> 
                                     <label class="form-label">Select Residence <span class="required">*</span></label>
                                     <select id="residentSelect" name="resident_email_id" class="form-select" required>
                                         <option value="">-- Select Residence --</option>
@@ -60,7 +60,7 @@
                                     <small class="text-danger d-none" id="capacityError">
                                         Max capacity is {{ $item->function_room_capacity }}
                                     </small>
-                                </div>
+                                </div> 
 
                                 <div class="col-md-6">
                                     <label class="form-label">End Time <span class="required">*</span></label>

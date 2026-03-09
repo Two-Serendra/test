@@ -74,13 +74,145 @@ $(document).ready(function () {
 
 
 
+    // $('#greaseTrapBookingFormAdmin').submit(function (event) {
+    //     event.preventDefault();
+
+    //     const form = this;
+    //     const $submitBtn = $('#saveUserGreaseTrapBtn');
+    //     const $bookingDate = $('#GreaseTrapBookingDateAdmin');
+    //     const modal = $bookingDate.val();
+
+    //     if (!form.checkValidity()) {
+    //         form.classList.add('was-validated');
+    //         return;
+    //     }
+    //     form.classList.remove('was-validated');
+
+    //     const originalWidth = $submitBtn.outerWidth();
+
+    //     const lockSubmitBtn = () => {
+    //         $submitBtn
+    //             .attr('disabled', true)
+    //             .html(`<div class="spinner-border spinner-border-sm text-light"></div>`)
+    //             .css('width', originalWidth + 'px');
+    //     };
+
+    //     const unlockSubmitBtn = () => {
+    //         $submitBtn
+    //             .attr('disabled', false)
+    //             .html(`<span class="btn-text">Submit</span>`)
+    //             .css('width', '');
+    //     };
+
+    //     const sendBooking = (forcePayment = false) => {
+    //         const formData = new FormData(form);
+    //         if (forcePayment) {
+    //             formData.append('force_payment', true);
+    //         }
+
+    //         lockSubmitBtn();
+
+    //         $.ajax({
+    //             url: $(form).attr('action'),
+    //             type: $(form).attr('method'),
+    //             headers: {
+    //                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    //             },
+    //             data: formData,
+    //             processData: false,
+    //             contentType: false,
+
+    //             success(response) {
+    //                 Swal.fire({
+    //                     icon: 'success',
+    //                     title: 'Booking Submitted!',
+    //                     text: response.message || 'Your booking has been successfully submitted.',
+    //                     timer: 2000,
+    //                     showConfirmButton: false
+    //                 });
+
+    //                 const selectedDate = $bookingDate.val();
+
+    //                 form.reset();
+    //                 $(form).removeClass('was-validated');
+
+    //                 flatpickr('#GreaseTrapBookingDateAdmin', {
+    //                     dateFormat: 'Y-m-d',
+    //                     minDate: new Date().fp_incr(1)
+    //                 });
+
+    //                 updateSlots(selectedDate);
+    //             },
+
+    //             error(xhr) {
+
+    //                 if (xhr.status === 409 && xhr.responseJSON?.requires_payment) {
+    //                     Swal.fire({
+    //                         icon: 'warning',
+    //                         title: 'Free Booking Limit Reached',
+    //                         text: xhr.responseJSON.message,
+    //                         showCancelButton: true,
+    //                         confirmButtonText: 'Yes, continue with payment',
+    //                         cancelButtonText: 'Cancel',
+    //                         confirmButtonColor: '#3085d6',
+    //                         cancelButtonColor: '#d33'
+    //                     }).then(result => {
+    //                         if (result.isConfirmed) {
+    //                             sendBooking(true);
+    //                         } else {
+    //                             unlockSubmitBtn();
+    //                         }
+    //                     });
+    //                     return;
+    //                 }
+
+
+    //                 if (xhr.status === 422) {
+    //                     let msg = 'Please check the form fields.';
+
+    //                     if (xhr.responseJSON?.errors) {
+    //                         msg = Object.values(xhr.responseJSON.errors)
+    //                             .map(e => e[0])
+    //                             .join('\n');
+    //                     }
+
+    //                     Swal.fire({
+    //                         icon: 'error',
+    //                         title: 'Validation Error',
+    //                         text: msg,
+    //                         confirmButtonText: 'OK',
+    //                         confirmButtonColor: '#d33'
+    //                     });
+    //                     return;
+    //                 }
+
+    //                 Swal.fire({
+    //                     toast: true,
+    //                     position: 'top-end',
+    //                     icon: 'error',
+    //                     title: 'Something went wrong. Please try again later.',
+    //                     timer: 3000,
+    //                     showConfirmButton: false
+    //                 });
+    //             },
+
+    //             complete() {
+    //                 unlockSubmitBtn();
+    //                 refreshGreaseTrapTableBookings()
+    //                 $('#greastrapAdd').modal('hide');
+    //             }
+    //         });
+    //     };
+    //     sendBooking();
+    // });
+
+
     $('#greaseTrapBookingFormAdmin').submit(function (event) {
         event.preventDefault();
 
         const form = this;
         const $submitBtn = $('#saveUserGreaseTrapBtn');
         const $bookingDate = $('#GreaseTrapBookingDateAdmin');
-        const modal = $bookingDate.val();
 
         if (!form.checkValidity()) {
             form.classList.add('was-validated');
@@ -126,13 +258,12 @@ $(document).ready(function () {
                     Swal.fire({
                         icon: 'success',
                         title: 'Booking Submitted!',
-                        text: response.message || 'Your booking has been successfully submitted.',
+                        text: response.message || 'Booking successfully submitted.',
                         timer: 2000,
                         showConfirmButton: false
                     });
 
                     const selectedDate = $bookingDate.val();
-
                     form.reset();
                     $(form).removeClass('was-validated');
 
@@ -145,12 +276,14 @@ $(document).ready(function () {
                 },
 
                 error(xhr) {
+                    const res = xhr.responseJSON || {};
 
-                    if (xhr.status === 409 && xhr.responseJSON?.requires_payment) {
+                    // Handle free booking limit
+                    if (xhr.status === 409 && res.requires_payment) {
                         Swal.fire({
                             icon: 'warning',
                             title: 'Free Booking Limit Reached',
-                            text: xhr.responseJSON.message,
+                            html: `${res.message}`,
                             showCancelButton: true,
                             confirmButtonText: 'Yes, continue with payment',
                             cancelButtonText: 'Cancel',
@@ -158,7 +291,7 @@ $(document).ready(function () {
                             cancelButtonColor: '#d33'
                         }).then(result => {
                             if (result.isConfirmed) {
-                                sendBooking(true);
+                                sendBooking(true); // force payment
                             } else {
                                 unlockSubmitBtn();
                             }
@@ -166,16 +299,12 @@ $(document).ready(function () {
                         return;
                     }
 
-
+                    // Validation errors
                     if (xhr.status === 422) {
                         let msg = 'Please check the form fields.';
-
-                        if (xhr.responseJSON?.errors) {
-                            msg = Object.values(xhr.responseJSON.errors)
-                                .map(e => e[0])
-                                .join('\n');
+                        if (res.errors) {
+                            msg = Object.values(res.errors).map(e => e[0]).join('\n');
                         }
-
                         Swal.fire({
                             icon: 'error',
                             title: 'Validation Error',
@@ -198,14 +327,14 @@ $(document).ready(function () {
 
                 complete() {
                     unlockSubmitBtn();
-                    refreshGreaseTrapTableBookings()
+                    refreshGreaseTrapTableBookings();
                     $('#greastrapAdd').modal('hide');
                 }
             });
         };
+
         sendBooking();
     });
-
 
 
     function refreshGreaseTrapTableBookings() {

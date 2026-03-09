@@ -158,6 +158,7 @@ $(document).ready(function () {
             $('#edit_amenity_select').val(data.amenity_id);
             $('#edit_activity_name').val(data.activity_name);
             $('#edit_activity_description').val(data.activity_description);
+            $('#edit_activity_description').summernote('code', data.activity_description);
             $('#currentImageFileNameActivity').val(data.activity_image);
             $('input[name="edit_activity_max_booking"]').each(function () {
                 $(this).prop('checked', $(this).val() == data.activity_max_booking);
@@ -307,6 +308,19 @@ $(document).ready(function () {
         });
     });
 
+    function stripHtml(html) {
+        var tmp = document.createElement("DIV");
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || "";
+    }
+
+    
+    function limitText(text, maxLength = 100) {
+        if (!text) return "N/A";
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + "...";
+    }
+
     function refreshTableActivities() {
         $.ajax({
             url: '/admin/get-updated-activities-table',
@@ -341,7 +355,7 @@ $(document).ready(function () {
 
                     var amenity_name = activity.amenity_name ? activity.amenity_name.toUpperCase() : 'N/A';
                     var activity_name = activity.activity_name ? activity.activity_name.toUpperCase() : 'N/A';
-                    var activity_description = activity.activity_description ? activity.activity_description.toUpperCase() : 'N/A';
+                    var activity_description = limitText(stripHtml(activity.activity_description), 100);
                     var activity_remarks = activity.activity_remarks ? activity.activity_remarks.toUpperCase() : 'N/A';
                     var activity_max_booking = activity.activity_max_booking ? activity.activity_max_booking.toUpperCase() : 'N/A';
                     var activity_space = activity.activity_space ? activity.activity_space.toUpperCase() : 'N/A';

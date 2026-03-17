@@ -214,6 +214,7 @@ class FrontendFunctionRoomBookingController extends Controller
     public function fullDetailsActivity($type, $activity_id)
     {
         $activity = Activity::with('ActivityBooking')->findOrFail($activity_id);
+        $activities = Activity::where('activity_status', 1)->get();
 
         $suggestions = Activity::where('amenity_id', $activity->amenity_id)
             ->where('id', '!=', $activity->id)
@@ -231,7 +232,7 @@ class FrontendFunctionRoomBookingController extends Controller
         return view('frontend.booking-full-details-activity', compact(
             'activity',
             'suggestions',
-            'residences'
+            'residences','activities'
         ));
     }
 

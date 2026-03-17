@@ -129,7 +129,7 @@ Route::middleware('auth:admin')->group(function () {
 
 
     Route::get('/fetch-blocked-dates', [ActivitiesController::class, 'fetchBlockDates'])->name('AdminDateBlocking');
-
+ 
     //Activities Bookings
     Route::get('get-updated-activities-blocking', [ActivitiesController::class, 'getUpdatedBlockingTable'])->name('get.updated.blocking.table');
     Route::get('/admin-activity-booking', [ActivitiesController::class, 'AdminBookingActivities'])->name('admin.booking.activities');

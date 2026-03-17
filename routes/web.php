@@ -80,7 +80,6 @@ Route::get('/booking-activity/{type}/{activity_id}', [FrontendFunctionRoomBookin
 Route::get('/check-unit-tenant/{unitNo}', [FrontendFunctionRoomBookingController::class, 'checkUnitTenant']);
 
 Route::post('/activity-new-booking', [FrontendActivityBookingController::class, 'ActivityNewBooking'])->name('activities.new.booking');
-Route::get('/fetch-blocked-dates', [FrontendActivityBookingController::class, 'fetchBlockDates'])->name('DateBlocking');
 Route::get('/check-unit-frontend', [FrontendActivityBookingController::class, 'checkUnitBooking'])->name('checkUnitBookingFront');
 
 Route::get('/fetch-available-times-user', [FrontendActivityBookingController::class, 'fetchAvailableTimesUser']);
@@ -94,8 +93,12 @@ Route::post('/resident/activity-booking/cancel/{booking}', [FrontendActivityBook
 Route::get('/amenity-booking-details/{id}', [FrontendActivityBookingController::class, 'showAmenityBookingDetails'])
     ->name('show.amenity.booking.details');
 
+Route::get('/fetch-blocked-dates', [FrontendActivityBookingController::class, 'fetchBlockDates'])->name('DateBlocking');
+
+Route::get('/fetch-all-slots-user', [FrontendActivityBookingController::class, 'fetchAllSlotsUser'])->name('fetchAllSlotsUser');
+
 Route::get('/check-auth', function () {
-    return response()->json([
+    return response()->json([ 
         'authenticated' => Auth::check()
     ]);
 });

@@ -1326,7 +1326,7 @@ $('.SearchSlotAdmin').submit(function (event) {
 
     let activityId = $('#activitySelectBookingSearchAdmin').val();
     let amenityId = $('#activitySelectBookingSearchAdmin option:selected').data('amenity-id');
-    let dateField = $('#activityDateFieldSearchAdmin').val();
+    let dateField = $('#dateFieldSearchAdmin').val();
 
     $('#spinner').removeClass('d-none');
 
@@ -1351,8 +1351,15 @@ $('.SearchSlotAdmin').submit(function (event) {
             response.slots.forEach(slot => {
                 html += `<tr><td>${slot.time_range}</td>`;
                 slot.slots.forEach(status => {
-                    let badgeClass = status === 'Available' ? 'bg-success' :
-                        status === 'Booked' ? 'bg-danger' : 'bg-warning text-dark';
+                    let badgeClass;
+
+                    if (status === 'Available') {
+                        badgeClass = 'bg-primary';
+                    } else {
+
+                        badgeClass = 'bg-danger';
+                    }
+
                     html += `<td><span class="badge ${badgeClass} text-uppercase">${status}</span></td>`;
                 });
                 html += '</tr>';
@@ -1366,64 +1373,66 @@ $('.SearchSlotAdmin').submit(function (event) {
             alert('An error occurred while fetching the data.');
         }
     });
+});
 
 
-    $('#bookingTable').on('click', 'mark-as-no-show', function () {
 
-        const bookingId = $(this).data('id');
+$('#bookingTable').on('click', 'mark-as-no-show', function () {
 
-        Swal.fire({
-            title: "Mark as No Show?",
-            html: "The resident did not attend. A <b>₱1000 penalty</b> will be applied.",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, mark as no show",
-            cancelButtonText: "Cancel"
-        }).then((result) => {
-            if (!result.isConfirmed) return;
+    const bookingId = $(this).data('id');
 
-            $.ajax({
-                url: `/admin/mark-no-show/${bookingId}`,
-                method: 'POST',
-                data: {
-                    _token: $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (res) {
-                    if (!res.success) {
-                        Swal.fire('Error', res.message || 'Failed to mark no show.', 'error');
-                        return;
-                    }
+    Swal.fire({
+        title: "Mark as No Show?",
+        html: "The resident did not attend. A <b>₱1000 penalty</b> will be applied.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, mark as no show",
+        cancelButtonText: "Cancel"
+    }).then((result) => {
+        if (!result.isConfirmed) return;
 
-                    Swal.fire('Updated!', res.message, 'success')
-                        .then(() => refreshTableBookings());
-                },
-                error: function () {
-                    Swal.fire('Error', 'Something went wrong.', 'error');
+        $.ajax({
+            url: `/admin/mark-no-show/${bookingId}`,
+            method: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (res) {
+                if (!res.success) {
+                    Swal.fire('Error', res.message || 'Failed to mark no show.', 'error');
+                    return;
                 }
-            });
+
+                Swal.fire('Updated!', res.message, 'success')
+                    .then(() => refreshTableBookings());
+            },
+            error: function () {
+                Swal.fire('Error', 'Something went wrong.', 'error');
+            }
         });
     });
+});
 
 
-    $('#uploadBookingBtn').on('click', function () {
-        $('#bookingFileInput').click();
-    });
+$('#uploadBookingBtn').on('click', function () {
+    $('#bookingFileInput').click();
+});
 
-    $('#bookingFileInput').on('change', function () {
+$('#bookingFileInput').on('change', function () {
 
-        if (this.files.length === 0) return;
+    if (this.files.length === 0) return;
 
-        let fileName = this.files[0].name;
+    let fileName = this.files[0].name;
 
-        if (confirm("Upload file: " + fileName + " ?")) {
-            $('#bookingImportForm').submit();
-        } else {
-            $(this).val('');
-        }
-
-    });
+    if (confirm("Upload file: " + fileName + " ?")) {
+        $('#bookingImportForm').submit();
+    } else {
+        $(this).val('');
+    }
 
 });
+
+
 

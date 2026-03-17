@@ -52,19 +52,20 @@ class FrontendActivityBookingController extends Controller
                 $amenityId = $activity->amenity_id;
 
                 if (strtoupper($request->booking_type) === '20HRS') {
-                    $existing20HrsBooking = ActivityBooking::where('booking_date', $request->booking_date)
-                        ->where('unit', strtoupper($request->unit))
+
+                    $exists = ActivityBooking::where('booking_date', $request->booking_date)
+                        ->where('unit', strtoupper($resident->unit_no)) // ✅ FIXED
                         ->where('activity_id', $activityId)
                         ->where('booking_type', '20HRS')
                         ->where('booking_status', 1)
                         ->lockForUpdate()
-                        ->first();
+                        ->exists();
 
-                    if ($existing20HrsBooking) {
+                    if ($exists) {
                         DB::rollBack();
                         return response()->json([
                             'success' => false,
-                            'message' => 'This unit already has a 20hrs booking for the selected date.'
+                            'message' => 'This unit already has a 20HRS booking for this activity on the selected date.'
                         ], 409);
                     }
                 }
@@ -986,6 +987,113 @@ class FrontendActivityBookingController extends Controller
         return view('frontend.user-amenity-booking-details', compact('booking'));
     }
 
+    public function fetchAllSlotsUser(Request $request)
+    {
+        $activityId = $request->input('activity_id');
+        $date = $request->input('booking_date');
+
+        $activity = Activity::find($activityId); 
+        if (!$activity) {
+            return response()->json(['error' => 'Activity not found'], 404);
+        }
+
+        $activitySpace = $activity->activity_space;
+        $amenityId = $activity->amenity_id;
+
+        $day = Carbon::parse($date)->format('l');
+
+        $schedule = ActivitySchedule::where('activity_id', $activityId)
+            ->where('day', $day)
+            ->first();
+
+        if (!$schedule) {
+            return response()->json(['error' => 'No schedule for this activity on selected day'], 404);
+        }
+
+        $start = Carbon::parse($date . ' ' . $schedule->start_time);
+        $end = Carbon::parse($date . ' ' . $schedule->end_time);
+
+        if ($end->lessThanOrEqualTo($start)) {
+            $end->addDay();
+        }
+
+        $bookings = ActivityBooking::where('booking_date', $date)
+            ->where('booking_status', 1)
+            ->whereHas('activity', function ($query) use ($amenityId) {
+                $query->where('amenity_id', $amenityId);
+            })
+            ->with('activity')
+            ->get();
+
+        $slots = [];
+
+        while ($start < $end) {
+            $slotStart = $start->copy();
+            $slotEnd = $slotStart->copy()->addHour();
+
+            $row = [
+                'time_range' => $slotStart->format('g:i A') . ' - ' . $slotEnd->format('g:i A'),
+                'slots' => []
+            ];
 
 
+            $overlappingBookings = $bookings->filter(function ($booking) use ($slotStart, $slotEnd) {
+                $bookingStart = Carbon::parse($booking->booking_date . ' ' . $booking->booking_start_time);
+                $bookingEnd = Carbon::parse($booking->booking_date . ' ' . $booking->booking_end_time);
+
+                if ($bookingEnd->lessThanOrEqualTo($bookingStart)) {
+                    $bookingEnd->addDay();
+                }
+
+                return $bookingStart->lt($slotEnd) && $bookingEnd->gt($slotStart);
+            });
+
+
+            $hasDifferentSpace = $overlappingBookings->contains(function ($booking) use ($activitySpace) {
+                return $booking->activity
+                    && $booking->activity->activity_space != $activitySpace;
+            });
+
+            if ($hasDifferentSpace) {
+
+
+                $conflictingActivities = $overlappingBookings
+                    ->map(function ($booking) {
+                        return $booking->activity ? $booking->activity->activity_name : null;
+                    })
+                    ->filter()
+                    ->unique()
+                    ->values()
+                    ->all();
+
+                for ($i = 1; $i <= $activitySpace; $i++) {
+                    $row['slots'][] = implode(', ', $conflictingActivities);
+                }
+
+            } else {
+
+                $slotIndex = 0;
+
+                foreach ($overlappingBookings as $booking) {
+                    if ($slotIndex < $activitySpace) {
+                        $row['slots'][] = $booking->activity->activity_name;
+                        $slotIndex++;
+                    }
+                }
+
+                while ($slotIndex < $activitySpace) {
+                    $row['slots'][] = 'Available';
+                    $slotIndex++;
+                }
+            }
+
+            $slots[] = $row;
+            $start->addHour();
+        }
+
+        return response()->json([
+            'activity_space' => $activitySpace,
+            'slots' => $slots
+        ]);
+    }
 }

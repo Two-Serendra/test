@@ -33,7 +33,7 @@ class UserPestControlBookingConfirmation extends Mailable implements ShouldQueue
         $fee = 350;
 
         return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra')
-            ->subject('Your Pest Control Booking has been Confirmed')
+            ->subject('Pest Control Booking has been Confirmed')
             ->view('emails.user-pest-control-booking-confirmation')
             ->with([
                 'name' => $name,

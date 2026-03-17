@@ -373,6 +373,7 @@ class PestControlController extends Controller
                     'start' => $schedule->booking_date . ' ' . Carbon::parse(trim($start))->format('H:i:s'),
                     'end' => $schedule->booking_date . ' ' . Carbon::parse(trim($end))->format('H:i:s'),
                     'allDay' => false,
+                    'unit_area' => $schedule->unit_area,
                 ];
             });
 
@@ -520,5 +521,102 @@ class PestControlController extends Controller
         Log::info("Pest Control CSV Export Completed", ['filename' => $fileName]);
 
         return $response;
+    }
+
+
+    public function importPestControlBookings(Request $request)
+    {
+        Log::info('Import pest control booking route hit');
+
+        if (!$request->hasFile('file')) {
+            Log::error('No file uploaded');
+            return back()->with('error', 'No file uploaded');
+        }
+
+        $file = $request->file('file');
+        Log::info('File received', [
+            'filename' => $file->getClientOriginalName(),
+            'size' => $file->getSize(),
+            'mime' => $file->getMimeType(),
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+
+            $csvData = array_map('str_getcsv', file($file->getRealPath()));
+
+            if (count($csvData) <= 1) {
+                Log::warning('CSV file is empty or only has headers');
+                return back()->with('error', 'CSV file is empty');
+            }
+
+            $header = array_shift($csvData);
+
+            $lastTransaction = PestControlBooking::lockForUpdate()->latest('id')->first();
+            $lastNumber = $lastTransaction
+                ? ((int) str_replace('2SPC-', '', $lastTransaction->transaction_no))
+                : 0;
+
+            foreach ($csvData as $index => $row) {
+
+                Log::info('Processing CSV row', ['index' => $index, 'row' => $row]);
+
+
+                $lastNumber++;
+                $transactionNo = '2SPC-' . str_pad($lastNumber, 5, '0', STR_PAD_LEFT);
+
+                try {
+                    $bookingDate = Carbon::parse(trim($row[6]))->format('Y-m-d');
+                } catch (\Exception $e) {
+                    Log::error('Booking date parse error', [
+                        'row' => $row,
+                        'error' => $e->getMessage()
+                    ]);
+                    continue;
+                }
+
+                try {
+                    PestControlBooking::create([
+                        'transaction_no' => $transactionNo,
+                        'unit_no' => trim($row[4]),
+                        'resident_type' => trim($row[5]),
+                        'booking_date' => $bookingDate,
+                        'booking_time_slot' => trim($row[7]),
+                        'srf_no' => trim($row[8]),
+                        'unit_area' => trim($row[9]),
+                        'remarks' => null,
+                        'charged_type' => trim($row[11]),
+                        'emergency' => trim($row[12]),
+                        'booking_status' => trim($row[13]),
+                        'cancelled_by' => null,
+                        'cancelled_at' => null,
+                        'has_penalty' => trim($row[16]),
+                        'penalty_amount' => null,
+                        'created_by' => null,
+                        'created_at' => null,
+                        'updated_at' => null,
+                    ]);
+
+                    Log::info('Booking created', ['transaction_no' => $transactionNo]);
+
+                } catch (\Exception $e) {
+                    Log::error('Row insert failed', [
+                        'index' => $index,
+                        'row' => $row,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
+            DB::commit();
+            Log::info('CSV import completed successfully');
+            return back()->with('success', 'Bookings imported successfully');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('CSV import failed', ['error' => $e->getMessage()]);
+            return back()->with('error', $e->getMessage());
+        }
     }
 }

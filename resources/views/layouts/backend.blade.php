@@ -265,7 +265,7 @@
                     toastr.success(`(Unit: ${data.unit_no})`, `New Pest Control Booking`);
                     incrementPestContrtolBookingCounter();
                     refreshTableDebounced();
-                }   
+                }
             });
 
             pestControlChannel.bind('PestContrtolBookingCancellation', function (data) {

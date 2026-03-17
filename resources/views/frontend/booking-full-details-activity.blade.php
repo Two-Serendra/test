@@ -10,7 +10,6 @@
         background-color: #fff !important;
         cursor: pointer;
     }
-
 </style>
 
 @section('content')
@@ -19,8 +18,9 @@
     <div class="container my-5">
 
         <div class="mb-3">
-            <a href="{{ route('booking.list') }}" class="text-decoration-none text-primary fw-semibold">
-                ← Back to List
+            <a href="{{ url()->previous() ?? route('booking.list') }}"
+                class="text-decoration-none text-primary fw-semibold">
+                ← Back to list
             </a>
         </div>
 
@@ -57,7 +57,7 @@
                             @auth
                                 <button type="button"
                                     class="btn customBtn AddNewBooking 
-                                                                                    @if ($activity->activity_status == 0) btn-secondary @else btn-outline-primary @endif"
+                                                                                            @if ($activity->activity_status == 0) btn-secondary @else btn-outline-primary @endif"
                                     style="@if ($activity->activity_status == 0) cursor: not-allowed; opacity: 0.6; @else background-color: #008b26; border-color: #008b26; color: white; font-weight: bold; @endif"
                                     @if ($activity->activity_status == 0) disabled @endif
                                     data-bs-target="#modalActivity{{ $activity->id }}" data-activity-id="{{ $activity->id }}">
@@ -65,13 +65,12 @@
                                 </button>
                             @else
                                 @if($activity->activity_status == 0)
-                                    <a class="btn btn-secondary btn-lg customBtn disabled"
-                                        style="pointer-events: none; opacity: 0.6;">
+                                    <a class="btn btn-secondary customBtn disabled" style="pointer-events: none; opacity: 0.6;">
                                         Book Now
                                     </a>
                                 @else
                                     <a href="{{ route('login', ['redirect' => url()->current()]) }}"
-                                        class="btn btn-primary btn-lg customBtn">
+                                        class="btn btn-primary customBtn">
                                         Book Now
                                     </a>
                                 @endif
@@ -120,23 +119,23 @@
     </div>
 
     <!-- <div id="loadingOverlay"
-                style="
-                    display: none; /* 🔥 Keep this as default */
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(255, 255, 255, 0.7);
-                    z-index: 2000;
-                    justify-content: center;
-                    align-items: center;
-                                                                                                                                    ">
-                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-                    <span class="visually-hidden">Loading...</span>
+                    style="
+                        display: none; /* 🔥 Keep this as default */
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(255, 255, 255, 0.7);
+                        z-index: 2000;
+                        justify-content: center;
+                        align-items: center;
+                                                                                                                                        ">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
                 </div>
-            </div>
-         -->
+             -->
 
 
     <style>
@@ -146,19 +145,19 @@
         }
 
         /* #loadingOverlay {
-                    display: none;
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(255, 255, 255, 0.7);
-                    z-index: 2000;
-                    display: flex;
+                        display: none;
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(255, 255, 255, 0.7);
+                        z-index: 2000;
+                        display: flex;
 
-                    justify-content: center;
-                    align-items: center;
-                } */
+                        justify-content: center;
+                        align-items: center;
+                    } */
     </style>
 
     @include('frontend.modal.360-modal-view')

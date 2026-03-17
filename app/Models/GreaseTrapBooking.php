@@ -56,7 +56,6 @@ class GreaseTrapBooking extends Model
 
     public function isWithin24Hours()
     {
-        // return now()->diffInHours($this->getBookingDateTime(), false) < 24;
         return now()->diffInHours($this->getBookingDateTime()) < 24;
     }
 

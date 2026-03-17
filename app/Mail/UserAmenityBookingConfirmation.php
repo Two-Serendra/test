@@ -26,7 +26,7 @@ class UserAmenityBookingConfirmation extends Mailable implements ShouldQueue
 
 
         return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra')
-            ->subject('Your Amenity Booking has been Confirmed')
+            ->subject('Amenity Booking has been Confirmed')
             ->view('emails.user-amenity-booking-confirmation')
             ->with([
                 'name' => $name,

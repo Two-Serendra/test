@@ -33,7 +33,7 @@
                             <!-- <li class="nav-item">
                                 <a class="nav-link booking-tab" id="walkin-tab" data-bs-toggle="tab" href="#"
                                     data-value="Walk-in">Walk-in</a>
-                            </li> -->
+                            </li> --> 
                         </ul>
 
                         <div class="col-md-6">

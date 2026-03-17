@@ -292,7 +292,6 @@ class GreaseTrapBookingController extends Controller
    {
       try {
 
-         // Already cancelled
          if ($booking->booking_status == GreaseTrapBooking::STATUS_CANCELLED) {
             return response()->json([
                'success' => false,
@@ -300,7 +299,6 @@ class GreaseTrapBookingController extends Controller
             ], 400);
          }
 
-         // Booking already completed
          if ($booking->getBookingDateTime()->lt(now())) {
             return response()->json([
                'success' => false,
@@ -310,11 +308,9 @@ class GreaseTrapBookingController extends Controller
 
          $within24Hours = $booking->isWithin24Hours();
 
-         // Count used free bookings for this unit
          $usedFree = GreaseTrapBooking::getUsedFreeBookings($booking->unit_no);
          $freeLimit = 2;
 
-         // Confirmation step before actually cancelling
          if (!$request->has('confirm')) {
 
             $message = '';
@@ -337,17 +333,16 @@ class GreaseTrapBookingController extends Controller
             ]);
          }
 
-         // Apply cancellation
          $booking->booking_status = GreaseTrapBooking::STATUS_CANCELLED;
          $booking->cancelled_at = now();
          $booking->cancelled_by = auth()->id();
 
          if ($within24Hours) {
             if ($usedFree >= $freeLimit) {
-               // Apply penalty
+
                $booking->applyCancellationPenalty();
             } else {
-               // Mark as cancelled within 24hrs but no penalty
+
                $booking->cancelled_within_24hrs = 1;
             }
          }
@@ -462,12 +457,10 @@ class GreaseTrapBookingController extends Controller
             $bookingDate = Carbon::parse($request->booking_date)->toDateString();
             $unitNo = strtoupper(trim($request->unit));
 
-            // Free booking limit
             $freeBookingLimit = 2;
             $yearStart = Carbon::now()->startOfYear()->toDateString();
             $yearEnd = Carbon::now()->endOfYear()->toDateString();
 
-            // Count existing bookings for the unit this year
             $unitBookingsCount = GreaseTrapBooking::where('unit_no', $unitNo)
                ->whereBetween('booking_date', [$yearStart, $yearEnd])
                ->where(function ($q) {
@@ -479,7 +472,6 @@ class GreaseTrapBookingController extends Controller
             $remainingFreeBookings = max($freeBookingLimit - $unitBookingsCount, 0);
             $chargedType = $unitBookingsCount < $freeBookingLimit ? 1 : 2;
 
-            // If exceeded free bookings and no force payment, ask for confirmation
             if ($chargedType == 2 && !$request->force_payment) {
                DB::rollBack();
                return response()->json([
@@ -489,11 +481,9 @@ class GreaseTrapBookingController extends Controller
                ], 409);
             }
 
-            // Generate transaction number
             $lastId = (GreaseTrapBooking::max('id') ?? 0) + 1;
             $transactionNo = '2SGT-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
 
-            // Create emergency booking (no conflict checking)
             $booking = GreaseTrapBooking::create([
                'user_id' => Auth::id(),
                'name' => $request->name,
@@ -614,18 +604,32 @@ class GreaseTrapBookingController extends Controller
          ->get()
          ->map(function ($schedule) {
 
-            $timeSlot = str_replace([' NN', ' MN'], [' PM', ' AM'], $schedule->booking_time_slot);
-            [$start, $end] = explode('-', $timeSlot);
+            if (!empty($schedule->booking_time_slot)) {
 
-            $startTime = Carbon::parse(trim($start))->format('g:i A');
-            $endTime = Carbon::parse(trim($end))->format('g:i A');
+               $timeSlot = str_replace([' NN', ' MN'], [' PM', ' AM'], $schedule->booking_time_slot);
+               $times = explode('-', $timeSlot);
 
+               $start = trim($times[0]);
+               $end = trim($times[1] ?? $times[0]);
+
+               $startTime = Carbon::parse($start)->format('g:i A');
+               $endTime = Carbon::parse($end)->format('g:i A');
+
+               return [
+                  'id' => $schedule->id,
+                  'title' => $schedule->unit_no . ' (' . $startTime . ' - ' . $endTime . ')',
+                  'start' => $schedule->booking_date . ' ' . Carbon::parse($start)->format('H:i:s'),
+                  'end' => $schedule->booking_date . ' ' . Carbon::parse($end)->format('H:i:s'),
+                  'allDay' => false,
+               ];
+            }
+
+            // If booking_time_slot is empty
             return [
                'id' => $schedule->id,
-               'title' => $schedule->unit_no . ' (' . $startTime . ' - ' . $endTime . ')',
-               'start' => $schedule->booking_date . ' ' . Carbon::parse(trim($start))->format('H:i:s'),
-               'end' => $schedule->booking_date . ' ' . Carbon::parse(trim($end))->format('H:i:s'),
-               'allDay' => false,
+               'title' => $schedule->unit_no . ' (No Time Slot)',
+               'start' => $schedule->booking_date,
+               'allDay' => true,
             ];
          });
 
@@ -775,5 +779,102 @@ class GreaseTrapBookingController extends Controller
       Log::info("Grease Trap CSV Export Completed", ['filename' => $fileName]);
 
       return $response;
+   }
+
+
+
+   public function importGreaseTrapBookings(Request $request)
+   {
+      Log::info('Import grease trap booking route hit');
+
+      if (!$request->hasFile('file')) {
+         Log::error('No file uploaded');
+         return back()->with('error', 'No file uploaded');
+      }
+
+      $file = $request->file('file');
+      Log::info('File received', [
+         'filename' => $file->getClientOriginalName(),
+         'size' => $file->getSize(),
+         'mime' => $file->getMimeType(),
+      ]);
+
+      DB::beginTransaction();
+
+      try {
+
+         $csvData = array_map('str_getcsv', file($file->getRealPath()));
+
+         if (count($csvData) <= 1) {
+            Log::warning('CSV file is empty or only has headers');
+            return back()->with('error', 'CSV file is empty');
+         }
+
+         $header = array_shift($csvData);
+
+         $lastTransaction = GreaseTrapBooking::lockForUpdate()->latest('id')->first();
+         $lastNumber = $lastTransaction
+            ? ((int) str_replace('2SGT-', '', $lastTransaction->transaction_no))
+            : 0;
+
+         foreach ($csvData as $index => $row) {
+
+            Log::info('Processing CSV row', ['index' => $index, 'row' => $row]);
+
+
+            $lastNumber++;
+            $transactionNo = '2SGT-' . str_pad($lastNumber, 5, '0', STR_PAD_LEFT);
+
+            try {
+               $bookingDate = Carbon::parse(trim($row[6]))->format('Y-m-d');
+            } catch (\Exception $e) {
+               Log::error('Booking date parse error', [
+                  'row' => $row,
+                  'error' => $e->getMessage()
+               ]);
+               continue;
+            }
+
+            try {
+               GreaseTrapBooking::create([
+                  'transaction_no' => $transactionNo,
+                  'unit_no' => trim($row[4]),
+                  'resident_type' => trim($row[5]),
+                  'booking_date' => $bookingDate,
+                  'booking_time_slot' => trim($row[7]),
+                  'srf_no' => trim($row[8]),
+                  'remarks' => null,
+                  'charged_type' => trim($row[10]),
+                  'emergency' => trim($row[11]),
+                  'booking_status' => trim($row[12]),
+                  'cancelled_by' => null,
+                  'cancelled_at' => null,
+                  'has_penalty' => trim($row[14]),
+                  'penalty_amount' => null,
+                  'created_by' => null,
+                  'created_at' => null,
+                  'updated_at' => null,
+               ]);
+
+               Log::info('Booking created', ['transaction_no' => $transactionNo]);
+
+            } catch (\Exception $e) {
+               Log::error('Row insert failed', [
+                  'index' => $index,
+                  'row' => $row,
+                  'error' => $e->getMessage()
+               ]);
+            }
+         }
+
+         DB::commit();
+         Log::info('CSV import completed successfully');
+         return back()->with('success', 'Bookings imported successfully');
+
+      } catch (\Exception $e) {
+         DB::rollBack();
+         Log::error('CSV import failed', ['error' => $e->getMessage()]);
+         return back()->with('error', $e->getMessage());
+      }
    }
 }

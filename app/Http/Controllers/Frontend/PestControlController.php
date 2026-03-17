@@ -368,7 +368,7 @@ class PestControlController extends Controller
             }
 
 
-            $booking->booking_status = PestControlBooking::STATUS_CANCELLED; // or 2
+            $booking->booking_status = PestControlBooking::STATUS_CANCELLED;
             $booking->cancelled_at = now();
             $booking->cancelled_by = auth()->id();
             $booking->save();

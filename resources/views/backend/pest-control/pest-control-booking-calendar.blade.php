@@ -80,15 +80,15 @@
             opacity: 1 !important;
         }
 
-        .filter-btn.active {
+        .filter-btn-pc.active {
             background-color: #28a745 !important;
             color: #fff !important;
             font-weight: bold;
         }
 
 
-        .filter-btn:hover,
-        .filter-btn:focus {
+        .filter-btn-pc:hover,
+        .filter-btn-pc:focus {
             background-color: #28a745 !important;
             color: #fff !important;
             font-weight: bold;
@@ -97,10 +97,25 @@
 
     <div class="container">
         <div class="row">
+            <div class="col-md-10">
+                <div id="calendar-pest-control-booking"></div>
+            </div>
 
+            <div class="col-md-2">
+                <div class="d-flex flex-column gap-2">
+                    <button class="btn btn-outline-primary filter-btn-pc active" data-rise="">
+                        All
+                    </button>
 
-            <div id="calendar-pest-control-booking"></div>
+                    <button class="btn btn-outline-primary filter-btn-pc filter-btn-rise" data-rise="lowrise">
+                        Lowrise
+                    </button>
 
+                    <button class="btn btn-outline-primary filter-btn-pc filter-btn-rise" data-rise="highrise">
+                        Highrise
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -108,8 +123,9 @@
 @endsection
 @push('js')
     <script>
+        var schedule = @json($events);
         $(document).ready(function () {
-            var schedule = @json($events);
+
             $('#calendar-pest-control-booking').fullCalendar({
                 timezone: 'local',
                 header: {
@@ -169,6 +185,45 @@
                     });
                 }
             });
+        });
+
+
+        let selectedRise = "";
+
+        $('.filter-btn-pc').on('click', function () {
+
+            selectedRise = $(this).data('rise');
+
+            $('.filter-btn-pc')
+                .removeClass('active btn-success')
+                .addClass('btn-outline-success');
+
+            $(this)
+                .addClass('active btn-success')
+                .removeClass('btn-outline-success');
+
+            if (selectedRise === "") {
+                $('#calendar-pest-control-booking').fullCalendar('removeEvents');
+                $('#calendar-pest-control-booking').fullCalendar('addEventSource', schedule);
+                return;
+            }
+
+            var filteredEvents = schedule.filter(function (event) {
+
+                let area = (event.unit_area || '').toUpperCase();
+
+                if (selectedRise === "highrise") {
+                    return ['F', 'G', 'H', 'I'].includes(area);
+                }
+
+                if (selectedRise === "lowrise") {
+                    return ['A', 'B', 'C', 'D', 'E'].includes(area);
+                }
+
+            });
+
+            $('#calendar-pest-control-booking').fullCalendar('removeEvents');
+            $('#calendar-pest-control-booking').fullCalendar('addEventSource', filteredEvents);
         });
 
 

@@ -38,7 +38,7 @@ class UserFunctionRoomBookingNotification extends Mailable implements ShouldQueu
             ->implode(', ');
 
         return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra')
-            ->subject('Your Function Room Booking is Being Processed')
+            ->subject('Function Room Booking is Being Processed')
             ->view('emails.user-function-room-booking')
             ->with([
                 'name' => $name,

@@ -34,7 +34,7 @@ class UserGreaseTrapBookingConfirmation extends Mailable implements ShouldQueue
 
 
         return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra')
-            ->subject('Your Grease Trap Booking has been Confirmed')
+            ->subject('Grease Trap Booking has been Confirmed')
             ->view('emails.user-grease-trap-booking-confirmation')
             ->with([
                 'name' => $name,

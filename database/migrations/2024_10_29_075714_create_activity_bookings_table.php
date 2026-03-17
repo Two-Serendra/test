@@ -25,12 +25,19 @@ return new class extends Migration {
             $table->date('booking_date');
             $table->time('booking_start_time');
             $table->time('booking_end_time');
+
+            $table->timestamp('cancelled_at')->nullable();
+            $table->boolean('has_penalty')->default(false);
+            $table->decimal('penalty_amount', 10, 2)->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('cancelled_by')->nullable();
+            $table->boolean('cancelled_within_12hrs')->default(0);
             $table->timestamps();
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Reverse the migrations. 
      */
     public function down(): void
     {

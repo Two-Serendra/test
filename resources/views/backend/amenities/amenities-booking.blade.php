@@ -37,8 +37,8 @@
                     </button>
 
                     <button type="button" class="btn badge fs-5 px-2 py-2 SlotChecking" style="color: #fff;
-                            background-color: #6c757d;
-                            border-color: #6c757d;">
+                                        background-color: #6c757d;
+                                        border-color: #6c757d;">
                         <i class="fa-solid fa-check-to-slot"></i> Slot Checking
                     </button>
                 </div>
@@ -77,13 +77,11 @@
                                     <td>{{ strtoupper($booking->transaction_no ?? 'N/A') }}</td>
                                     <td>{{ strtoupper($booking->activity->activity_name ?? 'N/A') }}</td>
                                     <td>{{ strtoupper($booking->unit ?? 'N/A') }}</td>
-                                    <td>
-                                        @if (strtoupper($booking->resident_type) == 'OWNER')
-                                            <span class="text-success">{{ strtoupper($booking->resident_type) }}</span>
-                                        @elseif (strtoupper($booking->resident_type) == 'TENANT')
-                                            <span class="text-danger">{{ strtoupper($booking->resident_type) }}</span>
-                                        @else
-                                            {{ strtoupper($booking->resident_type) ?: 'N/A' }}
+                                    <td> @if($booking->resident_type === 'TENANT')
+                                        <span class="badge bg-danger border-danger custom-badge">TENANT</span>
+                                    @else($booking->resident_type === 'OWNER')
+                                            <span class="badge bg-primary border-primary custom-badge">OWNER</span>
+
                                         @endif
                                     </td>
                                     <td>{{ strtoupper($booking->name ?? 'N/A') }}</td>
@@ -91,7 +89,7 @@
                                     <td>{{ strtoupper($booking->booking_type ?? 'N/A') }}</td>
                                     <td>
                                         @if ($booking->booking_status == 1)
-                                            <span class="badge bg-success border-success custom-badge">Booked</span>
+                                            <span class="badge bg-primary border-primary custom-badge">Booked</span>
                                         @else
                                             <span class="badge bg-danger border-danger custom-badge">Cancelled</span>
                                         @endif
@@ -109,18 +107,18 @@
                                         </button>
 
                                         <!-- @if ($booking->booking_status == 0)
-                                                                                                                                <button type="button" class="btn btn-success confirm-booking btn-sm btn-equal"
-                                                                                                                                    data-bs-toggle="tooltip" data-bs-placement="right" title="Confirm"
-                                                                                                                                    data-id="{{ $booking->id }}">
-                                                                                                                                    <i class="fa-solid fa-check-circle"></i>
-                                                                                                                                </button>
-                                                                                                                            @else
-                                                                                                                                <button type="button" class="btn btn-danger cancel-booking btn-sm btn-equal"
-                                                                                                                                    data-bs-toggle="tooltip" data-bs-placement="right" title="Cancel"
-                                                                                                                                    data-id="{{ $booking->id }}">
-                                                                                                                                    <i class="fa-solid fa-ban"></i>
-                                                                                                                                </button>
-                                                                                                                            @endif -->
+                                                                                                                                                                    <button type="button" class="btn btn-success confirm-booking btn-sm btn-equal"
+                                                                                                                                                                        data-bs-toggle="tooltip" data-bs-placement="right" title="Confirm"
+                                                                                                                                                                        data-id="{{ $booking->id }}">
+                                                                                                                                                                        <i class="fa-solid fa-check-circle"></i>
+                                                                                                                                                                    </button>
+                                                                                                                                                                @else
+                                                                                                                                                                    <button type="button" class="btn btn-danger cancel-booking btn-sm btn-equal"
+                                                                                                                                                                        data-bs-toggle="tooltip" data-bs-placement="right" title="Cancel"
+                                                                                                                                                                        data-id="{{ $booking->id }}">
+                                                                                                                                                                        <i class="fa-solid fa-ban"></i>
+                                                                                                                                                                    </button>
+                                                                                                                                                                @endif -->
 
                                         @if ($booking->booking_status == 0)
                                             <button type="button" class="btn btn-secondary cancel-booking btn-sm btn-equal"

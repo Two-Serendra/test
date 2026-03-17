@@ -4,8 +4,9 @@
     <div class="container my-5">
         <!-- Go Back -->
         <div class="mb-3">
-            <a href="{{ route('booking.list') }}" class="text-decoration-none text-primary fw-semibold">
-                ← Back to List
+            <a href="{{ url()->previous() ?? route('booking.list') }}"
+                class="text-decoration-none text-primary fw-semibold">
+                ← Back to list
             </a>
         </div>
 
@@ -175,10 +176,10 @@
                 <h5 class="fw-bold mb-4">
                     You may also like
                     <!-- @if($type === 'function_room')
-                                                                                                                                                        Function Rooms
-                                                                                                                                                    @else
-                                                                                                                                                        Amenities
-                                                                                                                                                    @endif -->
+                                                                                                                                                                Function Rooms
+                                                                                                                                                            @else
+                                                                                                                                                                Amenities
+                                                                                                                                                            @endif -->
                 </h5>
                 <div class="row z-1 position-relative">
                     @foreach($suggestions as $suggestion)

@@ -31,7 +31,7 @@ class UserAmenityBookingCancellation extends Mailable implements ShouldQueue
         $activity_name = optional($this->booking->activity)->activity_name ?? 'N/A';
 
         return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra')
-            ->subject('Your Amenity Booking has been Cancelled')
+            ->subject('Amenity Booking has been Cancelled')
             ->view('emails.user-amenity-booking-cancellation')
             ->with([
                 'name' => $name,

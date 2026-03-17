@@ -6,7 +6,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form action="{{ route('admin.new.booking.activities') }}" id="AdminNewBooking" method="POST"
+                <form action="{{ route('AdminNewBooking') }}" id="AdminNewBooking" method="POST"
                     enctype="multipart/form-data" class="AdminNewBooking needs-validation" novalidate>
                     @csrf
                     <div class="row">
@@ -123,11 +123,9 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="submit" form="AdminNewBooking" id="saveActivityBookingBtn"
-                    class="btn btn-primary d-flex align-items-center justify-content-center"
-                    style="min-width: 100px; height: 38px;">
-                    <span class="btn-text">Submit</span>
-                </button>
+                <button type="submit" form="AdminNewBooking" class="btn btn-primary submitBtn"><span
+                        class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"
+                        id="spinner"></span>Submit</button>
             </div>
         </div>
     </div>
@@ -256,151 +254,72 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-
-                <input type="hidden" id="booking_id">
-
-                <div class="row">
-
-                    <!-- LEFT -->
-                    <div class="col-md-6">
-
-                        <div class="mb-3">
-                            <label class="form-label custom-label">Transaction No:</label>
-                            <p id="edit_transaction_no" class="form-control-plaintext custom-p"></p>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label custom-label">Resident Type:</label>
-                            <p id="edit_selectResidentType_text" class="form-control-plaintext custom-p"></p>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label custom-label">Unit:</label>
-                            <p id="edit_booking_unit_text" class="form-control-plaintext custom-p"></p>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label custom-label">Name:</label>
-                            <p id="edit_booking_name_text" class="form-control-plaintext custom-p"></p>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label custom-label">Contact:</label>
-                            <p id="edit_contact_number_text" class="form-control-plaintext custom-p"></p>
-                        </div>
-
-                    </div>
-
-                    <!-- RIGHT -->
-                    <div class="col-md-6">
-
-                        <div class="mb-3">
-                            <label class="form-label custom-label">Booking Status:</label>
-                            <p id="booking-status" class="form-control-plaintext custom-p"></p>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label custom-label">Booking Type:</label>
-                            <p class="form-control-plaintext custom-p booking_type_text"></p>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label custom-label">Activity:</label>
-                            <p id="edit_booking_select_text" class="form-control-plaintext custom-p"></p>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label custom-label">Booking Date:</label>
-                            <p id="edit_booking_date_text" class="form-control-plaintext custom-p"></p>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label custom-label">Time:</label>
-                            <p class="form-control-plaintext custom-p">
-                                <span id="edit_booking_start_time_text"></span> -
-                                <span id="edit_booking_end_time_text"></span>
-                            </p>
-                        </div>
-
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="activityCalendarModal" tabindex="-1" aria-labelledby="editProductModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fs-3" id="exampleModalLabel">Calendar Schedule</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                    id="modalClose"></button>
-            </div>
-            <div class="modal-body">
-                <form action="" method="POST" enctype="multipart/form-data">
+                <form id="updateBooking" method="POST" enctype="multipart/form-data" class="needs-validation"
+                    novalidate>
                     @csrf
-                    <div class="row mb-2">
-                        <input type="hidden" class="form-control" name="schedule_id" id="edit_id">
+                    <input type="hidden" id="booking_id" name="booking_id">
 
-                        <div class="col-12 mb-2">
-                            <label for="" class="form-label"><b>Activity</b></label>
-                            <p id="calendar_activity_name" class="form-control-static calendar-value"></p>
-                            <!-- Display as text -->
+                    <div class="row">
+                        <div class="col-6">
+                            <input type="hidden" id="edit_bookingType" name="booking_type">
+
+                            <!-- <h3 id="booking_type_text" class="text-center"></h3> -->
+
+                            <!-- Booking Status below it -->
+                            <p id="booking_status_text" class="text-center font-weight-bold"></p>
+
+                            <div class="mb-3">
+                                <label class="form-label custom-label">Transaction No.</label>
+                                <p id="edit_transaction_no" class="form-control-plaintext custom-p"></p>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label custom-label">Activity</label>
+                                <p id="edit_booking_select_text" class="form-control-plaintext custom-p"></p>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label custom-label">Unit</label>
+                                <p id="edit_booking_unit_text" class="form-control-plaintext custom-p"></p>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label custom-label">Resident Type</label>
+                                <p id="edit_selectResidentType_text" class="form-control-plaintext custom-p"></p>
+                            </div>
+
+
                         </div>
 
                         <div class="col-6">
-                            <div class="mb-2">
-                                <label for="" class="form-label"><b>Unit</b></label>
-                                <p id="calendar_unit" class="form-control-static calendar-value"></p>
-                                <!-- Display as text -->
+
+                            <div class="mb-3">
+                                <label class="form-label custom-label">Name</label>
+                                <p id="edit_booking_name_text" class="form-control-plaintext custom-p"></p>
                             </div>
 
-                            <div class="mb-2">
-                                <label for="" class="form-label"><b>Name</b></label>
-                                <p id="calendar_name" class="form-control-static calendar-value"></p>
-                                <!-- Display as text -->
+                            <div class="mb-3">
+                                <label class="form-label custom-label">Contact</label>
+                                <p id="edit_contact_number_text" class="form-control-plaintext custom-p"></p>
                             </div>
 
-                            <div class="mb-2">
-                                <label for="" class="form-label"><b>Contact</b></label>
-                                <p id="calendar_contact_number" class="form-control-static calendar-value"></p>
-                                <!-- Display as text -->
+
+
+                            <div class="mb-3">
+                                <label class="form-label custom-label">Time Start</label>
+                                <p id="edit_booking_start_time_text" class="form-control-plaintext custom-p"></p>
                             </div>
 
+                            <div class="mb-3">
+                                <label class="form-label custom-label">Time Finish</label>
+                                <p id="edit_booking_end_time_text" class="form-control-plaintext custom-p"></p>
+                            </div>
                         </div>
-
-                        <div class="col-6">
-                            <div class="mb-2">
-                                <label for="" class="form-label"><b>Date</b></label>
-                                <p id="calendar_booking_date" class="form-control-static calendar-value"></p>
-                                <!-- Display as text -->
-                            </div>
-
-                            <div class="mb-2">
-                                <label for="" class="form-label"><b>Start</b></label>
-                                <p id="calendar_booking_start_time" class="form-control-static calendar-value"></p>
-                                <!-- Display as text -->
-                            </div>
-
-                            <div class="mb-2">
-                                <label for="" class="form-label"><b>End</b></label>
-                                <p id="calendar_booking_end_time" class="form-control-static calendar-value"></p>
-                                <!-- Display as text -->
-                            </div>
-
-                        </div>
-                    </div>
-                    <div class="modal-footer p-2">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
                     </div>
                 </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

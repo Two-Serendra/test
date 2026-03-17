@@ -30,7 +30,7 @@ class FunctionRoomBookingConfirmedNotification extends Mailable implements Shoul
             ->unique()
             ->implode(', ');
 
-        return $this->subject('Your Function Room Booking is Confirmed')
+        return $this->subject('Function Room Booking is Confirmed')
             ->view('emails.user-function-room-booking-confirmed')
             ->with([
                 // 'name' => $this->booking->user->name,

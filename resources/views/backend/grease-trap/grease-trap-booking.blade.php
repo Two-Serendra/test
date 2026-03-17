@@ -21,6 +21,18 @@
                 </div>
 
                 <div class="col-6 d-flex justify-content-end align-items-center">
+
+                    <form id="bookingImportFormGT" action="{{ route('grease.trap.booking.import') }}" method="POST"
+                        enctype="multipart/form-data">
+                        @csrf
+                        <input type="file" id="GTbookingFileInput" name="file" accept=".csv,.xlsx" style="display:none;">
+                    </form>
+
+                    <button type="button" class="btn btn-primary badge me-2" id="uploadBookingBtnGT">
+                        <i class='bx bx-upload'></i> Upload Bookings
+                    </button>
+
+
                     <button type="button" class="btn btn-primary badge AddGreaseTrapBookingAdmin me-2">
                         <i class='bx bx-plus'></i> New Booking
                     </button>

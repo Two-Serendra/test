@@ -3,28 +3,70 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Booking Confirmed</title>
+    <title>Amenity Booking Confirmation</title>
 </head>
 
-<body style="font-family: Arial, sans-serif; color: #333;">
-    <div style="max-width: 600px; margin: auto; border: 1px solid #eee; padding: 30px; background-color: #f9f9f9;">
-        <div style="text-align: center; margin-bottom: 20px;">
-            <img src="https://twoserendra.com/assets/images/twoserendraemaillogo.png" alt="Two Serendra Logo"
-                style="max-width: 180px;">
-        </div>
-        <h2 style="color: #0056b3;">📢 New Amenity Booking Received</h2>
-        <p>A new booking has been made by <strong>{{ $name }}</strong>.</p>
-        <p><strong>Transaction No:</strong> {{ $transaction_no }}</p>
-        <p><strong>Booking Type:</strong> {{ $booking_type }}</p>
-        <p><strong>Amenity:</strong> {{ $activity_name }}</p>
-        <p><strong>Unit No:</strong> {{ $unit_no }}</p>
-        <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($booking_date)->format('F d, Y') }}</p>
-        <p><strong>Time:</strong> {{ \Carbon\Carbon::parse($booking_start_time)->format('h:i A') }} - {{ \Carbon\Carbon::parse($booking_end_time)->format('h:i A') }}</p>
-        <br>
+<body style="font-family: Arial, sans-serif; background-color:#f4f6f8; padding:20px; color:#333;">
+    <div
+        style="max-width: 650px; margin:auto; background:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 0 10px rgba(0,0,0,0.05);">
 
-        <p style="margin-top: 30px;">Best regards,</p>
-        <p><strong>Two Serendra IT Team</strong></p>
+        <!-- Header -->
+        <div style="padding:20px; text-align:center;">
+            <img src="https://twoserendra.com/assets/images/twoserendraemaillogo.png" alt="Two Serendra"
+                style="max-width:160px;">
+        </div>
+
+        <!-- Body -->
+        <div style="padding:30px;">
+            <h2>Hello {{ $name }},</h2>
+
+            <p>Your amenity booking has been <strong>successfully confirmed</strong>. Below are your booking details:
+            </p>
+
+            <table style="width:100%; border-collapse:collapse; margin-top:15px;">
+                <tr>
+                    <td style="padding:8px 0;"><strong>Transaction No:</strong></td>
+                    <td>{{ $transaction_no }}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px 0;"><strong>Booking Type:</strong></td>
+                    <td>{{ $booking_type }}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px 0;"><strong>Amenity:</strong></td>
+                    <td>{{ $activity_name ?? 'N/A' }}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px 0;"><strong>Unit No:</strong></td>
+                    <td>{{ $unit_no }}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px 0;"><strong>Date:</strong></td>
+                    <td>{{ \Carbon\Carbon::parse($booking_date)->format('F d, Y') }}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px 0;"><strong>Time:</strong></td>
+                    <td>
+                        {{ \Carbon\Carbon::parse($booking_start_time)->format('h:i A') }} -
+                        {{ \Carbon\Carbon::parse($booking_end_time)->format('h:i A') }}
+                    </td>
+                </tr>
+            </table>
+
+            <p style="margin-top:25px;">For any further assistance, please contact the Concierge Team.</p>
+
+            <p style="margin-top:30px;">
+                Regards,<br>
+                <strong>Two Serendra Concierge Team</strong>
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div style="background:#f1f1f1; padding:15px; text-align:center; font-size:12px; color:#777;">
+            © {{ date('Y') }} Two Serendra. All rights reserved.
+        </div>
+
     </div>
 </body>
 
-</html>F
+</html>

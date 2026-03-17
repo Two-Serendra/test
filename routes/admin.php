@@ -122,6 +122,12 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/date-blocking', [ActivitiesController::class, 'fetchDateBlocking'])->name('admin.show.date.blocking');
     Route::get('/search-block-dates', [ActivitiesController::class, 'searchBlockdDates'])->name('admin.search.block.dates');
     Route::post('/new-date-blocking', [ActivitiesController::class, 'newDateBlocking'])->name('admin.new.date.blocking');
+
+    Route::get('/schedule-blocking', [ActivitiesController::class, 'fetchScheduleBlocking'])->name('admin.show.schedule.blocking');
+    Route::post('/new-schedule-blocking', [ActivitiesController::class, 'newScheduleBlocking'])->name('admin.new.schedule.blocking');
+    Route::get('get-updated-activity-schedule-blocking-table', [ActivitiesController::class, 'getUpdatedActivityScheduleBlockingTable'])->name('getUpdatedActivityScheduleBlockingTable');
+
+
     Route::get('/fetch-blocked-dates', [ActivitiesController::class, 'fetchBlockDates'])->name('AdminDateBlocking');
 
     //Activities Bookings
@@ -137,10 +143,15 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/check-unit-booking', [ActivitiesController::class, 'checkUnitBooking'])->name('checkUnitBooking');
     Route::get('get-updated-bookings-table', [ActivitiesController::class, 'getUpdatedBookingTable'])->name('getUpdatedBookingTable');
     Route::get('/fetch/booking/{id}', [ActivitiesController::class, 'fetchInfoBooking'])->name('fetchInfoBooking');
-    Route::post('/cancel-booking', [ActivitiesController::class, 'cancelBooking'])->name('cancelBooking');
+    Route::post('/cancel-booking/{booking}', [ActivitiesController::class, 'cancelBooking'])->name('cancelBooking');
+    Route::post('/admin-mark-no-show/{booking}', [ActivitiesController::class, 'markNoShow']);
     Route::get('/history', [ActivitiesController::class, 'history'])->name('admin.activity.history');
     Route::get('/search-histories', [ActivitiesController::class, 'searchHistory'])->name('search-history');
     Route::post('/download-history', [ActivitiesController::class, 'downloadHistory'])->name('download-history');
+    Route::get('/admin-activity-booking-calendar', [ActivitiesController::class, 'AdminActivityBookingCalendar'])->name('admin.activity.booking.calendar');
+    Route::get('/fetch/activity-calendar-schedule/{id}', [ActivitiesController::class, 'fetchActivityCalendarInfo'])->name("fetchActivityCalendarSchedule");
+
+    Route::post('/amenity-import-booking', [ActivitiesController::class, 'importAmenityBookings'])->name('booking.import');
 
     //Function Rooms
     Route::get('/admin-function-rooms', [FunctionRoomsController::class, 'showFunctionRooms'])->name('admin.show.function.rooms');
@@ -236,6 +247,7 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/fetch/grease-trap-calendar-details/{id}', [GreaseTrapBookingController::class, 'fetchGreaseTrapCalendarSchedule'])->name("admin.fetch.booking.grease.trap.calendar");
     Route::post('/admin-download-grease-trap-booking-records', [GreaseTrapBookingController::class, 'downloadGreaseTrapBookingRecords'])
         ->name('download.grease.trap.booking.reports');
+    Route::post('/grease-trap-import-booking', [GreaseTrapBookingController::class, 'importGreaseTrapBookings'])->name('grease.trap.booking.import');
 
 
     //Pest Control
@@ -259,6 +271,9 @@ Route::middleware('auth:admin')->group(function () {
 
     Route::post('/admin-download-pest-control-booking-records', [PestControlController::class, 'downloadPestControlBookingReports'])
         ->name('download.pest.control.booking.reports');
+
+    Route::post('/pest-control-import-booking', [PestControlController::class, 'importPestControlBookings'])->name('pest.control.booking.import');
+
 
 
 

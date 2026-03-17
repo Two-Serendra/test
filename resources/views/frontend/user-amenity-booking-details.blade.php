@@ -25,7 +25,7 @@
                             $statusText = match ((int) $booking->booking_status) {
                                 1 => 'Confirmed',
                                 2 => 'Cancelled',
-                                3 => 'Penalty (₱1000)',
+                                3 => 'Penalty',
                                 default => 'N/A',
                             };
 

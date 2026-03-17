@@ -40,7 +40,7 @@
                         class="nav-item nav-link {{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a>
                 </div>
 
-                <!-- <div class="ms-auto">
+                <div class="ms-auto">
                     <a href="{{ route('booking.list') }}" class="btn btn-primary custom-btn">Book Now</a>
                 </div>
 
@@ -94,10 +94,10 @@
 
                         </div>
                     </div>
-                @endauth -->
+                @endauth
 
 
-                <!-- <div class="nav-item dropdown ms-3 mt-2 mt-lg-0">
+                <div class="nav-item dropdown ms-3 mt-2 mt-lg-0">
                     <a href="#" class="nav-link dropdown-toggle d-flex align-items-center justify-content-center"
                         id="userDropdown" role="button" data-bs-toggle="dropdown"
                         style="width: 40px; height: 40px; background-color: #008b26; border-radius: 50%; color: white;">
@@ -109,9 +109,9 @@
                                 <i class='bx bx-user-circle me-2'></i> Profile
                             </a>
 
-                            <a href="{{ route('soa') }}" class="dropdown-item">
+                            <!-- <a href="{{ route('soa') }}" class="dropdown-item">
                                 <i class='bx bx-file me-2'></i> SOA
-                            </a>
+                            </a> -->
 
                             <a href="{{ route('resident.booking.history') }}" class="dropdown-item">
                                 <i class='bx bx-calendar me-2'></i> Bookings
@@ -130,7 +130,7 @@
                             </a>
                         @endauth
                     </div>
-                </div> -->
+                </div>
             </div>
         </nav>
     </div>

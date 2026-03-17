@@ -57,7 +57,7 @@
                             @auth
                                 <button type="button"
                                     class="btn customBtn AddNewBooking 
-                                                                                            @if ($activity->activity_status == 0) btn-secondary @else btn-outline-primary @endif"
+                                                                                                    @if ($activity->activity_status == 0) btn-secondary @else btn-outline-primary @endif"
                                     style="@if ($activity->activity_status == 0) cursor: not-allowed; opacity: 0.6; @else background-color: #008b26; border-color: #008b26; color: white; font-weight: bold; @endif"
                                     @if ($activity->activity_status == 0) disabled @endif
                                     data-bs-target="#modalActivity{{ $activity->id }}" data-activity-id="{{ $activity->id }}">
@@ -70,12 +70,15 @@
                                     </a>
                                 @else
                                     <a href="{{ route('login', ['redirect' => url()->current()]) }}"
-                                        class="btn btn-primary customBtn">
+                                        class="btn btn-primary customBtn" >
                                         Book Now
                                     </a>
                                 @endif
                             @endauth
-
+                            <button type="button"
+                                class="btn customBtn SlotCheckingModalUserbBtn btn-secondary" style="color: white;">
+                                Check Slots
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -119,23 +122,23 @@
     </div>
 
     <!-- <div id="loadingOverlay"
-                    style="
-                        display: none; /* 🔥 Keep this as default */
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background: rgba(255, 255, 255, 0.7);
-                        z-index: 2000;
-                        justify-content: center;
-                        align-items: center;
-                                                                                                                                        ">
-                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-                        <span class="visually-hidden">Loading...</span>
+                        style="
+                            display: none; /* 🔥 Keep this as default */
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background: rgba(255, 255, 255, 0.7);
+                            z-index: 2000;
+                            justify-content: center;
+                            align-items: center;
+                                                                                                                                            ">
+                        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
-                </div>
-             -->
+                 -->
 
 
     <style>
@@ -145,22 +148,22 @@
         }
 
         /* #loadingOverlay {
-                        display: none;
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background: rgba(255, 255, 255, 0.7);
-                        z-index: 2000;
-                        display: flex;
+                            display: none;
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background: rgba(255, 255, 255, 0.7);
+                            z-index: 2000;
+                            display: flex;
 
-                        justify-content: center;
-                        align-items: center;
-                    } */
+                            justify-content: center;
+                            align-items: center;
+                        } */
     </style>
 
-    @include('frontend.modal.360-modal-view')
+    @include('frontend.modal.slot-checking-user-modal')
     @auth
         @include('frontend.modal.activity-booking-modal')
     @endauth

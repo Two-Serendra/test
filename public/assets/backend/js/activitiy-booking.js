@@ -1,4 +1,36 @@
 $(document).ready(function () {
+    $(document).ready(function () {
+
+        $('#uploadBookingBtn').on('click', function () {
+            console.log("Upload button clicked");
+            $('#bookingFileInput').click();
+        });
+
+        $('#bookingFileInput').on('change', function () {
+
+            console.log("File input changed");
+
+            if (this.files.length === 0) {
+                console.log("No file selected");
+                return;
+            }
+
+            let fileName = this.files[0].name;
+            console.log("Selected file:", fileName);
+
+            if (confirm("Upload file: " + fileName + " ?")) {
+                console.log("Submitting form...");
+                $('#bookingImportForm').submit();
+            } else {
+                console.log("Upload cancelled");
+                $(this).val('');
+            }
+
+        });
+
+    });
+
+
     const adminModal = $('#AddBookingAdmin');
     const bookingTabs = adminModal.find('#bookingTabs');
     const bookingTypeInput = adminModal.find('#bookingType');
@@ -19,7 +51,7 @@ $(document).ready(function () {
     updateFormState(bookingType);
 
     // Booking type tab change
-    bookingTabs.find('a').on('click', function () { 
+    bookingTabs.find('a').on('click', function () {
         bookingType = $(this).data('value');
         bookingTypeInput.val(bookingType);
         updateFormState(bookingType);
@@ -354,6 +386,11 @@ $('#AddBookingAdmin').on('change', '#activitySelectBooking', function () {
     const unitNumber = modal.find('#unitNumber');
     const checkUnit = modal.find('.checkUnit');
     const dateField = modal.find('#dateFieldBooking');
+    if (dateField[0]._flatpickr) {
+        dateField[0]._flatpickr.clear();
+    }
+    dateField.val('');
+
     const startTimeDropdown = modal.find('#booking_start_time');
     const endTimeDropdown = modal.find('#booking_end_time');
 
@@ -617,6 +654,45 @@ $('#AddDateBlocking').on('hidden.bs.modal', function () {
     $('.modal-backdrop').remove();
 });
 
+
+$('#bookingTable').on('click', '.mark-as-no-show', function () {
+
+    const bookingId = $(this).data('id');
+
+    Swal.fire({
+        title: "Mark as No Show?",
+        html: "The resident did not attend. A <b>₱1000 penalty</b> will be applied.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, mark as no show",
+        cancelButtonText: "Cancel"
+    }).then((result) => {
+        if (!result.isConfirmed) return;
+
+        $.ajax({
+            url: `/admin/admin-mark-no-show/${bookingId}`,
+            method: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (res) {
+                if (!res.success) {
+                    Swal.fire('Error', res.message || 'Failed to mark no show.', 'error');
+                    return;
+                }
+
+                Swal.fire('Updated!', res.message, 'success')
+                    .then(() => refreshTableBookings());
+            },
+            error: function () {
+                Swal.fire('Error', 'Something went wrong.', 'error');
+            }
+        });
+    });
+});
+
 $('#bookingTable').on('click', '.editInfo_id_booking', function () {
     var booking_id = $(this).data("id");
 
@@ -628,35 +704,80 @@ $('#bookingTable').on('click', '.editInfo_id_booking', function () {
         $('#edit_booking_unit_text').text(data.unit);
         $('#edit_booking_name_text').text(data.name);
         $('#edit_contact_number_text').text(data.contact_number);
-        $('#edit_booking_date_text').text(data.booking_date);
         $('#edit_booking_start_time_text').text(data.booking_start_time);
         $('#edit_booking_end_time_text').text(data.booking_end_time);
-        $('#edit_selectResidentType_text').text(
-            data.resident_type.charAt(0).toUpperCase() + data.resident_type.slice(1).toLowerCase()
-        );
+        $('#edit_selectResidentType_text').empty();
+
+        if (data.resident_type === 'TENANT') {
+            $('#edit_selectResidentType_text').append(
+                '<span class="badge bg-danger border-danger custom-badge">TENANT</span>'
+            );
+        } else if (data.resident_type === 'OWNER') {
+            $('#edit_selectResidentType_text').append(
+                '<span class="badge bg-primary border-primary custom-badge">OWNER</span>'
+            );
+        }
+
+        // Create booking date once
+        const bookingDate = new Date(data.booking_date);
+
+        const optionsDate = {
+            year: 'numeric',
+            month: 'long',
+            day: '2-digit'
+        };
+
+        const formattedDate = bookingDate.toLocaleDateString(undefined, optionsDate);
+        $('#edit_booking_date_text').text(formattedDate);
 
         $('#booking_id').val(booking_id);
 
-        $('.booking_type_text').text(data.booking_type);
-        $('#booking_status_text').text(data.booking_status);
+        let today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-        $.ajax({
-            url: '/admin/fetch-blocked-dates',
-            method: 'GET',
-            data: { amenity_id: data.amenity_id },
-            success: function (blockedDates) {
-                console.log("Blocked dates:", blockedDates);
-            },
-            error: function (xhr) {
-                console.error('Failed to fetch blocked dates:', xhr.responseText);
+        let statusText = '';
+        let statusClass = '';
+
+        if (bookingDate < today) {
+            statusText = 'Completed';
+            statusClass = 'badge bg-success';
+
+        } else {
+            switch (data.booking_status) {
+
+                case 1:
+                    statusText = 'Confirmed';
+                    statusClass = 'badge bg-success';
+                    $('#cancelAmenityBookingBtn').show();
+                    break;
+
+                case 2:
+                    statusText = 'Cancelled';
+                    statusClass = 'badge bg-danger';
+                    break;
+
+                case 3:
+                    statusText = 'Penalty';
+                    statusClass = 'badge bg-warning';
+                    break;
+
+                case 4:
+                    statusText = 'No Show';
+                    statusClass = 'badge bg-dark';
+                    break;
+
+                default:
+                    statusText = 'N/A';
+                    statusClass = 'badge bg-secondary';
             }
-        });
+        }
+
+        $('#booking-status').html(`<span class="${statusClass}">${statusText}</span>`);
 
     }).fail(function () {
         alert("Data not found");
     });
 });
-
 
 
 $('#bookingEdit').on('change', '#edit_booking_select', function () {
@@ -822,92 +943,132 @@ function refreshTableBookings() {
             $('[data-bs-toggle="tooltip"]').tooltip('dispose');
             tableBody.empty();
 
-            bookings.forEach(function (booking) {
-                var actionButtons = `
-                           <div class="d-flex gap-1 justify-content-center">
-                            <button type="button"
-                                class="btn btn-primary editInfo_id_booking btn-sm btn-equal"
-                                data-bs-toggle="tooltip"
-                                data-bs-placement="left"
-                                title="View"
-                                data-id="${booking.id}">
-                                <i class="fa-solid fa-eye"></i>
-                            </button>`;
+            if (bookings.length === 0) {
+                tableBody.append(`
+                    <tr>
+                        <td colspan="18" class="text-center">No Records Found</td>
+                    </tr>
+                `);
+                return;
+            }
 
-                if (booking.booking_status == 0) {
+            bookings.forEach(function (booking) {
+                // Resident Type Badge
+                var residentTypeHtml = 'N/A';
+                if (booking.resident_type) {
+                    if (booking.resident_type.toUpperCase() === 'TENANT') {
+                        residentTypeHtml = `<span class="badge bg-danger border-danger custom-badge">TENANT</span>`;
+                    } else if (booking.resident_type.toUpperCase() === 'OWNER') {
+                        residentTypeHtml = `<span class="badge bg-primary border-primary custom-badge">OWNER</span>`;
+                    }
+                }
+
+                // Booking Status Badge
+                var bookingStatusHtml = '';
+                switch (booking.booking_status) {
+                    case 1:
+                        bookingStatusHtml = `<span class="badge bg-primary">Booked</span>`;
+                        break;
+                    case 2:
+                        bookingStatusHtml = `<span class="badge bg-danger">Cancelled</span>`;
+                        break;
+                    case 3:
+                        bookingStatusHtml = `<span class="badge bg-warning">Penalty</span>`;
+                        break;
+                    case 4:
+                        bookingStatusHtml = `<span class="badge bg-dark">No Show</span>`;
+                        break;
+                    default:
+                        bookingStatusHtml = 'N/A';
+                }
+
+                // Action Buttons
+                var actionButtons = `
+                    <div class="d-flex gap-1 justify-content-center">
+                        <!-- View button -->
+                        <button type="button" class="btn btn-primary editInfo_id_booking btn-sm btn-equal"
+                            data-bs-toggle="tooltip" data-bs-placement="left" title="View"
+                            data-id="${booking.id}">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                `;
+
+                // Cancel button
+                if (booking.booking_status == 2 || booking.booking_status == 3 || booking.booking_status == 4) {
                     actionButtons += `
-        <button type="button"
-            class="btn btn-secondary cancel-booking btn-sm btn-equal"
-            data-bs-toggle="tooltip"
-            data-bs-placement="right"
-            title="Cancelled"
-            data-id="${booking.id}"
-            disabled>
-            <i class="fa-solid fa-ban"></i>
+                        <button type="button" class="btn btn-secondary cancelled-booking btn-sm btn-equal"
+                            data-bs-toggle="tooltip" data-bs-placement="right" title="Cancelled"
+                            data-id="${booking.id}" disabled>
+                            <i class="fa-solid fa-ban"></i>
+                        </button>
+                    `;
+                } else {
+                    actionButtons += `
+                        <button type="button" class="btn btn-danger cancel-booking btn-sm btn-equal"
+                            data-bs-toggle="tooltip" data-bs-placement="right" title="Cancel"
+                            data-id="${booking.id}">
+                            <i class="fa-solid fa-ban"></i>
+                        </button>
+                    `;
+                }
+
+                // Create booking datetime
+                var bookingDateTime = new Date(booking.booking_date + " " + booking.booking_start_time);
+                var now = new Date();
+
+                var disableNoShow =
+                    booking.booking_status == 2 ||
+                    booking.booking_status == 3 ||
+                    booking.booking_status == 4 ||
+                    bookingDateTime > now;
+
+                // No Show button
+                if (disableNoShow) {
+                    actionButtons += `
+        <button type="button" class="btn btn-secondary marked-as-no-show btn-sm btn-equal"
+            data-bs-toggle="tooltip" title="No show" disabled>
+            <i class="fa-solid fa-user-slash"></i>
         </button>
     `;
                 } else {
                     actionButtons += `
-        <button type="button"
-            class="btn btn-danger cancel-booking btn-sm btn-equal"
-            data-bs-toggle="tooltip"
-            data-bs-placement="right"
-            title="Cancel"
+        <button type="button" class="btn btn-warning mark-as-no-show btn-sm btn-equal"
+            data-bs-toggle="tooltip" data-bs-placement="right" title="Mark as no show"
             data-id="${booking.id}">
-            <i class="fa-solid fa-ban"></i>
+            <i class="fa-solid fa-user-slash"></i>
         </button>
     `;
                 }
                 actionButtons += `</div>`;
 
-                var lobby = booking.lobby ? booking.lobby.toUpperCase() : 'N/A';
-                var transaction_no = booking.transaction_no ? booking.transaction_no : 'N/A';
-                var booking_name = booking.activity.activity_name ? booking.activity.activity_name.toUpperCase() : 'N/A';
-                var booking_unit = booking.unit ? booking.unit.toUpperCase() : 'N/A';
+                // Penalty formatting
+                var penaltyHtml = booking.penalty_amount && booking.penalty_amount > 0
+                    ? `<span class="text-danger fw-semibold">₱${parseFloat(booking.penalty_amount).toFixed(2)}</span>`
+                    : `₱0.00`;
 
-                var residentTypeHtml = booking.resident_type
-                    ? (booking.resident_type.toUpperCase() === 'OWNER'
-                        ? `<span class="text-success">${booking.resident_type.toUpperCase()}</span>`
-                        : booking.resident_type.toUpperCase() === 'TENANT'
-                            ? `<span class="text-danger">${booking.resident_type.toUpperCase()}</span>`
-                            : booking.resident_type.toUpperCase())
-                    : 'N/A';
-
-                var name = booking.name ? booking.name.toUpperCase() : 'N/A';
-                var booking_contact = booking.contact_number ? booking.contact_number.toUpperCase() : 'N/A';
-                var booking_type = booking.booking_type ? booking.booking_type.toUpperCase() : 'N/A';
-
-                var booking_status = booking.booking_status == 1
-                    ? `<span class="badge bg-success border-success custom-badge">Booked</span>`
-                    : `<span class="badge bg-danger border-danger custom-badge">Cancelled</span>`;
-
-                var booking_booking_date = booking.booking_date || 'N/A';
-                var booking_booking_start_time = booking.booking_start_time || 'N/A';
-                var booking_booking_end_time = booking.booking_end_time || 'N/A';
-
-                // Use raw values from the database
-                var booking_created_at = booking.created_at || 'N/A';
-                var booking_updated_at = booking.updated_at || 'N/A';
-
+                // Build row exactly like Blade
                 var row = $(`
-                        <tr>
-                            <td class="sticky-th">${lobby}</td>
-                            <td class="sticky-th">${transaction_no}</td>
-                            <td class="sticky-th">${booking_name}</td>
-                            <td class="sticky-th">${booking_unit}</td>
-                            <td class="sticky-th">${residentTypeHtml}</td>
-                            <td class="sticky-th">${name}</td>
-                            <td class="sticky-th">${booking_contact}</td>
-                            <td class="sticky-th">${booking_type}</td>
-                            <td class="sticky-th">${booking_status}</td>
-                            <td class="sticky-th">${booking_booking_date}</td>
-                            <td class="sticky-th">${booking_booking_start_time}</td>
-                            <td class="sticky-th">${booking_booking_end_time}</td>
-                            <td class="sticky-th">${booking_created_at}</td>
-                            <td class="sticky-th">${booking_updated_at}</td>
-                            <td class="sticky-th sticky-col sticky-col-color">${actionButtons}</td>
-                        </tr>
-                    `);
+                    <tr>
+                        <td>${booking.transaction_no ? booking.transaction_no.toUpperCase() : 'N/A'}</td>
+                        <td>${booking.activity?.activity_name ? booking.activity.activity_name.toUpperCase() : 'N/A'}</td>
+                        <td>${booking.unit ? booking.unit.toUpperCase() : 'N/A'}</td>
+                        <td>${residentTypeHtml}</td>
+                        <td>${booking.name ? booking.name.toUpperCase() : 'N/A'}</td>
+                        <td>${booking.contact_number ? booking.contact_number.toUpperCase() : 'N/A'}</td>
+                        <td>${booking.booking_type ? booking.booking_type.toUpperCase() : 'N/A'}</td>
+                        <td>${bookingStatusHtml}</td>
+                        <td>${booking.booking_date || 'N/A'}</td>
+                        <td>${booking.booking_start_time || 'N/A'}</td>
+                        <td>${booking.booking_end_time || 'N/A'}</td>
+                        <td>${booking.cancelledBy?.name ? booking.cancelledBy.name.toUpperCase() : 'N/A'}</td>
+                        <td>${booking.cancelled_at || 'N/A'}</td>
+                        <td>${penaltyHtml}</td>
+                        <td>${booking.user_name ? booking.user_name.toUpperCase() : 'N/A'}</td>
+                        <td>${booking.created_at || 'N/A'}</td>
+                        <td>${booking.updated_at || 'N/A'}</td>
+                        <td class="sticky-col sticky-col-color">${actionButtons}</td>
+                    </tr>
+                `);
 
                 tableBody.append(row);
             });
@@ -1006,74 +1167,78 @@ $('#bookingTable').on('click', '.confirm-booking', function () {
 
 
 $('#bookingTable').on('click', '.cancel-booking', function () {
-    var bookingId = $(this).data('id');
+
+    const bookingId = $(this).data('id');
+
     Swal.fire({
-        title: "Are you sure?",
-        text: "This will cancel the booking.",
+        title: "Cancel Booking?",
+        text: "Are you sure you want to cancel this booking?",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#d33",
         cancelButtonColor: "#3085d6",
-        confirmButtonText: "Yes, cancel it!"
+        confirmButtonText: "Yes, cancel it",
+        cancelButtonText: "No, keep it"
     }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: '/admin/cancel-booking',
-                type: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                data: {
-                    booking_id: bookingId,
-                    booking_status: 0
-                },
-                success: function (response) {
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: "top-end",
-                        showConfirmButton: false,
-                        timer: 2000,
-                        timerProgressBar: true,
-                        customClass: {
-                            popup: 'colored-toast'
-                        },
-                        didOpen: (toast) => {
-                            toast.onmouseenter = Swal.stopTimer;
-                            toast.onmouseleave = Swal.resumeTimer;
-                        }
-                    });
 
-                    Toast.fire({
-                        icon: 'success',
-                        title: 'Booking Cancelled'
-                    });
+        if (!result.isConfirmed) return;
 
-                    refreshTableBookings();
-                },
-                error: function (xhr, status, error) {
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: "top-end",
-                        showConfirmButton: false,
-                        timer: 2000,
-                        timerProgressBar: true,
-                        customClass: {
-                            popup: 'colored-toast-error'
-                        },
-                        didOpen: (toast) => {
-                            toast.onmouseenter = Swal.stopTimer;
-                            toast.onmouseleave = Swal.resumeTimer;
-                        }
-                    });
+        $.ajax({
+            url: `/admin/cancel-booking/${bookingId}`,
+            method: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (res) {
 
-                    Toast.fire({
-                        icon: 'error',
-                        title: 'Failed to cancel'
-                    });
+                if (!res.success) {
+                    Swal.fire('Error', res.message || 'Failed to cancel booking.', 'error');
+                    return;
                 }
-            });
-        }
+
+                // penalty warning
+                if (res.requires_confirmation) {
+
+                    Swal.fire({
+                        title: 'Penalty Warning',
+                        html: res.message,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Proceed',
+                        cancelButtonText: 'No'
+                    }).then((result2) => {
+
+                        if (!result2.isConfirmed) return;
+
+                        $.ajax({
+                            url: `/admin/cancel-booking/${bookingId}`,
+                            method: 'POST',
+                            data: {
+                                _token: $('meta[name="csrf-token"]').attr('content'),
+                                confirm: 1
+                            },
+                            success: function (res2) {
+                                Swal.fire('Cancelled!', res2.message, 'success')
+                                    .then(() => refreshTableBookings());
+                            }
+                        });
+
+                    });
+
+                } else {
+
+                    Swal.fire('Cancelled!', res.message, 'success')
+                        .then(() => refreshTableBookings());
+
+                }
+
+            }
+        });
+
     });
+
 });
 
 $('.SlotChecking').on('click', function () {
@@ -1201,5 +1366,64 @@ $('.SearchSlotAdmin').submit(function (event) {
             alert('An error occurred while fetching the data.');
         }
     });
+
+
+    $('#bookingTable').on('click', 'mark-as-no-show', function () {
+
+        const bookingId = $(this).data('id');
+
+        Swal.fire({
+            title: "Mark as No Show?",
+            html: "The resident did not attend. A <b>₱1000 penalty</b> will be applied.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, mark as no show",
+            cancelButtonText: "Cancel"
+        }).then((result) => {
+            if (!result.isConfirmed) return;
+
+            $.ajax({
+                url: `/admin/mark-no-show/${bookingId}`,
+                method: 'POST',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (res) {
+                    if (!res.success) {
+                        Swal.fire('Error', res.message || 'Failed to mark no show.', 'error');
+                        return;
+                    }
+
+                    Swal.fire('Updated!', res.message, 'success')
+                        .then(() => refreshTableBookings());
+                },
+                error: function () {
+                    Swal.fire('Error', 'Something went wrong.', 'error');
+                }
+            });
+        });
+    });
+
+
+    $('#uploadBookingBtn').on('click', function () {
+        $('#bookingFileInput').click();
+    });
+
+    $('#bookingFileInput').on('change', function () {
+
+        if (this.files.length === 0) return;
+
+        let fileName = this.files[0].name;
+
+        if (confirm("Upload file: " + fileName + " ?")) {
+            $('#bookingImportForm').submit();
+        } else {
+            $(this).val('');
+        }
+
+    });
+
 });
 

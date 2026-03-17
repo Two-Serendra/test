@@ -15,7 +15,7 @@ return [
     'admin.show.date.blocking' => ['Amenities', 'Date Blocking'],
     'admin.show.amenities' => ['Amenities', 'Add Amenities'],
     'admin.show.activities' => ['Amenities', 'Add Activities'],
-
+    'admin.activity.booking.calendar' => ['Amenities', 'Calendar'],
     // Grease Trap
     'admin.booking.grease.trap' => ['Grease Trap', 'Booking'],
     'admin.booking.grease.trap.calendar' => ['Grease Trap', 'Calendar'],

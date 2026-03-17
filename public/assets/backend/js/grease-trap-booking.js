@@ -845,4 +845,24 @@ $(document).ready(function () {
 
 
 
+    $('#uploadBookingBtnGT').on('click', function () {
+        $('#GTbookingFileInput').click();
+    });
+
+    $('#GTbookingFileInput').on('change', function () {
+
+        if (this.files.length === 0) return;
+
+        let fileName = this.files[0].name;
+
+        if (confirm("Upload file: " + fileName + " ?")) {
+            $('#bookingImportFormGT').submit();
+        } else {
+            $(this).val('');
+        }
+
+    });
+
+
+
 });

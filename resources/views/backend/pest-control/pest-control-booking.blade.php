@@ -21,6 +21,17 @@
                 </div>
 
                 <div class="col-6 d-flex justify-content-end align-items-center">
+                    <form id="bookingImportFormPC" action="{{ route('pest.control.booking.import') }}" method="POST"
+                        enctype="multipart/form-data">
+                        @csrf
+                        <input type="file" id="PCbookingFileInput" name="file" accept=".csv,.xlsx" style="display:none;">
+                    </form>
+
+                    <button type="button" class="btn btn-primary badge me-2" id="uploadBookingBtnPC">
+                        <i class='bx bx-upload'></i> Upload Bookings
+                    </button>
+
+                    
                     <button type="button" class="btn btn-primary badge AddPesControlBookingAdmin me-2">
                         <i class='bx bx-plus'></i> New Booking
                     </button>
@@ -70,7 +81,8 @@
                                         @if ($resType === 'tenant')
                                             <span class="badge bg-danger text-uppercase">{{ $pestControlBooking->resident_type }}</span>
                                         @elseif ($resType === 'owner')
-                                            <span class="badge bg-primary text-uppercase">{{ $pestControlBooking->resident_type }}</span>
+                                            <span
+                                                class="badge bg-primary text-uppercase">{{ $pestControlBooking->resident_type }}</span>
                                         @else
                                             <span class="badge bg-secondary">N/A</span>
                                         @endif

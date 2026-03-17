@@ -18,9 +18,7 @@
         <!-- Body -->
         <div style="padding:25px;">
             <h2 style="color:#dc3545;">Grease Trap Booking Cancelled</h2>
-
-            <p>Your grease trap booking has been <strong>cancelled</strong>.</p>
-
+            
             <table style="width:100%; border-collapse:collapse; margin-top:15px; font-size:14px;">
                 <tr>
                     <td style="padding:8px;"><strong>Resident Name:</strong></td>

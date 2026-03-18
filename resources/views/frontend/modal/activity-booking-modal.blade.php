@@ -15,7 +15,8 @@
                     @csrf
                     <input type="hidden" id="amenityId{{ $activity->id }}" name="amenity_id"
                         value="{{ $activity->amenity_id }}">
-                    <input type="hidden" name="activity_id" value="{{ $activity->id }}">
+                    <!-- <input type="hidden" name="activity_id" value="{{ $activity->id }}"> -->
+                    <input type="hidden" name="activity_id" class="activity_id_input" value="{{ $activity->id }}">
                     <div class="row">
                         <input type="hidden" id="bookingType" name="booking_type">
 
@@ -30,10 +31,6 @@
                                     data-value="20hrs">20 Hrs</a>
                             </li>
 
-                            <!-- <li class="nav-item">
-                                <a class="nav-link booking-tab" id="walkin-tab" data-bs-toggle="tab" href="#"
-                                    data-value="Walk-in">Walk-in</a>
-                            </li> -->
                         </ul>
 
                         <div class="col-md-6">
@@ -68,10 +65,12 @@
                                     </div>
                                 </div>
 
-                                <!-- <div class="d-flex gap-2 mt-1">
-                                    <select id="residentSelect" name="resident_email_id"
-                                        class="form-select selectResidentType flex-grow-1" required>
-                                        <option value="">-- Select Residence --</option>
+                                <div class="d-flex gap-2 mt-1">
+                                    <select id="residentSelect" name="resident_email_id" class="form-select flex-grow-1"
+                                        required>
+                                        @if(count($residences) > 1)
+                                            <option value="">-- Select Residence --</option>
+                                        @endif
                                         @foreach ($residences as $residence)
                                             <option value="{{ $residence->id }}"
                                                 data-type="{{ strtolower($residence->resident_type) }}"
@@ -83,21 +82,7 @@
 
                                     <button type="button"
                                         class="btn btn-secondary customBtn checkUnit text-white">Check</button>
-                                </div> -->
-
-                                <select id="residentSelect" name="resident_email_id" class="form-select flex-grow-1"
-                                    required>
-                                    @if(count($residences) > 1)
-                                        <option value="">-- Select Residence --</option>
-                                    @endif
-                                    @foreach ($residences as $residence)
-                                        <option value="{{ $residence->id }}"
-                                            data-type="{{ strtolower($residence->resident_type) }}"
-                                            data-unit="{{ $residence->unit_no }}">
-                                            {{ ucfirst($residence->resident_type) }} - Unit {{ $residence->unit_no }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                </div>
                                 <div class="invalid-feedback">Required</div>
                             </div>
 

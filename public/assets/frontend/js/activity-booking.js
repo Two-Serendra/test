@@ -1,91 +1,4 @@
 $(document).ready(function () {
-    // $('#bookingTabs a.booking-tab').on('shown.bs.tab', function (e) {
-    //     let bookingType = $(e.target).data('value');
-    //     let modal = $(this).closest(".modal");
-    //     modal.find("#bookingType").val(bookingType);
-    // });
-
-
-    // $('.modal').each(function () {
-    //     var modal = $(this);
-    //     var bookingTabs = modal.find('#bookingTabs');
-    //     var bookingTypeInput = modal.find('#bookingType');
-    //     var unitNumber = modal.find('#residentSelect');
-    //     var checkUnit = modal.find('.checkUnit');
-    //     var unitStatus = modal.find('#unitStatus');
-    //     var residentType = modal.find('#selectResidentType');
-    //     var nameField = modal.find('[id^=name]');
-    //     var contactField = modal.find('[id^=contact_number]');
-    //     var dateField = modal.find('#dateField');
-    //     var startTimeDropdown = modal.find('[id^=booking_start_time]');
-    //     var endTimeDropdown = modal.find('[id^=booking_end_time]');
-    //     var submitButton = modal.find('.activity-submit-btn');
-
-    //     var bookingType = bookingTabs.find('a.active').data('value') || "Advanced Booking";
-    //     bookingTypeInput.val(bookingType);
-    //     updateFormState(bookingType);
-
-    //     bookingTabs.find('a').on('click', function () {
-    //         var bookingType = $(this).data('value');
-    //         bookingTypeInput.val(bookingType);
-    //         updateFormState(bookingType);
-    //     });
-
-    //     function updateFormState(bookingType) {
-    //         resetFields(); //
-
-    //         if (bookingType === "Walk-in") {
-    //             checkUnit.hide();
-    //             unitStatus.hide();
-    //             toggleFields(true);
-    //             dateField.prop('disabled', false);
-    //             submitButton.prop('disabled', false);
-    //             dateField.off('change.enableFields').on('change.enableFields', function () {
-    //                 toggleFields(false);
-    //             });
-    //         }
-    //         else if (bookingType === "Advanced Booking") {
-    //             checkUnit.show().prop('disabled', false);
-    //             unitStatus.show();
-    //             toggleFields(true);
-    //             dateField.prop('disabled', false);
-    //             submitButton.prop('disabled', true);
-    //         }
-    //         else if (bookingType === "20hrs") {
-    //             checkUnit.hide();
-    //             unitStatus.hide();
-    //             toggleFields(false);
-    //             dateField.prop('disabled', false);
-    //             submitButton.prop('disabled', false);
-    //         }
-    //     }
-
-    //     function resetFields() {
-    //         modal.find('input[type="text"], input[type="number"]').val('');
-    //         modal.find('select').prop('selectedIndex', 0);
-    //         dateField.val('');
-
-    //         startTimeDropdown.prop('disabled', true).empty().append('<option>Select a Date First</option>');
-    //         endTimeDropdown.prop('disabled', true).empty().append('<option>Select Start Time First</option>');
-
-    //         unitStatus.text('').hide();
-
-    //         modal.find('form').removeClass('was-validated');
-    //         modal.find('input, select').removeClass('is-valid is-invalid');
-    //     }
-
-    //     function toggleFields(disable) {
-    //         residentType.prop('disabled', disable);
-    //         nameField.prop('disabled', disable);
-    //         contactField.prop('disabled', disable);
-    //         startTimeDropdown.prop('disabled', disable)
-    //             .empty()
-    //             .append('<option>' + (disable ? 'Select a Date First' : 'Select Start Time') + '</option>');
-    //         endTimeDropdown.prop('disabled', disable)
-    //             .empty()
-    //             .append('<option>' + (disable ? 'Select start time first' : 'Select End Time') + '</option>');
-    //     }
-    // });
 
     $('.AddNewBooking').on('click', function () {
         showLoading();
@@ -95,8 +8,7 @@ $(document).ready(function () {
         const amenityId = modal.find('#amenityId' + activityId).val();
 
         modal.data('activity-id', activityId);
-
-        // Standard field selectors
+        console.log("Activity ID set on modal:", modal.data('activity-id'));
         const bookingTabs = modal.find('#bookingTabs');
         const bookingTypeInput = modal.find('#bookingType');
         const dateField = modal.find('#dateField');
@@ -112,7 +24,7 @@ $(document).ready(function () {
 
         unitStatusInfo = modal.find('.unitStatusInfo');
 
-        // Reset fields
+
         function resetFields() {
             modal.find('input[type="text"], input[type="number"]').val('');
             modal.find('select').prop('selectedIndex', 0);
@@ -125,7 +37,6 @@ $(document).ready(function () {
             submitButton.prop('disabled', true);
             selectResidentType.prop('disabled', true);
             nameField.prop('disabled', true);
-            // contactField.prop('disabled', true);
             checkUnit.prop('disabled', false).show();
             residentSelect.prop('disabled', false);
             modal.find('form').removeClass('was-validated');
@@ -175,8 +86,6 @@ $(document).ready(function () {
         });
 
         function applyFieldToggles(type) {
-            // resetFields();
-
             if (type === 'Walk-in') {
                 checkUnit.hide();
                 unitStatus.hide();
@@ -247,25 +156,6 @@ $(document).ready(function () {
         }
     });
 
-
-    $("form[id^='bookAmenityForm']").on("submit", function (event) {
-        var form = this;
-        if (!form.checkValidity()) {
-            event.preventDefault();
-            event.stopPropagation();
-
-            $(form).addClass("was-validated");
-            return;
-        }
-
-        var activityId = $(this).attr("id").replace("bookAmenityForm", "");
-        var $btn = $("#submitButton" + activityId);
-        var $spinner = $("#spinner" + activityId);
-        $btn.prop("disabled", true);
-        $spinner.removeClass("d-none");
-    });
-
-
     function fetchAvailableStartTimes(modal, bookingDate, activityId) {
         const startTimeDropdown = modal.find('.booking_start_time');
         const endTimeDropdown = modal.find('.booking_end_time');
@@ -292,6 +182,7 @@ $(document).ready(function () {
                         startTimeDropdown.append(`<option value="${pair.start}">${pair.start}</option>`);
                     });
                     startTimeDropdown.prop('disabled', false);
+                    endTimeDropdown.prop('disabled', false).empty().append('<option>Select Start Time First</option>');
                 } else {
                     let msg = "Fully Booked";
                     const bookingType = modal.find('#bookingType').val();
@@ -317,16 +208,17 @@ $(document).ready(function () {
     }
 
     $(document).on('change', '.booking_start_time', function () {
-        const modal = $(this).closest('.modal');
-        const selectedStartTime = $(this).val();
-        const activityId = modal.find('[name="activity_id"]').val();
-        modal.find(`#userAvailableSlotsContainer${activityId}`).empty();
-        const bookingDate = modal.find('[name="booking_date"]').val();
-        const endTimeDropdown = modal.find('.booking_end_time');
+        const $startDropdown = $(this);
+        const modal = $startDropdown.closest('.modal');
+
+        const activityId = modal.data('activity-id');
+        const bookingDate = modal.find('#dateField').val();
+        const selectedStartTime = $startDropdown.val();
 
         if (!selectedStartTime || !activityId || !bookingDate) return;
 
-        endTimeDropdown.prop('disabled', true).empty().append('<option>Loading...</option>');
+        const $endDropdown = modal.find('.booking_end_time');
+        $endDropdown.prop('disabled', true).empty().append('<option>Loading...</option>');
 
         $.ajax({
             url: '/fetch-end-times-user',
@@ -337,30 +229,32 @@ $(document).ready(function () {
                 start_time: selectedStartTime
             },
             success: function (response) {
-                endTimeDropdown.empty();
-
-                if (response.availableEndTimes.length > 0) {
-                    endTimeDropdown.append('<option>Select End Time</option>');
+                $endDropdown.empty();
+                if (response.availableEndTimes && response.availableEndTimes.length > 0) {
+                    $endDropdown.append('<option>Select End Time</option>');
                     response.availableEndTimes.forEach(time => {
-                        endTimeDropdown.append(`<option value="${time}">${time}</option>`);
+                        $endDropdown.append(`<option value="${time}">${time}</option>`);
                     });
-                    endTimeDropdown.prop('disabled', false);
+                    $endDropdown.prop('disabled', false);
                 } else {
-                    endTimeDropdown.append('<option>No available times</option>').prop('disabled', true);
+                    $endDropdown.append('<option>No available times</option>').prop('disabled', true);
                 }
             },
             error: function (xhr) {
                 console.error('Failed to fetch end times:', xhr.responseText);
+                $endDropdown.prop('disabled', true).empty().append('<option>Error loading times</option>');
             }
         });
     });
 
     $(document).on('change', '.booking_end_time', function () {
         const modal = $(this).closest('.modal');
+
         const selectedStartTime = modal.find('.booking_start_time').val();
         const selectedEndTime = $(this).val();
-        const activityId = modal.find('[name="activity_id"]').val();
-        const bookingDate = modal.find('[name="booking_date"]').val();
+
+        const activityId = modal.data('activity-id'); // ✅ FIX
+        const bookingDate = modal.find('#dateField').val(); // ✅ FIX (your flatpickr input)
 
         if (!selectedStartTime || !selectedEndTime || !activityId || !bookingDate) return;
 
@@ -383,7 +277,7 @@ $(document).ready(function () {
     });
 
     function updateAvailableSlotsUser(activitySpace, bookedSlots, modal) {
-        const activityId = modal.find('[name="activity_id"]').val();
+        const activityId = modal.data('activity-id'); // ✅ FIX
         const slotsContainer = modal.find(`#userAvailableSlotsContainer${activityId}`);
 
         slotsContainer.empty();
@@ -398,17 +292,17 @@ $(document).ready(function () {
             if (isSelected) firstAvailableSelected = true;
 
             let boxHtml = `
-                <div class="slot-box p-2 m-1 shadow-sm border ${isSelected ? 'selected-slots-user border-success' : ''} ${isDisabled ? 'bg-secondary text-white' : 'text-success'}" 
-                     data-slot="${slotNumber}"
-                     style="width: 120px; height: 100px; cursor: ${isDisabled ? 'not-allowed' : 'pointer'}; flex: 1 1 calc(33.33% - 10px); max-width: 120px;">
-                    <div class="slot-box-body p-1 text-center d-flex flex-column justify-content-center">
-                        <h6 class="slot-title ${isDisabled ? 'text-white' : 'text-success'}" style="font-size: 14px; font-weight: bold;">Court ${slotNumber}</h6>
-                        <p class="m-0 ${isDisabled ? 'text-white' : 'text-success'}" style="font-size: 12px; font-weight: bold;">
-                            ${isDisabled ? 'Booked' : 'Available'}
-                        </p>
-                    </div>
+            <div class="slot-box p-2 m-1 shadow-sm border ${isSelected ? 'selected-slots-user border-success' : ''} ${isDisabled ? 'bg-secondary text-white' : 'text-success'}" 
+                 data-slot="${slotNumber}"
+                 style="width: 120px; height: 100px; cursor: ${isDisabled ? 'not-allowed' : 'pointer'}; flex: 1 1 calc(33.33% - 10px); max-width: 120px;">
+                <div class="slot-box-body p-1 text-center d-flex flex-column justify-content-center">
+                    <h6 class="slot-title ${isDisabled ? 'text-white' : 'text-success'}" style="font-size: 14px; font-weight: bold;">Court ${slotNumber}</h6>
+                    <p class="m-0 ${isDisabled ? 'text-white' : 'text-success'}" style="font-size: 12px; font-weight: bold;">
+                        ${isDisabled ? 'Booked' : 'Available'}
+                    </p>
                 </div>
-            `;
+            </div>
+        `;
             row.append(boxHtml);
 
             if (slotNumber % 3 === 0 || slotNumber === activitySpace) {
@@ -416,6 +310,7 @@ $(document).ready(function () {
                 row = $('<div class="d-flex justify-content-start flex-wrap w-100"></div>');
             }
         }
+
         updateSelectedSlotCountUser(modal);
     }
 
@@ -451,7 +346,8 @@ $(document).ready(function () {
 
         console.log("Selected Slots:", selectedSlots);
 
-        modal.find('#selectedSlotsInputUser').val(selectedSlots.join(',')); // Update input in modal
+        // ✅ FIX: use class instead of ID
+        modal.find('.selected_slots_user').val(selectedSlots.join(','));
     }
 
     // Clear fields when modal closes
@@ -463,20 +359,142 @@ $(document).ready(function () {
 
 
 
+    // $('.bookAmenityForm').submit(function (event) {
+    //     event.preventDefault();
+    //     const form = this;
+    //     const formId = $(form).attr('id');
+    //     const startTime = $(form).find('[name="booking_start_time"]').val();
+    //     const endTime = $(form).find('[name="booking_end_time"]').val();
+
+    //     let selectedCount = $('.selected-slots-user').length;
+    //     $('#selectedSlotsInputUser').val(selectedCount);
+
+    //     if (!form.checkValidity()) {
+    //         form.classList.add('was-validated');
+    //         submitBtn.prop('disabled', false);
+    //         spinner.addClass('d-none');
+    //         return;
+    //     }
+
+    //     const startMoment = moment(startTime, 'h:mm A', true);
+    //     let endMoment = moment(endTime, 'h:mm A', true);
+
+    //     if (!startMoment.isValid() || !endMoment.isValid()) {
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'Invalid Time Format',
+    //             text: 'Please enter valid start and end times.'
+    //         });
+    //         submitBtn.prop('disabled', false);
+    //         spinner.addClass('d-none');
+    //         return;
+    //     }
+
+    //     if (endMoment.isSameOrBefore(startMoment)) {
+    //         endMoment.add(1, 'day');
+    //     }
+
+    //     if (endMoment.diff(startMoment) <= 0) {
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'Invalid Time Selection',
+    //             text: 'End time must be greater than start time.'
+    //         });
+    //         submitBtn.prop('disabled', false);
+    //         spinner.addClass('d-none');
+    //         return;
+    //     }
+
+
+    //     const $btn = $('.activity-submit-btn');
+    //     const originalWidth = $btn.outerWidth();
+    //     $btn
+    //         .attr('disabled', true)
+    //         .html(`<div class="spinner-border spinner-border-sm text-light"></div>`)
+    //         .css('width', originalWidth + 'px');
+
+    //     form.classList.remove('was-validated');
+    //     const formData = new FormData(form);
+
+    //     $.ajax({
+    //         url: $(form).attr('action'),
+    //         type: $(form).attr('method'),
+    //         headers: {
+    //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    //         },
+    //         data: formData,
+    //         processData: false,
+    //         contentType: false,
+    //         success: function (response) {
+    //             $(form).closest('.modal').modal('hide');
+
+    //             Swal.fire({
+    //                 icon: 'success',
+    //                 title: 'Booking Submitted!',
+    //                 text: response.message || 'Your booking has been successfully submitted.',
+    //                 timer: 2000,
+    //                 showConfirmButton: false
+    //             });
+    //             form.reset();
+    //             form.classList.remove('was-validated');
+    //             $('.selected-slots-user').removeClass('selected-slots-user');
+    //             $('#selectedSlotsInputUser').val(0);
+    //             $(form).find('select').val('');
+    //             $(form).closest('.modal').modal('hide');
+    //         },
+    //         error: function (xhr) {
+    //             let message = 'Something went wrong. Please try again.';
+
+    //             if (xhr.status === 422 && xhr.responseJSON?.errors) {
+    //                 const firstError = Object.values(xhr.responseJSON.errors)[0][0];
+    //                 message = firstError;
+    //             }
+
+    //             else if (xhr.responseJSON?.message) {
+    //                 message = xhr.responseJSON.message;
+    //             }
+    //             else if (xhr.status === 409) {
+    //                 message = xhr.responseText || message;
+    //             }
+
+    //             Swal.fire({
+    //                 icon: 'error',
+    //                 title: 'Booking Failed',
+    //                 text: message,
+    //                 confirmButtonText: 'OK'
+    //             });
+    //         },
+    //         complete: function () {
+    //             $btn
+    //                 .attr('disabled', false)
+    //                 .html(`<span class="btn-text">Submit</span>`)
+    //                 .css('width', '');
+    //         }
+    //     });
+
+    // });
+
+
     $('.bookAmenityForm').submit(function (event) {
         event.preventDefault();
-        const form = this;
-        const formId = $(form).attr('id');
-        const startTime = $(form).find('[name="booking_start_time"]').val();
-        const endTime = $(form).find('[name="booking_end_time"]').val();
 
-        let selectedCount = $('.selected-slots-user').length;
-        $('#selectedSlotsInputUser').val(selectedCount);
+        const form = this;
+        const $form = $(form);
+        const modal = $form.closest('.modal');
+
+        const startTime = $form.find('[name="booking_start_time"]').val();
+        const endTime = $form.find('[name="booking_end_time"]').val();
+
+        let selectedSlots = modal.find('.selected-slots-user');
+
+        modal.find('.selected_slots_user').val(
+            selectedSlots.map(function () {
+                return $(this).data('slot');
+            }).get().join(',')
+        );
 
         if (!form.checkValidity()) {
             form.classList.add('was-validated');
-            submitBtn.prop('disabled', false);
-            spinner.addClass('d-none');
             return;
         }
 
@@ -489,8 +507,6 @@ $(document).ready(function () {
                 title: 'Invalid Time Format',
                 text: 'Please enter valid start and end times.'
             });
-            submitBtn.prop('disabled', false);
-            spinner.addClass('d-none');
             return;
         }
 
@@ -504,33 +520,35 @@ $(document).ready(function () {
                 title: 'Invalid Time Selection',
                 text: 'End time must be greater than start time.'
             });
-            submitBtn.prop('disabled', false);
-            spinner.addClass('d-none');
             return;
         }
 
-
-        const $btn = $('.activity-submit-btn');
+        const $btn = modal.find('.activity-submit-btn');
         const originalWidth = $btn.outerWidth();
+
         $btn
             .attr('disabled', true)
             .html(`<div class="spinner-border spinner-border-sm text-light"></div>`)
             .css('width', originalWidth + 'px');
 
-        form.classList.remove('was-validated');
+        const activityId = modal.attr('id').replace('modalActivity', '');
+        $form.find('.activity_id_input').val(activityId);
+
         const formData = new FormData(form);
 
+
         $.ajax({
-            url: $(form).attr('action'),
-            type: $(form).attr('method'),
+            url: $form.attr('action'),
+            type: $form.attr('method'),
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             data: formData,
             processData: false,
             contentType: false,
+
             success: function (response) {
-                $(form).closest('.modal').modal('hide');
+                modal.modal('hide');
 
                 Swal.fire({
                     icon: 'success',
@@ -539,51 +557,29 @@ $(document).ready(function () {
                     timer: 2000,
                     showConfirmButton: false
                 });
-
-                // form.reset();
-                // form.classList.remove('was-validated');
-                // $('.selected-slots-user').removeClass('selected-slots-user');
-                // $('#selectedSlotsInputUser').val(0);
-
                 form.reset();
-
-                // 2. Remove validation styles
                 form.classList.remove('was-validated');
 
-                // 3. CLEAR selected slots UI (THIS is your main issue)
-                $('.selected-slots-user').removeClass('selected-slots-user');
-
-                // 4. Reset hidden count input
-                $('#selectedSlotsInputUser').val(0);
-
-                // 5. Reset any custom selects (if any)
-                $(form).find('select').val('');
-
-                // 6. Finally close modal
-                $(form).closest('.modal').modal('hide');
             },
+
             error: function (xhr) {
                 let message = 'Something went wrong. Please try again.';
 
                 if (xhr.status === 422 && xhr.responseJSON?.errors) {
-                    const firstError = Object.values(xhr.responseJSON.errors)[0][0];
-                    message = firstError;
-                }
-
-                else if (xhr.responseJSON?.message) {
+                    message = Object.values(xhr.responseJSON.errors)[0][0];
+                } else if (xhr.responseJSON?.message) {
                     message = xhr.responseJSON.message;
-                }
-                else if (xhr.status === 409) {
+                } else if (xhr.status === 409) {
                     message = xhr.responseText || message;
                 }
 
                 Swal.fire({
                     icon: 'error',
                     title: 'Booking Failed',
-                    text: message,
-                    confirmButtonText: 'OK'
+                    text: message
                 });
             },
+
             complete: function () {
                 $btn
                     .attr('disabled', false)
@@ -591,9 +587,7 @@ $(document).ready(function () {
                     .css('width', '');
             }
         });
-
     });
-
 
 
     $("#customUserDropdownBtn").on("click", function (e) {
@@ -619,12 +613,21 @@ $(document).ready(function () {
     });
 
 
+    $(document).ready(function () {
+        const $select = $('#residentSelect');
+        if ($select.find('option').length === 2 && !$select.val()) {
+            $select.prop('selectedIndex', 1).trigger('change'); // <-- trigger change
+        }
+    });
+
     $(".checkUnit").on("click", function () {
         let button = $(this);
         let modal = button.closest(".modal");
         let activityId = modal.attr("id").replace("modalActivity", "");
-        let unitNumber = modal.find(".selectResidentType option:selected").data('unit')?.toString().trim();
-        let selectResidentType = modal.find(".selectResidentType")
+        // let unitNumber = modal.find(".selectResidentType option:selected").data('unit')?.toString().trim();
+        let selectResidentType = modal.find("#residentSelect");
+        let unitNumber = selectResidentType.find("option:selected").data('unit')?.toString().trim();
+
         let submitButton = modal.find("#submitButton" + activityId);
         let checkUnit = modal.find(".checkUnit");
         let selectedDate = modal.find("#dateField").val()?.trim();
@@ -804,27 +807,6 @@ $(document).ready(function () {
             }
         });
     });
-
-    // When the resident select changes
-    // $(".selectResidentType").on("change", function () {
-    //     let select = $(this);
-    //     let modal = select.closest(".modal");
-
-    //     // Reset unit status
-    //     let unitStatus = modal.find("#unitStatus");
-    //     unitStatus.text("0/0").removeClass("text-success text-danger text-primary").addClass("text-muted");
-
-    //     // Disable fields
-    //     let activityId = modal.attr("id")?.replace("modalActivity", "");
-    //     let submitButton = modal.find("#submitButton" + activityId);
-    //     let name = modal.find("#name" + activityId);
-    //     let radio = modal.find(":radio");
-
-    //     submitButton.prop("disabled", true);
-    //     name.prop("disabled", true);
-
-    //     radio.prop("disabled", true);
-    // });
 
     $(".selectResidentType").on("change", function () {
         let select = $(this);
@@ -1064,7 +1046,7 @@ $(document).ready(function () {
                         } else {
                             Swal.fire('Cancelled!', res.message, 'success').then(() => {
                                 $('#residentActivityBookingDetailsModal').modal('hide');
-                               
+
                                 let page = $('.pagination .active span').text() || 1;
                                 loadBookings(page);
                             });

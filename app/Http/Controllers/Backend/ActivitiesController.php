@@ -505,8 +505,7 @@ class ActivitiesController extends Controller
                         ->whereIn('booking_type', ['24HRS', 'WALK-IN'])
                         ->where('booking_status', 1)
                         ->lockForUpdate()
-                        ->first();
-
+                        ->exists();
                     if ($existingBooking) {
                         DB::rollBack();
                         return response()->json([
@@ -642,7 +641,6 @@ class ActivitiesController extends Controller
         $start = Carbon::parse($date . ' ' . $schedule->start_time);
         $end = Carbon::parse($date . ' ' . $schedule->end_time);
 
-        // Handle overnight schedule
         if ($end->lessThanOrEqualTo($start)) {
             $end->addDay();
         }
@@ -660,17 +658,17 @@ class ActivitiesController extends Controller
         while ($start < $end) {
             $slotStart = $start->copy();
             $slotEnd = $slotStart->copy()->addHour();
-
+ 
             $row = [
                 'time_range' => $slotStart->format('g:i A') . ' - ' . $slotEnd->format('g:i A'),
                 'slots' => []
             ];
 
+
             $overlappingBookings = $bookings->filter(function ($booking) use ($slotStart, $slotEnd) {
                 $bookingStart = Carbon::parse($booking->booking_date . ' ' . $booking->booking_start_time);
                 $bookingEnd = Carbon::parse($booking->booking_date . ' ' . $booking->booking_end_time);
 
-                // Handle overnight bookings
                 if ($bookingEnd->lessThanOrEqualTo($bookingStart)) {
                     $bookingEnd->addDay();
                 }
@@ -678,21 +676,42 @@ class ActivitiesController extends Controller
                 return $bookingStart->lt($slotEnd) && $bookingEnd->gt($slotStart);
             });
 
-            $sameActivityCount = $overlappingBookings->filter(function ($booking) use ($activitySpace, $activity) {
-                return $booking->activity->id === $activity->id;
-            })->count();
 
-            $hasConflictingActivity = $overlappingBookings->contains(function ($booking) use ($activity) {
-                return $booking->activity->id !== $activity->id;
+            $hasDifferentSpace = $overlappingBookings->contains(function ($booking) use ($activitySpace) {
+                return $booking->activity
+                    && $booking->activity->activity_space != $activitySpace;
             });
 
-            for ($i = 1; $i <= $activitySpace; $i++) {
-                if ($hasConflictingActivity) {
-                    $row['slots'][] = 'Unavailable';
-                } elseif ($sameActivityCount >= $i) {
-                    $row['slots'][] = 'Booked';
-                } else {
+            if ($hasDifferentSpace) {
+
+
+                $conflictingActivities = $overlappingBookings
+                    ->map(function ($booking) {
+                        return $booking->activity ? $booking->activity->activity_name : null;
+                    })
+                    ->filter()
+                    ->unique()
+                    ->values()
+                    ->all();
+
+                for ($i = 1; $i <= $activitySpace; $i++) {
+                    $row['slots'][] = implode(', ', $conflictingActivities);
+                }
+
+            } else {
+
+                $slotIndex = 0;
+
+                foreach ($overlappingBookings as $booking) {
+                    if ($slotIndex < $activitySpace) {
+                        $row['slots'][] = $booking->activity->activity_name;
+                        $slotIndex++;
+                    }
+                }
+
+                while ($slotIndex < $activitySpace) {
                     $row['slots'][] = 'Available';
+                    $slotIndex++;
                 }
             }
 
@@ -1736,7 +1755,7 @@ class ActivitiesController extends Controller
     }
     public function getUpdatedActivityScheduleBlockingTable()
     {
-        $dateBlockings = ActivityDateBlocking::with(['amenity', 'activity'])->latest()
+        $dateBlockings = ActivityBlocking::with('activity')->latest()
             ->paginate(10);
         return response()->json([
             'data' => $dateBlockings->items(),

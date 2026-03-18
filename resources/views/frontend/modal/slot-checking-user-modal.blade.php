@@ -6,11 +6,11 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" style="max-height: calc(100vh - 200px); overflow-y: auto;">
-                <form action="{{ route('fetchAllSlotsUser') }}" id="SearchSlotUser" method="POST"
-                    class="SearchSlotUser" enctype="multipart/form-data" novalidate>
+                <form action="{{ route('fetchAllSlotsUser') }}" id="SearchSlotUser" method="POST" class="SearchSlotUser"
+                    enctype="multipart/form-data" novalidate>
                     @csrf
                     <div class="row mb-3">
-                        <div class="col-4">
+                        <div class="col-12 col-md-4 mb-3 mb-md-0">
                             <label for="activitySelectBookingSearchUser" class="form-label">Select Activity *</label>
                             <input type="hidden" id="amenityIdBooking" name="amenity_id">
                             <select class="form-select" id="activitySelectBookingSearchUser" name="activity_id"
@@ -29,7 +29,7 @@
                         </div>
 
                         <!-- Date Field -->
-                        <div class="col-4">
+                        <div class="col-12 col-md-4 mb-3 mb-md-0">
                             <div class="position-relative">
                                 <label for="activityDateFieldSearchUser" class="form-label">Date *</label>
                                 <input type="text" id="activityDateFieldSearchUser" class="form-control"
@@ -39,8 +39,9 @@
                             </div>
                         </div>
 
-                        <div class="col-4 d-flex justify-content-start align-items-end">
-                            <button type="submit" form="SearchSlotUser" class="btn btn-primary searchBtn">
+                        <div class="col-12 col-md-4 mb-3 mb-md-0 d-flex justify-content-start align-items-end">
+                            <button type="submit" form="SearchSlotUser" class="btn btn-primary customBtn searchBtn slot-checking-submit-btn"
+                                style="min-width: 100px; height: 38px;">
                                 <i class="fa-solid fa-search me-1"></i><span> Search</span>
                                 <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"
                                     id="spinner"></span>
@@ -50,7 +51,7 @@
 
                     </div>
 
-                    <div class="all-slot-available-admin">
+                    <div class="all-slot-available-user">
 
                     </div>
                 </form>

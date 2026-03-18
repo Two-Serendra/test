@@ -19,40 +19,51 @@
                 @foreach ($bookings as $b)
                     <tr>
                         <td>{{ $b->transaction_no }}</td>
-                        <!-- <td>{{ $b->srf_no ?? 'N/A' }}</td> -->
                         <td>{{ \Carbon\Carbon::parse($b->booking_date)->format('F d, Y') }}</td>
-                        <td>{{ $b->booking_time_slot }}</td>
+                        <td>{{ $b->booking_time_slot ?? '-' }}</td>
 
                         <td>
                             @if ($b->charged_type === 1)
-                                <span class="text-primary">
-                                    Free
-                                </span>
+                                <span class="text-primary">Free</span>
                             @else
-                                <span class="text-danger">
-                                    ₱{{ number_format(448, 2) }}
-                                </span>
+                                <span class="text-danger">₱{{ number_format(448, 2) }}</span>
                             @endif
                         </td>
 
                         <td>
                             @php
-                                $startTime = $b->booking_time_slot ? trim(explode('-', $b->booking_time_slot)[0]) : null;
-                                $bookingDateTime = ($b->booking_date && $startTime)
-                                    ? \Carbon\Carbon::parse($b->booking_date . ' ' . $startTime)
-                                    : null;
+                                // Determine booking datetime
+                                if ($b->booking_date) {
+                                    if ($b->booking_time_slot) {
+                                        // Use start time if time slot exists
+                                        $startTime = trim(explode('-', $b->booking_time_slot)[0]);
+                                        $bookingDateTime = \Carbon\Carbon::parse($b->booking_date . ' ' . $startTime);
+                                    } else {
+                                        // If no time slot, check just the date (end of day)
+                                        $bookingDateTime = \Carbon\Carbon::parse($b->booking_date)->endOfDay();
+                                    }
+                                } else {
+                                    $bookingDateTime = null;
+                                }
+
                                 $isPast = $bookingDateTime ? $bookingDateTime->lt(now()) : false;
+
+                                // Determine status text
+                                if ($b->booking_status == 2) {
+                                    $statusText = '<span class="text-danger">Cancelled</span>';
+                                } elseif ($b->booking_status == 1 && $isPast) {
+                                    $statusText = '<span class="text-success">Completed</span>';
+                                } elseif ($b->booking_status == 1) {
+                                    $statusText = '<span class="text-primary">Confirmed</span>';
+                                } else {
+                                    $statusText = '<span class="text-warning">Pending</span>';
+                                }
+
+                                // Disable cancel button if past or cancelled
+                                $disabled = ($b->booking_status == 2 || $isPast) ? 'disabled' : '';
                             @endphp
 
-                            @if ($b->booking_status == 2)
-                                <span class="text-danger">Cancelled</span>
-                            @elseif ($b->booking_status == 1 && $isPast)
-                                <span class="text-success">Completed</span>
-                            @elseif ($b->booking_status == 1)
-                                <span class="text-primary">Confirmed</span>
-                            @else
-                                <span class="text-warning">Pending</span>
-                            @endif
+                            {!! $statusText !!}
                         </td>
 
                         <td>
@@ -63,41 +74,21 @@
                             @endif
                         </td>
 
-                        @php
-                            $timeRange = explode(' - ', $b->booking_time_slot);
-                            $startTime = $timeRange[0] ?? null;
-
-                            $bookingDateTime = $startTime
-                                ? \Carbon\Carbon::parse($b->booking_date . ' ' . $startTime)
-                                : \Carbon\Carbon::parse($b->booking_date);
-
-                            $now = \Carbon\Carbon::now();
-                        @endphp
-
                         <td>
-                            @php
-                                $disabled = $isPast ? 'disabled' : '';
-                            @endphp
-
                             @if ($b->booking_status == 2)
-                                {{-- Cancelled: disabled button --}}
                                 <div data-bs-toggle="tooltip" title="Cancelled">
                                     <button class="btn btn-secondary text-white badge-forge grease-trap-booking-cancelled" disabled>
                                         <i class="fa-solid fa-ban"></i>
                                     </button>
                                 </div>
-
                             @elseif ($b->booking_status == 1)
-                                {{-- Active: wrap button in div so tooltip works even if disabled --}}
                                 <div data-bs-toggle="tooltip" title="Cancel">
                                     <button class="btn btn-danger grease-trap-booking-cancel text-white badge-forge"
                                         data-id="{{ $b->id }}" {{ $disabled }}>
                                         <i class="fa-solid fa-ban"></i>
                                     </button>
                                 </div>
-
                             @else
-                                {{-- Pending --}}
                                 <div data-bs-toggle="tooltip" title="Pending">
                                     <button class="btn btn-sm btn-warning badge-forge" data-id="{{ $b->id }}" {{ $disabled }}>
                                         <i class="bi bi-clock"></i>
@@ -105,8 +96,6 @@
                                 </div>
                             @endif
                         </td>
-
-
                     </tr>
                 @endforeach
             @else

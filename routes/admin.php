@@ -115,7 +115,7 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/fetch/activity/{id}', [ActivitiesController::class, 'fetchInfoActivity'])->name('fetchInfoActivity');
     Route::post('/update-activities', [ActivitiesController::class, 'updateActivities'])->name('activitiesUpdate');
     Route::get('/fetch/activity_add_remarks/{id}', [ActivitiesController::class, 'fetchActivityAddRemarks'])->name('fetchActivityAddRemarks');
-    Route::post('/deactivate-activities', [ActivitiesController::class, 'deactivateActivities'])->name('deactivateActivities');
+    Route::post('/deactivate-activities', [ActivitiesController::class, 'deactivateActivities'])->name('deactivateActivities'); 
     Route::post('/activate-activities', [ActivitiesController::class, 'activateActivities'])->name('activateActivities');
     Route::get('/delete-activities', [ActivitiesController::class, 'deleteActivities'])->name('deleteActivities');
     Route::get('/search-activities', [ActivitiesController::class, 'searchActivity'])->name('admin.search.activities');

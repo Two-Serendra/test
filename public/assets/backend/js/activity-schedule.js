@@ -5,6 +5,9 @@ $(document).ready(function () {
         $('#addActivityBlockingModal').modal('show');
     });
 
+    $('#selectAllDays').on('change', function () {
+        $('input[name="days[]"]').prop('checked', this.checked);
+    });
 
     $('#ActivityScheduleBlocking').submit(function (event) {
         event.preventDefault();
@@ -100,70 +103,96 @@ $(document).ready(function () {
     });
 
 
+    function stripHtml(html) {
+        var tmp = document.createElement("DIV");
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || "";
+    }
+
+
+    function limitText(text, maxLength = 100) {
+        if (!text) return "N/A";
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + "...";
+    }
 
     function refreshTableActivityScheduleBlocking() {
+
         $.ajax({
             url: '/admin/get-updated-activity-schedule-blocking-table',
             type: 'GET',
             dataType: 'json',
             success: function (response) {
-                var activities = response.data;
+                console.log(response);
+                var dateBlockings = response.data;
                 var tableBody = $('#activityScheduleBlockingTable tbody');
+
                 $('[data-bs-toggle="tooltip"]').tooltip('dispose');
+
                 tableBody.empty();
-                activities.forEach(function (activity) {
 
-                    var actionButtons = `<button type="button" class="btn btn-primary editInfo_id_activity btn-equal btn-sm" data-bs-toggle="tooltip" data-bs-placement="left" title="Edit" data-id="${activity.id}">
-                                        <i class="fa-solid fa-pen-to-square"></i>
-                                    </button>`;
+                if (dateBlockings.length === 0) {
+                    tableBody.append(`
+                    <tr>
+                        <td colspan="8" class="text-center">No Records Found</td>
+                    </tr>
+                `);
+                    return;
+                }
 
-                    if (activity.activity_status == 1) {
-                        actionButtons += `<button type="button" class="btn btn-danger deactivate_activity btn-equal btn-responsive btn-sm mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Deactivate" data-id="${activity.id}" style="margin: 0 4px 0 4px;">
-                                        <i class="fa-solid fa-ban"></i>
-                                    </button>`;
-                    } else {
-                        actionButtons += `<button type="button" class="btn btn-success activate-activity btn-equal btn-responsive btn-sm mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Activate" data-id="${activity.id}" style="margin: 0 4px 0 1px;">
-                                    <i class="fa-solid fa-check-circle"></i>
+                dateBlockings.forEach(function (dateBlocking) {
 
-                        </button>`;
-                    }
-                    actionButtons += `<button type="button" class="btn btn-danger delete_activity btn-equal btn-responsive btn-sm"
-                                        data-bs-toggle="tooltip" data-bs-placement="right" title="Delete"
-                                        data-id="{{ $activity->id }}" style="margin-right:2px;">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>`;
-
-                    var amenity_name = activity.amenity_name ? activity.amenity_name.toUpperCase() : 'N/A';
-                    var activity_name = activity.activity_name ? activity.activity_name.toUpperCase() : 'N/A';
-                    var activity_description = limitText(stripHtml(activity.activity_description), 100);
-                    var activity_remarks = activity.activity_remarks ? activity.activity_remarks.toUpperCase() : 'N/A';
-                    var activity_max_booking = activity.activity_max_booking ? activity.activity_max_booking.toUpperCase() : 'N/A';
-                    var activity_space = activity.activity_space ? activity.activity_space.toUpperCase() : 'N/A';
-                    var activity_image = activity.activity_image
-                        ? `<img src="/assets/images/activities/${activity.activity_image}" alt="Amenity Image" style="width: 100px; height: auto;">`
+                    var activity_name = dateBlocking.activity
+                        ? dateBlocking.activity.activity_name.toUpperCase()
                         : 'N/A';
-                    var activity_status = activity.activity_status == 1
-                        ? `<span class="badge bg-success custom-badge">Active</span>`
-                        : `<span class="badge bg-danger custom-badge">Inactive</span>`;
 
-                    var row = $(`
-                            <tr>
-                                <td>${amenity_name}</td>
-                                <td>${activity_name}</td>
-                                <td>${activity_image}</td>
-                                <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${activity_description}</td>
-                                <td>${activity_status}</td>
-                                <td>${activity_remarks}</td>   
-                                <td>${activity_max_booking}</td>   
-                                <td>${activity_space}</td>  
-                                <td>${actionButtons}</td>
-                            </tr>
-                        `);
+                    var day = dateBlocking.day
+                        ? dateBlocking.day.toUpperCase()
+                        : 'N/A';
+
+                    var start_time = dateBlocking.start_time
+                        ? moment(dateBlocking.start_time, "HH:mm:ss").format("h:mm A")
+                        : 'N/A';
+
+                    var end_time = dateBlocking.end_time
+                        ? moment(dateBlocking.end_time, "HH:mm:ss").format("h:mm A")
+                        : 'N/A';
+
+                    var remarks = dateBlocking.remarks
+                        ? dateBlocking.remarks.toUpperCase()
+                        : 'N/A';
+
+                    var repeat_weekly = dateBlocking.repeat_weekly == 1
+                        ? `<span class="badge bg-success">Yes</span>`
+                        : `<span class="badge bg-danger">No</span>`;
+
+                    var created_at = dateBlocking.created_at
+                        ? moment(dateBlocking.created_at).format("MMM D, YYYY h:mm A")
+                        : 'N/A';
+
+                    var updated_at = dateBlocking.updated_at
+                        ? moment(dateBlocking.updated_at).format("MMM D, YYYY h:mm A")
+                        : 'N/A';
+
+                    var row = `
+                    <tr>
+                        <td>${activity_name}</td>
+                        <td>${day}</td>
+                        <td>${start_time}</td>
+                        <td>${end_time}</td>
+                        <td>${remarks}</td>
+                        <td>${repeat_weekly}</td>
+                        <td>${created_at}</td>
+                        <td>${updated_at}</td>
+                    </tr>
+                `;
 
                     tableBody.append(row);
                 });
+
                 $('[data-bs-toggle="tooltip"]').tooltip();
             },
+
             error: function (xhr, status, error) {
                 console.error('Error refreshing the table:', error);
             }

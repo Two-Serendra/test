@@ -91,7 +91,7 @@
 
 
                             <div class="mb-3">
-                                <label for="contact" class="form-label">Contact </label>
+                                <label for="contact" class="form-label">Contact No. </label>
                                 <input type="number" class="form-control" id="contact_number{{ $activity->id }}"
                                     name="contact_number">
 

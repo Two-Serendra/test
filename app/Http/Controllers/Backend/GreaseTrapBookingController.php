@@ -47,99 +47,6 @@ class GreaseTrapBookingController extends Controller
       return response()->json($bookings);
    }
 
-
-
-   // public function AdminStoreGreaseTrapBooking(Request $request)
-   // {
-
-   //    $maxRetries = 3;
-   //    $attempt = 0;
-
-   //    while ($attempt < $maxRetries) {
-   //       try {
-   //          DB::beginTransaction();
-
-   //          $bookingDate = Carbon::parse($request->booking_date)->toDateString();
-   //          $lastId = (GreaseTrapBooking::max('id') ?? 0) + 1;
-   //          $transactionNo = '2SGT-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
-   //          $unitNo = strtoupper(trim($request->unit));
-   //          $freeBookingLimit = 2;
-   //          $yearStart = Carbon::now()->startOfYear()->toDateString();
-   //          $yearEnd = Carbon::now()->endOfYear()->toDateString();
-
-   //          $unitBookingsCount = GreaseTrapBooking::where('unit_no', $request->unit)
-   //             ->where('booking_status', 1)
-   //             ->whereBetween('booking_date', [$yearStart, $yearEnd])
-   //             ->count();
-
-   //          $remainingFreeBookings = max($freeBookingLimit - $unitBookingsCount, 0);
-   //          $chargedType = $unitBookingsCount < $freeBookingLimit ? 1 : 2;
-
-   //          if ($chargedType == 2 && !$request->force_payment) {
-   //             DB::rollBack();
-   //             return response()->json([
-   //                'message' => "You have {$remainingFreeBookings} free bookings remaining. This booking will require payment. Do you want to continue?",
-   //                'requires_payment' => true,
-   //                'remaining_free_bookings' => $remainingFreeBookings
-   //             ], 409);
-   //          }
-
-   //          $isAlreadyBooked = GreaseTrapBooking::whereDate('booking_date', $bookingDate)
-   //             ->where('booking_time_slot', $request->booking_time_slot)
-   //             ->where('booking_status', 1)
-   //             ->lockForUpdate()
-   //             ->exists();
-
-   //          if ($isAlreadyBooked) {
-   //             DB::rollBack();
-   //             return response()->json([
-   //                'message' => 'This time slot is already booked.'
-   //             ], 409);
-   //          }
-
-   //          $booking = GreaseTrapBooking::create([
-   //             'user_id' => Auth::id(),
-   //             'name' => $request->name,
-   //             'unit_no' => $unitNo,
-   //             'resident_type' => strtoupper($request->selectResidentType),
-   //             'transaction_no' => $transactionNo,
-   //             'booking_date' => $bookingDate,
-   //             'booking_time_slot' => $request->booking_time_slot,
-   //             'charged_type' => $chargedType,
-   //             'remarks' => $request->remarks,
-   //             'booking_status' => 1,
-   //          ]);
-
-   //          DB::commit();
-
-   //          return response()->json([
-   //             'message' => 'Grease trap booking created successfully.',
-   //             'charged_type' => $chargedType
-   //          ]);
-
-   //       } catch (\Illuminate\Database\QueryException $e) {
-   //          DB::rollBack();
-
-   //          if (in_array($e->errorInfo[1], [1213, 1205])) {
-   //             $attempt++;
-   //             usleep(100000);
-   //             continue;
-   //          }
-
-   //          Log::error('Admin Grease Trap Booking Error', ['error' => $e->getMessage()]);
-   //          return response()->json(['message' => 'Something went wrong.'], 500);
-
-   //       } catch (\Throwable $e) {
-   //          DB::rollBack();
-   //          Log::error('Admin Grease Trap Booking Fatal', ['error' => $e->getMessage()]);
-   //          return response()->json(['message' => 'Something went wrong.'], 500);
-   //       }
-   //    }
-
-   //    return response()->json(['message' => 'Could not complete booking. Try again.'], 500);
-   // }
-
-
    public function AdminStoreGreaseTrapBooking(Request $request)
    {
       $maxRetries = 3;
@@ -189,21 +96,23 @@ class GreaseTrapBookingController extends Controller
                ], 409);
             }
 
-            $lastId = (GreaseTrapBooking::max('id') ?? 0) + 1;
-            $transactionNo = '2SGT-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
-
+            // Create booking first without transaction_no
             $booking = GreaseTrapBooking::create([
                'user_id' => Auth::id(),
                'name' => $request->name,
                'unit_no' => $unitNo,
                'resident_type' => strtoupper($request->selectResidentType),
-               'transaction_no' => $transactionNo,
+               'transaction_no' => null, // temporarily null
                'booking_date' => $bookingDate,
                'booking_time_slot' => $request->booking_time_slot,
                'charged_type' => $chargedType,
                'remarks' => $request->remarks,
                'booking_status' => 1,
             ]);
+
+            // Generate transaction_no using auto-increment ID
+            $booking->transaction_no = '2SGT-' . str_pad($booking->id, 5, '0', STR_PAD_LEFT);
+            $booking->save();
 
             DB::commit();
 
@@ -234,59 +143,6 @@ class GreaseTrapBookingController extends Controller
       return response()->json(['message' => 'Could not complete booking. Try again.'], 500);
    }
 
-   // public function CancelGreaseTrapBookingAdmin(GreaseTrapBooking $booking, Request $request)
-   // {
-   //    try {
-
-   //       if ($booking->booking_status == GreaseTrapBooking::STATUS_CANCELLED) {
-   //          return response()->json([
-   //             'success' => false,
-   //             'message' => 'Booking already cancelled.'
-   //          ], 400);
-   //       }
-
-   //       if ($booking->getBookingDateTime()->lt(now())) {
-   //          return response()->json([
-   //             'success' => false,
-   //             'message' => 'Cannot cancel a completed booking.'
-   //          ], 400);
-   //       }
-
-   //       $within24Hours = $booking->isWithin24Hours();
-
-   //       if (!$request->has('confirm')) {
-   //          return response()->json([
-   //             'success' => true,
-   //             'requires_confirmation' => $within24Hours,
-   //             'message' => $within24Hours
-   //                ? 'Cancelling this booking within 24 hours will incur a penalty of ₱448.'
-   //                : 'No penalty will be applied if you cancel this booking.'
-   //          ]);
-   //       }
-
-   //       $booking->booking_status = GreaseTrapBooking::STATUS_CANCELLED;
-   //       $booking->cancelled_at = now();
-   //       $booking->cancelled_by = auth()->id();
-
-   //       $booking->applyCancellationPenalty();
-   //       $booking->save();
-
-   //       return response()->json([
-   //          'success' => true,
-   //          'message' => $booking->has_penalty
-   //             ? 'Booking cancelled. Penalty has been applied.'
-   //             : 'Booking has been cancelled successfully.'
-   //       ]);
-
-   //    } catch (\Exception $e) {
-
-   //       return response()->json([
-   //          'success' => false,
-   //          'message' => 'Failed to cancel booking.',
-   //          'error' => $e->getMessage(),
-   //       ], 500);
-   //    }
-   // }
 
    public function CancelGreaseTrapBookingAdmin(GreaseTrapBooking $booking, Request $request)
    {
@@ -365,85 +221,6 @@ class GreaseTrapBookingController extends Controller
          ], 500);
       }
    }
-
-
-   // public function AdminStoreEmergencyGreaseTrapBooking(Request $request)
-   // {
-
-   //    $maxRetries = 3;
-   //    $attempt = 0;
-
-   //    while ($attempt < $maxRetries) {
-   //       try {
-   //          DB::beginTransaction();
-
-   //          $bookingDate = Carbon::parse($request->booking_date)->toDateString();
-   //          $lastId = (GreaseTrapBooking::max('id') ?? 0) + 1;
-   //          $transactionNo = '2SGT-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
-   //          $freeBookingLimit = 2;
-   //          $yearStart = Carbon::now()->startOfYear()->toDateString();
-   //          $yearEnd = Carbon::now()->endOfYear()->toDateString();
-   //          $unitNo = strtoupper(trim($request->unit));
-   //          $unitBookingsCount = GreaseTrapBooking::where('unit_no', $unitNo)
-   //             ->where('booking_status', 1)
-   //             ->whereBetween('booking_date', [$yearStart, $yearEnd])
-   //             ->count();
-
-   //          $remainingFreeBookings = max($freeBookingLimit - $unitBookingsCount, 0);
-   //          $chargedType = $unitBookingsCount < $freeBookingLimit ? 1 : 2;
-
-   //          if ($chargedType == 2 && !$request->force_payment) {
-   //             DB::rollBack();
-   //             return response()->json([
-   //                'message' => "This unit has reached the monthly free grease trap booking limit. This booking will cost ₱448.00. Do you want to continue?",
-   //                'requires_payment' => true,
-   //                'remaining_free_bookings' => $remainingFreeBookings
-   //             ], 409);
-   //          }
-
-   //          $booking = GreaseTrapBooking::create([
-   //             'user_id' => Auth::id(),
-   //             'name' => $request->name,
-   //             'unit_no' => $unitNo,
-   //             'resident_type' => strtoupper($request->selectResidentType),
-   //             'transaction_no' => $transactionNo,
-   //             'booking_date' => $bookingDate,
-   //             'booking_time_slot' => $request->booking_time_slot,
-   //             'charged_type' => $chargedType,
-   //             'remarks' => $request->remarks,
-   //             'emergency' => 2,
-   //             'booking_status' => 1,
-   //          ]);
-
-   //          DB::commit();
-
-   //          return response()->json([
-   //             'message' => 'Grease trap booking created successfully.',
-   //             'charged_type' => $chargedType
-   //          ]);
-
-   //       } catch (\Illuminate\Database\QueryException $e) {
-   //          DB::rollBack();
-
-   //          if (in_array($e->errorInfo[1], [1213, 1205])) {
-   //             $attempt++;
-   //             usleep(100000);
-   //             continue;
-   //          }
-
-   //          Log::error('Admin Grease Trap Booking Error', ['error' => $e->getMessage()]);
-   //          return response()->json(['message' => 'Something went wrong.'], 500);
-
-   //       } catch (\Throwable $e) {
-   //          DB::rollBack();
-   //          Log::error('Admin Grease Trap Booking Fatal', ['error' => $e->getMessage()]);
-   //          return response()->json(['message' => 'Something went wrong.'], 500);
-   //       }
-   //    }
-
-   //    return response()->json(['message' => 'Could not complete booking. Try again.'], 500);
-   // }
-
 
    public function AdminStoreEmergencyGreaseTrapBooking(Request $request)
    {
@@ -527,6 +304,9 @@ class GreaseTrapBookingController extends Controller
 
       return response()->json(['message' => 'Could not complete booking. Try again.'], 500);
    }
+
+
+
    public function fetchGreaseTrapBooking($id)
    {
       $greaseTrapBooking = GreaseTrapBooking::with('user')->find($id);
@@ -783,6 +563,101 @@ class GreaseTrapBookingController extends Controller
 
 
 
+   // public function importGreaseTrapBookings(Request $request)
+   // {
+   //    Log::info('Import grease trap booking route hit');
+
+   //    if (!$request->hasFile('file')) {
+   //       Log::error('No file uploaded');
+   //       return back()->with('error', 'No file uploaded');
+   //    }
+
+   //    $file = $request->file('file');
+   //    Log::info('File received', [
+   //       'filename' => $file->getClientOriginalName(),
+   //       'size' => $file->getSize(),
+   //       'mime' => $file->getMimeType(),
+   //    ]);
+
+   //    DB::beginTransaction();
+
+   //    try {
+
+   //       $csvData = array_map('str_getcsv', file($file->getRealPath()));
+
+   //       if (count($csvData) <= 1) {
+   //          Log::warning('CSV file is empty or only has headers');
+   //          return back()->with('error', 'CSV file is empty');
+   //       }
+
+   //       $header = array_shift($csvData);
+
+   //       $lastTransaction = GreaseTrapBooking::lockForUpdate()->latest('id')->first();
+   //       $lastNumber = $lastTransaction
+   //          ? ((int) str_replace('2SGT-', '', $lastTransaction->transaction_no))
+   //          : 0;
+
+   //       foreach ($csvData as $index => $row) {
+
+   //          Log::info('Processing CSV row', ['index' => $index, 'row' => $row]);
+
+
+   //          $lastNumber++;
+   //          $transactionNo = '2SGT-' . str_pad($lastNumber, 5, '0', STR_PAD_LEFT);
+
+   //          try {
+   //             $bookingDate = Carbon::parse(trim($row[6]))->format('Y-m-d');
+   //          } catch (\Exception $e) {
+   //             Log::error('Booking date parse error', [
+   //                'row' => $row,
+   //                'error' => $e->getMessage()
+   //             ]);
+   //             continue;
+   //          }
+
+   //          try {
+   //             GreaseTrapBooking::create([
+   //                'transaction_no' => $transactionNo,
+   //                'unit_no' => trim($row[4]),
+   //                'resident_type' => trim($row[5]),
+   //                'booking_date' => $bookingDate,
+   //                'booking_time_slot' => trim($row[7]),
+   //                'srf_no' => trim($row[8]),
+   //                'remarks' => null,
+   //                'charged_type' => trim($row[10]),
+   //                'emergency' => trim($row[11]),
+   //                'booking_status' => trim($row[12]),
+   //                'cancelled_by' => null,
+   //                'cancelled_at' => null,
+   //                'has_penalty' => trim($row[14]),
+   //                'penalty_amount' => null,
+   //                'created_by' => null,
+   //                'created_at' => null,
+   //                'updated_at' => null,
+   //             ]);
+
+   //             Log::info('Booking created', ['transaction_no' => $transactionNo]);
+
+   //          } catch (\Exception $e) {
+   //             Log::error('Row insert failed', [
+   //                'index' => $index,
+   //                'row' => $row,
+   //                'error' => $e->getMessage()
+   //             ]);
+   //          }
+   //       }
+
+   //       DB::commit();
+   //       Log::info('CSV import completed successfully');
+   //       return back()->with('success', 'Bookings imported successfully');
+
+   //    } catch (\Exception $e) {
+   //       DB::rollBack();
+   //       Log::error('CSV import failed', ['error' => $e->getMessage()]);
+   //       return back()->with('error', $e->getMessage());
+   //    }
+   // }
+
    public function importGreaseTrapBookings(Request $request)
    {
       Log::info('Import grease trap booking route hit');
@@ -802,7 +677,6 @@ class GreaseTrapBookingController extends Controller
       DB::beginTransaction();
 
       try {
-
          $csvData = array_map('str_getcsv', file($file->getRealPath()));
 
          if (count($csvData) <= 1) {
@@ -812,18 +686,9 @@ class GreaseTrapBookingController extends Controller
 
          $header = array_shift($csvData);
 
-         $lastTransaction = GreaseTrapBooking::lockForUpdate()->latest('id')->first();
-         $lastNumber = $lastTransaction
-            ? ((int) str_replace('2SGT-', '', $lastTransaction->transaction_no))
-            : 0;
-
          foreach ($csvData as $index => $row) {
 
             Log::info('Processing CSV row', ['index' => $index, 'row' => $row]);
-
-
-            $lastNumber++;
-            $transactionNo = '2SGT-' . str_pad($lastNumber, 5, '0', STR_PAD_LEFT);
 
             try {
                $bookingDate = Carbon::parse(trim($row[6]))->format('Y-m-d');
@@ -836,8 +701,9 @@ class GreaseTrapBookingController extends Controller
             }
 
             try {
-               GreaseTrapBooking::create([
-                  'transaction_no' => $transactionNo,
+               // Create booking first without transaction_no
+               $booking = GreaseTrapBooking::create([
+                  'transaction_no' => null, // will assign after insert
                   'unit_no' => trim($row[4]),
                   'resident_type' => trim($row[5]),
                   'booking_date' => $bookingDate,
@@ -852,11 +718,13 @@ class GreaseTrapBookingController extends Controller
                   'has_penalty' => trim($row[14]),
                   'penalty_amount' => null,
                   'created_by' => null,
-                  'created_at' => null,
-                  'updated_at' => null,
                ]);
 
-               Log::info('Booking created', ['transaction_no' => $transactionNo]);
+               // Assign unique transaction_no based on auto-increment id
+               $booking->transaction_no = '2SGT-' . str_pad($booking->id, 5, '0', STR_PAD_LEFT);
+               $booking->save();
+
+               Log::info('Booking created', ['transaction_no' => $booking->transaction_no]);
 
             } catch (\Exception $e) {
                Log::error('Row insert failed', [

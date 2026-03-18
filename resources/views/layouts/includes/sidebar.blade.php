@@ -66,11 +66,25 @@
                     </a>
                 </li>
 
-                <li class="menu-item {{ request()->routeIs('admin.show.date.blocking') ? 'active' : '' }}">
+                <!-- <li class="menu-item {{ request()->routeIs('admin.show.date.blocking') ? 'active' : '' }}">
                     <a href="{{ route('admin.show.date.blocking') }}" class="menu-link">
                         <div data-i18n="Typography">Date Blocking</div>
                     </a>
+                </li> -->
+
+                <li class="menu-item {{ request()->routeIs('admin.activity.booking.calendar') ? 'active' : '' }}">
+                    <a href="{{ route('admin.activity.booking.calendar') }}" class="menu-link">
+                        <div data-i18n="Typography">Calendar</div>
+                    </a>
                 </li>
+
+
+                <li class="menu-item {{ request()->routeIs('admin.show.schedule.blocking') ? 'active' : '' }}">
+                    <a href="{{ route('admin.show.schedule.blocking') }}" class="menu-link">
+                        <div data-i18n="Typography">Schedule Blocking</div>
+                    </a>
+                </li>
+
 
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -207,17 +221,13 @@
                         <div data-i18n="Typography">Booking</div>
                     </a>
                 </li>
-            </ul>
 
-            <ul class="menu-sub">
                 <li class="menu-item {{ request()->routeIs('admin.booking.grease.trap.calendar') ? 'active' : '' }}">
                     <a href="{{ route('admin.booking.grease.trap.calendar') }}" class="menu-link">
                         <div data-i18n="Typography">Calendar</div>
                     </a>
                 </li>
-            </ul>
 
-            <ul class="menu-sub">
                 <li class="menu-item {{ request()->routeIs('admin.report.grease.trap') ? 'active' : '' }}">
                     <a href="{{ route('admin.report.grease.trap') }}" class="menu-link">
                         <div data-i18n="Typography">Reports</div>
@@ -244,17 +254,14 @@
                         <div data-i18n="Typography">Booking</div>
                     </a>
                 </li>
-            </ul>
 
-            <ul class="menu-sub">
+
                 <li class="menu-item {{ request()->routeIs('admin.booking.pest.control.calendar') ? 'active' : '' }}">
                     <a href="{{ route('admin.booking.pest.control.calendar') }}" class="menu-link">
                         <div data-i18n="Typography">Calendar</div>
                     </a>
                 </li>
-            </ul>
-
-            <ul class="menu-sub">
+                
                 <li class="menu-item {{ request()->routeIs('admin.report.pest.control') ? 'active' : '' }}">
                     <a href="{{ route('admin.report.pest.control') }}" class="menu-link">
                         <div data-i18n="Typography">Reports</div>

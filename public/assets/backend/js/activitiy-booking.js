@@ -1326,7 +1326,7 @@ $('.SearchSlotAdmin').submit(function (event) {
 
     let activityId = $('#activitySelectBookingSearchAdmin').val();
     let amenityId = $('#activitySelectBookingSearchAdmin option:selected').data('amenity-id');
-    let dateField = $('#dateFieldSearchAdmin').val();
+    let dateField = $('#activityDateFieldSearchAdmin').val();
 
     $('#spinner').removeClass('d-none');
 
@@ -1416,23 +1416,6 @@ $('#bookingTable').on('click', 'mark-as-no-show', function () {
 });
 
 
-$('#uploadBookingBtn').on('click', function () {
-    $('#bookingFileInput').click();
-});
-
-$('#bookingFileInput').on('change', function () {
-
-    if (this.files.length === 0) return;
-
-    let fileName = this.files[0].name;
-
-    if (confirm("Upload file: " + fileName + " ?")) {
-        $('#bookingImportForm').submit();
-    } else {
-        $(this).val('');
-    }
-
-});
 
 
 

@@ -23,7 +23,7 @@
                                         {{ strtoupper($activity->activity_name) }}
                                     </option>
                                 @endforeach
-                            </select>
+                            </select> 
                             <div class="invalid-feedback">Please select an amenity</div>
                         </div>
 

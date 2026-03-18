@@ -1032,19 +1032,19 @@ $(document).ready(function () {
 
     $('.SlotCheckingModalUserbBtn').on('click', function () {
         $('#SlotCheckingModalUser').modal('show');
-        $('#SearchSlotAdmin')[0].reset();
-        $('#activityDateFieldSearchAdmin').prop('disabled', true);
+        $('#SearchSlotUser')[0].reset();
+        $('#activityDateFieldSearchUser').prop('disabled', true);
         $('.searchBtn').prop('disabled', true);
-        $('.all-slot-available-admin').empty();
+        $('.all-slot-available-user').empty();
         $('#spinner').addClass('d-none');
     });
 
     $('#SlotCheckingModalUser').on('hidden.bs.modal', function () {
         $('.modal-backdrop').remove();
-        $('#activityDateFieldSearchAdmin').prop('disabled', true);
+        $('#activityDateFieldSearchUser').prop('disabled', true);
         $('.searchBtn').prop('disabled', true);
-        $('#SearchSlotAdmin')[0].reset();
-        $('.all-slot-available-admin').empty();
+        $('#SearchSlotUser')[0].reset();
+        $('.all-slot-available-user').empty();
         $('#spinner').addClass('d-none');
     });
 
@@ -1054,7 +1054,7 @@ $(document).ready(function () {
         const selectedAmenityId = activitySelect.find(':selected').data('amenity-id');
         const activityDateFieldSearchUser = $('#activityDateFieldSearchUser');
 
-        $('.all-slot-available-admin').empty();
+        $('.all-slot-available-user').empty();
         $('#amenityIdBooking').val(selectedAmenityId);
         $('#unitStatus').text('0/0').attr('class', 'mt-1 text-muted');
         activityDateFieldSearchUser.val('').prop('disabled', false);
@@ -1115,9 +1115,14 @@ $(document).ready(function () {
 
         let activityId = $('#activitySelectBookingSearchUser').val();
         let amenityId = $('#activitySelectBookingSearchUser option:selected').data('amenity-id');
-        let dateField = $('#dateFieldSearchUser').val();
+        let dateField = $('#activityDateFieldSearchUser').val();
+        const $btn = $('.slot-checking-submit-btn');
+        const originalWidth = $btn.outerWidth();
+        $btn
+            .attr('disabled', true)
+            .html(`<div class="spinner-border spinner-border-sm text-light"></div>`)
+            .css('width', originalWidth + 'px');
 
-        $('#spinner').removeClass('d-none');
 
         $.ajax({
             url: '/fetch-all-slots-user',
@@ -1143,10 +1148,10 @@ $(document).ready(function () {
                         let badgeClass;
 
                         if (status === 'Available') {
-                            badgeClass = 'bg-primary';
+                            badgeClass = 'custom-badge bg-primary text-white';
                         } else {
 
-                            badgeClass = 'bg-danger';
+                            badgeClass = 'custom-badge bg-danger text-white';
                         }
 
                         html += `<td><span class="badge ${badgeClass} text-uppercase">${status}</span></td>`;
@@ -1160,7 +1165,16 @@ $(document).ready(function () {
             error: function (xhr) {
                 $('#spinner').addClass('d-none');
                 alert('An error occurred while fetching the data.');
+            },
+
+            complete: function () {
+                $btn
+                    .attr('disabled', false)
+                    .html(`<i class="fa-solid fa-search me-1"></i><span> Search</span>`)
+                    .css('width', '');
             }
+
+
         });
     });
 

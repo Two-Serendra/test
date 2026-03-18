@@ -872,25 +872,44 @@ class FrontendActivityBookingController extends Controller
         ]);
     }
 
-    // public function cancelAmenityBooking(ActivityBooking $booking)
+
+    // public function cancelAmenityBooking(ActivityBooking $booking, Request $request)
     // {
     //     try {
     //         $booking->load('activity', 'user');
 
-    //         $penaltyHours = 12;
-    //         $penaltyAmount = 1000;
-    //         $bookingDateTime = Carbon::parse($booking->booking_date . ' ' . $booking->booking_start_time);
-    //         $now = now();
+    //         if (!$booking->canCancel()) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Booking cannot be cancelled.'
+    //             ], 400);
+    //         }
 
-    //         $hoursDiff = $now->diffInHours($bookingDateTime, false);
-    //         $withPenalty = $hoursDiff < $penaltyHours;
+    //         $withPenalty = $booking->isWithin12Hours();
 
-    //         $booking->booking_status = $withPenalty ? 3 : 2;
+    //         if (!$request->has('confirm') && $withPenalty) {
+    //             return response()->json([
+    //                 'success' => true,
+    //                 'requires_confirmation' => true,
+    //                 'message' => " Cancelling within 12 hours will incur a ₱1000 penalty."
+    //             ]);
+    //         }
+
+    //         if ($withPenalty) {
+    //             $booking->applyCancellationPenalty();
+    //             $booking->booking_status = 3;
+    //         } else {
+    //             $booking->booking_status = 2;
+    //         }
+
+    //         $booking->cancelled_at = now();
+    //         $booking->cancelled_by = auth()->id();
     //         $booking->save();
 
+    //         $penaltyAmount = $booking->penalty_amount ?? 0;
+
+
     //         $booking->user?->notify(new UserAmenityBookingBellNotification($booking));
-
-
     //         if ($booking->user?->email) {
     //             Mail::to($booking->user->email)->queue(
     //                 new UserAmenityBookingCancellation($booking, $withPenalty, $penaltyAmount)
@@ -903,19 +922,21 @@ class FrontendActivityBookingController extends Controller
     //         return response()->json([
     //             'success' => true,
     //             'withPenalty' => $withPenalty,
-    //             'penaltyAmount' => $withPenalty ? $penaltyAmount : 0,
+    //             'penaltyAmount' => $penaltyAmount,
     //             'message' => $withPenalty
     //                 ? "Booking cancelled. ₱{$penaltyAmount} penalty will be applied."
     //                 : "Booking has been cancelled successfully."
     //         ]);
 
     //     } catch (\Exception $e) {
+    //         \Log::error('Cancel Amenity Booking Error', ['error' => $e->getMessage()]);
     //         return response()->json([
     //             'success' => false,
     //             'message' => 'Failed to cancel booking.'
     //         ], 500);
     //     }
     // }
+
 
     public function cancelAmenityBooking(ActivityBooking $booking, Request $request)
     {
@@ -931,14 +952,17 @@ class FrontendActivityBookingController extends Controller
 
             $withPenalty = $booking->isWithin12Hours();
 
+            // Step 1: If this is the first request without confirm flag, tell frontend if penalty applies
             if (!$request->has('confirm') && $withPenalty) {
                 return response()->json([
                     'success' => true,
                     'requires_confirmation' => true,
-                    'message' => " Cancelling within 12 hours will incur a ₱1000 penalty."
+                    'penaltyAmount' => 1000, // or $booking->penalty_amount
+                    'message' => "Cancelling within 12 hours will incur a ₱1000 penalty."
                 ]);
             }
 
+            // Step 2: Apply cancellation
             if ($withPenalty) {
                 $booking->applyCancellationPenalty();
                 $booking->booking_status = 3;
@@ -951,7 +975,6 @@ class FrontendActivityBookingController extends Controller
             $booking->save();
 
             $penaltyAmount = $booking->penalty_amount ?? 0;
-
 
             $booking->user?->notify(new UserAmenityBookingBellNotification($booking));
             if ($booking->user?->email) {
@@ -980,7 +1003,7 @@ class FrontendActivityBookingController extends Controller
             ], 500);
         }
     }
-
+    
     public function showAmenityBookingDetails($id)
     {
         $booking = ActivityBooking::with('user', 'activity')->findOrFail($id);
@@ -992,7 +1015,7 @@ class FrontendActivityBookingController extends Controller
         $activityId = $request->input('activity_id');
         $date = $request->input('booking_date');
 
-        $activity = Activity::find($activityId); 
+        $activity = Activity::find($activityId);
         if (!$activity) {
             return response()->json(['error' => 'Activity not found'], 404);
         }

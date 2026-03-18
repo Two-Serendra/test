@@ -694,3 +694,26 @@ select.form-select:not(:disabled) {
     font-size: inherit !important;
     color: inherit !important;
 }
+
+.custom-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 6px;
+    /* 👈 reduced */
+    line-height: 1;
+    letter-spacing: 0.5px;
+}
+
+.custom-badge.available {
+    background-color: #0d6efd;
+    /* blue */
+    color: #fff;
+}
+
+.custom-badge.unavailable {
+    background-color: #dc3545;
+    /* red */
+    color: #fff;
+}

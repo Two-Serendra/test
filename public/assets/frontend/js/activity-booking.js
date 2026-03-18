@@ -234,6 +234,7 @@ $(document).ready(function () {
                 altInput: true,
                 altFormat: 'F j, Y',
                 disable: blockedDates,
+                disableMobile: true,
                 onChange: function (selectedDates, dateStr) {
                     if (!dateStr) return;
                     startTimeDropdown.prop('disabled', false);
@@ -960,74 +961,122 @@ $(document).ready(function () {
     });
 
 
-    $(document).on('click', '#cancelAmenityBookingBtn', function () {
 
+    // $(document).on('click', '#cancelAmenityBookingBtn', function () {
+    //     const bookingEl = $('#detail-transaction-no');
+    //     const bookingId = bookingEl.data('booking-id');
+
+    //     Swal.fire({
+    //         title: 'Cancel Booking',
+    //         html: 'Are you sure you want to cancel this booking?',
+    //         icon: 'warning',
+    //         showCancelButton: true,
+    //         confirmButtonColor: '#d33',
+    //         cancelButtonColor: '#3085d6',
+    //         confirmButtonText: 'Yes, cancel it',
+    //         cancelButtonText: 'No, keep it'
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             // Send cancel request to backend
+    //             $.ajax({
+    //                 url: `/resident/activity-booking/cancel/${bookingId}`,
+    //                 method: 'POST',
+    //                 data: {
+    //                     _token: $('meta[name="csrf-token"]').attr('content'),
+    //                     confirm: 1 // always confirm
+    //                 },
+    //                 success: function (res) {
+    //                     if (!res.success) {
+    //                         Swal.fire('Error', res.message || 'Failed to cancel booking.', 'error');
+    //                         return;
+    //                     }
+    //                     Swal.fire('Cancelled!', res.message, 'success').then(() => {
+    //                         $('#residentActivityBookingDetailsModal').modal('hide');
+    //                         if (typeof refreshBookingTable === 'function') refreshBookingTable();
+    //                     });
+    //                 },
+    //                 error: function () {
+    //                     Swal.fire('Error', 'Something went wrong while cancelling.', 'error');
+    //                 }
+    //             });
+    //         }
+    //     });
+    // });
+
+    $(document).on('click', '#cancelAmenityBookingBtn', function () {
         const bookingEl = $('#detail-transaction-no');
         const bookingId = bookingEl.data('booking-id');
+        Swal.fire({
+            title: 'Cancel Booking',
+            html: 'Are you sure you want to cancel this booking?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, cancel it',
+            cancelButtonText: 'No, keep it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `/resident/activity-booking/cancel/${bookingId}`,
+                    method: 'POST',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (res) {
+                        if (!res.success) {
+                            Swal.fire('Error', res.message || 'Failed to cancel booking.', 'error');
+                            return;
+                        }
+                        if (res.requires_confirmation) {
+                            Swal.fire({
+                                title: 'Cancel Booking with Penalty',
+                                html: 'Cancelling this booking will incur a ₱' + res.penaltyAmount + ' penalty. Proceed?',
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#d33',
+                                cancelButtonColor: '#3085d6',
+                                confirmButtonText: 'Yes, cancel it',
+                                cancelButtonText: 'No, keep it'
+                            }).then((result2) => {
+                                if (result2.isConfirmed) {
+                                    $.ajax({
+                                        url: `/resident/activity-booking/cancel/${bookingId}`,
+                                        method: 'POST',
+                                        data: {
+                                            _token: $('meta[name="csrf-token"]').attr('content'),
+                                            confirm: 1
+                                        },
+                                        success: function (res2) {
+                                            Swal.fire('Cancelled!', res2.message, 'success').then(() => {
+                                                $('#residentActivityBookingDetailsModal').modal('hide');
 
-        // Step 1: Ask backend if confirmation is required
-        $.ajax({
-            url: `/resident/activity-booking/cancel/${bookingId}`,
-            method: 'POST',
-            data: {
-                _token: $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function (res) {
-
-                if (!res.success) {
-                    Swal.fire('Error', res.message || 'Failed to cancel booking.', 'error');
-                    return;
-                }
-
-                // If confirmation is required (penalty), show warning modal
-                if (res.requires_confirmation) {
-                    Swal.fire({
-                        title: 'Cancel Booking',
-                        html: 'Are you sure you want to cancel this booking?' + res.message,
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: 'Yes, cancel it',
-                        cancelButtonText: 'No, keep it'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Step 2: Send final confirmation to cancel
-                            $.ajax({
-                                url: `/resident/activity-booking/cancel/${bookingId}`,
-                                method: 'POST',
-                                data: {
-                                    _token: $('meta[name="csrf-token"]').attr('content'),
-                                    confirm: 1
-                                },
-                                success: function (res2) {
-                                    Swal.fire('Cancelled!', res2.message, 'success').then(() => {
-                                        $('#residentActivityBookingDetailsModal').modal('hide');
-                                        if (typeof refreshBookingTable === 'function') refreshBookingTable();
+                                                let page = $('.pagination .active span').text() || 1;
+                                                loadBookings(page);
+                                            });
+                                        },
+                                        error: function () {
+                                            Swal.fire('Error', 'Something went wrong while cancelling.', 'error');
+                                        }
                                     });
-                                },
-                                error: function () {
-                                    Swal.fire('Error', 'Something went wrong while cancelling.', 'error');
                                 }
                             });
+                        } else {
+                            Swal.fire('Cancelled!', res.message, 'success').then(() => {
+                                $('#residentActivityBookingDetailsModal').modal('hide');
+                               
+                                let page = $('.pagination .active span').text() || 1;
+                                loadBookings(page);
+                            });
                         }
-                    });
-                } else {
-                    // No confirmation required, just cancel
-                    Swal.fire('Cancelled!', res.message, 'success').then(() => {
-                        $('#residentActivityBookingDetailsModal').modal('hide');
-                        if (typeof refreshBookingTable === 'function') refreshBookingTable();
-                    });
-                }
-            },
-            error: function () {
-                Swal.fire('Error', 'Something went wrong.', 'error');
+                    },
+                    error: function () {
+                        Swal.fire('Error', 'Something went wrong.', 'error');
+                    }
+                });
             }
         });
-
     });
-
-
 
 
     $('.SlotCheckingModalUserbBtn').on('click', function () {

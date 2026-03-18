@@ -33,7 +33,7 @@
                             <!-- <li class="nav-item">
                                 <a class="nav-link booking-tab" id="walkin-tab" data-bs-toggle="tab" href="#"
                                     data-value="Walk-in">Walk-in</a>
-                            </li> --> 
+                            </li> -->
                         </ul>
 
                         <div class="col-md-6">
@@ -68,7 +68,7 @@
                                     </div>
                                 </div>
 
-                                <div class="d-flex gap-2 mt-1">
+                                <!-- <div class="d-flex gap-2 mt-1">
                                     <select id="residentSelect" name="resident_email_id"
                                         class="form-select selectResidentType flex-grow-1" required>
                                         <option value="">-- Select Residence --</option>
@@ -83,7 +83,21 @@
 
                                     <button type="button"
                                         class="btn btn-secondary customBtn checkUnit text-white">Check</button>
-                                </div>
+                                </div> -->
+
+                                <select id="residentSelect" name="resident_email_id" class="form-select flex-grow-1"
+                                    required>
+                                    @if(count($residences) > 1)
+                                        <option value="">-- Select Residence --</option>
+                                    @endif
+                                    @foreach ($residences as $residence)
+                                        <option value="{{ $residence->id }}"
+                                            data-type="{{ strtolower($residence->resident_type) }}"
+                                            data-unit="{{ $residence->unit_no }}">
+                                            {{ ucfirst($residence->resident_type) }} - Unit {{ $residence->unit_no }}
+                                        </option>
+                                    @endforeach
+                                </select>
                                 <div class="invalid-feedback">Required</div>
                             </div>
 

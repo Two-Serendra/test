@@ -58,8 +58,8 @@
                                 <tr>
                                     <td>{{ strtoupper($activity_blocking->activity->activity_name ?? 'N/A') }}</td>
                                     <td>{{ strtoupper($activity_blocking->day ?? 'N/A') }}</td>
-                                    <td>{{ $activity_blocking->start_time }}</td>
-                                    <td>{{ $activity_blocking->end_time }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($activity_blocking->start_time)->format('h:i A') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($activity_blocking->end_time)->format('h:i A') }}</td>
                                     <td>{{ strtoupper($activity_blocking->remarks ?? 'N/A') }}</td>
                                     <td>
                                         @if ($activity_blocking->repeat_weekly)

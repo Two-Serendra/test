@@ -47,7 +47,7 @@
 
                                         case 3:
                                             $statusText = 'Penalty';
-                                            $statusClass = 'badge bg-danger badge-forge';
+                                            $statusClass = 'badge bg-warning badge-forge';
                                             break;
 
                                         case 4:

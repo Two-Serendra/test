@@ -34,7 +34,7 @@ class FrontendFunctionRoomBookingController extends Controller
 {
     public function list(Request $request)
     {
-        $category = $request->get('category', 'function_room');
+        $category = $request->get('category', 'amenity');
         $items = collect();        // default
         $residences = collect();
 

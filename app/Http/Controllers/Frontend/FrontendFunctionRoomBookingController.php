@@ -62,7 +62,9 @@ class FrontendFunctionRoomBookingController extends Controller
                     return $item;
                 });
         } elseif ($category === 'amenity') {
-            $items = Activity::where('activity_status', '1')->get()
+            $items = Activity::where('activity_status', '1')
+                ->orderBy('amenity_id') // <-- sorts by amenity_id ascending
+                ->get()
                 ->map(function ($item) {
                     $item->type = 'amenity';
                     return $item;
@@ -232,7 +234,8 @@ class FrontendFunctionRoomBookingController extends Controller
         return view('frontend.booking-full-details-activity', compact(
             'activity',
             'suggestions',
-            'residences','activities'
+            'residences',
+            'activities'
         ));
     }
 

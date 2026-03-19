@@ -61,9 +61,9 @@ class FrontendFunctionRoomBookingController extends Controller
 
                     return $item;
                 });
+        } elseif ($category === 'amenity') {
             $items = Activity::where('activity_status', '1')
-                ->orderBy('amenity_id', 'asc')     // group by amenity
-                ->orderBy('created_at', 'asc')     // or 'id' if you prefer
+                ->orderBy('amenity_id') // <-- sorts by amenity_id ascending
                 ->get()
                 ->map(function ($item) {
                     $item->type = 'amenity';
@@ -216,10 +216,7 @@ class FrontendFunctionRoomBookingController extends Controller
     public function fullDetailsActivity($type, $activity_id)
     {
         $activity = Activity::with('ActivityBooking')->findOrFail($activity_id);
-        $activities = Activity::where('activity_status', 1)
-            ->orderBy('amenity_id', 'asc')
-            ->orderBy('created_at', 'asc')
-            ->get();
+        $activities = Activity::where('activity_status', 1)->get();
 
         $suggestions = Activity::where('amenity_id', $activity->amenity_id)
             ->where('id', '!=', $activity->id)

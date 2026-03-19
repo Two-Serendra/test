@@ -259,6 +259,9 @@ class FrontendActivityBookingController extends Controller
         $sharedActivityGroups = [
             'almond_basketball' => [1, 2],
             'sequoia_basketball' => [4, 5],
+            'almond_futsal' => [15, 17],
+            'sequoia_futsal' => [10, 16],
+            'almond_badminton' => [13, 18],
         ];
 
         $sharedActivityIds = [];

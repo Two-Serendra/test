@@ -43,14 +43,12 @@ $(document).ready(function () {
     const dateField = adminModal.find('#dateFieldBooking');
     const startTimeDropdown = adminModal.find('#booking_start_time');
     const endTimeDropdown = adminModal.find('#booking_end_time');
-    const submitButton = adminModal.find('.submitBtn');
+    const submitButton = adminModal.find('#saveActivityBookingBtn');
 
-    // Set initial booking type
     let bookingType = bookingTabs.find('a.active').data('value') || "Advanced Booking";
     bookingTypeInput.val(bookingType);
     updateFormState(bookingType);
 
-    // Booking type tab change
     bookingTabs.find('a').on('click', function () {
         bookingType = $(this).data('value');
         bookingTypeInput.val(bookingType);
@@ -70,7 +68,6 @@ $(document).ready(function () {
 
             dateField.off('change.enableFields').on('change.enableFields', function () {
                 toggleFields(false);
-                // Walk-in: Enable all fields immediately
                 enableAllFields();
             });
         } else if (type === "Advanced Booking") {
@@ -96,14 +93,6 @@ $(document).ready(function () {
             toggleFields(false);
             enableAllFields();
         }
-
-        //  } else if (type === "Advanced Booking" || type === "24hrs") {
-        //     checkUnitBtn.show().prop('disabled', false);
-        //     unitStatus.show();
-        //     toggleFields(true);
-        //     dateField.prop('disabled', false);
-        //     submitButton.prop('disabled', true);
-        // }
     }
 
     function resetFields() {
@@ -589,12 +578,12 @@ function updateAvailableSlots(activitySpace, bookedSlots) {
         if (isSelected) firstAvailableSelected = true;
 
         let cardHtml = `
-                <div class="card p-2 m-1 shadow-sm border slot-card ${isSelected ? 'selected-slot border-success' : ''} ${isDisabled ? 'bg-secondary text-white' : 'text-success'}" 
+                <div class="card p-2 m-1 shadow-sm border slot-card ${isSelected ? 'selected-slot border-primary' : ''} ${isDisabled ? 'bg-secondary text-white' : 'text-primary'}" 
                      data-slot="${slotNumber}"
                      style="width: 120px; height: 100px; cursor: ${isDisabled ? 'not-allowed' : 'pointer'}; flex: 1 1 calc(33.33% - 10px); max-width: 120px;">
                     <div class="card-body p-1 text-center d-flex flex-column justify-content-center">
-                        <h6 class="card-title ${isDisabled ? 'text-white' : 'text-success'}" style="font-size: 14px; font-weight: bold;">Court ${slotNumber}</h6>
-                        <p class="m-0 ${isDisabled ? 'text-white' : 'text-success'}" style="font-size: 12px; font-weight: bold;">
+                        <h6 class="card-title ${isDisabled ? 'text-white' : 'text-primary'}" style="font-size: 14px; font-weight: bold;">Court ${slotNumber}</h6>
+                        <p class="m-0 ${isDisabled ? 'text-white' : 'text-primary'}" style="font-size: 12px; font-weight: bold;">
                             ${isDisabled ? 'Booked' : 'Available'}
                         </p>
                     </div>
@@ -1327,8 +1316,12 @@ $('.SearchSlotAdmin').submit(function (event) {
     let activityId = $('#activitySelectBookingSearchAdmin').val();
     let amenityId = $('#activitySelectBookingSearchAdmin option:selected').data('amenity-id');
     let dateField = $('#activityDateFieldSearchAdmin').val();
-
-    $('#spinner').removeClass('d-none');
+    const $btn = $('.slot-checking-submit-btn-admin');
+    const originalWidth = $btn.outerWidth();
+    $btn
+        .attr('disabled', true)
+        .html(`<div class="spinner-border spinner-border-sm text-light"></div>`)
+        .css('width', originalWidth + 'px');
 
     $.ajax({
         url: '/admin/fetch-all-slots-admin',
@@ -1340,6 +1333,16 @@ $('.SearchSlotAdmin').submit(function (event) {
         },
         success: function (response) {
             $('#spinner').addClass('d-none');
+
+            if (response.error) {
+                $('.all-slot-available-admin').html(
+                    `<div class="alert alert-warning text-center mb-0">
+                No Schedule for the selected date. Please choose another date.
+            </div>`
+                );
+                return;
+            }
+
             let html = '<table class="table table-bordered"><thead><tr><th>Time</th>';
 
             for (let i = 0; i < response.activity_space; i++) {
@@ -1371,6 +1374,12 @@ $('.SearchSlotAdmin').submit(function (event) {
         error: function (xhr) {
             $('#spinner').addClass('d-none');
             alert('An error occurred while fetching the data.');
+        },
+        complete: function () {
+            $btn
+                .attr('disabled', false)
+                .html(`<i class="fa-solid fa-search me-1"></i><span> Search</span>`)
+                .css('width', '');
         }
     });
 });

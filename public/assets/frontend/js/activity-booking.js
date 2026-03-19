@@ -6,7 +6,6 @@ $(document).ready(function () {
         const activityId = $(this).data('activity-id');
         const modal = $('#modalActivity' + activityId);
         const amenityId = modal.find('#amenityId' + activityId).val();
-
         modal.data('activity-id', activityId);
         console.log("Activity ID set on modal:", modal.data('activity-id'));
         const bookingTabs = modal.find('#bookingTabs');
@@ -23,8 +22,6 @@ $(document).ready(function () {
         const unitStatus = modal.find('#unitStatus');
 
         unitStatusInfo = modal.find('.unitStatusInfo');
-
-
         function resetFields() {
             modal.find('input[type="text"], input[type="number"]').val('');
             modal.find('select').prop('selectedIndex', 0);
@@ -175,6 +172,12 @@ $(document).ready(function () {
                 console.log("Available Times Response:", availableTimePairs);
                 startTimeDropdown.empty();
                 endTimeDropdown.empty();
+                if (availableTimePairs.error) {
+                    startTimeDropdown.append('<option>No Schedule</option>').prop('disabled', true);
+                    endTimeDropdown.append('<option>No Schedule</option>').prop('disabled', true);
+                    return;
+                }
+
 
                 if (availableTimePairs.length > 0) {
                     startTimeDropdown.append('<option>Select Start Time</option>');
@@ -345,135 +348,13 @@ $(document).ready(function () {
         }).get();
 
         console.log("Selected Slots:", selectedSlots);
-
-        // ✅ FIX: use class instead of ID
         modal.find('.selected_slots_user').val(selectedSlots.join(','));
     }
-
-    // Clear fields when modal closes
     $('.modal').on('hidden.bs.modal', function () {
         const modal = $(this);
         modal.find('input, select').val('');
         modal.find('.booking_start_time, .booking_end_time').prop('disabled', true).empty();
     });
-
-
-
-    // $('.bookAmenityForm').submit(function (event) {
-    //     event.preventDefault();
-    //     const form = this;
-    //     const formId = $(form).attr('id');
-    //     const startTime = $(form).find('[name="booking_start_time"]').val();
-    //     const endTime = $(form).find('[name="booking_end_time"]').val();
-
-    //     let selectedCount = $('.selected-slots-user').length;
-    //     $('#selectedSlotsInputUser').val(selectedCount);
-
-    //     if (!form.checkValidity()) {
-    //         form.classList.add('was-validated');
-    //         submitBtn.prop('disabled', false);
-    //         spinner.addClass('d-none');
-    //         return;
-    //     }
-
-    //     const startMoment = moment(startTime, 'h:mm A', true);
-    //     let endMoment = moment(endTime, 'h:mm A', true);
-
-    //     if (!startMoment.isValid() || !endMoment.isValid()) {
-    //         Swal.fire({
-    //             icon: 'error',
-    //             title: 'Invalid Time Format',
-    //             text: 'Please enter valid start and end times.'
-    //         });
-    //         submitBtn.prop('disabled', false);
-    //         spinner.addClass('d-none');
-    //         return;
-    //     }
-
-    //     if (endMoment.isSameOrBefore(startMoment)) {
-    //         endMoment.add(1, 'day');
-    //     }
-
-    //     if (endMoment.diff(startMoment) <= 0) {
-    //         Swal.fire({
-    //             icon: 'error',
-    //             title: 'Invalid Time Selection',
-    //             text: 'End time must be greater than start time.'
-    //         });
-    //         submitBtn.prop('disabled', false);
-    //         spinner.addClass('d-none');
-    //         return;
-    //     }
-
-
-    //     const $btn = $('.activity-submit-btn');
-    //     const originalWidth = $btn.outerWidth();
-    //     $btn
-    //         .attr('disabled', true)
-    //         .html(`<div class="spinner-border spinner-border-sm text-light"></div>`)
-    //         .css('width', originalWidth + 'px');
-
-    //     form.classList.remove('was-validated');
-    //     const formData = new FormData(form);
-
-    //     $.ajax({
-    //         url: $(form).attr('action'),
-    //         type: $(form).attr('method'),
-    //         headers: {
-    //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    //         },
-    //         data: formData,
-    //         processData: false,
-    //         contentType: false,
-    //         success: function (response) {
-    //             $(form).closest('.modal').modal('hide');
-
-    //             Swal.fire({
-    //                 icon: 'success',
-    //                 title: 'Booking Submitted!',
-    //                 text: response.message || 'Your booking has been successfully submitted.',
-    //                 timer: 2000,
-    //                 showConfirmButton: false
-    //             });
-    //             form.reset();
-    //             form.classList.remove('was-validated');
-    //             $('.selected-slots-user').removeClass('selected-slots-user');
-    //             $('#selectedSlotsInputUser').val(0);
-    //             $(form).find('select').val('');
-    //             $(form).closest('.modal').modal('hide');
-    //         },
-    //         error: function (xhr) {
-    //             let message = 'Something went wrong. Please try again.';
-
-    //             if (xhr.status === 422 && xhr.responseJSON?.errors) {
-    //                 const firstError = Object.values(xhr.responseJSON.errors)[0][0];
-    //                 message = firstError;
-    //             }
-
-    //             else if (xhr.responseJSON?.message) {
-    //                 message = xhr.responseJSON.message;
-    //             }
-    //             else if (xhr.status === 409) {
-    //                 message = xhr.responseText || message;
-    //             }
-
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: 'Booking Failed',
-    //                 text: message,
-    //                 confirmButtonText: 'OK'
-    //             });
-    //         },
-    //         complete: function () {
-    //             $btn
-    //                 .attr('disabled', false)
-    //                 .html(`<span class="btn-text">Submit</span>`)
-    //                 .css('width', '');
-    //         }
-    //     });
-
-    // });
-
 
     $('.bookAmenityForm').submit(function (event) {
         event.preventDefault();
@@ -698,140 +579,23 @@ $(document).ready(function () {
     });
 
 
-    $('#activitySelectBooking').on('change', function () {
-        const activitySelect = $(this);
-        const selectedActivityId = activitySelect.val();
-        const selectedAmenityId = activitySelect.find(':selected').data('amenity-id');
-        const dateFieldSearchFront = $('#dateFieldSearchFront');
-
-        $('.all-slot-available-front').empty();
-        $('#amenityIdBooking').val(selectedAmenityId);
-        $('#unitStatus').text('0/0').attr('class', 'mt-1 text-muted');
-
-        dateFieldSearchFront.val('').prop('disabled', false);
-        $('.searchBtn').prop('disabled', true);
-
-        if (dateFieldSearchFront[0]._flatpickr) {
-            dateFieldSearchFront[0]._flatpickr.destroy();
-        }
-
-        $.ajax({
-            url: '/fetch-blocked-dates',
-            method: 'GET',
-            data: { amenity_id: selectedAmenityId },
-            success: function (blockedDates) {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-
-                let currentMonday = new Date(today);
-                currentMonday.setDate(today.getDate() - today.getDay() + 1);
-
-                let maxBookingDate = new Date(currentMonday);
-                maxBookingDate.setDate(currentMonday.getDate() + 13);
-
-                if (today.getDay() >= 5) {
-                    maxBookingDate.setDate(maxBookingDate.getDate() + 7);
-                }
-
-                flatpickr(dateFieldSearchFront[0], {
-                    enableTime: false,
-                    dateFormat: "Y-m-d",
-                    minDate: today,
-                    maxDate: maxBookingDate,
-                    allowInput: true,
-                    altInput: true,
-                    altFormat: "F j, Y",
-                    disable: blockedDates,
-
-                    onChange: function (selectedDates, dateStr, instance) {
-                        if (dateStr) {
-                            $('.searchBtn').prop('disabled', false);
-                            $('.all-slot-available-front').empty();
-                        } else {
-                            $('.searchBtn').prop('disabled', true);
-                            $('.all-slot-available-front').empty();
-                        }
-                    }
-                });
-            },
-            error: function (xhr) {
-                console.error('Failed to fetch blocked dates:', xhr.responseText);
-            }
-        });
-    });
-
-
-    $('.SearchSlotFront').submit(function (event) {
-        event.preventDefault();
-
-        let activityId = $('#activitySelectBooking').val();
-        let amenityId = $('#activitySelectBooking option:selected').data('amenity-id');
-        let dateField = $('#dateFieldSearchFront').val();
-
-        $('#spinner').removeClass('d-none');
-
-        $.ajax({
-            url: '/fetch-all-slots-user',
-            method: 'get',
-            data: {
-                activity_id: activityId,
-                amenity_id: amenityId,
-                booking_date: dateField
-            },
-            success: function (response) {
-                $('#spinner').addClass('d-none');
-                let html = '<table class="table table-bordered"><thead><tr><th>Time</th>';
-
-                for (let i = 0; i < response.activity_space; i++) {
-                    html += `<th>Slot ${i + 1}</th>`;
-                }
-
-                html += '</tr></thead><tbody>';
-
-                response.slots.forEach(slot => {
-                    html += `<tr><td>${slot.time_range}</td>`;
-                    slot.slots.forEach(status => {
-                        let badgeClass = status === 'Available' ? 'bg-success' :
-                            status === 'Booked' ? 'bg-danger' : 'bg-warning text-dark';
-                        html += `<td><span class="badge ${badgeClass} text-uppercase">${status}</span></td>`;
-                    });
-                    html += '</tr>';
-                });
-
-                html += '</tbody></table>';
-                $('.all-slot-available-front').html(html);
-            },
-            error: function (xhr) {
-                $('#spinner').addClass('d-none');
-                alert('An error occurred while fetching the data.');
-            }
-        });
-    });
-
     $(".selectResidentType").on("change", function () {
         let select = $(this);
         let modal = select.closest(".modal");
-
-        // Get booking type
         let bookingType = modal.find("#bookingType").val();
-
-        // Reset unit status
         let unitStatus = modal.find("#unitStatus");
         unitStatus.text("0/0")
             .removeClass("text-success text-danger text-primary")
             .addClass("text-muted");
 
-        // Fields
         let activityId = modal.attr("id")?.replace("modalActivity", "");
         let submitButton = modal.find("#submitButton" + activityId);
         let name = modal.find("#name" + activityId);
         let radio = modal.find(":radio");
 
-        // Disable name and radios
         name.prop("disabled", true);
         radio.prop("disabled", true);
 
-        // ✅ Exception for 20hrs booking
         if (bookingType !== "20hrs") {
             submitButton.prop("disabled", true);
         }
@@ -899,24 +663,24 @@ $(document).ready(function () {
                     $('#cancelAmenityBookingBtn').hide();
                 } else {
                     switch (booking.booking_status) {
-                        case 1: // Confirmed
+                        case 1:
                             statusText = 'Confirmed';
                             statusClass = 'badge bg-success';
                             $('#cancelAmenityBookingBtn').show();
-                            break; // <-- stop here
+                            break; 
 
-                        case 2: // Cancelled
+                        case 2: 
                             statusText = 'Cancelled';
                             statusClass = 'badge bg-danger';
                             $('#cancelAmenityBookingBtn').hide();
                             break;
-                        case 3: // Penalty
+                        case 3:
                             statusText = 'Penalty';
                             statusClass = 'badge bg-warning';
                             $('#cancelAmenityBookingBtn').hide();
                             break;
 
-                        case 4: // No Show
+                        case 4:
                             statusText = 'No Show';
                             statusClass = 'badge bg-dark';
                             $('#cancelAmenityBookingBtn').hide();
@@ -941,49 +705,6 @@ $(document).ready(function () {
             }
         });
     });
-
-
-
-    // $(document).on('click', '#cancelAmenityBookingBtn', function () {
-    //     const bookingEl = $('#detail-transaction-no');
-    //     const bookingId = bookingEl.data('booking-id');
-
-    //     Swal.fire({
-    //         title: 'Cancel Booking',
-    //         html: 'Are you sure you want to cancel this booking?',
-    //         icon: 'warning',
-    //         showCancelButton: true,
-    //         confirmButtonColor: '#d33',
-    //         cancelButtonColor: '#3085d6',
-    //         confirmButtonText: 'Yes, cancel it',
-    //         cancelButtonText: 'No, keep it'
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             // Send cancel request to backend
-    //             $.ajax({
-    //                 url: `/resident/activity-booking/cancel/${bookingId}`,
-    //                 method: 'POST',
-    //                 data: {
-    //                     _token: $('meta[name="csrf-token"]').attr('content'),
-    //                     confirm: 1 // always confirm
-    //                 },
-    //                 success: function (res) {
-    //                     if (!res.success) {
-    //                         Swal.fire('Error', res.message || 'Failed to cancel booking.', 'error');
-    //                         return;
-    //                     }
-    //                     Swal.fire('Cancelled!', res.message, 'success').then(() => {
-    //                         $('#residentActivityBookingDetailsModal').modal('hide');
-    //                         if (typeof refreshBookingTable === 'function') refreshBookingTable();
-    //                     });
-    //                 },
-    //                 error: function () {
-    //                     Swal.fire('Error', 'Something went wrong while cancelling.', 'error');
-    //                 }
-    //             });
-    //         }
-    //     });
-    // });
 
     $(document).on('click', '#cancelAmenityBookingBtn', function () {
         const bookingEl = $('#detail-transaction-no');
@@ -1122,14 +843,15 @@ $(document).ready(function () {
                     altInput: true,
                     altFormat: "F j, Y",
                     disable: blockedDates,
+                    disableMobile: true,
 
                     onChange: function (selectedDates, dateStr, instance) {
                         if (dateStr) {
                             $('.searchBtn').prop('disabled', false);
-                            $('.all-slot-available-admin').empty();
+                            $('.all-slot-available-user').empty();
                         } else {
                             $('.searchBtn').prop('disabled', true);
-                            $('.all-slot-available-admin').empty();
+                            $('.all-slot-available-user').empty();
                         }
                     }
                 });
@@ -1165,13 +887,23 @@ $(document).ready(function () {
             },
             success: function (response) {
                 $('#spinner').addClass('d-none');
+
+                if (response.error) {
+                    $('.all-slot-available-user').html(
+                        `<div class="alert alert-warning text-center mb-0">
+                No Schedule for the selected date. Please choose another date.
+            </div>`
+                    );
+                    return;
+                }
+
                 let html = '<table class="table table-bordered"><thead><tr><th>Time</th>';
 
                 for (let i = 0; i < response.activity_space; i++) {
                     html += `<th>Slot ${i + 1}</th>`;
                 }
 
-                html += '</tr></thead><tbody>';
+                html += '</tr></thead><tbody>'; 
 
                 response.slots.forEach(slot => {
                     html += `<tr><td>${slot.time_range}</td>`;
@@ -1204,8 +936,6 @@ $(document).ready(function () {
                     .html(`<i class="fa-solid fa-search me-1"></i><span> Search</span>`)
                     .css('width', '');
             }
-
-
         });
     });
 

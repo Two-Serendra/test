@@ -13,7 +13,8 @@
                         <div class="col-4">
                             <label for="activitySelectBookingSearchAdmin" class="form-label">Select Activity *</label>
                             <input type="hidden" id="amenityIdBooking" name="amenity_id">
-                            <select class="form-select" id="activitySelectBookingSearchAdmin" name="activity_id" required>
+                            <select class="form-select" id="activitySelectBookingSearchAdmin" name="activity_id"
+                                required>
                                 <option value="" disabled selected>Activity</option>
                                 @foreach($activities as $activity)
                                     <option value="{{ $activity->id }}" data-amenity-id="{{ $activity->amenity_id }}"
@@ -23,7 +24,7 @@
                                         {{ strtoupper($activity->activity_name) }}
                                     </option>
                                 @endforeach
-                            </select> 
+                            </select>
                             <div class="invalid-feedback">Please select an amenity</div>
                         </div>
 
@@ -39,8 +40,10 @@
                         </div>
 
                         <div class="col-4 d-flex justify-content-start align-items-end">
-                            <button type="submit" form="SearchSlotAdmin" class="btn btn-primary searchBtn">
-                                <i class="fa-solid fa-search me-1"></i><span> Search</span>
+                            <button type="submit" form="SearchSlotAdmin"
+                                class="btn btn-primary searchBtn slot-checking-submit-btn-admin"
+                                style="min-width: 100px; height: 38px;">
+                                <i class="fa-solid fa-search me-1"></i><span>Search</span>
                                 <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"
                                     id="spinner"></span>
                             </button>

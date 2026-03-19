@@ -634,8 +634,16 @@ class ActivitiesController extends Controller
             ->where('day', $day)
             ->first();
 
-        if (!$schedule) {
-            return response()->json(['error' => 'No schedule for this activity on selected day'], 404);
+        if (
+            !$schedule ||
+            is_null($schedule->start_time) ||
+            is_null($schedule->end_time) ||
+            $schedule->start_time === '00:00:00' ||
+            $schedule->end_time === '00:00:00'
+        ) {
+            return response()->json([
+                'error' => 'No Schedule'
+            ]);
         }
 
         $start = Carbon::parse($date . ' ' . $schedule->start_time);
@@ -658,7 +666,7 @@ class ActivitiesController extends Controller
         while ($start < $end) {
             $slotStart = $start->copy();
             $slotEnd = $slotStart->copy()->addHour();
- 
+
             $row = [
                 'time_range' => $slotStart->format('g:i A') . ' - ' . $slotEnd->format('g:i A'),
                 'slots' => []
@@ -884,9 +892,20 @@ class ActivitiesController extends Controller
             ->where('day', $dayOfWeek)
             ->first();
 
+        // if (
+        //     !$schedule || !$schedule->start_time || !$schedule->end_time ||
+        //     $schedule->start_time === '00:00:00' || $schedule->end_time === '00:00:00'
+        // ) {
+        //     return response()->json(['error' => 'No Schedule']);
+        // }
+
+
         if (
-            !$schedule || !$schedule->start_time || !$schedule->end_time ||
-            $schedule->start_time === '00:00:00' || $schedule->end_time === '00:00:00'
+            !$schedule ||
+            is_null($schedule->start_time) ||
+            is_null($schedule->end_time) ||
+            $schedule->start_time === '00:00:00' ||
+            $schedule->end_time === '00:00:00'
         ) {
             return response()->json(['error' => 'No Schedule']);
         }

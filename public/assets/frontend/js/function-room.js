@@ -11,7 +11,7 @@ $(document).ready(function () {
         fontSizes: [], // disables font size dropdown
         dialogsInBody: true
     });
-    
+
     flatpickr("#functionRoomBookingDate", {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(6)
@@ -161,6 +161,14 @@ $(document).ready(function () {
 
 
     let supplierIndex = 1;
+
+    $(document).ready(function () {
+        const $select = $('#residentSelect');
+        if ($select.find('option').length === 2 && !$select.val()) {
+            // Only one real option exists (plus placeholder)
+            $select.prop('selectedIndex', 1);
+        }
+    });
 
     $('#hasSuppliers').on('change', function () {
         if ($(this).is(':checked')) {

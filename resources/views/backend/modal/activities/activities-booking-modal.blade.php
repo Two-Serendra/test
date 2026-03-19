@@ -58,8 +58,12 @@
                             <div class="mb-3 d-flex align-items-end gap-2">
                                 <div class="flex-grow-1">
                                     <label for="unitNumber" class="form-label">Unit *</label>
-                                    <input type="text" class="form-control" id="unitNumber" name="unit" required>
-                                    <div class="invalid-feedback">Required</div>
+                                    <input type="text" class="form-control" id="unitNumber" name="unit" oninput="
+                                this.value = this.value
+                                    .toUpperCase()
+                                    .replace(/[^0-9A-I]/g,'');
+                                " required>
+                                    <div class="invalid-feedback">Format: 304A</div>
                                 </div>
                                 <button type="button" class="btn btn-outline-secondary checkUnit">Check</button>
 

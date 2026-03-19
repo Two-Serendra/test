@@ -434,7 +434,13 @@ class FrontendActivityBookingController extends Controller
             ->where('day', $dayOfWeek)
             ->first();
 
-        if (!$schedule || !$schedule->start_time || !$schedule->end_time) {
+        if (
+            !$schedule ||
+            is_null($schedule->start_time) ||
+            is_null($schedule->end_time) ||
+            $schedule->start_time === '00:00:00' ||
+            $schedule->end_time === '00:00:00'
+        ) {
             return response()->json(['error' => 'No Schedule']);
         }
 
@@ -447,7 +453,7 @@ class FrontendActivityBookingController extends Controller
         $activitySpace = $activity->activity_space;
         $amenityId = $activity->amenity_id;
 
-        // Fetch booked slots under the same amenity
+
         $bookedSlots = ActivityBooking::with('activity:id,activity_space,amenity_id')
             ->where('booking_date', $date)
             ->where('booking_status', 1)
@@ -456,7 +462,7 @@ class FrontendActivityBookingController extends Controller
             })
             ->get();
 
-        // Fetch blocked slots under the same amenity
+
         $blockedSlots = ActivityBlocking::whereHas('activity', function ($q) use ($amenityId) {
             $q->where('amenity_id', $amenityId);
         })->where(function ($q) use ($dayOfWeek) {
@@ -467,7 +473,6 @@ class FrontendActivityBookingController extends Controller
 
         $occupiedSlots = [];
 
-        // Map booked slots
         foreach ($bookedSlots as $booking) {
             $bookingStart = Carbon::parse("{$date} {$booking->booking_start_time}");
             $bookingEnd = Carbon::parse("{$date} {$booking->booking_end_time}");
@@ -491,7 +496,6 @@ class FrontendActivityBookingController extends Controller
             }
         }
 
-        // Map blocked slots
         foreach ($blockedSlots as $block) {
             $blockStart = Carbon::parse("{$date} {$block->start_time}");
             $blockEnd = Carbon::parse("{$date} {$block->end_time}");
@@ -505,7 +509,6 @@ class FrontendActivityBookingController extends Controller
             }
         }
 
-        // Determine available time pairs
         $availableTimePairs = [];
         $currentSlotStart = $start->copy();
 
@@ -535,19 +538,16 @@ class FrontendActivityBookingController extends Controller
                 'blocked' => false,
             ];
 
-            // Skip blocked slots immediately (applies across all activities under the same amenity)
             if (!empty($existing['blocked'])) {
                 $currentSlotStart->addHour();
                 continue;
             }
 
-            // Skip if conflict with other activity_space
             if ($existing['count'] > 0 && $existing['activity_space'] != $activitySpace) {
                 $currentSlotStart->addHour();
                 continue;
             }
 
-            // Add to available times
             if ($existing['count'] < $activitySpace) {
                 $availableTimePairs[] = [
                     'start' => $currentSlotStart->format('h:i A'),
@@ -1003,7 +1003,7 @@ class FrontendActivityBookingController extends Controller
             ], 500);
         }
     }
-    
+
     public function showAmenityBookingDetails($id)
     {
         $booking = ActivityBooking::with('user', 'activity')->findOrFail($id);
@@ -1029,8 +1029,16 @@ class FrontendActivityBookingController extends Controller
             ->where('day', $day)
             ->first();
 
-        if (!$schedule) {
-            return response()->json(['error' => 'No schedule for this activity on selected day'], 404);
+        if (
+            !$schedule ||
+            is_null($schedule->start_time) ||
+            is_null($schedule->end_time) ||
+            $schedule->start_time === '00:00:00' ||
+            $schedule->end_time === '00:00:00'
+        ) {
+            return response()->json([
+                'error' => 'No Schedule'
+            ]);
         }
 
         $start = Carbon::parse($date . ' ' . $schedule->start_time);

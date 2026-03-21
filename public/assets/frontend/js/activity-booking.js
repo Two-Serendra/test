@@ -1,4 +1,13 @@
 $(document).ready(function () {
+    $(document).on("change", "#residentSelect", function () {
+        let modal = $(this).closest(".modal");
+        checkUnitAvailability(modal);
+    });
+
+    $(document).on("change", "#dateField", function () {
+        let modal = $(this).closest(".modal");
+        checkUnitAvailability(modal);
+    });
 
     $('.AddNewBooking').on('click', function () {
         showLoading();
@@ -538,11 +547,86 @@ $(document).ready(function () {
         }
     });
 
-    $(".checkUnit").on("click", function () {
-        let button = $(this);
-        let modal = button.closest(".modal");
+    // $(".checkUnit").on("click", function () {
+    //     let button = $(this);
+    //     let modal = button.closest(".modal");
+    //     let activityId = modal.attr("id").replace("modalActivity", "");
+    //     // let unitNumber = modal.find(".selectResidentType option:selected").data('unit')?.toString().trim();
+    //     let selectResidentType = modal.find("#residentSelect");
+    //     let unitNumber = selectResidentType.find("option:selected").data('unit')?.toString().trim();
+
+    //     let submitButton = modal.find("#submitButton" + activityId);
+    //     let checkUnit = modal.find(".checkUnit");
+    //     let selectedDate = modal.find("#dateField").val()?.trim();
+    //     let name = modal.find("#name" + activityId);
+    //     let contact_number = modal.find("#contact_number" + activityId);
+    //     let radio = modal.find(":radio");
+    //     let bookingType = modal.find("#bookingType").val();
+
+    //     if (unitNumber === "") {
+    //         Swal.fire({
+    //             icon: "warning",
+    //             title: "Missing Information",
+    //             text: "Please enter a unit number.",
+    //         });
+    //         return;
+    //     }
+
+    //     $.ajax({
+    //         url: '/check-unit-frontend',
+    //         type: "GET",
+    //         data: {
+    //             unit: unitNumber,
+    //             activity_id: activityId,
+    //             dateField: selectedDate
+    //         },
+    //         success: function (response) {
+    //             let unitStatus = modal.find("#unitStatus");
+
+    //             if (response.success) {
+    //                 let count = response.count;
+    //                 let maxBookings = response.maxBookings;
+    //                 let statusText = `${count}/${maxBookings}`;
+    //                 unitStatus.removeClass("text-muted text-danger text-success text-primary");
+    //                 if (bookingType === "Advanced Booking") {
+    //                     if (count < maxBookings) {
+    //                         unitStatus.addClass("text-success").text(statusText);
+    //                         enableFields();
+    //                     } else {
+    //                         unitStatus.addClass("text-danger").text(statusText + " (Max)");
+    //                         disableFields();
+    //                     }
+    //                 }
+
+    //             } else {
+    //                 Swal.fire({
+    //                     icon: "error",
+    //                     title: "Error",
+    //                     text: response.message,
+    //                 });
+    //             }
+    //         },
+    //         error: function () {
+    //             Swal.fire({
+    //                 icon: "error",
+    //                 title: "Server Error",
+    //                 text: "Something went wrong. Please try again later.",
+    //             });
+    //         }
+    //     });
+    //     function enableFields() {
+    //         submitButton.prop('disabled', false);
+    //         checkUnit.prop('disabled', false);
+    //         selectResidentType.prop('disabled', false);
+    //         name.prop('disabled', false);
+    //         // contact_number.prop('disabled', false);
+    //         radio.prop('disabled', false);
+    //     }
+    // });
+
+
+    function checkUnitAvailability(modal) {
         let activityId = modal.attr("id").replace("modalActivity", "");
-        // let unitNumber = modal.find(".selectResidentType option:selected").data('unit')?.toString().trim();
         let selectResidentType = modal.find("#residentSelect");
         let unitNumber = selectResidentType.find("option:selected").data('unit')?.toString().trim();
 
@@ -554,14 +638,7 @@ $(document).ready(function () {
         let radio = modal.find(":radio");
         let bookingType = modal.find("#bookingType").val();
 
-        if (unitNumber === "") {
-            Swal.fire({
-                icon: "warning",
-                title: "Missing Information",
-                text: "Please enter a unit number.",
-            });
-            return;
-        }
+        if (!unitNumber) return; // silently ignore instead of popup on change
 
         $.ajax({
             url: '/check-unit-frontend',
@@ -578,7 +655,9 @@ $(document).ready(function () {
                     let count = response.count;
                     let maxBookings = response.maxBookings;
                     let statusText = `${count}/${maxBookings}`;
+
                     unitStatus.removeClass("text-muted text-danger text-success text-primary");
+
                     if (bookingType === "Advanced Booking") {
                         if (count < maxBookings) {
                             unitStatus.addClass("text-success").text(statusText);
@@ -586,6 +665,11 @@ $(document).ready(function () {
                         } else {
                             unitStatus.addClass("text-danger").text(statusText + " (Max)");
                             disableFields();
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Limit Reached',
+                                text: 'This unit has already reached the maximum number of bookings for this date.'
+                            });
                         }
                     }
 
@@ -605,15 +689,20 @@ $(document).ready(function () {
                 });
             }
         });
+
         function enableFields() {
             submitButton.prop('disabled', false);
             checkUnit.prop('disabled', false);
             selectResidentType.prop('disabled', false);
             name.prop('disabled', false);
-            // contact_number.prop('disabled', false);
             radio.prop('disabled', false);
         }
-    });
+
+        function disableFields() {
+            submitButton.prop('disabled', true);
+            radio.prop('disabled', true);
+        }
+    }
 
 
     $(".selectResidentType").on("change", function () {

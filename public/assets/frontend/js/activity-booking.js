@@ -668,7 +668,7 @@ $(document).ready(function () {
                             Swal.fire({
                                 icon: 'warning',
                                 title: 'Limit Reached',
-                                text: 'This unit has already reached the maximum number of bookings for this date.'
+                                text: 'This unit has already reached the maximum number of bookings for this month.'
                             });
                         }
                     }

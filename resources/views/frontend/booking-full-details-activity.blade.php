@@ -20,7 +20,7 @@
         <div class="mb-3">
             <a href="{{ url()->previous() ?? route('booking.list') }}"
                 class="text-decoration-none text-primary fw-semibold">
-                ← Back to list
+                ← Back
             </a>
         </div>
 

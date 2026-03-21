@@ -404,6 +404,37 @@ $(document).ready(function () {
             return;
         }
 
+        const bookingDate = $form.find('[name="booking_date"]').val();
+
+        // Combine date + time
+        const bookingDateTime = moment(
+            bookingDate + ' ' + startTime,
+            'YYYY-MM-DD h:mm A'
+        );
+
+        const now = moment();
+        const diffHours = bookingDateTime.diff(now, 'hours', true);
+
+        // ⚠️ Check if within 12 hours
+        if (diffHours <= 12) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Confirm Booking',
+                text: 'This booking is made within 12 hours and can no longer be cancelled for free. Proceed?',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, proceed',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    submitBooking(form, $form, modal);
+                }
+            });
+
+            return; 
+        }
+    });
+
+    function submitBooking(form, $form, modal) {
         const $btn = modal.find('.activity-submit-btn');
         const originalWidth = $btn.outerWidth();
 
@@ -416,7 +447,6 @@ $(document).ready(function () {
         $form.find('.activity_id_input').val(activityId);
 
         const formData = new FormData(form);
-
 
         $.ajax({
             url: $form.attr('action'),
@@ -438,9 +468,9 @@ $(document).ready(function () {
                     timer: 2000,
                     showConfirmButton: false
                 });
+
                 form.reset();
                 form.classList.remove('was-validated');
-
             },
 
             error: function (xhr) {
@@ -468,7 +498,7 @@ $(document).ready(function () {
                     .css('width', '');
             }
         });
-    });
+    }
 
 
     $("#customUserDropdownBtn").on("click", function (e) {
@@ -667,9 +697,9 @@ $(document).ready(function () {
                             statusText = 'Confirmed';
                             statusClass = 'badge bg-success';
                             $('#cancelAmenityBookingBtn').show();
-                            break; 
+                            break;
 
-                        case 2: 
+                        case 2:
                             statusText = 'Cancelled';
                             statusClass = 'badge bg-danger';
                             $('#cancelAmenityBookingBtn').hide();
@@ -903,7 +933,7 @@ $(document).ready(function () {
                     html += `<th>Slot ${i + 1}</th>`;
                 }
 
-                html += '</tr></thead><tbody>'; 
+                html += '</tr></thead><tbody>';
 
                 response.slots.forEach(slot => {
                     html += `<tr><td>${slot.time_range}</td>`;

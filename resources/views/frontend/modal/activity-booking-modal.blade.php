@@ -80,8 +80,8 @@
                                         @endforeach
                                     </select>
 
-                                    <button type="button"
-                                        class="btn btn-secondary customBtn checkUnit text-white">Check</button>
+                                    <!-- <button type="button"
+                                        class="btn btn-secondary customBtn checkUnit text-white">Check</button> -->
                                 </div>
                                 <div class="invalid-feedback">Required</div>
                             </div>

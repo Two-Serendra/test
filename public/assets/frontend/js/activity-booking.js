@@ -406,7 +406,6 @@ $(document).ready(function () {
 
         const bookingDate = $form.find('[name="booking_date"]').val();
 
-        // Combine date + time
         const bookingDateTime = moment(
             bookingDate + ' ' + startTime,
             'YYYY-MM-DD h:mm A'
@@ -415,23 +414,31 @@ $(document).ready(function () {
         const now = moment();
         const diffHours = bookingDateTime.diff(now, 'hours', true);
 
-        // ⚠️ Check if within 12 hours
-        if (diffHours <= 12) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Confirm Booking',
-                text: 'This booking is made within 12 hours and can no longer be cancelled for free. Proceed?',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, proceed',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    submitBooking(form, $form, modal);
-                }
-            });
+        let confirmText = '';
+        let confirmIcon = 'question';
 
-            return; 
+        if (diffHours <= 12) {
+            confirmText = 'This booking is made within 12 hours and can no longer be cancelled for free. Proceed?';
+            confirmIcon = 'warning';
+        } else {
+            confirmText = 'Are you sure you want to submit this booking?';
+            confirmIcon = 'question';
         }
+
+        Swal.fire({
+            icon: confirmIcon,
+            title: 'Confirm Booking',
+            text: confirmText,
+            showCancelButton: true,
+            confirmButtonText: 'Yes, proceed',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                submitBooking(form, $form, modal);
+            }
+        });
+
+        return;
     });
 
     function submitBooking(form, $form, modal) {

@@ -892,14 +892,6 @@ class ActivitiesController extends Controller
             ->where('day', $dayOfWeek)
             ->first();
 
-        // if (
-        //     !$schedule || !$schedule->start_time || !$schedule->end_time ||
-        //     $schedule->start_time === '00:00:00' || $schedule->end_time === '00:00:00'
-        // ) {
-        //     return response()->json(['error' => 'No Schedule']);
-        // }
-
-
         if (
             !$schedule ||
             is_null($schedule->start_time) ||
@@ -977,9 +969,15 @@ class ActivitiesController extends Controller
 
 
         $availableTimePairs = [];
-        $currentSlotStart = clone $start;
+        $now = Carbon::now();
 
+        $currentSlotStart = clone $start;
         while ($currentSlotStart < $end) {
+            if ($date == $now->toDateString() && $currentSlotStart->lessThanOrEqualTo($now)) {
+                $currentSlotStart->addHour();
+                continue;
+            }
+
             $currentSlotEnd = (clone $currentSlotStart)->addHour();
             $slotKey = $currentSlotStart->format('H:i');
 
@@ -1009,99 +1007,6 @@ class ActivitiesController extends Controller
 
         return response()->json($availableTimePairs);
     }
-
-    // public function fetchEndTimes(Request $request)
-    // {
-    //     $activityId = $request->input('activity_id');
-    //     $date = $request->input('booking_date');
-    //     $startTime = $request->input('start_time');
-
-    //     \Log::info("ADMIN - Fetching end times for Activity ID: $activityId, Date: $date, Start Time: $startTime");
-
-    //     $activity = Activity::find($activityId);
-    //     if (!$activity) {
-    //         return response()->json(['error' => 'Activity not found'], 404);
-    //     }
-
-    //     $dayOfWeek = Carbon::parse($date)->format('l');
-    //     $schedule = ActivitySchedule::where('activity_id', $activityId)
-    //         ->where('day', $dayOfWeek)
-    //         ->first();
-
-    //     if (!$schedule || is_null($schedule->start_time) || is_null($schedule->end_time)) {
-    //         return response()->json(['error' => 'No Schedule']);
-    //     }
-
-    //     $start = Carbon::parse("{$date} {$startTime}");
-    //     $end = Carbon::parse("{$date} {$schedule->end_time}");
-
-    //     if ($end->lessThanOrEqualTo(Carbon::parse("{$date} {$schedule->start_time}"))) {
-    //         $end->addDay();
-    //     }
-
-    //     $activitySpace = $activity->activity_space;
-    //     $amenityId = $activity->amenity_id;
-
-    //     $bookedSlots = ActivityBooking::whereHas('activity', function ($query) use ($amenityId) {
-    //         $query->where('amenity_id', $amenityId);
-    //     })->where('booking_date', $date)
-    //         ->where('booking_status', 1)
-    //         ->get(['activity_id', 'booking_start_time', 'booking_end_time']);
-
-    //     $occupiedSlots = [];
-    //     foreach ($bookedSlots as $booking) {
-    //         $bookingStart = Carbon::parse("{$date} {$booking->booking_start_time}");
-    //         $bookingEnd = Carbon::parse("{$date} {$booking->booking_end_time}");
-
-    //         if ($bookingEnd->lessThanOrEqualTo($bookingStart)) {
-    //             $bookingEnd->addDay();
-    //         }
-
-    //         $bookingActivitySpace = Activity::find($booking->activity_id)->activity_space;
-
-    //         while ($bookingStart < $bookingEnd) {
-    //             $slotKey = $bookingStart->format('H:i');
-
-    //             if (!isset($occupiedSlots[$slotKey])) {
-    //                 $occupiedSlots[$slotKey] = [
-    //                     'count' => 0,
-    //                     'activity_space' => null,
-    //                 ];
-    //             }
-
-    //             $occupiedSlots[$slotKey]['count']++;
-    //             $occupiedSlots[$slotKey]['activity_space'] = $bookingActivitySpace;
-
-    //             $bookingStart->addHour();
-    //         }
-    //     }
-
-    //     $availableEndTimes = [];
-    //     $currentSlotStart = clone $start;
-
-    //     while ($currentSlotStart < $end) {
-    //         $currentSlotEnd = (clone $currentSlotStart)->addHour();
-    //         $slotKey = $currentSlotStart->format('H:i');
-
-    //         $existingBooking = $occupiedSlots[$slotKey] ?? ['count' => 0, 'activity_space' => null];
-
-    //         if ($existingBooking['count'] > 0 && $existingBooking['activity_space'] != $activitySpace) {
-    //             break;
-    //         }
-
-    //         if ($existingBooking['count'] >= $activitySpace) {
-    //             break;
-    //         }
-
-    //         $availableEndTimes[] = $currentSlotEnd->format('h:i A');
-    //         $currentSlotStart->addHour();
-    //     }
-
-    //     return response()->json([
-    //         'availableEndTimes' => $availableEndTimes,
-    //     ]);
-    // }
-
 
     public function fetchEndTimes(Request $request)
     {
@@ -1138,7 +1043,6 @@ class ActivitiesController extends Controller
         $activitySpace = $activity->activity_space;
         $amenityId = $activity->amenity_id;
 
-        // Fetch booked slots under the same amenity
         $bookedSlots = ActivityBooking::with('activity:id,activity_space,amenity_id')
             ->whereHas('activity', function ($q) use ($amenityId) {
                 $q->where('amenity_id', $amenityId);
@@ -1147,7 +1051,6 @@ class ActivitiesController extends Controller
             ->where('booking_status', 1)
             ->get(['activity_id', 'booking_start_time', 'booking_end_time']);
 
-        // Fetch blocked slots under the same amenity
         $blockedSlots = ActivityBlocking::whereHas('activity', function ($q) use ($amenityId) {
             $q->where('amenity_id', $amenityId);
         })->where(function ($query) use ($dayOfWeek) {
@@ -1156,7 +1059,6 @@ class ActivitiesController extends Controller
             });
         })->get();
 
-        // Map occupied slots
         $occupiedSlots = [];
 
         foreach ($bookedSlots as $booking) {
@@ -1183,7 +1085,6 @@ class ActivitiesController extends Controller
             }
         }
 
-        // Mark blocked slots
         foreach ($blockedSlots as $block) {
             $blockStart = Carbon::parse("{$date} {$block->start_time}");
             $blockEnd = Carbon::parse("{$date} {$block->end_time}");
@@ -1197,30 +1098,24 @@ class ActivitiesController extends Controller
             }
         }
 
-        // Determine available end times
+
         $availableEndTimes = [];
         $currentSlotStart = clone $start;
+        $maxHours = 2;
+        $addedHours = 0;
 
-        while ($currentSlotStart < $end) {
+        while ($currentSlotStart < $end && $addedHours < $maxHours) {
             $currentSlotEnd = (clone $currentSlotStart)->addHour();
             $slotKey = $currentSlotStart->format('H:i');
 
-            $existing = $occupiedSlots[$slotKey] ?? [
-                'count' => 0,
-                'activity_space' => null,
-                'blocked' => false,
-            ];
-
-
-            if (!empty($existing['blocked']))
+            $existingBooking = $occupiedSlots[$slotKey] ?? ['count' => 0, 'activity_space' => null];
+            if ($existingBooking['count'] > 0 && $existingBooking['activity_space'] != $activitySpace)
                 break;
-            if ($existing['count'] > 0 && $existing['activity_space'] != $activitySpace)
-                break;
-
-            if ($existing['count'] >= $activitySpace)
+            if ($existingBooking['count'] >= $activitySpace)
                 break;
 
             $availableEndTimes[] = $currentSlotEnd->format('h:i A');
+            $addedHours++;
             $currentSlotStart->addHour();
         }
 
@@ -1228,6 +1123,7 @@ class ActivitiesController extends Controller
             'availableEndTimes' => $availableEndTimes,
         ]);
     }
+
     public function fetchAvailableSlots(Request $request)
     {
         $activityId = $request->input('activity_id');
@@ -1419,7 +1315,7 @@ class ActivitiesController extends Controller
     {
         $currentDate = Carbon::today();
 
-        $bookings = ActivityBooking::with(['activity', 'user'])
+        $bookings = ActivityBooking::with(['activity', 'user', 'cancelledBy', 'waivedBy'])
             ->whereDate('booking_date', '>=', $currentDate)
             ->latest()
             ->paginate(10);
@@ -1427,10 +1323,13 @@ class ActivitiesController extends Controller
         $bookings->getCollection()->transform(function ($booking) {
             return [
                 'id' => $booking->id,
-                'lobby' => $booking->lobby,
                 'transaction_no' => $booking->transaction_no,
                 'activity' => $booking->activity,
-                'user' => $booking->user, // IMPORTANT
+                'user' => $booking->user,
+                'created_by' => $booking->user?->name ?? 'Admin',
+                'cancelled_by' => $booking->cancelledBy?->name ?? null, // snake_case
+                'cancelled_at' => $booking->cancelled_at ? Carbon::parse($booking->cancelled_at)->format('Y-m-d H:i:s') : null,
+                'waived_by' => $booking->waivedBy?->name ?? null,       // snake_case
                 'unit' => $booking->unit,
                 'resident_type' => $booking->resident_type,
                 'name' => $booking->name,
@@ -1439,6 +1338,7 @@ class ActivitiesController extends Controller
                 'booking_status' => $booking->booking_status,
                 'booking_date' => $booking->booking_date,
                 'penalty_amount' => $booking->penalty_amount ?? 0,
+                'penalty_waived' => $booking->penalty_waived,
                 'booking_start_time' => Carbon::parse($booking->booking_start_time)->format('h:i A'),
                 'booking_end_time' => Carbon::parse($booking->booking_end_time)->format('h:i A'),
                 'created_at' => Carbon::parse($booking->created_at)->format('Y-m-d H:i:s'),
@@ -1480,6 +1380,70 @@ class ActivitiesController extends Controller
         ]);
     }
 
+    // public function cancelBooking(ActivityBooking $booking, Request $request)
+    // {
+    //     try {
+
+    //         $booking->load('activity');
+
+    //         if (!$booking->canCancel()) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Booking cannot be cancelled.'
+    //             ], 400);
+    //         }
+
+    //         $withPenalty = $booking->isWithin12Hours();
+    //         if (!$request->has('confirm') && $withPenalty) {
+    //             return response()->json([
+    //                 'success' => true,
+    //                 'requires_confirmation' => true,
+    //                 'message' => " Cancelling within 12 hours will incur a ₱1000 penalty."
+    //             ]);
+    //         }
+
+    //         $transactionNo = $booking->transaction_no;
+
+    //         $bookings = ActivityBooking::where('transaction_no', $transactionNo)->get();
+
+    //         foreach ($bookings as $b) {
+
+    //             if ($withPenalty) {
+    //                 $b->applyCancellationPenalty();
+    //                 $b->booking_status = 3;
+    //             } else {
+    //                 $b->booking_status = 2; 
+    //             }
+
+    //             $b->cancelled_at = now();
+    //             $b->cancelled_by = auth()->id();
+    //             $b->save();
+    //         }
+
+    //         $penaltyAmount = $booking->penalty_amount ?? 0;
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'withPenalty' => $withPenalty,
+    //             'penaltyAmount' => $penaltyAmount,
+    //             'message' => $withPenalty
+    //                 ? "Booking cancelled. ₱{$penaltyAmount} penalty applied."
+    //                 : "Booking has been cancelled successfully."
+    //         ]);
+
+    //     } catch (\Exception $e) {
+
+    //         \Log::error('Admin Cancel Booking Error', [
+    //             'error' => $e->getMessage()
+    //         ]);
+
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Failed to cancel booking.'
+    //         ], 500);
+    //     }
+    // }
+
     public function cancelBooking(ActivityBooking $booking, Request $request)
     {
         try {
@@ -1494,43 +1458,59 @@ class ActivitiesController extends Controller
             }
 
             $withPenalty = $booking->isWithin12Hours();
+            $waivePenalty = $request->input('waive_penalty', false); // 👈 NEW
 
-            // Step 1: ask confirmation
-            if (!$request->has('confirm') && $withPenalty) {
+            if (!$request->has('confirm') && $withPenalty && !$waivePenalty) {
                 return response()->json([
                     'success' => true,
                     'requires_confirmation' => true,
-                    'message' => " Cancelling within 12 hours will incur a ₱1000 penalty."
+                    'message' => "Cancelling within 12 hours will incur a ₱1000 penalty."
                 ]);
             }
 
             $transactionNo = $booking->transaction_no;
-
             $bookings = ActivityBooking::where('transaction_no', $transactionNo)->get();
 
             foreach ($bookings as $b) {
 
-                if ($withPenalty) {
-                    $b->applyCancellationPenalty();
-                    $b->booking_status = 3; // cancelled with penalty
+                if ($withPenalty && !$waivePenalty) {
+
+                    $b->applyCancellationPenalty(); // sets penalty_amount
+                    $b->booking_status = 3;
+                    $b->penalty_waived = false;
+                    $b->waived_by = null;
+
+                } elseif ($withPenalty && $waivePenalty) {
+
+                    $b->applyCancellationPenalty(); // 👈 STILL APPLY (IMPORTANT)
+
+                    $b->booking_status = 2; // still cancelled
+                    $b->penalty_waived = true;
+                    $b->waived_by = auth()->id(); // 👈 TRACK WHO WAIVED
+
                 } else {
-                    $b->booking_status = 2; // cancelled normally
+
+                    $b->booking_status = 2;
+                    $b->penalty_waived = false;
+                    $b->waived_by = null;
                 }
 
                 $b->cancelled_at = now();
                 $b->cancelled_by = auth()->id();
+                $b->cancelled_within_12hrs = $withPenalty ? 1 : 0;
+
                 $b->save();
             }
 
-            $penaltyAmount = $booking->penalty_amount ?? 0;
-
             return response()->json([
                 'success' => true,
-                'withPenalty' => $withPenalty,
-                'penaltyAmount' => $penaltyAmount,
-                'message' => $withPenalty
-                    ? "Booking cancelled. ₱{$penaltyAmount} penalty applied."
-                    : "Booking has been cancelled successfully."
+                'withPenalty' => $withPenalty && !$waivePenalty,
+                'waived' => $waivePenalty,
+                'message' => ($withPenalty && !$waivePenalty)
+                    ? "Booking cancelled. Penalty applied."
+                    : ($waivePenalty
+                        ? "Booking cancelled. Penalty waived."
+                        : "Booking cancelled successfully.")
             ]);
 
         } catch (\Exception $e) {
@@ -1545,6 +1525,7 @@ class ActivitiesController extends Controller
             ], 500);
         }
     }
+
 
     public function History(Request $request)
     {

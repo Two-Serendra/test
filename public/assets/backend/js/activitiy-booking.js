@@ -935,7 +935,7 @@ function refreshTableBookings() {
             if (bookings.length === 0) {
                 tableBody.append(`
                     <tr>
-                        <td colspan="18" class="text-center">No Records Found</td>
+                       <td colspan="19" class="text-center">No Records Found</td>
                     </tr>
                 `);
                 return;
@@ -1029,13 +1029,30 @@ function refreshTableBookings() {
     `;
                 }
                 actionButtons += `</div>`;
+                // Penalty Waived Badge
 
-                // Penalty formatting
-                var penaltyHtml = booking.penalty_amount && booking.penalty_amount > 0
+                var penaltyAmountHtml = booking.penalty_amount && booking.penalty_amount > 0
                     ? `<span class="text-danger fw-semibold">₱${parseFloat(booking.penalty_amount).toFixed(2)}</span>`
                     : `₱0.00`;
 
-                // Build row exactly like Blade
+                var penaltyWaivedHtml = booking.penalty_waived
+                    ? `<span class="badge bg-primary">YES</span>`
+                    : `<span class="badge bg-danger">NO</span>`;
+
+                // Waived By
+                var waivedByHtml = booking.waived_by
+                    ? booking.waived_by.toUpperCase()
+                    : 'N/A';
+
+                // Cancelled By
+                var cancelledByHtml = booking.cancelled_by
+                    ? booking.cancelled_by.toUpperCase()
+                    : 'N/A';
+
+                // Cancelled At
+                var cancelledAtHtml = booking.cancelled_at || 'N/A';
+
+                var createdByHtml = booking.created_by ? booking.created_by.toUpperCase() : 'N/A';
                 var row = $(`
                     <tr>
                         <td>${booking.transaction_no ? booking.transaction_no.toUpperCase() : 'N/A'}</td>
@@ -1043,16 +1060,18 @@ function refreshTableBookings() {
                         <td>${booking.unit ? booking.unit.toUpperCase() : 'N/A'}</td>
                         <td>${residentTypeHtml}</td>
                         <td>${booking.name ? booking.name.toUpperCase() : 'N/A'}</td>
-                        <td>${booking.contact_number ? booking.contact_number.toUpperCase() : 'N/A'}</td>
-                        <td>${booking.booking_type ? booking.booking_type.toUpperCase() : 'N/A'}</td>
+                        <td>${booking.contact_number || 'N/A'}</td>
+                        <td>${booking.booking_type || 'N/A'}</td>
                         <td>${bookingStatusHtml}</td>
                         <td>${booking.booking_date || 'N/A'}</td>
                         <td>${booking.booking_start_time || 'N/A'}</td>
                         <td>${booking.booking_end_time || 'N/A'}</td>
-                        <td>${booking.cancelledBy?.name ? booking.cancelledBy.name.toUpperCase() : 'N/A'}</td>
-                        <td>${booking.cancelled_at || 'N/A'}</td>
-                        <td>${penaltyHtml}</td>
-                        <td>${booking.user_name ? booking.user_name.toUpperCase() : 'N/A'}</td>
+                        <td>${cancelledByHtml}</td>
+                        <td>${cancelledAtHtml}</td>
+                         <td>${penaltyAmountHtml}</td>   
+                        <td>${penaltyWaivedHtml}</td>
+                        <td>${waivedByHtml}</td>
+                        <td>${createdByHtml}</td>
                         <td>${booking.created_at || 'N/A'}</td>
                         <td>${booking.updated_at || 'N/A'}</td>
                         <td class="sticky-col sticky-col-color">${actionButtons}</td>
@@ -1185,41 +1204,31 @@ $('#bookingTable').on('click', '.cancel-booking', function () {
                     return;
                 }
 
-                // penalty warning
                 if (res.requires_confirmation) {
 
                     Swal.fire({
                         title: 'Penalty Warning',
                         html: res.message,
                         icon: 'warning',
+                        showDenyButton: true, // 👈 NEW
                         showCancelButton: true,
                         confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: 'Proceed',
-                        cancelButtonText: 'No'
+                        denyButtonColor: '#28a745',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Apply Penalty',
+                        denyButtonText: 'Waive Penalty', // 👈 NEW
+                        cancelButtonText: 'Cancel'
                     }).then((result2) => {
 
-                        if (!result2.isConfirmed) return;
+                        if (result2.isConfirmed) {
+                            sendCancelRequest(bookingId, false);
+                        }
 
-                        $.ajax({
-                            url: `/admin/cancel-booking/${bookingId}`,
-                            method: 'POST',
-                            data: {
-                                _token: $('meta[name="csrf-token"]').attr('content'),
-                                confirm: 1
-                            },
-                            success: function (res2) {
-                                Swal.fire('Cancelled!', res2.message, 'success')
-                                    .then(() => refreshTableBookings());
-                            }
-                        });
+                        if (result2.isDenied) {
+                            sendCancelRequest(bookingId, true);
+                        }
 
                     });
-
-                } else {
-
-                    Swal.fire('Cancelled!', res.message, 'success')
-                        .then(() => refreshTableBookings());
 
                 }
 
@@ -1229,6 +1238,22 @@ $('#bookingTable').on('click', '.cancel-booking', function () {
     });
 
 });
+
+function sendCancelRequest(bookingId, waivePenalty = false) {
+    $.ajax({
+        url: `/admin/cancel-booking/${bookingId}`,
+        method: 'POST',
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            confirm: 1,
+            waive_penalty: waivePenalty ? 1 : 0
+        },
+        success: function (res2) {
+            Swal.fire('Cancelled!', res2.message, 'success')
+                .then(() => refreshTableBookings());
+        }
+    });
+}
 
 $('.SlotChecking').on('click', function () {
     $('#SlotCheckingModal').modal('show');
@@ -1386,43 +1411,43 @@ $('.SearchSlotAdmin').submit(function (event) {
 
 
 
-$('#bookingTable').on('click', 'mark-as-no-show', function () {
+// $('#bookingTable').on('click', 'mark-as-no-show', function () {
 
-    const bookingId = $(this).data('id');
+//     const bookingId = $(this).data('id');
 
-    Swal.fire({
-        title: "Mark as No Show?",
-        html: "The resident did not attend. A <b>₱1000 penalty</b> will be applied.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Yes, mark as no show",
-        cancelButtonText: "Cancel"
-    }).then((result) => {
-        if (!result.isConfirmed) return;
+//     Swal.fire({
+//         title: "Mark as No Show?",
+//         html: "The resident did not attend. A <b>₱1000 penalty</b> will be applied.",
+//         icon: "warning",
+//         showCancelButton: true,
+//         confirmButtonColor: "#d33",
+//         cancelButtonColor: "#3085d6",
+//         confirmButtonText: "Yes, mark as no show",
+//         cancelButtonText: "Cancel"
+//     }).then((result) => {
+//         if (!result.isConfirmed) return;
 
-        $.ajax({
-            url: `/admin/mark-no-show/${bookingId}`,
-            method: 'POST',
-            data: {
-                _token: $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function (res) {
-                if (!res.success) {
-                    Swal.fire('Error', res.message || 'Failed to mark no show.', 'error');
-                    return;
-                }
+//         $.ajax({
+//             url: `/admin/mark-no-show/${bookingId}`,
+//             method: 'POST',
+//             data: {
+//                 _token: $('meta[name="csrf-token"]').attr('content')
+//             },
+//             success: function (res) {
+//                 if (!res.success) {
+//                     Swal.fire('Error', res.message || 'Failed to mark no show.', 'error');
+//                     return;
+//                 }
 
-                Swal.fire('Updated!', res.message, 'success')
-                    .then(() => refreshTableBookings());
-            },
-            error: function () {
-                Swal.fire('Error', 'Something went wrong.', 'error');
-            }
-        });
-    });
-});
+//                 Swal.fire('Updated!', res.message, 'success')
+//                     .then(() => refreshTableBookings());
+//             },
+//             error: function () {
+//                 Swal.fire('Error', 'Something went wrong.', 'error');
+//             }
+//         });
+//     });
+// });
 
 
 

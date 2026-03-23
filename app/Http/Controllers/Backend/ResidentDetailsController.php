@@ -14,9 +14,85 @@ class ResidentDetailsController extends Controller
 {
     public function showResidentDetails()
     {
-        $emailPaginationLinks = ResidentDetails:: paginate(10);
+        $emailPaginationLinks = ResidentDetails::paginate(10);
         return view('backend.admin-registered-emails', compact('emailPaginationLinks'));
     }
+
+    // public function uploadResidentDetails(Request $request)
+    // {
+    //     $request->validate([
+    //         'email_file' => 'required|file|mimes:csv,txt',
+    //     ]);
+
+    //     $file = $request->file('email_file');
+    //     $fileName = $file->getClientOriginalName();
+    //     $destinationPath = public_path('assets/files/emails');
+    //     $file->move($destinationPath, $fileName);
+
+    //     ResidentDetails::truncate();
+    //     $filePath = $destinationPath . '/' . $fileName;
+    //     $csv = fopen($filePath, 'r');
+
+    //     $header = fgetcsv($csv);
+    //     if (!$header || count($header) < 2) {
+    //         fclose($csv);
+    //         return back()->withErrors('Invalid CSV header. Expected at least 2 columns.');
+    //     }
+
+    //     $processed = 0;
+    //     $skipped = 0;
+    //     $uploadedEmails = []; 
+
+    //     while (($row = fgetcsv($csv)) !== false) {
+    //         if (count($row) < 2) {
+    //             Log::warning('Skipped row due to insufficient columns', ['row' => $row]);
+    //             $skipped++;
+    //             continue;
+    //         }
+
+    //         $unitNo = trim($row[0]);
+    //         $email = strtolower(trim($row[1]));
+    //         $residentType = isset($row[2]) ? strtoupper(trim($row[2])) : null; 
+
+    //         if (filter_var($email, FILTER_VALIDATE_EMAIL) && $unitNo !== '') {
+    //             ResidentDetails::create([
+    //                 'unit_no' => $unitNo,
+    //                 'email' => $email,
+    //                 'resident_type' => $residentType, 
+    //             ]);
+
+    //             $uploadedEmails[] = $email;
+
+    //             Log::info('Uploaded email record', [
+    //                 'unit_no' => $unitNo,
+    //                 'email' => $email,
+    //                 'resident_type' => $residentType,
+    //             ]);
+
+    //             $processed++;
+    //         } else {
+    //             Log::warning('Invalid or missing data in row', ['row' => $row]);
+    //             $skipped++;
+    //         }
+    //     }
+
+    //     fclose($csv);
+
+    //     \DB::table('users')
+    //         ->where('role_id', 0)
+    //         ->whereNotIn('email', $uploadedEmails)
+    //         ->update(['is_active' => false]);
+
+    //     Log::info("Email CSV upload summary", [
+    //         'processed' => $processed,
+    //         'skipped' => $skipped,
+    //         'uploaded_by' => auth()->user()->email ?? 'guest'
+    //     ]);
+
+    //     Log::info("Email CSV file stored at: assets/files/emails/$fileName");
+
+    //     return back()->with('success', "CSV uploaded successfully. Processed: $processed, Skipped: $skipped");
+    // }
 
     public function uploadResidentDetails(Request $request)
     {
@@ -25,86 +101,16 @@ class ResidentDetailsController extends Controller
         ]);
 
         $file = $request->file('email_file');
-        $fileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . $file->getClientOriginalName();
         $destinationPath = public_path('assets/files/emails');
         $file->move($destinationPath, $fileName);
 
-        // Clear existing email records
-        ResidentDetails::truncate();
+        // Dispatch the job
+        \App\Jobs\ProcessResidentCSV::dispatch($destinationPath . '/' . $fileName);
 
-        // Use the new file path after move
-        $filePath = $destinationPath . '/' . $fileName;
-        $csv = fopen($filePath, 'r');
-
-        $header = fgetcsv($csv);
-        if (!$header || count($header) < 2) {
-            fclose($csv);
-            return back()->withErrors('Invalid CSV header. Expected at least 2 columns.');
-        }
-
-        $processed = 0;
-        $skipped = 0;
-        $uploadedEmails = []; // ✅ Store uploaded emails
-
-        while (($row = fgetcsv($csv)) !== false) {
-            if (count($row) < 2) {
-                Log::warning('Skipped row due to insufficient columns', ['row' => $row]);
-                $skipped++;
-                continue;
-            }
-
-            $unitNo = trim($row[0]);
-            $email = strtolower(trim($row[1]));
-            $residentType = isset($row[2]) ? strtoupper(trim($row[2])) : null; // ✅ optional 3rd column
-
-            if (filter_var($email, FILTER_VALIDATE_EMAIL) && $unitNo !== '') {
-                ResidentDetails::create([
-                    'unit_no' => $unitNo,
-                    'email' => $email,
-                    'resident_type' => $residentType, // ✅ saved if CSV has column
-                ]);
-
-                $uploadedEmails[] = $email; // ✅ Add to array
-
-                Log::info('Uploaded email record', [
-                    'unit_no' => $unitNo,
-                    'email' => $email,
-                    'resident_type' => $residentType,
-                ]);
-
-                $processed++;
-            } else {
-                Log::warning('Invalid or missing data in row', ['row' => $row]);
-                $skipped++;
-            }
-        }
-
-        fclose($csv);
-
-        // ✅ Deactivate users whose emails are not in the new list
-        \DB::table('users')
-            ->where('role_id', 0)
-            ->whereNotIn('email', $uploadedEmails)
-            ->update(['is_active' => false]);
-
-        // ✅ (Optional) Reactivate users whose emails are in the list
-        \DB::table('users')
-            ->where('role_id', 0)
-            ->whereIn('email', $uploadedEmails)
-            ->update(['is_active' => true]);
-
-        Log::info("Email CSV upload summary", [
-            'processed' => $processed,
-            'skipped' => $skipped,
-            'uploaded_by' => auth()->user()->email ?? 'guest'
-        ]);
-
-        Log::info("Email CSV file stored at: assets/files/emails/$fileName");
-
-        return back()->with('success', "CSV uploaded successfully. Processed: $processed, Skipped: $skipped");
+        // Immediately return success
+        return response()->json(['success' => true]);
     }
-
-
 
 
     public function getUpdatedResidentDetailsTable(Request $request)

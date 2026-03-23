@@ -231,7 +231,10 @@ $(document).ready(function () {
 
         const $endDropdown = modal.find('.booking_end_time');
         $endDropdown.prop('disabled', true).empty().append('<option>Loading...</option>');
+        const slotsContainer = modal.find(`#userAvailableSlotsContainer${activityId}`);
+        slotsContainer.empty();
 
+        modal.find('.selected_slots_user').val('');
         $.ajax({
             url: '/fetch-end-times-user',
             method: 'GET',
@@ -668,7 +671,7 @@ $(document).ready(function () {
                             Swal.fire({
                                 icon: 'warning',
                                 title: 'Limit Reached',
-                                text: 'This unit has already reached the maximum number of bookings for this month.'
+                                text: 'This unit has already reached the maximum number of advanced bookings for this month.'
                             });
                         }
                     }
@@ -801,7 +804,7 @@ $(document).ready(function () {
                             $('#cancelAmenityBookingBtn').hide();
                             break;
                         case 3:
-                            statusText = 'Penalty';
+                            statusText = 'Penalized';
                             statusClass = 'badge bg-warning';
                             $('#cancelAmenityBookingBtn').hide();
                             break;

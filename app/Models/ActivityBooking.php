@@ -60,6 +60,10 @@ class ActivityBooking extends Model
             && now()->lessThan($bookingDateTime);
     }
 
+    public function waivedBy()
+    {
+        return $this->belongsTo(User::class, 'waived_by');
+    }
     public function applyCancellationPenalty(): void
     {
         if ($this->isWithin12Hours()) {

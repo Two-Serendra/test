@@ -541,23 +541,25 @@ class FrontendActivityBookingController extends Controller
                 'blocked' => false,
             ];
 
+            // Stop if blocked or fully booked
             if (!empty($existing['blocked'])) {
                 $currentSlotStart->addHour();
                 continue;
             }
 
             if ($existing['count'] > 0 && $existing['activity_space'] != $activitySpace) {
-                $currentSlotStart->addHour();
-                continue;
+                break; // stop further end times after conflict
             }
 
-            if ($existing['count'] < $activitySpace) {
-                $availableTimePairs[] = [
-                    'start' => $currentSlotStart->format('h:i A'),
-                    'end' => $currentSlotEnd->format('h:i A'),
-                ];
+            if ($existing['count'] >= $activitySpace) {
+                break; // fully booked
             }
 
+            // Slot is available
+            $availableTimePairs[] = [
+                'start' => $currentSlotStart->format('h:i A'),
+                'end' => $currentSlotEnd->format('h:i A'),
+            ];
             $currentSlotStart->addHour();
         }
 
@@ -660,6 +662,122 @@ class FrontendActivityBookingController extends Controller
     // }
 
 
+    // public function fetchEndTimesUser(Request $request)
+    // {
+    //     $activityId = $request->input('activity_id');
+    //     $date = $request->input('booking_date');
+    //     $startTime = $request->input('start_time');
+
+    //     \Log::info("Fetching end times for Activity ID: $activityId, Date: $date, Start Time: $startTime");
+
+    //     $activity = Activity::select('id', 'amenity_id', 'activity_space')->find($activityId);
+    //     if (!$activity) {
+    //         return response()->json(['error' => 'Activity not found'], 404);
+    //     }
+
+    //     $activitySpace = $activity->activity_space;
+    //     $amenityId = $activity->amenity_id;
+
+    //     $dayOfWeek = Carbon::parse($date)->format('l');
+    //     $schedule = ActivitySchedule::where('activity_id', $activityId)
+    //         ->where('day', $dayOfWeek)
+    //         ->first();
+
+    //     if (!$schedule || !$schedule->start_time || !$schedule->end_time) {
+    //         return response()->json(['error' => 'No Schedule']);
+    //     }
+
+    //     $start = Carbon::parse("{$date} {$startTime}");
+    //     $end = Carbon::parse("{$date} {$schedule->end_time}");
+    //     if ($end->lessThanOrEqualTo($start))
+    //         $end->addDay();
+
+    //     $bookedSlots = ActivityBooking::with('activity:id,activity_space,amenity_id')
+    //         ->where('booking_date', $date)
+    //         ->where('booking_status', 1)
+    //         ->whereHas('activity', function ($q) use ($amenityId) {
+    //             $q->where('amenity_id', $amenityId);
+    //         })
+    //         ->get();
+
+    //     $blockedSlots = ActivityBlocking::whereHas('activity', function ($q) use ($amenityId) {
+    //         $q->where('amenity_id', $amenityId);
+    //     })->where(function ($q) use ($dayOfWeek) {
+    //         $q->where(function ($q2) use ($dayOfWeek) {
+    //             $q2->where('repeat_weekly', true)->where('day', $dayOfWeek);
+    //         });
+    //     })->get();
+
+    //     $occupiedSlots = [];
+
+    //     foreach ($bookedSlots as $booking) {
+    //         $bookingStart = Carbon::parse("{$date} {$booking->booking_start_time}");
+    //         $bookingEnd = Carbon::parse("{$date} {$booking->booking_end_time}");
+    //         if ($bookingEnd->lessThanOrEqualTo($bookingStart))
+    //             $bookingEnd->addDay();
+
+    //         $bookingActivitySpace = $booking->activity->activity_space;
+
+    //         while ($bookingStart < $bookingEnd) {
+    //             $slotKey = $bookingStart->format('H:i');
+    //             if (!isset($occupiedSlots[$slotKey])) {
+    //                 $occupiedSlots[$slotKey] = [
+    //                     'count' => 0,
+    //                     'activity_space' => null,
+    //                     'blocked' => false,
+    //                 ];
+    //             }
+    //             $occupiedSlots[$slotKey]['count']++;
+    //             $occupiedSlots[$slotKey]['activity_space'] = $bookingActivitySpace;
+    //             $bookingStart->addHour();
+    //         }
+    //     }
+
+    //     foreach ($blockedSlots as $block) {
+    //         $blockStart = Carbon::parse("{$date} {$block->start_time}");
+    //         $blockEnd = Carbon::parse("{$date} {$block->end_time}");
+    //         if ($blockEnd->lessThanOrEqualTo($blockStart))
+    //             $blockEnd->addDay();
+
+    //         while ($blockStart < $blockEnd) {
+    //             $slotKey = $blockStart->format('H:i');
+    //             $occupiedSlots[$slotKey] = ['blocked' => true];
+    //             $blockStart->addHour();
+    //         }
+    //     }
+
+    //     $availableEndTimes = [];
+    //     $currentSlotStart = $start->copy();
+    //     $maxHours = 2;
+    //     $addedHours = 0;
+
+    //     while ($currentSlotStart < $end && $addedHours < $maxHours) {
+    //         $currentSlotEnd = $currentSlotStart->copy()->addHour();
+    //         $slotKey = $currentSlotStart->format('H:i');
+
+    //         $existing = $occupiedSlots[$slotKey] ?? [
+    //             'count' => 0,
+    //             'activity_space' => null,
+    //             'blocked' => false,
+    //         ];
+    //         if (!empty($existing['blocked']))
+    //             break;
+    //         if ($existing['count'] > 0 && $existing['activity_space'] != $activitySpace)
+    //             break;
+    //         if ($existing['count'] >= $activitySpace)
+    //             break;
+
+    //         $availableEndTimes[] = $currentSlotEnd->format('h:i A');
+    //         $addedHours++;
+    //         $currentSlotStart->addHour();
+    //     }
+
+    //     return response()->json([
+    //         'availableEndTimes' => $availableEndTimes,
+    //     ]);
+    // }
+
+
     public function fetchEndTimesUser(Request $request)
     {
         $activityId = $request->input('activity_id');
@@ -677,50 +795,61 @@ class FrontendActivityBookingController extends Controller
         $amenityId = $activity->amenity_id;
 
         $dayOfWeek = Carbon::parse($date)->format('l');
+
         $schedule = ActivitySchedule::where('activity_id', $activityId)
             ->where('day', $dayOfWeek)
             ->first();
 
-        if (!$schedule || !$schedule->start_time || !$schedule->end_time) {
+        if (
+            !$schedule || !$schedule->start_time || !$schedule->end_time ||
+            $schedule->start_time === '00:00:00' || $schedule->end_time === '00:00:00'
+        ) {
             return response()->json(['error' => 'No Schedule']);
         }
 
         $start = Carbon::parse("{$date} {$startTime}");
         $end = Carbon::parse("{$date} {$schedule->end_time}");
-        if ($end->lessThanOrEqualTo($start))
-            $end->addDay();
 
-        // Fetch booked slots under the same amenity
+        if ($end->lessThanOrEqualTo(Carbon::parse("{$date} {$schedule->start_time}"))) {
+            $end->addDay();
+        }
+
         $bookedSlots = ActivityBooking::with('activity:id,activity_space,amenity_id')
-            ->where('booking_date', $date)
-            ->where('booking_status', 1)
             ->whereHas('activity', function ($q) use ($amenityId) {
                 $q->where('amenity_id', $amenityId);
             })
-            ->get();
+            ->where('booking_date', $date)
+            ->where('booking_status', 1)
+            ->get(['activity_id', 'booking_start_time', 'booking_end_time']);
 
-        // Fetch blocked slots under the same amenity
         $blockedSlots = ActivityBlocking::whereHas('activity', function ($q) use ($amenityId) {
             $q->where('amenity_id', $amenityId);
-        })->where(function ($q) use ($dayOfWeek) {
-            $q->where(function ($q2) use ($dayOfWeek) {
-                $q2->where('repeat_weekly', true)->where('day', $dayOfWeek);
-            });
-        })->get();
+        })
+            ->where(function ($query) use ($dayOfWeek) {
+                $query->where(function ($q) use ($dayOfWeek) {
+                    $q->where('repeat_weekly', true)
+                        ->where('day', $dayOfWeek);
+                });
+            })
+            ->get();
 
+  
         $occupiedSlots = [];
 
-        // Map booked slots
+  
         foreach ($bookedSlots as $booking) {
             $bookingStart = Carbon::parse("{$date} {$booking->booking_start_time}");
             $bookingEnd = Carbon::parse("{$date} {$booking->booking_end_time}");
-            if ($bookingEnd->lessThanOrEqualTo($bookingStart))
+
+            if ($bookingEnd->lessThanOrEqualTo($bookingStart)) {
                 $bookingEnd->addDay();
+            }
 
             $bookingActivitySpace = $booking->activity->activity_space;
 
             while ($bookingStart < $bookingEnd) {
-                $slotKey = $bookingStart->format('Y-m-d H:i');
+                $slotKey = $bookingStart->format('H:i');
+
                 if (!isset($occupiedSlots[$slotKey])) {
                     $occupiedSlots[$slotKey] = [
                         'count' => 0,
@@ -728,35 +857,45 @@ class FrontendActivityBookingController extends Controller
                         'blocked' => false,
                     ];
                 }
+
                 $occupiedSlots[$slotKey]['count']++;
                 $occupiedSlots[$slotKey]['activity_space'] = $bookingActivitySpace;
+
                 $bookingStart->addHour();
             }
         }
 
-        // Map blocked slots
+
         foreach ($blockedSlots as $block) {
             $blockStart = Carbon::parse("{$date} {$block->start_time}");
             $blockEnd = Carbon::parse("{$date} {$block->end_time}");
-            if ($blockEnd->lessThanOrEqualTo($blockStart))
+
+            if ($blockEnd->lessThanOrEqualTo($blockStart)) {
                 $blockEnd->addDay();
+            }
 
             while ($blockStart < $blockEnd) {
-                $slotKey = $blockStart->format('Y-m-d H:i');
-                $occupiedSlots[$slotKey] = ['blocked' => true];
+                $slotKey = $blockStart->format('H:i');
+
+                $occupiedSlots[$slotKey] = [
+                    'count' => 0,
+                    'activity_space' => null,
+                    'blocked' => true,
+                ];
+
                 $blockStart->addHour();
             }
         }
 
-        // Determine available end times
         $availableEndTimes = [];
-        $currentSlotStart = $start->copy();
-        $maxHours = 2; // max hours for user booking
+        $currentSlotStart = clone $start;
+
+        $maxHours = 2;
         $addedHours = 0;
 
         while ($currentSlotStart < $end && $addedHours < $maxHours) {
-            $currentSlotEnd = $currentSlotStart->copy()->addHour();
-            $slotKey = $currentSlotStart->format('Y-m-d H:i');
+
+            $slotKey = $currentSlotStart->format('H:i');
 
             $existing = $occupiedSlots[$slotKey] ?? [
                 'count' => 0,
@@ -764,16 +903,19 @@ class FrontendActivityBookingController extends Controller
                 'blocked' => false,
             ];
 
-            // Stop if the slot is blocked
-            if (!empty($existing['blocked']))
+            if (
+                !empty($existing['blocked']) ||
+                ($existing['count'] > 0 && $existing['activity_space'] != $activitySpace) ||
+                $existing['count'] >= $activitySpace
+            ) {
                 break;
+            }
 
-            // Stop if the slot conflicts with another activity_space under the same amenity
-            if ($existing['count'] > 0 && $existing['activity_space'] != $activitySpace)
-                break;
 
-            // Otherwise, add the hour as available
+            $currentSlotEnd = (clone $currentSlotStart)->addHour();
+
             $availableEndTimes[] = $currentSlotEnd->format('h:i A');
+
             $addedHours++;
             $currentSlotStart->addHour();
         }
@@ -782,9 +924,6 @@ class FrontendActivityBookingController extends Controller
             'availableEndTimes' => $availableEndTimes,
         ]);
     }
-
-
-
 
     public function fetchAvailableSlotsUser(Request $request)
     {

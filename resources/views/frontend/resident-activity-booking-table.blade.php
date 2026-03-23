@@ -8,6 +8,7 @@
                 <th>Time</th>
                 <th>Status</th>
                 <th>Penalty</th>
+                <th>Waived</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -46,7 +47,7 @@
                                             break;
 
                                         case 3:
-                                            $statusText = 'Penalty';
+                                            $statusText = 'Penalized';
                                             $statusClass = 'badge bg-warning badge-forge';
                                             break;
 
@@ -62,8 +63,21 @@
                             @endphp
                             <span class="{{ $statusClass }}">{{ $statusText }}</span>
                         </td>
-                        <td class="{{ ($b->penalty_amount ?? 0) > 0 ? 'text-danger fw-semibold' : '' }}">
-                            ₱{{ number_format($b->penalty_amount ?? 0, 2) }}
+                        <td class="{{ ($b->has_penalty && ($b->penalty_amount ?? 0) > 0) ? 'text-danger fw-semibold' : '' }}">
+                            @if(!$b->has_penalty)
+                                -
+                            @else
+                                ₱{{ number_format($b->penalty_amount ?? 0, 2) }}
+                            @endif
+                        </td>
+                        <td>
+                            @if($b->has_penalty == 0 && $b->penalty_amount == 0)
+                                <span>-</span>
+                            @elseif($b->has_penalty == 1 && $b->penalty_waived)
+                                <span class="text-primary">Yes</span>
+                            @elseif($b->has_penalty == 1 && !$b->penalty_waived)
+                                <span class="text-danger">No</span>
+                            @endif
                         </td>
 
 

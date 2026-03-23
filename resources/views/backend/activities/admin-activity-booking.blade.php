@@ -67,6 +67,8 @@
                             <th class="table-custom sticky-th">CANCELLED BY</th>
                             <th class="table-custom sticky-th">CANCELLED AT</th>
                             <th class="table-custom sticky-th">PENALTY</th>
+                            <th class="table-custom sticky-th">PENALTY WAIVED</th>
+                            <th class="table-custom sticky-th">WAIVED BY</th>
                             <th class="table-custom sticky-th">CREATED BY</th>
                             <th class="table-custom sticky-th">CREATED AT</th>
                             <th class="table-custom sticky-th">UPDATED AT</th>
@@ -109,6 +111,8 @@
                                             <span class="badge bg-dark">No Show</span>
                                         @endif
                                     </td>
+
+
                                     <td>{{ strtoupper($booking->booking_date ?? 'N/A') }}</td>
                                     <td>{{ strtoupper($booking->booking_start_time ?? 'N/A') }}</td>
                                     <td>{{ strtoupper($booking->booking_end_time ?? 'N/A') }}</td>
@@ -116,6 +120,16 @@
                                     <td>{{ strtoupper($booking->cancelled_at ?? 'N/A') }}</td>
                                     <td class="{{ ($booking->penalty_amount ?? 0) > 0 ? 'text-danger fw-semibold' : '' }}">
                                         ₱{{ number_format($booking->penalty_amount ?? 0, 2) }}
+                                    </td>
+                                    <td>
+                                        @if($booking->penalty_waived)
+                                            <span class="badge bg-primary">YES</span>
+                                        @else
+                                            <span class="badge bg-danger">NO</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        {{ $booking->waivedBy->name ?? 'N/A' }}
                                     </td>
 
                                     <td>{{ strtoupper($booking->user->name ?? 'N/A') }}</td>

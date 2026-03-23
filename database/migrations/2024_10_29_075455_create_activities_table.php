@@ -22,7 +22,7 @@ return new class extends Migration
             $table->tinyInteger('activity_max_booking');
             $table->string('activity_remarks')->nullable();
             $table->tinyInteger('activity_status')->default('1');
-            $table->timestamps();
+            $table->timestamps();  
         });
     }
 

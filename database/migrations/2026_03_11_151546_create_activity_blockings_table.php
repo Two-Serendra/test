@@ -15,12 +15,12 @@ return new class extends Migration {
 
             $table->foreignId('activity_id')->constrained()->cascadeOnDelete();
 
-            $table->string('day'); // Monday, Tuesday, etc
+            $table->string('day'); 
 
             $table->time('start_time');
             $table->time('end_time');
 
-            $table->string('remarks')->nullable(); // Basketball Clinic, Maintenance, etc
+            $table->string('remarks')->nullable();
 
             $table->boolean('repeat_weekly')->default(true);
             $table->timestamps();

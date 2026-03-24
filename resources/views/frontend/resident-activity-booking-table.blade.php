@@ -7,8 +7,8 @@
                 <th>Date</th>
                 <th>Time</th>
                 <th>Status</th>
-                <th>Penalty</th>
-                <th>Waived</th>
+                <!-- <th>Penalty</th>
+                <th>Waived</th> -->
                 <th>Action</th>
             </tr>
         </thead>
@@ -28,42 +28,51 @@
                                 $bookingDate = \Carbon\Carbon::parse($b->booking_date);
                                 $today = \Carbon\Carbon::today();
 
-                                if ($bookingDate->lt($today)) {
-                                    $statusText = 'Completed';
-                                    $statusClass = 'badge bg-success badge-forge';
-                                } else {
-                                    switch ($b->booking_status) {
-                                        case 0:
-                                            $statusText = 'Waiting';
-                                            $statusClass = 'badge bg-warning text-white badge-forge';
-                                            break;
-                                        case 1:
+                                switch ($b->booking_status) {
+                                    case 0:
+                                        $statusText = 'Waiting';
+                                        $statusClass = 'badge bg-warning text-white badge-forge';
+                                        break;
+
+                                    case 1:
+                                        if ($bookingDate->lt($today)) {
+                                            $statusText = 'Completed';
+                                            $statusClass = 'badge bg-success badge-forge';
+                                        } else {
                                             $statusText = 'Confirmed';
                                             $statusClass = 'badge bg-primary badge-forge';
-                                            break;
-                                        case 2:
-                                            $statusText = 'Cancelled';
-                                            $statusClass = 'badge bg-danger badge-forge';
-                                            break;
+                                        }
+                                        break;
 
-                                        case 3:
-                                            $statusText = 'Penalized';
-                                            $statusClass = 'badge bg-warning badge-forge';
-                                            break;
+                                    case 2:
+                                        $statusText = 'Cancelled';
+                                        $statusClass = 'badge bg-danger badge-forge';
+                                        break;
 
-                                        case 4:
-                                            $statusText = 'No Show';
-                                            $statusClass = 'badge bg-dark badge-forge';
-                                            break;
-                                        default:
-                                            $statusText = 'Cancelled';
-                                            $statusClass = 'badge bg-danger badge-forge';
-                                    }
+                                    case 3:
+                                        $statusText = 'Late Cancel';
+                                        $statusClass = 'badge bg-warning badge-forge';
+                                        break;
+
+                                    case 4:
+                                        $statusText = 'No Show';
+                                        $statusClass = 'badge bg-dark badge-forge';
+                                        break;
+
+                                    default:
+                                        if ($bookingDate->lt($today)) {
+                                            $statusText = 'Completed';
+                                            $statusClass = 'badge bg-success badge-forge';
+                                        } else {
+                                            $statusText = 'N/A';
+                                            $statusClass = 'badge bg-secondary badge-forge';
+                                        }
                                 }
                             @endphp
+
                             <span class="{{ $statusClass }}">{{ $statusText }}</span>
                         </td>
-                        <td class="{{ ($b->has_penalty && ($b->penalty_amount ?? 0) > 0) ? 'text-danger fw-semibold' : '' }}">
+                        <!-- <td class="{{ ($b->has_penalty && ($b->penalty_amount ?? 0) > 0) ? 'text-danger fw-semibold' : '' }}">
                             @if(!$b->has_penalty)
                                 -
                             @else
@@ -78,7 +87,7 @@
                             @elseif($b->has_penalty == 1 && !$b->penalty_waived)
                                 <span class="text-danger">No</span>
                             @endif
-                        </td>
+                        </td> -->
 
 
                         <td>

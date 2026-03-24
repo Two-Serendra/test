@@ -11,7 +11,7 @@
         font-weight: 600;
         /* Make it bolder */
         color: #222;
-        /* Darker text */ 
+        /* Darker text */
     }
 </style>
 
@@ -30,70 +30,91 @@
             </div>
 
             <!-- Body -->
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label custom-label">Booking ID:</label>
-                            <p id="detail-transaction-no" class="form-control-plaintext custom-p"></p>
-                        </div>
+            <div class="modal-body px-4 py-3">
 
-                        <div class="mb-3 align-items-center">
-                            <label class="form-label custom-label">Resident Type:</label>
-                            <p id="detail-resident-type" class="form-control-plaintext custom-p"></p>
-                        </div>
+                <!-- Header -->
+                <div class="text-center mb-4">
+                    <h5 class="fw-bold mb-1">Booking Details</h5>
+                    <small class="text-muted">Reference #: <span id="detail-transaction-no"></span></small>
+                </div>
 
-                        <div class="mb-3">
-                            <label class="form-label custom-label">Unit:</label>
-                            <p id="detail-unit" class="form-control-plaintext custom-p"></p>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label custom-label">Name:</label>
-                            <p id="detail-name" class="form-control-plaintext custom-p"></p>
-                        </div>
-
-
-
-                        <div class="mb-3">
-                            <label class="form-label custom-label">Contact:</label>
-                            <p id="detail-contact" class="form-control-plaintext custom-p"></p>
-                        </div>
+                <!-- STATUS + PENALTY (Highlight Section) -->
+                <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded bg-light">
+                    <div>
+                        <small class="text-muted d-block">Status</small>
+                        <span id="detail-booking-status"></span>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label custom-label">Booking Status:</label>
-                            <p id="detail-booking-status" class="form-control-plaintext custom-p"></p>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label custom-label">Booking Type:</label>
-                            <p id="detail-booking-type" class="form-control-plaintext custom-p"></p>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label custom-label">Activity:</label>
-                            <p id="detail-activity-name" class="form-control-plaintext custom-p"></p>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label custom-label">Booking Date:</label>
-                            <p id="detail-booking-date" class="form-control-plaintext custom-p"></p>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label custom-label">Time:</label>
-                            <p id="detail-start-time" class="form-control-plaintext custom-p"></p>
-                        </div>
+                    <div class="text-end">
+                        <small class="text-muted d-block">Penalty</small>
+                        <span id="detail-penalty-display" class="fw-semibold"></span>
                     </div>
                 </div>
+
+                <div class="row g-3">
+
+                    <!-- Guest Info Card -->
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 h-100">
+                            <h6 class="fw-semibold text-primary mb-3">Guest Information</h6>
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Name</span>
+                                <span id="detail-name" class="fw-semibold text-end"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Unit</span>
+                                <span id="detail-unit" class="fw-semibold"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Resident Type</span>
+                                <span id="detail-resident-type"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Contact</span>
+                                <span id="detail-contact" class="fw-semibold"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Booking Info Card -->
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 h-100">
+                            <h6 class="fw-semibold text-primary mb-3">Booking Information</h6>
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Activity</span>
+                                <span id="detail-activity-name" class="fw-semibold text-end"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Type</span>
+                                <span id="detail-booking-type" class="fw-semibold"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Date</span>
+                                <span id="detail-booking-date" class="fw-semibold"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Time</span>
+                                <span id="detail-start-time" class="fw-semibold"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
 
             <!-- Footer -->
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger btn-sm customBtn text-white" id="cancelAmenityBookingBtn">
-                   Cancel
+                    Cancel
                 </button>
             </div>
         </div>

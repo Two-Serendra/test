@@ -775,54 +775,114 @@ $(document).ready(function () {
 
 
                 let residentBadgeClass = '';
-                if (booking.resident_type === 'TENANT') residentBadgeClass = 'badge badge-forge bg-danger';
-                else if (booking.resident_type === 'OWNER') residentBadgeClass = 'badge badge-forge bg-primary';
-                else residentBadgeClass = 'bg-secondary text-white';
+                if (booking.resident_type === 'TENANT') residentBadgeClass = 'fw-semibold text-danger';
+                else if (booking.resident_type === 'OWNER') residentBadgeClass = 'fw-semibold text-primary';
+                else residentBadgeClass = 'text-secondary text-white';
 
                 $('#detail-resident-type').html(
-                    `<span class="badge ${residentBadgeClass}">${booking.resident_type ?? 'N/A'}</span>`
+                    `<span class="fw-semibold ${residentBadgeClass}">${booking.resident_type ?? 'N/A'}</span>`
                 );
 
                 let statusText = '';
                 let statusClass = '';
+                let cancelledAtText = ''; // 👈 NEW
 
-                if (bookingDate < today) {
-                    statusText = 'Completed';
-                    statusClass = 'badge bg-success';
-                    $('#cancelAmenityBookingBtn').hide();
-                } else {
-                    switch (booking.booking_status) {
-                        case 1:
+                const formatDateTime = (dateStr) => {
+                    if (!dateStr) return '';
+                    const d = new Date(dateStr);
+
+                    const options = {
+                        year: 'numeric',
+                        month: 'short',
+                        day: '2-digit',
+                        hour: 'numeric',
+                        minute: '2-digit'
+                    };
+
+                    return d.toLocaleString(undefined, options);
+                };
+
+                // PRIORITY: real booking status first
+                switch (booking.booking_status) {
+                    case 1:
+                        if (bookingDate < today) {
+                            statusText = 'Completed';
+                            statusClass = 'text-success';
+                            $('#cancelAmenityBookingBtn').hide();
+                        } else {
                             statusText = 'Confirmed';
-                            statusClass = 'badge bg-success';
+                            statusClass = 'text-success';
                             $('#cancelAmenityBookingBtn').show();
-                            break;
+                        }
+                        break;
 
-                        case 2:
-                            statusText = 'Cancelled';
-                            statusClass = 'badge bg-danger';
-                            $('#cancelAmenityBookingBtn').hide();
-                            break;
-                        case 3:
-                            statusText = 'Penalized';
-                            statusClass = 'badge bg-warning';
-                            $('#cancelAmenityBookingBtn').hide();
-                            break;
+                    case 2:
+                        statusText = 'Cancelled';
+                        statusClass = 'text-danger';
+                        if (booking.cancelled_at) {
+                            cancelledAtText = `<small class="text-muted"> at ${formatDateTime(booking.cancelled_at)}</small>`;
+                        }
+                        $('#cancelAmenityBookingBtn').hide();
+                        break;
 
-                        case 4:
-                            statusText = 'No Show';
-                            statusClass = 'badge bg-dark';
-                            $('#cancelAmenityBookingBtn').hide();
-                            break;
+                    case 3:
+                        statusText = 'Late cancel';
+                        statusClass = 'text-warning';
 
-                        default:
+                        if (booking.cancelled_at) {
+                            cancelledAtText = `<small class="text-muted"> at ${formatDateTime(booking.cancelled_at)}</small>`;
+                        }
+                        $('#cancelAmenityBookingBtn').hide();
+                        break;
+
+                    case 4:
+                        statusText = 'No Show';
+                        statusClass = 'text-dark';
+                        $('#cancelAmenityBookingBtn').hide();
+                        break;
+
+                    default:
+                        // ONLY mark as completed if no specific status
+                        if (bookingDate < today) {
+                            statusText = 'Completed';
+                            statusClass = 'text-success';
+                        } else {
                             statusText = 'N/A';
-                            statusClass = 'badge bg-secondary';
-                            $('#cancelAmenityBookingBtn').hide();
-                    }
+                            statusClass = 'text-secondary';
+                        }
+                        $('#cancelAmenityBookingBtn').hide();
                 }
 
-                $('#detail-booking-status').html(`<span class="${statusClass} badge badge-forge">${statusText}</span>`);
+                // Reset
+                $('#detail-penalty-display').removeClass('text-danger text-success fw-semibold');
+
+                // No penalty
+                if (!booking.has_penalty || booking.penalty_amount == 0) {
+                    $('#detail-penalty-display').text('-');
+
+                } else {
+                    const amount = parseFloat(booking.penalty_amount).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+
+                    if (booking.penalty_waived) {
+                        // Waived
+                        $('#detail-penalty-display')
+                            .html(`₱${amount} <span class="text-success">(Waived)</span>`)
+                            .addClass('fw-semibold');
+
+                    } else {
+                        // Not waived
+                        $('#detail-penalty-display')
+                            .text(`₱${amount}`)
+                            .addClass('text-danger fw-semibold');
+                    }
+                }
+                $('#detail-booking-status').html(`
+                    <span class="${statusClass}">${statusText}</span>
+                    ${cancelledAtText}
+                `);
 
                 $('#residentActivityBookingDetailsModal').modal('show');
             },

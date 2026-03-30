@@ -91,7 +91,7 @@
                             </div>
 
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Type</span>
+                                <span class="text-muted">Booking Type</span>
                                 <span id="detail-booking-type" class="fw-semibold"></span>
                             </div>
 

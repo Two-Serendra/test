@@ -37,7 +37,6 @@
                 <table id="historyTable" class="display table">
                     <thead>
                         <tr>
-                            <th class="table-custom sticky-th">LOBBY</th>
                             <th class="table-custom sticky-th">TRANS NO.</th>
                             <th class="table-custom sticky-th">ACTIVITY</th>
                             <th class="table-custom sticky-th">UNIT</th>
@@ -49,6 +48,13 @@
                             <th class="table-custom sticky-th">DATE</th>
                             <th class="table-custom sticky-th">START TIME</th>
                             <th class="table-custom sticky-th">END TIME</th>
+                            <th class="table-custom sticky-th">CANCELLED BY</th>
+                            <th class="table-custom sticky-th">CANCELLED AT</th>
+                            <th class="table-custom sticky-th">PENALTY</th>
+                            <th class="table-custom sticky-th">PENALTY WAIVED</th>
+                            <th class="table-custom sticky-th">WAIVED BY</th>
+                            <th class="table-custom sticky-th">APPLIED BY</th>
+                            <th class="table-custom sticky-th">CREATED BY</th>
                             <th class="table-custom sticky-th">CREATED AT</th>
                             <th class="table-custom sticky-th">UPDATED AT</th>
                         </tr>
@@ -56,40 +62,77 @@
                     <tbody>
                         @if($activity_bookings->isEmpty())
                             <tr>
-                                <td colspan="11" class="text-center">No Records Found</td>
+                                <td colspan="21" class="text-center">No Records Found</td>
                             </tr>
                         @else
-                            @foreach ($activity_bookings as $activity_booking) 
+                            @foreach ($activity_bookings as $activity_booking)
                                 <tr>
-                                    <td>{{ strtoupper($activity_booking->lobby ?? 'N/A') }}</td>
+
                                     <td>{{ strtoupper($activity_booking->transaction_no ?? 'N/A') }}</td>
                                     <td>{{ strtoupper($activity_booking->activity->activity_name ?? 'N/A') }}</td>
                                     <td>{{ strtoupper($activity_booking->unit ?? 'N/A') }}</td>
+
                                     <td>
-                                        @if (strtoupper($activity_booking->resident_type) == 'OWNER')
-                                            <span class="text-success">{{ strtoupper($activity_booking->resident_type) }}</span>
-                                        @elseif (strtoupper($activity_booking->resident_type) == 'TENANT')
-                                            <span class="text-danger">{{ strtoupper($activity_booking->resident_type) }}</span>
+                                        @if($activity_booking->resident_type === 'TENANT')
+                                            <span class="badge bg-danger">TENANT</span>
                                         @else
-                                            {{ strtoupper($activity_booking->resident_type) ?: 'N/A' }}
+                                            <span class="badge bg-primary">OWNER</span>
                                         @endif
                                     </td>
+
                                     <td>{{ strtoupper($activity_booking->name ?? 'N/A') }}</td>
-                                    <td>{{ strtoupper($activity_booking->contact_number ?? 'N/A') }}</td>
+                                    <td>{{ $activity_booking->contact_number ?? 'N/A' }}</td>
                                     <td>{{ strtoupper($activity_booking->booking_type ?? 'N/A') }}</td>
 
                                     <td>
                                         @if ($activity_booking->booking_status == 1)
-                                            <span class="badge bg-success custom-badge">Completed</span>
-                                        @else
-                                            <span class="badge bg-danger custom-badge">Cancelled</span>
+                                            <span class="badge bg-primary">Completed</span>
+                                        @elseif ($activity_booking->booking_status == 2)
+                                            <span class="badge bg-danger">Cancelled</span>
+                                        @elseif ($activity_booking->booking_status == 3)
+                                            <span class="badge bg-warning">Penalty</span>
+                                        @elseif ($activity_booking->booking_status == 4)
+                                            <span class="badge bg-dark">No Show</span>
                                         @endif
                                     </td>
+
                                     <td>{{ strtoupper($activity_booking->booking_date ?? 'N/A') }}</td>
                                     <td>{{ strtoupper($activity_booking->booking_start_time ?? 'N/A') }}</td>
                                     <td>{{ strtoupper($activity_booking->booking_end_time ?? 'N/A') }}</td>
+
+                                    <td>{{ strtoupper($activity_booking->cancelledBy->name ?? 'N/A') }}</td>
+                                    <td>{{ strtoupper($activity_booking->cancelled_at ?? 'N/A') }}</td>
+
+                                    <td class="{{ ($activity_booking->penalty_amount ?? 0) > 0 ? 'text-danger fw-semibold' : '' }}">
+                                        ₱{{ number_format($activity_booking->penalty_amount ?? 0, 2) }}
+                                    </td>
+
+                                    <td>
+                                        @if($activity_booking->penalty_waived)
+                                            <span class="badge bg-primary">YES</span>
+                                        @else
+                                            <span class="badge bg-danger">NO</span>
+                                        @endif
+                                    </td>
+
+                                    <td>{{ $activity_booking->waivedBy->name ?? 'N/A' }}</td>
+                                    <td>{{ $activity_booking->penaltyAppliedBy->name ?? 'N/A' }}</td>
+
+                                    <td>{{ strtoupper($activity_booking->user->name ?? 'N/A') }}</td>
                                     <td>{{ strtoupper($activity_booking->created_at ?? 'N/A') }}</td>
                                     <td>{{ strtoupper($activity_booking->updated_at ?? 'N/A') }}</td>
+
+                                    {{-- ACTION COLUMN (simplified) --}}
+                                    <td class="sticky-col sticky-col-color">
+                                        <div class="d-flex gap-1 justify-content-center">
+
+                                            <button type="button" class="btn btn-primary viewActivityBookingDetailsBtn btn-sm" title="View"
+                                                data-id="{{ $activity_booking->id }}">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </button>
+
+                                        </div>
+                                    </td>
 
                                 </tr>
                             @endforeach
@@ -103,4 +146,5 @@
         </div>
     </div>
     @include('backend.modal.downloadHistory-modal')
+     @include('backend.modal.activities.activities-booking-modal')
 @endsection

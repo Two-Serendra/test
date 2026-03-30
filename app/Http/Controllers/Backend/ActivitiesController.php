@@ -1360,91 +1360,32 @@ class ActivitiesController extends Controller
             return response()->json(['message' => 'Data not found'], 404);
         }
 
-        $booking->save();
         $booking->booking_start_time = Carbon::parse($booking->booking_start_time)->format('h:i A');
         $booking->booking_end_time = Carbon::parse($booking->booking_end_time)->format(format: 'h:i A');
 
         return response()->json([
-            'id' => $booking->id,
-            'transaction_no' => $booking->transaction_no,
-            'activity_name' => $booking->activity->activity_name,
-            'unit' => $booking->unit,
-            'name' => $booking->name,
-            'contact_number' => $booking->contact_number,
-            'booking_type' => $booking->booking_type,
-            'resident_type' => $booking->resident_type,
-            'booking_date' => $booking->booking_date,
-            'booking_start_time' => $booking->booking_start_time,
-            'booking_end_time' => $booking->booking_end_time,
-            'booking_status' => $booking->booking_status,
+            'booking' => [
+                'id' => $booking->id,
+                'transaction_no' => $booking->transaction_no,
+                'activity_name' => $booking->activity->activity_name,
+                'unit' => $booking->unit,
+                'name' => $booking->name,
+                'contact' => $booking->contact_number,
+                'booking_type' => $booking->booking_type,
+                'resident_type' => $booking->resident_type,
+                'booking_date' => $booking->booking_date,
+                'booking_start_time' => $booking->booking_start_time,
+                'booking_end_time' => $booking->booking_end_time,
+                'booking_status' => $booking->booking_status,
 
+                // ✅ ADD THESE
+                'penalty_amount' => $booking->penalty_amount,
+                'penalty_waived' => $booking->penalty_waived,
+                'has_penalty' => $booking->penalty_amount > 0,
+                'cancelled_at' => $booking->cancelled_at,
+            ]
         ]);
     }
-
-    // public function cancelBooking(ActivityBooking $booking, Request $request)
-    // {
-    //     try {
-
-    //         $booking->load('activity');
-
-    //         if (!$booking->canCancel()) {
-    //             return response()->json([
-    //                 'success' => false,
-    //                 'message' => 'Booking cannot be cancelled.'
-    //             ], 400);
-    //         }
-
-    //         $withPenalty = $booking->isWithin12Hours();
-    //         if (!$request->has('confirm') && $withPenalty) {
-    //             return response()->json([
-    //                 'success' => true,
-    //                 'requires_confirmation' => true,
-    //                 'message' => " Cancelling within 12 hours will incur a ₱1000 penalty."
-    //             ]);
-    //         }
-
-    //         $transactionNo = $booking->transaction_no;
-
-    //         $bookings = ActivityBooking::where('transaction_no', $transactionNo)->get();
-
-    //         foreach ($bookings as $b) {
-
-    //             if ($withPenalty) {
-    //                 $b->applyCancellationPenalty();
-    //                 $b->booking_status = 3;
-    //             } else {
-    //                 $b->booking_status = 2; 
-    //             }
-
-    //             $b->cancelled_at = now();
-    //             $b->cancelled_by = auth()->id();
-    //             $b->save();
-    //         }
-
-    //         $penaltyAmount = $booking->penalty_amount ?? 0;
-
-    //         return response()->json([
-    //             'success' => true,
-    //             'withPenalty' => $withPenalty,
-    //             'penaltyAmount' => $penaltyAmount,
-    //             'message' => $withPenalty
-    //                 ? "Booking cancelled. ₱{$penaltyAmount} penalty applied."
-    //                 : "Booking has been cancelled successfully."
-    //         ]);
-
-    //     } catch (\Exception $e) {
-
-    //         \Log::error('Admin Cancel Booking Error', [
-    //             'error' => $e->getMessage()
-    //         ]);
-
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Failed to cancel booking.'
-    //         ], 500);
-    //     }
-    // }
-
     public function cancelBooking(ActivityBooking $booking, Request $request)
     {
         try {
@@ -1531,7 +1472,7 @@ class ActivitiesController extends Controller
     public function History(Request $request)
     {
         $currentDate = Carbon::now()->toDateString();
-        $activity_bookings = ActivityBooking::with('activity')
+        $activity_bookings = ActivityBooking::with(['activity', 'user', 'cancelledBy', 'waivedBy', 'penaltyAppliedBy'])
             ->whereDate('booking_date', '<', $currentDate)
             ->orderBy('booking_date', 'desc')
             ->paginate(10);
@@ -1552,7 +1493,7 @@ class ActivitiesController extends Controller
         $searchHistory = $request->input('searchHistory');
         $currentDate = now();
 
-        $activity_bookings = ActivityBooking::with('activity')
+        $activity_bookings = ActivityBooking::with(['activity', 'user', 'cancelledBy', 'waivedBy', 'penaltyAppliedBy'])
             ->where('booking_date', '<', $currentDate)
             ->when($searchHistory, function ($query, $searchHistory) {
                 $query->where(function ($q) use ($searchHistory) {
@@ -1572,7 +1513,7 @@ class ActivitiesController extends Controller
         $amenities = Amenity::all();
         $activities = Activity::all();
 
-        return view('backend.history', compact('activity_bookings', 'amenities', 'activities', 'searchHistory'));
+        return view('backend.activities.admin-activity-booking-records', compact('activity_bookings', 'amenities', 'activities', 'searchHistory'));
     }
 
     public function downloadHistory(Request $request)
@@ -1974,6 +1915,41 @@ class ActivitiesController extends Controller
                 'message' => 'Failed to update penalty.'
             ], 500);
         }
+    }
+
+
+    public function fetchInfoBookingReport($id)
+    {
+        $booking = ActivityBooking::find($id);
+        if (!$booking) {
+            return response()->json(['message' => 'Data not found'], 404);
+        }
+
+        $booking->booking_start_time = Carbon::parse($booking->booking_start_time)->format('h:i A');
+        $booking->booking_end_time = Carbon::parse($booking->booking_end_time)->format(format: 'h:i A');
+
+        return response()->json([
+            'booking' => [
+                'id' => $booking->id,
+                'transaction_no' => $booking->transaction_no,
+                'activity_name' => $booking->activity->activity_name,
+                'unit' => $booking->unit,
+                'name' => $booking->name,
+                'contact' => $booking->contact_number,
+                'booking_type' => $booking->booking_type,
+                'resident_type' => $booking->resident_type,
+                'booking_date' => $booking->booking_date,
+                'booking_start_time' => $booking->booking_start_time,
+                'booking_end_time' => $booking->booking_end_time,
+                'booking_status' => $booking->booking_status,
+
+                // ✅ ADD THESE
+                'penalty_amount' => $booking->penalty_amount,
+                'penalty_waived' => $booking->penalty_waived,
+                'has_penalty' => $booking->penalty_amount > 0,
+                'cancelled_at' => $booking->cancelled_at,
+            ]
+        ]);
     }
 }
 

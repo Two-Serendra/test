@@ -132,191 +132,96 @@
 </div>
 
 
-<!-- EDIT BOOKING -->
-<!-- <div class="modal fade" id="bookingEdit" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-3" id="staticBackdropLabel">EDIT BOOKING</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="updateBooking" method="POST" enctype="multipart/form-data" class="needs-validation"
-                    novalidate>
-                    @csrf
-                    <div class="row">
-                        <input type="hidden" id="booking_id" name="booking_id" required>
-                        <div class="col-6">
-
-                            <input type="hidden" id="edit_bookingType" name="booking_type">
-
-                            <ul class="nav nav-tabs mb-3" id="bookingTabs">
-                                <li class="nav-item">
-                                    <a class="nav-link" id="advanced-tab" data-bs-toggle="tab" href="#"
-                                        data-value="ADVANCED BOOKING">Advanced Booking</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link " id="walkin-tab" data-bs-toggle="tab" href="#"
-                                        data-value="WALK-IN">Walk-in</a>
-                                </li>
-                            </ul>
-
-                            <div class="mb-3">
-                                <select class="form-select" id="edit_booking_select" name="edit_amenity_id_activity">
-                                    <option value="" disabled selected>Select Activity</option>
-                                    @foreach($activities as $activity)
-                                        <option value="{{ $activity->id }}">{{ strtoupper($activity->activity_name) }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <div class="invalid-feedback">Please select an activity</div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="" class="form-label">Unit *</label>
-                                <input type="text" class="form-control" id="edit_booking_unit" name="booking_unit"
-                                    required>
-                                <div class="invalid-feedback">
-                                    Required
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="selectResidentType" class="form-label">Resident Type *</label>
-                                <select class="form-select" id="edit_selectResidentType" name="edit_selectResidentType"
-                                    required>
-                                    <option value="Owner">Owner</option>
-                                    <option value="Tenant">Tenant</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="" class="form-label">Name *</label>
-                                <input type="text" class="form-control" id="edit_booking_name" name="booking_name"
-                                    required>
-                                <div class="invalid-feedback">
-                                    Required
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-
-                            <div class="mb-3">
-                                <label for="" class="form-label">Contact </label>
-                                <input type="text" class="form-control" id="edit_contact_number" name="contact_number">
-                            </div>
-
-
-
-                            <div class="mb-3 position-relative">
-                                <label for="" class="form-label">Date *</label>
-                                <input type="date" id="edit_booking_date" class="form-control" name="booking_date">
-                            </div>
-
-                            <div class="mb-3 position-relative">
-                                <label for="edit_booking_start_time" class="form-label">Time Start *</label>
-                                <span id="current_start_time" class="text-muted d-inline ms-2"></span>
-                                <select class="form-control" id="edit_booking_start_time" name="booking_start_time"
-                                    required disabled>
-                                </select>
-                                <i class="fa-regular fa-clock position-absolute"
-                                    style="top: 73%; right: 8px; transform: translateY(-50%);"></i>
-
-                            </div>
-
-                            <div class="mb-3 position-relative">
-                                <label for="endTime" class="form-label">Time Finish *</label>
-                                <span id="current_end_time" class="text-muted d-inline ms-2"></span>
-                                <select class="form-control" id="edit_booking_end_time" name="booking_end_time" required
-                                    disabled>
-                                </select>
-                                <i class="fa-regular fa-clock position-absolute"
-                                    style="top: 73%; right: 8px; transform: translateY(-50%);"></i>
-                            </div>
-                        </div>
-
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="submit" form="updateBooking" class="btn btn-primary">Update</button>
-            </div>
-        </div>
-    </div>
-</div> -->
-
 <div class="modal fade" id="bookingEdit" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-3 booking_type_text" id="staticBackdropLabel"></h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-primary text-white justify-content-center position-relative">
+                <h5 class="modal-title m-0">
+                    <img src="{{ asset('assets/images/TWO SERENDRA LOGO PNG (White).png') }}"
+                        style="height: 60px; width: auto;" alt="2serendra" />
+                </h5>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
+                    data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <form id="updateBooking" method="POST" enctype="multipart/form-data" class="needs-validation"
-                    novalidate>
-                    @csrf
-                    <input type="hidden" id="booking_id" name="booking_id">
+            <div class="modal-body px-4 py-3">
 
-                    <div class="row">
-                        <div class="col-6">
-                            <input type="hidden" id="edit_bookingType" name="booking_type">
+                <!-- Header -->
+                <div class="text-center mb-4">
+                    <h5 class="fw-bold mb-1">Booking Details</h5>
+                    <small class="text-muted">Reference #: <span id="detail-transaction-no"></span></small>
+                </div>
 
-                            <!-- <h3 id="booking_type_text" class="text-center"></h3> -->
+                <!-- STATUS + PENALTY (Highlight Section) -->
+                <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded bg-light">
+                    <div>
+                        <small class="text-muted d-block">Status</small>
+                        <span id="detail-booking-status"></span>
+                    </div>
 
-                            <!-- Booking Status below it -->
-                            <p id="booking_status_text" class="text-center font-weight-bold"></p>
+                    <div class="text-end">
+                        <small class="text-muted d-block">Penalty</small>
+                        <span id="detail-penalty-display" class="fw-semibold"></span>
+                    </div>
+                </div>
 
-                            <div class="mb-3">
-                                <label class="form-label custom-label">Transaction No.</label>
-                                <p id="edit_transaction_no" class="form-control-plaintext custom-p"></p>
+                <div class="row g-3">
+
+                    <!-- Guest Info Card -->
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 h-100">
+                            <h6 class="fw-semibold text-primary mb-3">Guest Information</h6>
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Name</span>
+                                <span id="detail-name" class="fw-semibold text-end"></span>
                             </div>
 
-                            <div class="mb-3">
-                                <label class="form-label custom-label">Activity</label>
-                                <p id="edit_booking_select_text" class="form-control-plaintext custom-p"></p>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Unit</span>
+                                <span id="detail-unit" class="fw-semibold"></span>
                             </div>
 
-                            <div class="mb-3">
-                                <label class="form-label custom-label">Unit</label>
-                                <p id="edit_booking_unit_text" class="form-control-plaintext custom-p"></p>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Resident Type</span>
+                                <span id="detail-resident-type"></span>
                             </div>
 
-                            <div class="mb-3">
-                                <label class="form-label custom-label">Resident Type</label>
-                                <p id="edit_selectResidentType_text" class="form-control-plaintext custom-p"></p>
-                            </div>
-
-
-                        </div>
-
-                        <div class="col-6">
-
-                            <div class="mb-3">
-                                <label class="form-label custom-label">Name</label>
-                                <p id="edit_booking_name_text" class="form-control-plaintext custom-p"></p>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label custom-label">Contact</label>
-                                <p id="edit_contact_number_text" class="form-control-plaintext custom-p"></p>
-                            </div>
-
-
-
-                            <div class="mb-3">
-                                <label class="form-label custom-label">Time Start</label>
-                                <p id="edit_booking_start_time_text" class="form-control-plaintext custom-p"></p>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label custom-label">Time Finish</label>
-                                <p id="edit_booking_end_time_text" class="form-control-plaintext custom-p"></p>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Contact</span>
+                                <span id="detail-contact" class="fw-semibold"></span>
                             </div>
                         </div>
                     </div>
-                </form>
+
+                    <!-- Booking Info Card -->
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 h-100">
+                            <h6 class="fw-semibold text-primary mb-3">Booking Information</h6>
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Activity</span>
+                                <span id="detail-activity-name" class="fw-semibold text-end"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Type</span>
+                                <span id="detail-booking-type" class="fw-semibold"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Date</span>
+                                <span id="detail-booking-date" class="fw-semibold"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Time</span>
+                                <span id="detail-start-time" class="fw-semibold"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>

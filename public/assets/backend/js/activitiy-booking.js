@@ -1,4 +1,13 @@
 $(document).ready(function () {
+
+
+    window.showLoading = function () {
+        $('#loadingOverlay').css('display', 'flex').hide().fadeIn(150);
+    }
+
+    window.hideLoading = function () {
+        $('#loadingOverlay').fadeOut(150);
+    }
     $(document).ready(function () {
 
         $('#uploadBookingBtn').on('click', function () {
@@ -684,87 +693,165 @@ $('#bookingTable').on('click', '.mark-as-no-show', function () {
 
 $('#bookingTable').on('click', '.editInfo_id_booking', function () {
     var booking_id = $(this).data("id");
+    showLoading();
+    $.ajax({
+        url: '/admin/fetch/activity-booking/' + booking_id,
+        method: 'GET',
+        success: function (response) {
+            const booking = response.booking;
+            const withinPenalty = $('#detail-transaction-no').data('within-penalty');
 
-    $.get('/admin/fetch/booking/' + booking_id, function (data) {
-        $('#bookingEdit').modal('show');
+            const bookingDate = new Date(booking.booking_date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Reset time for accurate comparison
+            const optionsDate = { year: 'numeric', month: 'long', day: '2-digit' };
+            const formattedDate = bookingDate.toLocaleDateString(undefined, optionsDate);
 
-        $('#edit_transaction_no').text(data.transaction_no);
-        $('#edit_booking_select_text').text(data.activity_name);
-        $('#edit_booking_unit_text').text(data.unit);
-        $('#edit_booking_name_text').text(data.name);
-        $('#edit_contact_number_text').text(data.contact_number);
-        $('#edit_booking_start_time_text').text(data.booking_start_time);
-        $('#edit_booking_end_time_text').text(data.booking_end_time);
-        $('#edit_selectResidentType_text').empty();
+            // Format start/end times
+            const formatTime = (timeStr) => {
+                if (!timeStr) return 'N/A';
+                const d = new Date(`1970-01-01T${timeStr}`);
+                let hours = d.getHours();
+                const minutes = d.getMinutes();
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12 || 12;
+                return `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+            };
 
-        if (data.resident_type === 'TENANT') {
-            $('#edit_selectResidentType_text').append(
-                '<span class="badge bg-danger border-danger custom-badge">TENANT</span>'
+            const startTime = booking.booking_start_time;
+            const endTime = booking.booking_end_time;
+
+            $('#detail-transaction-no').text(booking.transaction_no)
+                .data('booking-id', booking.id)
+                .data('within-penalty', withinPenalty);
+            $('#detail-booking-type').text(booking.booking_type ?? 'N/A');
+            $('#detail-name').text(booking.name ?? booking.created_by_name ?? 'N/A');
+            $('#detail-unit').text(booking.unit ?? 'N/A');
+            $('#detail-activity-name').text(booking.activity_name ?? 'N/A');
+            $('#detail-start-time').text(`${startTime} - ${endTime}` ?? 'N/A');
+            $('#detail-contact').text(booking.contact ?? 'N/A');
+            $('#detail-booking-date').text(formattedDate ?? 'N/A');
+            $('#detail-transaction-no').data('booking-id', booking.id);
+
+
+            let residentBadgeClass = '';
+            if (booking.resident_type === 'TENANT') residentBadgeClass = 'fw-semibold text-danger';
+            else if (booking.resident_type === 'OWNER') residentBadgeClass = 'fw-semibold text-primary';
+            else residentBadgeClass = 'text-secondary text-white';
+
+            $('#detail-resident-type').html(
+                `<span class="fw-semibold ${residentBadgeClass}">${booking.resident_type ?? 'N/A'}</span>`
             );
-        } else if (data.resident_type === 'OWNER') {
-            $('#edit_selectResidentType_text').append(
-                '<span class="badge bg-primary border-primary custom-badge">OWNER</span>'
-            );
-        }
 
-        // Create booking date once
-        const bookingDate = new Date(data.booking_date);
+            let statusText = '';
+            let statusClass = '';
+            let cancelledAtText = ''; // 👈 NEW
 
-        const optionsDate = {
-            year: 'numeric',
-            month: 'long',
-            day: '2-digit'
-        };
+            const formatDateTime = (dateStr) => {
+                if (!dateStr) return '';
+                const d = new Date(dateStr);
 
-        const formattedDate = bookingDate.toLocaleDateString(undefined, optionsDate);
-        $('#edit_booking_date_text').text(formattedDate);
+                const options = {
+                    year: 'numeric',
+                    month: 'short',
+                    day: '2-digit',
+                    hour: 'numeric',
+                    minute: '2-digit'
+                };
 
-        $('#booking_id').val(booking_id);
+                return d.toLocaleString(undefined, options);
+            };
 
-        let today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        let statusText = '';
-        let statusClass = '';
-
-        if (bookingDate < today) {
-            statusText = 'Completed';
-            statusClass = 'badge bg-success';
-
-        } else {
-            switch (data.booking_status) {
-
+            // PRIORITY: real booking status first
+            switch (booking.booking_status) {
                 case 1:
-                    statusText = 'Confirmed';
-                    statusClass = 'badge bg-success';
-                    $('#cancelAmenityBookingBtn').show();
+                    if (bookingDate < today) {
+                        statusText = 'Completed';
+                        statusClass = 'text-primary';
+                        $('#cancelAmenityBookingBtn').hide();
+                    } else {
+                        statusText = 'Confirmed';
+                        statusClass = 'text-primary';
+                        $('#cancelAmenityBookingBtn').show();
+                    }
                     break;
 
                 case 2:
                     statusText = 'Cancelled';
-                    statusClass = 'badge bg-danger';
+                    statusClass = 'text-danger';
+                    if (booking.cancelled_at) {
+                        cancelledAtText = `<small class="text-muted"> at ${formatDateTime(booking.cancelled_at)}</small>`;
+                    }
+                    $('#cancelAmenityBookingBtn').hide();
                     break;
 
                 case 3:
-                    statusText = 'Penalty';
-                    statusClass = 'badge bg-warning';
+                    statusText = 'Late cancel';
+                    statusClass = 'text-warning';
+
+                    if (booking.cancelled_at) {
+                        cancelledAtText = `<small class="text-muted"> at ${formatDateTime(booking.cancelled_at)}</small>`;
+                    }
+                    $('#cancelAmenityBookingBtn').hide();
                     break;
 
                 case 4:
                     statusText = 'No Show';
-                    statusClass = 'badge bg-dark';
+                    statusClass = 'text-dark';
+                    $('#cancelAmenityBookingBtn').hide();
                     break;
 
                 default:
-                    statusText = 'N/A';
-                    statusClass = 'badge bg-secondary';
+                    // ONLY mark as completed if no specific status
+                    if (bookingDate < today) {
+                        statusText = 'Completed';
+                        statusClass = 'text-primary';
+                    } else {
+                        statusText = 'N/A';
+                        statusClass = 'text-secondary';
+                    }
+                    $('#cancelAmenityBookingBtn').hide();
             }
+
+            // Reset
+            $('#detail-penalty-display').removeClass('text-danger text-primary fw-semibold');
+
+            // No penalty
+            if (!booking.has_penalty || booking.penalty_amount == 0) {
+                $('#detail-penalty-display').text('-');
+
+            } else {
+                const amount = parseFloat(booking.penalty_amount).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+
+                if (booking.penalty_waived) {
+                    // Waived
+                    $('#detail-penalty-display')
+                        .html(`₱${amount} <span class="text-primary">(Waived)</span>`)
+                        .addClass('fw-semibold');
+
+                } else {
+                    // Not waived
+                    $('#detail-penalty-display')
+                        .text(`₱${amount}`)
+                        .addClass('text-danger fw-semibold');
+                }
+            }
+            $('#detail-booking-status').html(`
+                    <span class="${statusClass}">${statusText}</span>
+                    ${cancelledAtText}
+                `);
+
+            $('#bookingEdit').modal('show');
+        },
+        error: function () {
+            alert('Booking not found.');
+        },
+        complete: function () {
+            hideLoading();
         }
-
-        $('#booking-status').html(`<span class="${statusClass}">${statusText}</span>`);
-
-    }).fail(function () {
-        alert("Data not found");
     });
 });
 
@@ -920,7 +1007,6 @@ $('#updateBooking').on('submit', function (e) {
 
 });
 
-
 function refreshTableBookings() {
     $.ajax({
         url: '/admin/get-updated-bookings-table',
@@ -1065,7 +1151,7 @@ function refreshTableBookings() {
                     ? booking.waived_by.toUpperCase()
                     : 'N/A';
 
-    
+
                 var cancelledByHtml = booking.cancelled_by
                     ? booking.cancelled_by.toUpperCase()
                     : 'N/A';
@@ -1493,48 +1579,6 @@ $('.SearchSlotAdmin').submit(function (event) {
         }
     });
 });
-
-
-
-// $('#bookingTable').on('click', 'mark-as-no-show', function () {
-
-//     const bookingId = $(this).data('id');
-
-//     Swal.fire({
-//         title: "Mark as No Show?",
-//         html: "The resident did not attend. A <b>₱1000 penalty</b> will be applied.",
-//         icon: "warning",
-//         showCancelButton: true,
-//         confirmButtonColor: "#d33",
-//         cancelButtonColor: "#3085d6",
-//         confirmButtonText: "Yes, mark as no show",
-//         cancelButtonText: "Cancel"
-//     }).then((result) => {
-//         if (!result.isConfirmed) return;
-
-//         $.ajax({
-//             url: `/admin/mark-no-show/${bookingId}`,
-//             method: 'POST',
-//             data: {
-//                 _token: $('meta[name="csrf-token"]').attr('content')
-//             },
-//             success: function (res) {
-//                 if (!res.success) {
-//                     Swal.fire('Error', res.message || 'Failed to mark no show.', 'error');
-//                     return;
-//                 }
-
-//                 Swal.fire('Updated!', res.message, 'success')
-//                     .then(() => refreshTableBookings());
-//             },
-//             error: function () {
-//                 Swal.fire('Error', 'Something went wrong.', 'error');
-//             }
-//         });
-//     });
-// });
-
-
 
 
 

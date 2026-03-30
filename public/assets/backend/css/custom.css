@@ -232,3 +232,20 @@
     color: #008b26 !important;
     font-weight: bold;
 }
+
+.sticky-col {
+    position: -webkit-sticky;
+    position: sticky;
+    right: 0;
+    z-index: 1000;
+}
+
+.sticky-col-color, .sticky-th {
+    background-color: #fff !important;
+
+}
+
+th.sticky-col,
+td.sticky-col {
+    z-index: 1001;
+}

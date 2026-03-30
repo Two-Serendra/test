@@ -69,6 +69,7 @@
                             <th class="table-custom sticky-th">PENALTY</th>
                             <th class="table-custom sticky-th">PENALTY WAIVED</th>
                             <th class="table-custom sticky-th">WAIVED BY</th>
+                            <th class="table-custom sticky-th">APPLIED BY</th>
                             <th class="table-custom sticky-th">CREATED BY</th>
                             <th class="table-custom sticky-th">CREATED AT</th>
                             <th class="table-custom sticky-th">UPDATED AT</th>
@@ -131,6 +132,9 @@
                                     <td>
                                         {{ $booking->waivedBy->name ?? 'N/A' }}
                                     </td>
+                                    <td>
+                                        {{ $booking->penaltyAppliedBy->name ?? 'N/A' }}
+                                    </td>
 
                                     <td>{{ strtoupper($booking->user->name ?? 'N/A') }}</td>
                                     <td>{{ strtoupper($booking->created_at ?? 'N/A') }}</td>
@@ -177,6 +181,23 @@
                                                     <i class="fa-solid fa-user-slash"></i>
                                                 </button>
 
+                                            @endif
+
+
+                                            @if ($booking->penalty_amount > 0 && !$booking->penalty_waived)
+
+                                                <button type="button" class="btn btn-success manage-penalty btn-sm btn-equal"
+                                                    data-action="waive" data-id="{{ $booking->id }}" data-bs-toggle="tooltip"
+                                                    title="Waive Penalty">
+                                                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                                                </button>
+                                            @else
+                                                {{-- No penalty or waived → allow apply --}}
+                                                <button type="button" class="btn btn-dark manage-penalty btn-sm btn-equal"
+                                                    data-action="apply" data-id="{{ $booking->id }}" data-bs-toggle="tooltip"
+                                                    title="Apply Penalty">
+                                                    <i class="fa-solid fa-coins"></i>
+                                                </button>
                                             @endif
                                         </div>
                                     </td>

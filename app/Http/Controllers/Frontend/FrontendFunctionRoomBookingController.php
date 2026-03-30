@@ -224,6 +224,16 @@ class FrontendFunctionRoomBookingController extends Controller
             ->take(4)
             ->get();
 
+        if ($suggestions->count() < 4) {
+            $additional = Activity::where('id', '!=', $activity->id)
+                ->whereNotIn('id', $suggestions->pluck('id'))
+                ->inRandomOrder()
+                ->take(4 - $suggestions->count())
+                ->get();
+
+            $suggestions = $suggestions->merge($additional);
+        }
+
         $residences = auth()->check()
             ? DB::table('resident_details')
                 ->where('email', auth()->user()->email)

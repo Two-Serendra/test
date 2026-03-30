@@ -154,6 +154,7 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/download-history', [ActivitiesController::class, 'downloadHistory'])->name('download-history');
     Route::get('/admin-activity-booking-calendar', [ActivitiesController::class, 'AdminActivityBookingCalendar'])->name('admin.activity.booking.calendar');
     Route::get('/fetch/activity-calendar-schedule/{id}', [ActivitiesController::class, 'fetchActivityCalendarInfo'])->name("fetchActivityCalendarSchedule");
+    Route::post('/admin-manage-penalty/{booking}', [ActivitiesController::class, 'managePenalty']);
 
     Route::post('/amenity-import-booking', [ActivitiesController::class, 'importAmenityBookings'])->name('booking.import');
 

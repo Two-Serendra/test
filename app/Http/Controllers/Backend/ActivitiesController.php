@@ -432,7 +432,7 @@ class ActivitiesController extends Controller
     public function AdminBookingActivities(Request $request)
     {
         $currentDate = Carbon::today();
-        $bookings = ActivityBooking::with(['activity', 'user', 'cancelledBy'])
+        $bookings = ActivityBooking::with(['activity', 'user', 'cancelledBy', 'waivedBy', 'penaltyAppliedBy'])
             ->whereDate('booking_date', '>=', $currentDate)
             ->latest()
             ->paginate(10);
@@ -1315,7 +1315,7 @@ class ActivitiesController extends Controller
     {
         $currentDate = Carbon::today();
 
-        $bookings = ActivityBooking::with(['activity', 'user', 'cancelledBy', 'waivedBy'])
+        $bookings = ActivityBooking::with(['activity', 'user', 'cancelledBy', 'waivedBy', 'penaltyAppliedBy'])
             ->whereDate('booking_date', '>=', $currentDate)
             ->latest()
             ->paginate(10);
@@ -1343,6 +1343,7 @@ class ActivitiesController extends Controller
                 'booking_end_time' => Carbon::parse($booking->booking_end_time)->format('h:i A'),
                 'created_at' => Carbon::parse($booking->created_at)->format('Y-m-d H:i:s'),
                 'updated_at' => Carbon::parse($booking->updated_at)->format('Y-m-d H:i:s'),
+                'penalty_applied_by' => $booking->penaltyAppliedBy?->name ?? null,
             ];
         });
 
@@ -1924,6 +1925,55 @@ class ActivitiesController extends Controller
             'activity_name' => strtoupper($schedule->activity->activity_name),
 
         ]);
+    }
+
+
+    public function managePenalty(ActivityBooking $booking, Request $request)
+    {
+        try {
+
+            $booking->load('activity');
+
+            $action = $request->input('action');
+
+            $transactionNo = $booking->transaction_no;
+            $bookings = ActivityBooking::where('transaction_no', $transactionNo)->get();
+
+            foreach ($bookings as $b) {
+
+                if ($action === 'apply') {
+
+                    $b->applyManualPenalty();
+                    $b->penalty_waived = false;
+                    $b->waived_by = null;
+
+                } elseif ($action === 'waive') {
+
+                    $b->waivePenalty();
+                    $b->penalty_applied_by = null;
+                }
+
+                $b->save();
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => $action === 'apply'
+                    ? 'Penalty applied successfully.'
+                    : 'Penalty waived successfully.'
+            ]);
+
+        } catch (\Exception $e) {
+
+            \Log::error('Manage Penalty Error', [
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update penalty.'
+            ], 500);
+        }
     }
 }
 

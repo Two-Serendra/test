@@ -30,6 +30,9 @@ class ActivityBooking extends Model
         'cancelled_by',
         'has_penalty',
         'penalty_amount',
+        'penalty_waived',
+        'waived_by',
+        'penalty_applied_by',
         'cancelled_within_12hrs',
     ];
 
@@ -81,5 +84,28 @@ class ActivityBooking extends Model
     public function canCancel(): bool
     {
         return $this->booking_status == 1 && !$this->cancelled_at;
+    }
+
+    public function applyManualPenalty(): void
+    {
+        $this->has_penalty = true;
+        $this->penalty_amount = 1000;
+        $this->cancelled_within_12hrs = 0;
+        $this->penalty_applied_by = auth()->id();
+    }
+
+    public function penaltyAppliedBy()
+    {
+        return $this->belongsTo(User::class, 'penalty_applied_by');
+    }
+
+    public function waivePenalty(): void
+    {
+        if ($this->penalty_amount <= 0) {
+            $this->penalty_amount = 1000; // optional safeguard
+        }
+
+        $this->penalty_waived = true;
+        $this->waived_by = auth()->id();
     }
 }

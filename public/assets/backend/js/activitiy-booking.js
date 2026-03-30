@@ -971,7 +971,6 @@ function refreshTableBookings() {
                         bookingStatusHtml = 'N/A';
                 }
 
-                // Action Buttons
                 var actionButtons = `
                     <div class="d-flex gap-1 justify-content-center">
                         <!-- View button -->
@@ -982,7 +981,7 @@ function refreshTableBookings() {
                         </button>
                 `;
 
-                // Cancel button
+
                 if (booking.booking_status == 2 || booking.booking_status == 3 || booking.booking_status == 4) {
                     actionButtons += `
                         <button type="button" class="btn btn-secondary cancelled-booking btn-sm btn-equal"
@@ -1000,8 +999,6 @@ function refreshTableBookings() {
                         </button>
                     `;
                 }
-
-                // Create booking datetime
                 var bookingDateTime = new Date(booking.booking_date + " " + booking.booking_start_time);
                 var now = new Date();
 
@@ -1011,7 +1008,6 @@ function refreshTableBookings() {
                     booking.booking_status == 4 ||
                     bookingDateTime > now;
 
-                // No Show button
                 if (disableNoShow) {
                     actionButtons += `
         <button type="button" class="btn btn-secondary marked-as-no-show btn-sm btn-equal"
@@ -1028,8 +1024,33 @@ function refreshTableBookings() {
         </button>
     `;
                 }
+
+                if (booking.penalty_amount > 0 && !booking.penalty_waived) {
+                    actionButtons += `
+        <button type="button"
+            class="btn btn-success manage-penalty btn-sm btn-equal"
+            data-action="waive"
+            data-id="${booking.id}"
+            data-bs-toggle="tooltip"
+            title="Waive Penalty">
+            <i class="fa-solid fa-hand-holding-dollar"></i>
+        </button>
+    `;
+
+                } else {
+
+                    actionButtons += `
+        <button type="button"
+            class="btn btn-dark manage-penalty btn-sm btn-equal"
+            data-action="apply"
+            data-id="${booking.id}"
+            data-bs-toggle="tooltip"
+            title="Apply Penalty">
+            <i class="fa-solid fa-coins"></i>
+        </button>
+    `;
+                }
                 actionButtons += `</div>`;
-                // Penalty Waived Badge
 
                 var penaltyAmountHtml = booking.penalty_amount && booking.penalty_amount > 0
                     ? `<span class="text-danger fw-semibold">₱${parseFloat(booking.penalty_amount).toFixed(2)}</span>`
@@ -1039,20 +1060,23 @@ function refreshTableBookings() {
                     ? `<span class="badge bg-primary">YES</span>`
                     : `<span class="badge bg-danger">NO</span>`;
 
-                // Waived By
+
                 var waivedByHtml = booking.waived_by
                     ? booking.waived_by.toUpperCase()
                     : 'N/A';
 
-                // Cancelled By
+    
                 var cancelledByHtml = booking.cancelled_by
                     ? booking.cancelled_by.toUpperCase()
                     : 'N/A';
 
-                // Cancelled At
                 var cancelledAtHtml = booking.cancelled_at || 'N/A';
 
                 var createdByHtml = booking.created_by ? booking.created_by.toUpperCase() : 'N/A';
+
+                var penaltyAppliedByHtml = booking.penalty_applied_by
+                    ? booking.penalty_applied_by.toUpperCase()
+                    : 'N/A';
                 var row = $(`
                     <tr>
                         <td>${booking.transaction_no ? booking.transaction_no.toUpperCase() : 'N/A'}</td>
@@ -1071,6 +1095,7 @@ function refreshTableBookings() {
                          <td>${penaltyAmountHtml}</td>   
                         <td>${penaltyWaivedHtml}</td>
                         <td>${waivedByHtml}</td>
+                        <td>${penaltyAppliedByHtml}</td>
                         <td>${createdByHtml}</td>
                         <td>${booking.created_at || 'N/A'}</td>
                         <td>${booking.updated_at || 'N/A'}</td>
@@ -1229,9 +1254,11 @@ $('#bookingTable').on('click', '.cancel-booking', function () {
                         }
 
                     });
-
+                } else {
+                    // ✅ FIX HERE (no penalty case)
+                    Swal.fire('Cancelled!', res.message || 'Booking cancelled successfully.', 'success')
+                        .then(() => refreshTableBookings());
                 }
-
             }
         });
 
@@ -1254,6 +1281,64 @@ function sendCancelRequest(bookingId, waivePenalty = false) {
         }
     });
 }
+
+$('#bookingTable').on('click', '.manage-penalty', function () {
+
+    const bookingId = $(this).data('id');
+    const action = $(this).data('action'); // apply | waive
+
+    let config = {};
+
+    if (action === 'apply') {
+        config = {
+            title: "Apply Penalty?",
+            text: "This will manually apply a ₱1000 penalty to this booking.",
+            icon: "warning",
+            confirmButtonText: "Yes, apply",
+            confirmButtonColor: "#d33"
+        };
+    } else {
+        config = {
+            title: "Waive Penalty?",
+            text: "This will remove/waive the penalty for this booking.",
+            icon: "question",
+            confirmButtonText: "Yes, waive",
+            confirmButtonColor: "#28a745"
+        };
+    }
+
+    Swal.fire({
+        ...config,
+        showCancelButton: true,
+        cancelButtonText: "Cancel"
+    }).then((result) => {
+
+        if (!result.isConfirmed) return;
+
+        $.ajax({
+            url: `/admin/admin-manage-penalty/${bookingId}`,
+            method: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                action: action
+            },
+            success: function (res) {
+
+                if (!res.success) {
+                    Swal.fire('Error', res.message || 'Failed.', 'error');
+                    return;
+                }
+
+                Swal.fire('Success', res.message, 'success')
+                    .then(() => refreshTableBookings());
+            },
+            error: function () {
+                Swal.fire('Error', 'Something went wrong.', 'error');
+            }
+        });
+
+    });
+});
 
 $('.SlotChecking').on('click', function () {
     $('#SlotCheckingModal').modal('show');

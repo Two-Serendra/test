@@ -323,14 +323,14 @@ class ActivitiesController extends Controller
     }
 
 
-    public function fetchDateBlocking(Request $request)
+    public function fetchDateBlockingActivities(Request $request)
     {
         $dateBlockings = ActivityDateBlocking::with(['amenity', 'activity'])->paginate(10);
 
         $activities = Activity::all();
         $amenities = Amenity::all();
 
-        return view('backend.activities.date-blocking', compact('dateBlockings', 'activities', 'amenities'));
+        return view('backend.activities.admin-activity-date-blocking', compact('dateBlockings', 'activities', 'amenities'));
 
     }
     public function fetchActivityBlocking(Request $request)
@@ -441,7 +441,9 @@ class ActivitiesController extends Controller
             $booking->booking_end_time = Carbon::parse($booking->booking_end_time)->format('h:i A');
         }
 
-        $activities = Activity::where('activity_status', 1)->get();
+        $activities = Activity::with('amenity')
+            ->where('activity_status', 1)
+            ->get();
         $amenities = Amenity::all();
 
         return view('backend.activities.admin-activity-booking', compact('bookings', 'activities', 'amenities'));
@@ -1233,10 +1235,10 @@ class ActivitiesController extends Controller
 
         $sharedActivityGroups = [
             'almond_basketball' => [1, 2],
-            'sequoia_basketball' => [4, 5],
-            'almond_futsal' => [15, 17],
-            'sequoia_futsal' => [10, 16],
-            'almond_badminton' => [13, 18],
+            'almond_futsal' => [4, 5],
+            'almond_badminton' => [6, 7],
+            'sequoia_basketball' => [9, 10],
+            'sequoia_futsal' => [12, 13],
         ];
 
         $sharedActivityIds = [];
@@ -1341,6 +1343,8 @@ class ActivitiesController extends Controller
                 'penalty_waived' => $booking->penalty_waived,
                 'booking_start_time' => Carbon::parse($booking->booking_start_time)->format('h:i A'),
                 'booking_end_time' => Carbon::parse($booking->booking_end_time)->format('h:i A'),
+                'penalty_applied_at' => Carbon::parse($booking->penalty_applied_at)->format('Y-m-d H:i:s'),
+                'penalty_waived_at' => Carbon::parse($booking->penalty_waived_at)->format('Y-m-d H:i:s'),
                 'created_at' => Carbon::parse($booking->created_at)->format('Y-m-d H:i:s'),
                 'updated_at' => Carbon::parse($booking->updated_at)->format('Y-m-d H:i:s'),
                 'penalty_applied_by' => $booking->penaltyAppliedBy?->name ?? null,
@@ -1886,12 +1890,11 @@ class ActivitiesController extends Controller
 
                     $b->applyManualPenalty();
                     $b->penalty_waived = false;
-                    $b->waived_by = null;
 
                 } elseif ($action === 'waive') {
 
                     $b->waivePenalty();
-                    $b->penalty_applied_by = null;
+
                 }
 
                 $b->save();

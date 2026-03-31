@@ -26,6 +26,12 @@
 
         <div class="card border rounded-4 shadow-sm" style="background-color: #f4faff52;">
             <div class="card-body p-4">
+                @php
+                    $isAmenityInactive = optional($activity->amenity)->amenity_status == 0;
+                    $isActivityInactive = isset($activity->activity_status) && $activity->activity_status == 0;
+                    $isDisabled = $isAmenityInactive || $isActivityInactive;
+                @endphp
+
                 <div class="row g-4">
                     <div class="col-md-6">
                         <div class="rounded-4 overflow-hidden shadow-sm border">
@@ -42,8 +48,13 @@
                         <div>
                             <h3 class="fw-bold mb-1">{{ strtoupper($activity->activity_name) }}</h3>
 
-                            @if(isset($activity->activity_status) && $activity->activity_status == 0)
-                                <span class="badge bg-danger mb-2">Unavailable</span>
+                            @if($isDisabled)
+                                                <span class="badge bg-danger mb-2">
+                                                    {{ $isAmenityInactive
+                                ? ($activity->amenity->amenity_remarks ?? 'Unavailable')
+                                : 'Unavailable' 
+                                                                                                        }}
+                                                </span>
                             @endif
 
                             @if(!empty($activity->activity_description))
@@ -55,28 +66,29 @@
                         </div>
                         <div>
                             @auth
-                                <button type="button"
-                                    class="btn customBtn AddNewBooking 
-                                                                                                    @if ($activity->activity_status == 0) btn-secondary @else btn-outline-primary @endif"
-                                    style="@if ($activity->activity_status == 0) cursor: not-allowed; opacity: 0.6; @else background-color: #008b26; border-color: #008b26; color: white; font-weight: bold; @endif"
-                                    @if ($activity->activity_status == 0) disabled @endif
-                                    data-bs-target="#modalActivity{{ $activity->id }}" data-activity-id="{{ $activity->id }}">
-                                    BOOK NOW
-                                </button>
+                                                <button type="button"
+                                                    class="btn customBtn AddNewBooking {{ $isDisabled ? 'btn-secondary' : 'btn-outline-primary' }}"
+                                                    style="{{ $isDisabled
+                                ? 'cursor: not-allowed; opacity: 0.6;'
+                                : 'background-color: #008b26; border-color: #008b26; color: white; font-weight: bold;' }}"
+                                                    {{ $isDisabled ? 'disabled' : '' }} data-bs-target="#modalActivity{{ $activity->id }}"
+                                                    data-activity-id="{{ $activity->id }}">
+                                                    BOOK NOW
+                                                </button>
                             @else
-                                @if($activity->activity_status == 0)
+                                @if($isDisabled)
                                     <a class="btn btn-secondary customBtn disabled" style="pointer-events: none; opacity: 0.6;">
                                         Book Now
                                     </a>
                                 @else
                                     <a href="{{ route('login', ['redirect' => url()->current()]) }}"
-                                        class="btn btn-primary customBtn" >
+                                        class="btn btn-primary customBtn">
                                         Book Now
                                     </a>
                                 @endif
                             @endauth
-                            <button type="button"
-                                class="btn customBtn SlotCheckingModalUserbBtn btn-secondary" style="color: white;">
+                            <button type="button" class="btn customBtn SlotCheckingModalUserbBtn btn-secondary"
+                                style="color: white;">
                                 Check Slots
                             </button>
                         </div>
@@ -93,11 +105,25 @@
                 <h5 class="fw-bold mb-4">You may also like</h5>
                 <div class="row z-1 position-relative">
                     @foreach($suggestions as $suggestion)
-                        <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
-                            <div class="card shadow featured-card h-100 position-relative" style="border-radius: 5px;">
-                                <a href="{{ route('booking.full.details.activity', ['type' => 'amenity', 'activity_id' => $suggestion->id]) }}"
-                                    class="text-decoration-none text-dark">
 
+    
+                        <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+                            <a href="{{ route('booking.full.details.activity', ['type' => 'amenity', 'activity_id' => $suggestion->id]) }}"
+                                class="text-decoration-none text-dark">
+                                <div class="card shadow featured-card h-100 position-relative" style="border-radius: 5px;">
+
+                                    {{-- 🔴 Overlay (same as your amenity cards) --}}
+                                  @if($suggestion->amenity && $suggestion->amenity->amenity_status == 0)
+                                    <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center"
+                                        style="background: rgba(0,0,0,0.6); z-index: 2; border-radius: 5px;">
+
+                                        <span class="badge bg-danger mb-2">Unavailable</span>
+
+                                        <small class="text-white text-center px-3">
+                                            {{ $suggestion->amenity->amenity_remarks ?? 'Not Available' }}
+                                        </small>
+                                    </div>
+                                @endif
                                     <div class="card-body text-center">
                                         <div class="mb-3">
                                             @if(!empty($suggestion->activity_image))
@@ -112,33 +138,35 @@
                                             {{ strtoupper($suggestion->activity_name) }}
                                         </h5>
                                     </div>
-                                </a>
-                            </div>
+
+                                </div>
+                            </a>
                         </div>
+
                     @endforeach
-                </div> 
+                </div>
             </div>
         @endif
     </div>
 
     <!-- <div id="loadingOverlay"
-                        style="
-                            display: none; /* 🔥 Keep this as default */
-                            position: fixed;
-                            top: 0;
-                            left: 0;
-                            width: 100%;
-                            height: 100%;
-                            background: rgba(255, 255, 255, 0.7);
-                            z-index: 2000;
-                            justify-content: center;
-                            align-items: center;
-                                                                                                                                            ">
-                        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                 -->
+                                            style="
+                                                display: none; /* 🔥 Keep this as default */
+                                                position: fixed;
+                                                top: 0;
+                                                left: 0;
+                                                width: 100%;
+                                                height: 100%;
+                                                background: rgba(255, 255, 255, 0.7);
+                                                z-index: 2000;
+                                                justify-content: center;
+                                                align-items: center;
+                                                                                                                                                                ">
+                                            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </div>
+                                     -->
 
 
     <style>
@@ -148,19 +176,19 @@
         }
 
         /* #loadingOverlay {
-                            display: none;
-                            position: fixed;
-                            top: 0;
-                            left: 0;
-                            width: 100%;
-                            height: 100%;
-                            background: rgba(255, 255, 255, 0.7);
-                            z-index: 2000;
-                            display: flex;
+                                                display: none;
+                                                position: fixed;
+                                                top: 0;
+                                                left: 0;
+                                                width: 100%;
+                                                height: 100%;
+                                                background: rgba(255, 255, 255, 0.7);
+                                                z-index: 2000;
+                                                display: flex;
 
-                            justify-content: center;
-                            align-items: center;
-                        } */
+                                                justify-content: center;
+                                                align-items: center;
+                                            } */
     </style>
 
     @include('frontend.modal.slot-checking-user-modal')

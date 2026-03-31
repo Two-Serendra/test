@@ -69,7 +69,9 @@
                             <th class="table-custom sticky-th">PENALTY</th>
                             <th class="table-custom sticky-th">PENALTY WAIVED</th>
                             <th class="table-custom sticky-th">WAIVED BY</th>
+                            <th class="table-custom sticky-th">WAIVED AT</th>
                             <th class="table-custom sticky-th">APPLIED BY</th>
+                            <th class="table-custom sticky-th">APPLIED AT</th>
                             <th class="table-custom sticky-th">CREATED BY</th>
                             <th class="table-custom sticky-th">CREATED AT</th>
                             <th class="table-custom sticky-th">UPDATED AT</th>
@@ -133,7 +135,16 @@
                                         {{ $booking->waivedBy->name ?? 'N/A' }}
                                     </td>
                                     <td>
+                                        {{ $booking->penalty_waived_at ?? 'N/A' }}
+                                    </td>
+
+                                    <td>
+
                                         {{ $booking->penaltyAppliedBy->name ?? 'N/A' }}
+                                    </td>
+
+                                    <td>
+                                        {{ $booking->penalty_applied_at ?? 'N/A' }}
                                     </td>
 
                                     <td>{{ strtoupper($booking->user->name ?? 'N/A') }}</td>

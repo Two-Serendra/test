@@ -47,62 +47,71 @@
         @endroles
 
 
-        @roles(1, 6)
+        @roles(1, 6, 7)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-building"></i>
-                <div data-i18n="Form Elements">Amenities</div>
+                <div>Amenities</div>
+                <span id="amenity-booking-counter" class="badge bg-danger d-none"
+                    style="min-width: 22px; text-align: center; display: inline-flex; justify-content: center; align-items: center;">
+                0   
+                </span>
             </a>
+
             <ul class="menu-sub">
+
+                {{-- ✅ BOTH ROLE 1 & 6 --}}
                 <li class="menu-item {{ request()->routeIs('admin.booking.activities') ? 'active' : '' }}">
                     <a href="{{ route('admin.booking.activities') }}" class="menu-link">
-                        <div data-i18n="Typography">Booking</div>
+                        <div>Booking</div>
                     </a>
                 </li>
 
                 <li class="menu-item {{ request()->routeIs('admin.activity.history') ? 'active' : '' }}">
                     <a href="{{ route('admin.activity.history') }}" class="menu-link">
-                        <div data-i18n="Typography">Reports</div>
+                        <div>Reports</div>
                     </a>
                 </li>
-
-                <!-- <li class="menu-item {{ request()->routeIs('admin.show.date.blocking') ? 'active' : '' }}">
-                    <a href="{{ route('admin.show.date.blocking') }}" class="menu-link">
-                        <div data-i18n="Typography">Date Blocking</div>
-                    </a>
-                </li> -->
 
                 <li class="menu-item {{ request()->routeIs('admin.activity.booking.calendar') ? 'active' : '' }}">
                     <a href="{{ route('admin.activity.booking.calendar') }}" class="menu-link">
-                        <div data-i18n="Typography">Calendar</div>
+                        <div>Calendar</div>
                     </a>
                 </li>
 
+                {{-- 🔒 ADMIN ONLY --}}
+                @role(1, 7)
 
                 <li class="menu-item {{ request()->routeIs('admin.show.schedule.blocking') ? 'active' : '' }}">
                     <a href="{{ route('admin.show.schedule.blocking') }}" class="menu-link">
-                        <div data-i18n="Typography">Schedule Blocking</div>
+                        <div>Schedule Blocking</div>
                     </a>
                 </li>
 
+                <li class="menu-item {{ request()->routeIs('admin.show.date.blocking.activities') ? 'active' : '' }}">
+                    <a href="{{ route('admin.show.date.blocking.activities') }}" class="menu-link">
+                        <div>Date Blocking</div>
+                    </a>
+                </li>
 
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link menu-toggle">
-                        <div data-i18n="Typography">Setup</div>
+                        <div>Setup</div>
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item {{ request()->routeIs('admin.show.amenities') ? 'active' : '' }}">
                             <a href="{{ route('admin.show.amenities') }}" class="menu-link">
-                                <div data-i18n="Subitem">Add Amenities</div>
+                                <div>Amenities</div>
                             </a>
                         </li>
                         <li class="menu-item {{ request()->routeIs('admin.show.activities') ? 'active' : '' }}">
                             <a href="{{ route('admin.show.activities') }}" class="menu-link">
-                                <div data-i18n="Subitem">Add Activities</div>
+                                <div>Activities</div>
                             </a>
                         </li>
                     </ul>
                 </li>
+                @endrole
             </ul>
         </li>
         @endroles
@@ -261,7 +270,7 @@
                         <div data-i18n="Typography">Calendar</div>
                     </a>
                 </li>
-                
+
                 <li class="menu-item {{ request()->routeIs('admin.report.pest.control') ? 'active' : '' }}">
                     <a href="{{ route('admin.report.pest.control') }}" class="menu-link">
                         <div data-i18n="Typography">Reports</div>

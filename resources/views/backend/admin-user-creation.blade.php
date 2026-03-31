@@ -10,7 +10,7 @@
             3 => ['label' => 'Engineering', 'class' => 'bg-primary border-primary'],
             4 => ['label' => 'Security', 'class' => 'bg-danger border-danger'],
             5 => ['label' => 'Finance', 'class' => 'bg-primary border-primary'],
-            6 => ['label' => 'Concierge', 'class' => 'bg-primary border-primary'],
+            6 => ['label' => 'Lobby', 'class' => 'bg-primary border-primary'],
             7 => ['label' => 'Manager', 'class' => 'bg-dark border-dark'],
             8 => ['label' => 'Concierge Supervisor', 'class' => 'bg-dark border-dark'],
         ];

@@ -123,16 +123,15 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/activate-activities', [ActivitiesController::class, 'activateActivities'])->name('activateActivities');
     Route::get('/delete-activities', [ActivitiesController::class, 'deleteActivities'])->name('deleteActivities');
     Route::get('/search-activities', [ActivitiesController::class, 'searchActivity'])->name('admin.search.activities');
-    Route::get('/date-blocking', [ActivitiesController::class, 'fetchDateBlocking'])->name('admin.show.date.blocking');
-    Route::get('/search-block-dates', [ActivitiesController::class, 'searchBlockdDates'])->name('admin.search.block.dates');
-    Route::post('/new-date-blocking', [ActivitiesController::class, 'newDateBlocking'])->name('admin.new.date.blocking');
+    Route::get('/date-blocking-activities', [ActivitiesController::class, 'fetchDateBlockingActivities'])->name('admin.show.date.blocking.activities');
+    Route::get('/search-block-dates-activities', [ActivitiesController::class, 'searchBlockdDatesActivities'])->name('admin.search.block.dates');
+    Route::post('/new-date-blocking-activities', [ActivitiesController::class, 'newDateBlockingActivities'])->name('admin.new.date.blocking');
 
     Route::get('/schedule-blocking', [ActivitiesController::class, 'fetchScheduleBlocking'])->name('admin.show.schedule.blocking');
     Route::post('/new-schedule-blocking', [ActivitiesController::class, 'newScheduleBlocking'])->name('admin.new.schedule.blocking');
     Route::get('get-updated-activity-schedule-blocking-table', [ActivitiesController::class, 'getUpdatedActivityScheduleBlockingTable'])->name('getUpdatedActivityScheduleBlockingTable');
-
-
     Route::get('/fetch-blocked-dates', [ActivitiesController::class, 'fetchBlockDates'])->name('AdminDateBlocking');
+    Route::post('/admin-delete-blocked-date-activities', [ActivitiesController::class, 'deleteBlockedDate'])->name('admin.delete.blocked.date.activities');
 
     //Activities Bookings
     Route::get('get-updated-activities-blocking', [ActivitiesController::class, 'getUpdatedBlockingTable'])->name('get.updated.blocking.table');
@@ -146,7 +145,7 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/fetch-available-slots', [ActivitiesController::class, 'fetchAvailableSlots'])->name('fetchAvailableSlots');
     Route::get('/check-unit-booking', [ActivitiesController::class, 'checkUnitBooking'])->name('checkUnitBooking');
     Route::get('get-updated-bookings-table', [ActivitiesController::class, 'getUpdatedBookingTable'])->name('getUpdatedBookingTable');
-    Route::get('/fetch/booking/{id}', [ActivitiesController::class, 'fetchInfoBooking'])->name('fetchInfoBooking');
+    Route::get('/fetch/activity-booking/{id}', [ActivitiesController::class, 'fetchInfoBooking'])->name('fetchInfoBooking');
     Route::post('/cancel-booking/{booking}', [ActivitiesController::class, 'cancelBooking'])->name('cancelBooking');
     Route::post('/admin-mark-no-show/{booking}', [ActivitiesController::class, 'markNoShow']);
     Route::get('/history', [ActivitiesController::class, 'history'])->name('admin.activity.history');
@@ -157,6 +156,7 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/admin-manage-penalty/{booking}', [ActivitiesController::class, 'managePenalty']);
 
     Route::post('/amenity-import-booking', [ActivitiesController::class, 'importAmenityBookings'])->name('booking.import');
+    Route::get('/fetch/activity-booking-report/{id}', [ActivitiesController::class, 'fetchInfoBookingReport'])->name('fetchInfoBookingReport');
 
     //Function Rooms
     Route::get('/admin-function-rooms', [FunctionRoomsController::class, 'showFunctionRooms'])->name('admin.show.function.rooms');

@@ -35,13 +35,21 @@
                                 <select class="form-select" id="activitySelectBooking" name="activity_id" required>
                                     <option value="" disabled selected>Activity</option>
                                     @foreach($activities as $activity)
+
+                                        @php
+                                            $isAmenityInactive = optional($activity->amenity)->amenity_status == 0;
+                                        @endphp
+
                                         <option value="{{ $activity->id }}" data-amenity-id="{{ $activity->amenity_id }}"
                                             data-start-time="{{ \Carbon\Carbon::parse($activity->start_time)->format('H:i') }}"
                                             data-end-time="{{ \Carbon\Carbon::parse($activity->end_time)->format('H:i') }}"
-                                            data-activity-space="{{ $activity->activity_space }}">
+                                            data-activity-space="{{ $activity->activity_space }}" {{ $isAmenityInactive ? 'disabled' : '' }}>
+
                                             {{ strtoupper($activity->activity_name) }}
+                                            {{ $isAmenityInactive ? ' (Unavailable - ' . ($activity->amenity->amenity_remarks ?? 'Maintenance') . ')' : '' }}
 
                                         </option>
+
                                     @endforeach
                                 </select>
                                 <div class="invalid-feedback">Please select an amenity</div>
@@ -141,12 +149,19 @@
 <div class="modal fade" id="bookingEdit" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white justify-content-center position-relative">
-                <h5 class="modal-title m-0">
+            <div class="modal-header bg-primary text-white position-relative">
+
+                <!-- Centered Logo -->
+                <div class="w-100 d-flex align-items-center justify-content-center">
                     <img src="{{ asset('assets/images/TWO SERENDRA LOGO PNG (White).png') }}"
                         style="height: 60px; width: auto;" alt="2serendra" />
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Close Button (force right alignment) -->
+                <button type="button" class="btn-close position-absolute end-0 top-50 translate-middle-y me-2"
+                    data-bs-dismiss="modal" aria-label="Close">
+                </button>
+
             </div>
             <div class="modal-body px-4 py-3">
 
@@ -230,80 +245,99 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="activityCalendarModal" tabindex="-1" aria-labelledby="editProductModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fs-3" id="exampleModalLabel">Calendar Schedule</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                    id="modalClose"></button>
+<div class="modal fade" id="activityCalendarModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+
+            <!-- HEADER -->
+            <div class="modal-header bg-primary text-white position-relative py-3">
+
+                <div class="w-100 text-center">
+                    <img src="{{ asset('assets/images/TWO SERENDRA LOGO PNG (White).png') }}" style="height: 50px;"
+                        alt="logo">
+                </div>
+
+                <button type="button" class="btn-close position-absolute end-0 top-50 translate-middle-y me-2"
+                    data-bs-dismiss="modal" aria-label="Close">
+                </button>
             </div>
-            <div class="modal-body">
-                <form action="" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="row mb-2">
-                        <input type="hidden" class="form-control" name="schedule_id" id="edit_id">
 
-                        <div class="col-12 mb-2">
-                            <label for="" class="form-label"><b>Activity</b></label>
-                            <p id="calendar_activity_name" class="form-control-static calendar-value"></p>
-                            <!-- Display as text -->
-                        </div>
+            <!-- BODY -->
+            <div class="modal-body bg-light p-4">
 
-                        <div class="col-6">
-                            <div class="mb-2">
-                                <label for="" class="form-label"><b>Unit</b></label>
-                                <p id="calendar_unit" class="form-control-static calendar-value"></p>
-                                <!-- Display as text -->
+                <input type="hidden" id="edit_id">
+
+                <!-- TITLE CARD -->
+                <div class="bg-white p-3 rounded-4 shadow-sm border-start border-4 border-primary mb-4">
+                    <small class="text-muted">Activity</small>
+                    <div id="calendar_activity_name" class="fs-5 fw-bold text-primary"></div>
+                </div>
+
+                <!-- GRID -->
+                <div class="row g-4">
+
+                    <!-- LEFT CARD -->
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                            <div class="card-body p-4">
+
+                                <h6 class="text-uppercase text-muted small mb-3">Resident Info</h6>
+
+                                <div class="mb-3">
+                                    <small class="text-muted">Unit</small>
+                                    <div class="fw-semibold" id="calendar_unit">N/A</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <small class="text-muted">Name</small>
+                                    <div class="fw-semibold" id="calendar_name">N/A</div>
+                                </div>
+
+                                <div class="mb-0">
+                                    <small class="text-muted">Contact</small>
+                                    <div class="fw-semibold" id="calendar_contact_number">N/A</div>
+                                </div>
+
                             </div>
-
-                            <div class="mb-2">
-                                <label for="" class="form-label"><b>Name</b></label>
-                                <p id="calendar_name" class="form-control-static calendar-value"></p>
-                                <!-- Display as text -->
-                            </div>
-
-                            <div class="mb-2">
-                                <label for="" class="form-label"><b>Contact</b></label>
-                                <p id="calendar_contact_number" class="form-control-static calendar-value"></p>
-                                <!-- Display as text -->
-                            </div>
-
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-2">
-                                <label for="" class="form-label"><b>Date</b></label>
-                                <p id="calendar_booking_date" class="form-control-static calendar-value"></p>
-                                <!-- Display as text -->
-                            </div>
-
-                            <div class="mb-2">
-                                <label for="" class="form-label"><b>Start</b></label>
-                                <p id="calendar_booking_start_time" class="form-control-static calendar-value"></p>
-                                <!-- Display as text -->
-                            </div>
-
-                            <div class="mb-2">
-                                <label for="" class="form-label"><b>End</b></label>
-                                <p id="calendar_booking_end_time" class="form-control-static calendar-value"></p>
-                                <!-- Display as text -->
-                            </div>
-
                         </div>
                     </div>
-                    <div class="modal-footer p-2">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+
+                    <!-- RIGHT CARD -->
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                            <div class="card-body p-4">
+
+                                <h6 class="text-uppercase text-muted small mb-3">Schedule</h6>
+
+                                <div class="mb-3">
+                                    <small class="text-muted">Date</small>
+                                    <div class="fw-semibold" id="calendar_booking_date">N/A</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <small class="text-muted">Start Time</small>
+                                    <div class="fw-semibold" id="calendar_booking_start_time">N/A</div>
+                                </div>
+
+                                <div class="mb-0">
+                                    <small class="text-muted">End Time</small>
+                                    <div class="fw-semibold" id="calendar_booking_end_time">N/A</div>
+                                </div>
+
+                            </div>
+                        </div>
                     </div>
-                </form>
+
+                </div>
+
             </div>
+
         </div>
     </div>
 </div>

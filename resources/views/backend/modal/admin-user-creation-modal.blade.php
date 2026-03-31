@@ -19,7 +19,7 @@
                             <option value="3">Engineering</option>
                             <option value="4">Security</option>
                             <option value="5">Finance</option>
-                            <option value="6">Concierge</option>
+                            <option value="6">Lobby</option>
                             <option value="7">Manager</option>
                             <option value="8">Concierge Supervisor</option>
 

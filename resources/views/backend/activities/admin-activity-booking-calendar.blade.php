@@ -118,12 +118,25 @@
             </div>
         </div>
     </div>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
 
     @include('backend.modal.activities.activities-booking-modal')
 @endsection
 @push('js')
     <script>
         $(document).ready(function () {
+            window.showLoading = function () {
+                $('#loadingOverlay').css('display', 'flex').hide().fadeIn(150);
+            }
+
+            window.hideLoading = function () {
+                $('#loadingOverlay').fadeOut(150);
+            }
+
             var schedule = @json($events);
             $('#calendar').fullCalendar({
                 timezone: 'local',
@@ -134,27 +147,55 @@
                 },
                 contentHeight: 750,
                 events: schedule,
+
+                // ✅ AUTO spinner when calendar loads
+                loading: function (isLoading) {
+                    if (isLoading) {
+                        showLoading();
+                    } else {
+                        hideLoading();
+                    }
+                },
+
                 eventRender: function (event, element) {
                     element.find('.fc-time').remove();
                 },
+
                 eventClick: function (event) {
                     if (!event.id) {
                         alert("No event ID found.");
                         return;
                     }
+
                     var schedule_id = event.id;
-                    $.get('/admin/fetch/activity-calendar-schedule/' + schedule_id, function (data) {
-                        $('#activityCalendarModal').modal('show');
-                        $('#edit_id').val(data.id);
-                        $('#calendar_activity_name').text(data.activity_name);
-                        $('#calendar_unit').text(data.unit);
-                        $('#calendar_name').text(data.name);
-                        $('#calendar_contact_number').text(data.contact_number);
-                        $('#calendar_booking_date').text(data.booking_date);
-                        $('#calendar_booking_start_time').text(data.booking_start_time);
-                        $('#calendar_booking_end_time').text(data.booking_end_time);
-                    }).fail(function () {
-                        alert("Failed to fetch data. Please try again.");
+
+                    showLoading();
+
+                    $.ajax({
+                        url: '/admin/fetch/activity-calendar-schedule/' + schedule_id,
+                        method: 'GET',
+                        success: function (data) {
+                            $('#activityCalendarModal').modal('show');
+                            $('#edit_id').val(data.id);
+
+                            $('#calendar_activity_name').text(data.activity_name ?? 'N/A');
+                            $('#calendar_unit').text(data.unit ?? 'N/A');
+                            $('#calendar_name').text(data.name ?? 'N/A');
+
+                            $('#calendar_contact_number').text(
+                                data.contact_number ? data.contact_number : 'N/A'
+                            );
+
+                            $('#calendar_booking_date').text(data.booking_date ?? 'N/A');
+                            $('#calendar_booking_start_time').text(data.booking_start_time ?? 'N/A');
+                            $('#calendar_booking_end_time').text(data.booking_end_time ?? 'N/A');
+                        },
+                        error: function () {
+                            alert("Failed to fetch data. Please try again.");
+                        },
+                        complete: function () {
+                            hideLoading();
+                        }
                     });
                 }
             });

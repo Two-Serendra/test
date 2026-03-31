@@ -30,7 +30,9 @@ return new class extends Migration {
             $table->decimal('penalty_amount', 10, 2)->nullable();
             $table->boolean('penalty_waived')->default(false);
             $table->unsignedBigInteger('waived_by')->nullable();
+            $table->timestamp('penalty_waived_at')->nullable();
             $table->unsignedBigInteger('penalty_applied_by')->nullable();
+            $table->timestamp('penalty_applied_at')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('cancelled_by')->nullable();
             $table->boolean('cancelled_within_12hrs')->default(0);

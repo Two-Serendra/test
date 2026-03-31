@@ -1181,7 +1181,9 @@ function refreshTableBookings() {
                          <td>${penaltyAmountHtml}</td>   
                         <td>${penaltyWaivedHtml}</td>
                         <td>${waivedByHtml}</td>
+                        <td>${booking.penalty_waived_at || 'N/A'}</td>
                         <td>${penaltyAppliedByHtml}</td>
+                        <td>${booking.penalty_applied_at || 'N/A'}</td>
                         <td>${createdByHtml}</td>
                         <td>${booking.created_at || 'N/A'}</td>
                         <td>${booking.updated_at || 'N/A'}</td>

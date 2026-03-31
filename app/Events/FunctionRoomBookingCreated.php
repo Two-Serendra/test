@@ -19,7 +19,7 @@ class FunctionRoomBookingCreated implements ShouldBroadcast
     public $unit_no;
     public $function_room;
 
-    /**
+    /** 
      * Create a new event instance.
      */
     public function __construct(FunctionRoomBooking $booking)

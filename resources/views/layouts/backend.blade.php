@@ -229,6 +229,29 @@
                 counter.classList.remove('d-none');
             }
 
+
+            function incrementAmenityBookingCounter() {
+                const counter = document.getElementById('amenity-booking-counter');
+                let count = parseInt(counter.textContent);
+
+                if (isNaN(count)) {
+                    count = 0;
+                }
+
+                count++;
+                counter.textContent = count;
+                counter.classList.remove('d-none');
+            }
+
+            const amenityBookingChannel = pusher.subscribe('amenity-booking');
+            amenityBookingChannel.bind('amenity-booking-created', function (data) {
+                if ([1, 6, 7].includes(currentUserRoleId)) {
+                    toastr.success(`(Unit: ${data.unitNo})`, `New Amenity Booking`);
+                    incrementAmenityBookingCounter();
+                    refreshTableDebounced();
+                }
+            });
+
             const functionRoomChannel = pusher.subscribe('function-room-bookings');
             functionRoomChannel.bind('FunctionRoomBookingCreated', function (data) {
                 if ([1, 2, 3, 5, 7, 6].includes(currentUserRoleId)) {

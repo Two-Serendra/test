@@ -172,7 +172,10 @@ class FrontendActivityBookingController extends Controller
             $firstBooking->user->notify(new UserAmenityBookingBellNotification($firstBooking));
             DB::commit();
             if ($firstBookingId)
-                event(new NewRequestSubmitted($request->unit, $firstBookingId));
+                event(new NewRequestSubmitted(
+                    strtoupper($resident->unit_no),
+                    $firstBookingId
+                ));
 
             return response()->json([
                 'success' => true,
@@ -258,10 +261,11 @@ class FrontendActivityBookingController extends Controller
 
         $sharedActivityGroups = [
             'almond_basketball' => [1, 2],
-            'sequoia_basketball' => [4, 5],
-            'almond_futsal' => [15, 17],
-            'sequoia_futsal' => [10, 16],
-            'almond_badminton' => [13, 18],
+            'almond_futsal' => [4, 5],
+            'almond_badminton' => [6, 7],
+            'sequoia_basketball' => [9, 10],
+            'sequoia_futsal' => [12, 13],
+
         ];
 
         $sharedActivityIds = [];
@@ -833,10 +837,10 @@ class FrontendActivityBookingController extends Controller
             })
             ->get();
 
-  
+
         $occupiedSlots = [];
 
-  
+
         foreach ($bookedSlots as $booking) {
             $bookingStart = Carbon::parse("{$date} {$booking->booking_start_time}");
             $bookingEnd = Carbon::parse("{$date} {$booking->booking_end_time}");

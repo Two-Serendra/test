@@ -31,8 +31,10 @@ class ActivityBooking extends Model
         'has_penalty',
         'penalty_amount',
         'penalty_waived',
+        'penalty_waived_at',
         'waived_by',
         'penalty_applied_by',
+        'penalty_applied_at',
         'cancelled_within_12hrs',
     ];
 
@@ -73,6 +75,8 @@ class ActivityBooking extends Model
             $this->has_penalty = true;
             $this->penalty_amount = 1000;
             $this->cancelled_within_12hrs = 1;
+            $this->penalty_applied_by = auth()->id();
+            $this->penalty_applied_at = now();
         }
     }
 
@@ -92,6 +96,7 @@ class ActivityBooking extends Model
         $this->penalty_amount = 1000;
         $this->cancelled_within_12hrs = 0;
         $this->penalty_applied_by = auth()->id();
+        $this->penalty_applied_at = now();
     }
 
     public function penaltyAppliedBy()
@@ -107,5 +112,6 @@ class ActivityBooking extends Model
 
         $this->penalty_waived = true;
         $this->waived_by = auth()->id();
+        $this->penalty_waived_at = now();
     }
 }

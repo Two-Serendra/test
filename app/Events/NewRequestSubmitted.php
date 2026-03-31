@@ -25,12 +25,12 @@ class NewRequestSubmitted implements ShouldBroadcast
 
     public function broadcastOn(): array
     {
-        return ['my-channel'];  
+        return ['amenity-booking'];  
     }
 
     public function broadcastAs()
     {
-        return 'my-event';
+        return 'amenity-booking-created';
     }
 
     public function broadcastWith()

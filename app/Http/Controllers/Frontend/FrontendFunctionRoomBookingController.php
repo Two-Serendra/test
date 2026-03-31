@@ -218,21 +218,11 @@ class FrontendFunctionRoomBookingController extends Controller
         $activity = Activity::with('ActivityBooking')->findOrFail($activity_id);
         $activities = Activity::where('activity_status', 1)->get();
 
-        $suggestions = Activity::where('amenity_id', $activity->amenity_id)
+        $suggestions = Activity::with('amenity')
             ->where('id', '!=', $activity->id)
             ->inRandomOrder()
             ->take(4)
             ->get();
-
-        if ($suggestions->count() < 4) {
-            $additional = Activity::where('id', '!=', $activity->id)
-                ->whereNotIn('id', $suggestions->pluck('id'))
-                ->inRandomOrder()
-                ->take(4 - $suggestions->count())
-                ->get();
-
-            $suggestions = $suggestions->merge($additional);
-        }
 
         $residences = auth()->check()
             ? DB::table('resident_details')

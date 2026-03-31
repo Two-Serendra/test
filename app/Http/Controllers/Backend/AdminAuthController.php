@@ -29,8 +29,8 @@ class AdminAuthController extends Controller
                 3 => 'admin.show.function.room.bookings',
                 4 => 'engineering.dashboard',
                 5 => 'admin.show.function.room.bookings',
-                6 => 'admin.show.function.room.bookings',
-                7 => 'admin.show.function.room.bookings',
+                6 => 'admin.booking.activities',
+                7 => 'admin.booking.activities',
                 8 => 'admin.show.function.room.bookings',
             ];
 

@@ -109,9 +109,9 @@
                                 <i class='bx bx-user-circle me-2'></i> Profile
                             </a>
 
-                            <a href="{{ route('soa') }}" class="dropdown-item">
+                            <!-- <a href="{{ route('soa') }}" class="dropdown-item">
                                 <i class='bx bx-file me-2'></i> SOA
-                            </a>
+                            </a> -->
 
                             <a href="{{ route('resident.booking.history') }}" class="dropdown-item">
                                 <i class='bx bx-calendar me-2'></i> Bookings

@@ -40,6 +40,14 @@ $(document).ready(function () {
     });
 
 
+
+
+    $(document).on('click', '.AddBookingAdmin', function () {
+        resetBookingForm();
+        $('#AddBookingAdmin').modal('show');
+    });
+
+
     const adminModal = $('#AddBookingAdmin');
     const bookingTabs = adminModal.find('#bookingTabs');
     const bookingTypeInput = adminModal.find('#bookingType');
@@ -64,63 +72,42 @@ $(document).ready(function () {
         updateFormState(bookingType);
     });
 
+    // dateField.on('change', function () {
+    //     if (bookingType === "Walk-in") {
+    //         toggleFields(false);
+    //         enableAllFields();
+    //     }
+    // });
 
     function updateFormState(type) {
-        resetFields();
-
         if (type === "Walk-in") {
             checkUnitBtn.hide();
             unitStatus.hide();
             toggleFields(true);
-            dateField.prop('disabled', false);
-            submitButton.prop('disabled', false);
-
-            dateField.off('change.enableFields').on('change.enableFields', function () {
-                toggleFields(false);
-                enableAllFields();
-            });
-        } else if (type === "Advanced Booking") {
-            checkUnitBtn.show().prop('disabled', false);
-            unitStatus.show();
-            toggleFields(true);
-            dateField.prop('disabled', false);
-            submitButton.prop('disabled', true);
+            enableAllFields();
         }
 
         else if (type === "Advanced Booking") {
             checkUnitBtn.show().prop('disabled', false);
             unitStatus.show();
             toggleFields(true);
-            dateField.prop('disabled', false);
+            dateField.prop('disabled', true);
             submitButton.prop('disabled', true);
         }
 
         else if (type === "24hrs") {
-            checkUnitBtn.show().prop('disabled', false);
             checkUnitBtn.hide();
             unitStatus.hide();
-            toggleFields(false);
+            toggleFields(true);
             enableAllFields();
         }
     }
 
-    function resetFields() {
-        adminModal.find('input[type="text"], input[type="number"]').val('');
-        adminModal.find('select').prop('selectedIndex', 0);
-        dateField.val('');
-
-        startTimeDropdown.prop('disabled', true).empty().append('<option>Select a Date First</option>');
-        endTimeDropdown.prop('disabled', true).empty().append('<option>Select Start Time First</option>');
-
-        unitStatus.text('').hide();
-        adminModal.find('form').removeClass('was-validated');
-        adminModal.find('input, select').removeClass('is-valid is-invalid');
-    }
 
     function toggleFields(disable) {
-        residentType.prop('disabled', true); // 🔒 Always locked for now
-        nameField.prop('disabled', true);    // 🔒 Always locked for now
-        contactField.prop('disabled', true); // 🔒 Always locked for now
+        residentType.prop('disabled', true);
+        nameField.prop('disabled', true);
+        contactField.prop('disabled', true);
         startTimeDropdown.prop('disabled', disable)
             .empty()
             .append('<option>' + (disable ? 'Select a Date First' : 'Select Start Time') + '</option>');
@@ -129,12 +116,19 @@ $(document).ready(function () {
             .append('<option>' + (disable ? 'Select start time first' : 'Select End Time') + '</option>');
     }
 
+    function enableAllFields() {
+        submitButton.prop('disabled', false);
+        residentType.prop('disabled', false);
+        nameField.prop('disabled', false);
+        contactField.prop('disabled', false);
+    }
+
     $('.AdminNewBooking').submit(function (event) {
         event.preventDefault();
         const form = this;
         const startTime = $(form).find('[name="booking_start_time"]').val();
         const endTime = $(form).find('[name="booking_end_time"]').val();
-        const submitButton = $('.submitBtn');
+        const submitButton = $('#saveActivityBookingBtn');
         const spinner = $('#spinner');
 
         let selectedCount = $('.selected-slot').length;
@@ -202,7 +196,7 @@ $(document).ready(function () {
                     icon: 'success',
                     title: 'Booked Successfully'
                 });
-                form.reset();
+                // form.reset();
                 $(form).removeClass('was-validated');
                 resetBookingForm();
                 refreshTableBookings();
@@ -238,8 +232,41 @@ $(document).ready(function () {
 
 
 
+    function resetBookingForm() {
+        const form = $('#AdminNewBooking')[0];
+        form.reset();
+        bookingType = "Advanced Booking";
+        bookingTypeInput.val(bookingType);
 
+        startTimeDropdown
+            .empty()
+            .append('<option>Select a Date First</option>')
+            .prop('disabled', true);
 
+        endTimeDropdown
+            .empty()
+            .append('<option>Select Start Time First</option>')
+            .prop('disabled', true);
+
+        // Reset Tabs
+        $('#bookingTabs .nav-link').removeClass('active');
+        $('#advanced-tab').addClass('active');
+        $('#selectResidentType').prop('disabled', true).val('Owner');
+        $('#unitNumber, #name, #contact_number, #dateFieldBooking').prop('disabled', true).val('');
+
+        $('.bookingType').prop('checked', false);
+        $('#selectedSlotsInput').val('');
+        $('.checkUnit, #unitStatus').show();
+        $('.checkUnit').prop('disabled', true);
+        $('#availableSlotsContainer').empty();
+        $('#unitStatus').text('0/0');
+        $('#saveActivityBookingBtn').prop('disabled', true);
+        $('#amenityIdBooking').val('');
+        $('#activitySelectBooking').val('').change();
+        $('.is-invalid').removeClass('is-invalid');
+        $('.invalid-feedback').hide();
+        updateFormState(bookingType);
+    }
 
     function hideSpinner(button) {
         var $btn = $(button);
@@ -253,104 +280,8 @@ $(document).ready(function () {
         $(this).val(value);
     });
 
-    function resetBookingForm() {
-        const form = $('#AdminNewBooking')[0];
-        form.reset();
-
-        $('#selectResidentType').prop('disabled', true).val('Owner');
-        $('#unitNumber, #name, #contact_number, #dateFieldBooking').prop('disabled', true).val('');
-        $('#booking_start_time, #booking_end_time').empty();
-        $('.bookingType').prop('checked', false);
-        $('#selectedSlotsInput').val('');
-        $('.checkUnit, #unitStatus').show();
-        $('.checkUnit').prop('disabled', true);
-        $('#availableSlotsContainer').empty();
-        $('#unitStatus').text('0/0');
-        $('.submitBtn').prop('disabled', true);
-
-        // Reset Tabs
-        $('#bookingTabs .nav-link').removeClass('active');
-        $('#advanced-tab').addClass('active');
-
-        // Reset Booking Type
-        $('#bookingType').val('Advanced Booking');
-
-        // Reset Dropdowns
-        $('#amenityIdBooking').val('');
-        $('#activitySelectBooking').val('').change();
-        $('#selectResidentType, #booking_start_time, #booking_end_time').prop('selectedIndex', 0);
-
-        // Remove validation states
-        $('.is-invalid').removeClass('is-invalid');
-        $('.invalid-feedback').hide();
-    }
 
 
-    $('.AddBookingAdmin').on('click', function () {
-        resetBookingForm();
-        let submitButton = $(".submitBtn");
-        $('#AddBookingAdmin').modal('show');
-        hideSpinner(submitButton);
-
-    });
-
-
-
-
-    // $(".checkUnit").on("click", function () {
-    //     let unit = unitNumber.val().trim();
-    //     let selectedDate = dateField.val()?.trim();
-
-    //     if (!unit || !selectedDate) {
-    //         Swal.fire({
-    //             icon: "warning",
-    //             title: "Missing Information",
-    //             text: "Please enter a unit number and select a date.",
-    //         });
-    //         return;
-    //     }
-
-    //     $.ajax({
-    //         url: '/admin/check-unit-booking',
-    //         type: "GET",
-    //         data: {
-    //             unit: unit,
-    //             activity_id: adminModal.find('#activitySelectBooking').val(),
-    //             dateField: selectedDate
-    //         },
-    //         success: function (response) {
-    //             if (response.success) {
-    //                 let count = response.count;
-    //                 let maxBookings = response.maxBookings;
-    //                 let statusText = `${count}/${maxBookings}`;
-    //                 unitStatus.removeClass("text-muted text-danger text-success text-primary");
-
-    //                 if (bookingType === "Advanced Booking") {
-    //                     if (count < maxBookings) {
-    //                         unitStatus.addClass("text-success").text(statusText);
-    //                         enableAllFields();
-    //                     } else {
-    //                         unitStatus.addClass("text-danger").text(statusText + " (Max)");
-    //                         disableSubmitOnly();
-    //                     }
-    //                 }
-    //             } else {
-    //                 Swal.fire({
-    //                     icon: "error",
-    //                     title: "Error",
-    //                     text: response.message,
-    //                 });
-    //             }
-    //         },
-    //         error: function () {
-    //             Swal.fire({
-    //                 icon: "error",
-    //                 title: "Server Error",
-    //                 text: "Something went wrong. Please try again later.",
-    //             });
-    //         }
-    //     });
-    // });
 
     $(document).ready(function () {
         const $btn = $("#saveActivityBookingBtn");
@@ -455,16 +386,7 @@ $(document).ready(function () {
         });
     });
 
-    function enableAllFields() {
-        submitButton.prop('disabled', false);
-        residentType.prop('disabled', false);
-        nameField.prop('disabled', false);
-        contactField.prop('disabled', false);
-    }
 
-    // function disableSubmitOnly() {
-    //     submitButton.prop('disabled', true);
-    // }
 });
 
 

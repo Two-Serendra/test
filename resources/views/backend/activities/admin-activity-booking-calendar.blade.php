@@ -206,8 +206,8 @@
                 var activityId = $(this).data('activity');
                 if (activityId === "") {
                     selectedActivities = [];
-                    $('.filter-btn').removeClass('active btn-success').addClass('btn-outline-success');
-                    $(this).addClass('active btn-success');
+                    $('.filter-btn').removeClass('active btn-primary').addClass('btn-outline-primary');
+                    $(this).addClass('active btn-primary');
 
                     $('#calendar').fullCalendar('removeEvents');
                     $('#calendar').fullCalendar('addEventSource', schedule);
@@ -216,10 +216,10 @@
 
                 if (selectedActivities.includes(activityId)) {
                     selectedActivities = selectedActivities.filter(id => id !== activityId);
-                    $(this).removeClass('active btn-success').addClass('btn-outline-success');
+                    $(this).removeClass('active btn-primary').addClass('btn-outline-primary');
                 } else {
                     selectedActivities.push(activityId);
-                    $(this).addClass('active btn-success').removeClass('btn-outline-success');
+                    $(this).addClass('active btn-primary').removeClass('btn-outline-primary');
                 }
 
                 $(this).blur();
@@ -227,13 +227,13 @@
                 console.log("Filtering by Activity IDs:", selectedActivities);
 
                 if (selectedActivities.length === 0) {
-                    $('.filter-btn[data-activity=""]').addClass('active btn-success').removeClass('btn-outline-success');
+                    $('.filter-btn[data-activity=""]').addClass('active btn-primary').removeClass('btn-outline-primary');
 
                     $('#calendar').fullCalendar('removeEvents');
                     $('#calendar').fullCalendar('addEventSource', schedule);
                     return;
                 } else {
-                    $('.filter-btn[data-activity=""]').removeClass('active btn-success').addClass('btn-outline-success');
+                    $('.filter-btn[data-activity=""]').removeClass('active btn-primary').addClass('btn-outline-primary');
                 }
                 var filteredEvents = schedule.filter(function (event) {
                     return selectedActivities.includes(event.activity_id);

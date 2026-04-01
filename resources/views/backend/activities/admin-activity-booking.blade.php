@@ -33,9 +33,9 @@
                         <input type="file" id="bookingFileInput" name="file" accept=".csv,.xlsx" style="display:none;">
                     </form>
 
-                    <button type="button" class="btn btn-primary badge me-2" id="uploadBookingBtn">
+                    <!-- <button type="button" class="btn btn-primary badge me-2" id="uploadBookingBtn">
                         <i class='bx bx-upload'></i> Upload Bookings
-                    </button>
+                    </button> -->
 
                     <button type="button" class="btn btn-primary badge AddBookingAdmin me-2">
                         <i class='bx bx-plus'></i> New Booking

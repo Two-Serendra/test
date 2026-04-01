@@ -964,7 +964,11 @@ class ActivitiesController extends Controller
 
             while ($blockStart < $blockEnd) {
                 $slotKey = $blockStart->format('H:i');
-                $occupiedSlots[$slotKey] = ['blocked' => true];
+                $occupiedSlots[$slotKey] = [
+                    'count' => 0,
+                    'activity_space' => null,
+                    'blocked' => true,
+                ];
                 $blockStart->addHour();
             }
         }
@@ -1095,7 +1099,15 @@ class ActivitiesController extends Controller
 
             while ($blockStart < $blockEnd) {
                 $slotKey = $blockStart->format('H:i');
-                $occupiedSlots[$slotKey] = ['blocked' => true];
+                if (!isset($occupiedSlots[$slotKey])) {
+                    $occupiedSlots[$slotKey] = [
+                        'count' => 0,
+                        'activity_space' => null,
+                        'blocked' => true,
+                    ];
+                } else {
+                    $occupiedSlots[$slotKey]['blocked'] = true;
+                }
                 $blockStart->addHour();
             }
         }
@@ -1110,11 +1122,26 @@ class ActivitiesController extends Controller
             $currentSlotEnd = (clone $currentSlotStart)->addHour();
             $slotKey = $currentSlotStart->format('H:i');
 
-            $existingBooking = $occupiedSlots[$slotKey] ?? ['count' => 0, 'activity_space' => null];
-            if ($existingBooking['count'] > 0 && $existingBooking['activity_space'] != $activitySpace)
+            $existingBooking = $occupiedSlots[$slotKey] ?? [
+                'count' => 0,
+                'activity_space' => null,
+                'blocked' => false,
+            ];
+
+            if (!empty($existingBooking['blocked'])) {
                 break;
-            if ($existingBooking['count'] >= $activitySpace)
+            }
+
+            if ($existingBooking['count'] >= $activitySpace) {
                 break;
+            }
+
+            if (
+                $existingBooking['count'] > 0 &&
+                $existingBooking['activity_space'] != $activitySpace
+            ) {
+                break;
+            }
 
             $availableEndTimes[] = $currentSlotEnd->format('h:i A');
             $addedHours++;

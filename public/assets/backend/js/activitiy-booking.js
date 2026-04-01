@@ -297,66 +297,161 @@ $(document).ready(function () {
 
 
 
-    $(".checkUnit").on("click", function () {
-        let unit = unitNumber.val().trim();
-        let selectedDate = dateField.val()?.trim();
+    // $(".checkUnit").on("click", function () {
+    //     let unit = unitNumber.val().trim();
+    //     let selectedDate = dateField.val()?.trim();
 
-        if (!unit || !selectedDate) {
-            Swal.fire({
-                icon: "warning",
-                title: "Missing Information",
-                text: "Please enter a unit number and select a date.",
-            });
-            return;
+    //     if (!unit || !selectedDate) {
+    //         Swal.fire({
+    //             icon: "warning",
+    //             title: "Missing Information",
+    //             text: "Please enter a unit number and select a date.",
+    //         });
+    //         return;
+    //     }
+
+    //     $.ajax({
+    //         url: '/admin/check-unit-booking',
+    //         type: "GET",
+    //         data: {
+    //             unit: unit,
+    //             activity_id: adminModal.find('#activitySelectBooking').val(),
+    //             dateField: selectedDate
+    //         },
+    //         success: function (response) {
+    //             if (response.success) {
+    //                 let count = response.count;
+    //                 let maxBookings = response.maxBookings;
+    //                 let statusText = `${count}/${maxBookings}`;
+    //                 unitStatus.removeClass("text-muted text-danger text-success text-primary");
+
+    //                 if (bookingType === "Advanced Booking") {
+    //                     if (count < maxBookings) {
+    //                         unitStatus.addClass("text-success").text(statusText);
+    //                         enableAllFields();
+    //                     } else {
+    //                         unitStatus.addClass("text-danger").text(statusText + " (Max)");
+    //                         disableSubmitOnly();
+    //                     }
+    //                 }
+    //             } else {
+    //                 Swal.fire({
+    //                     icon: "error",
+    //                     title: "Error",
+    //                     text: response.message,
+    //                 });
+    //             }
+    //         },
+    //         error: function () {
+    //             Swal.fire({
+    //                 icon: "error",
+    //                 title: "Server Error",
+    //                 text: "Something went wrong. Please try again later.",
+    //             });
+    //         }
+    //     });
+    // });
+
+    $(document).ready(function () {
+        const $btn = $("#saveActivityBookingBtn");
+
+        let bookingAllowed = false;
+        let timeAllowed = false;
+
+        function checkTimeAvailability() {
+            const now = new Date();
+            const day = now.getDay();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+
+            const isFriday = day === 3;
+            const isAfter10 = hours > 10 || (hours === 10 && minutes >= 0);
+
+            timeAllowed = isFriday && isAfter10;
+
+            if (!timeAllowed) {
+                $btn.attr("title", "Available every Friday at 10:00 AM");
+            } else {
+                $btn.attr("title", "");
+            }
+
+            updateButtonState();
         }
 
-        $.ajax({
-            url: '/admin/check-unit-booking',
-            type: "GET",
-            data: {
-                unit: unit,
-                activity_id: adminModal.find('#activitySelectBooking').val(),
-                dateField: selectedDate
-            },
-            success: function (response) {
-                if (response.success) {
-                    let count = response.count;
-                    let maxBookings = response.maxBookings;
-                    let statusText = `${count}/${maxBookings}`;
-                    unitStatus.removeClass("text-muted text-danger text-success text-primary");
+        function updateButtonState() {
+            if (bookingAllowed && timeAllowed) {
+                $btn.prop("disabled", false);
+            } else {
+                $btn.prop("disabled", true);
+            }
+        }
 
-                    if (bookingType === "Advanced Booking") {
-                        if (count < maxBookings) {
-                            unitStatus.addClass("text-success").text(statusText);
-                            enableAllFields();
-                        } else {
-                            unitStatus.addClass("text-danger").text(statusText + " (Max)");
-                            disableSubmitOnly();
+        checkTimeAvailability();
+        setInterval(checkTimeAvailability, 60000);
+
+        $('#submitWrapper').tooltip();
+
+        $(".checkUnit").on("click", function () {
+            let unit = unitNumber.val().trim();
+            let selectedDate = dateField.val()?.trim();
+
+            if (!unit || !selectedDate) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Missing Information",
+                    text: "Please enter a unit number and select a date.",
+                });
+                return;
+            }
+
+            $.ajax({
+                url: '/admin/check-unit-booking',
+                type: "GET",
+                data: {
+                    unit: unit,
+                    activity_id: adminModal.find('#activitySelectBooking').val(),
+                    dateField: selectedDate
+                },
+                success: function (response) {
+                    if (response.success) {
+                        let count = response.count;
+                        let maxBookings = response.maxBookings;
+                        let statusText = `${count}/${maxBookings}`;
+
+                        unitStatus.removeClass("text-muted text-danger text-success text-primary");
+
+                        if (bookingType === "Advanced Booking") {
+                            if (count < maxBookings) {
+                                unitStatus.addClass("text-success").text(statusText);
+
+                                bookingAllowed = true;   // ✅ allow booking
+                                enableAllFields();
+                            } else {
+                                unitStatus.addClass("text-danger").text(statusText + " (Max)");
+
+                                bookingAllowed = false;  // ❌ block booking
+                                disableSubmitOnly();
+                            }
                         }
-                        // } else if (bookingType === "24hrs") {
-                        //     if (count >= maxBookings) {
-                        //         unitStatus.addClass("text-primary").text(statusText + " (Eligible)");
-                        //         enableAllFields();
-                        //     } else {
-                        //         unitStatus.addClass("text-danger").text(statusText + " (Advance Booking Required)");
-                        //         disableSubmitOnly();
-                        //     }
+
+                        // 🔥 Apply BOTH conditions
+                        updateButtonState();
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: response.message,
+                        });
                     }
-                } else {
+                },
+                error: function () {
                     Swal.fire({
                         icon: "error",
-                        title: "Error",
-                        text: response.message,
+                        title: "Server Error",
+                        text: "Something went wrong. Please try again later.",
                     });
                 }
-            },
-            error: function () {
-                Swal.fire({
-                    icon: "error",
-                    title: "Server Error",
-                    text: "Something went wrong. Please try again later.",
-                });
-            }
+            });
         });
     });
 
@@ -1580,6 +1675,9 @@ $('.SearchSlotAdmin').submit(function (event) {
                 .css('width', '');
         }
     });
+
+
+
 });
 
 

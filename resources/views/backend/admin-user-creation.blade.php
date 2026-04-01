@@ -13,6 +13,7 @@
             6 => ['label' => 'Lobby', 'class' => 'bg-primary border-primary'],
             7 => ['label' => 'Manager', 'class' => 'bg-dark border-dark'],
             8 => ['label' => 'Concierge Supervisor', 'class' => 'bg-dark border-dark'],
+            9 => ['label' => 'Main Lobby', 'class' => 'bg-dark border-dark'],
         ];
     @endphp
 

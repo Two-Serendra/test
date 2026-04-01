@@ -13,9 +13,12 @@ return [
     'admin.booking.activities' => ['Amenities', 'Booking'],
     'admin.activity.history' => ['Amenities', 'Reports'],
     'admin.show.date.blocking' => ['Amenities', 'Date Blocking'],
-    'admin.show.amenities' => ['Amenities', 'Add Amenities'],
-    'admin.show.activities' => ['Amenities', 'Add Activities'],
+    'admin.show.amenities' => ['Setup', 'Amenities'],
+    'admin.show.activities' => ['Setup', 'Activities'],
     'admin.activity.booking.calendar' => ['Amenities', 'Calendar'],
+
+    'admin.show.schedule.blocking' => ['Setup', 'Schedule Blocking'],
+    'admin.show.date.blocking.activities' => ['Setup', 'Date Blocking'],
     // Grease Trap
     'admin.booking.grease.trap' => ['Grease Trap', 'Booking'],
     'admin.booking.grease.trap.calendar' => ['Grease Trap', 'Calendar'],

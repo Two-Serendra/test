@@ -47,20 +47,18 @@
         @endroles
 
 
-        @roles(1, 6, 7)
+        @roles(1, 6, 7, 9)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-building"></i>
                 <div>Amenities</div>
                 <span id="amenity-booking-counter" class="badge bg-danger d-none"
                     style="min-width: 22px; text-align: center; display: inline-flex; justify-content: center; align-items: center;">
-                0   
+                    0
                 </span>
             </a>
 
             <ul class="menu-sub">
-
-                {{-- ✅ BOTH ROLE 1 & 6 --}}
                 <li class="menu-item {{ request()->routeIs('admin.booking.activities') ? 'active' : '' }}">
                     <a href="{{ route('admin.booking.activities') }}" class="menu-link">
                         <div>Booking</div>
@@ -78,22 +76,8 @@
                         <div>Calendar</div>
                     </a>
                 </li>
-
-                {{-- 🔒 ADMIN ONLY --}}
-                @role(1, 7)
-
-                <li class="menu-item {{ request()->routeIs('admin.show.schedule.blocking') ? 'active' : '' }}">
-                    <a href="{{ route('admin.show.schedule.blocking') }}" class="menu-link">
-                        <div>Schedule Blocking</div>
-                    </a>
-                </li>
-
-                <li class="menu-item {{ request()->routeIs('admin.show.date.blocking.activities') ? 'active' : '' }}">
-                    <a href="{{ route('admin.show.date.blocking.activities') }}" class="menu-link">
-                        <div>Date Blocking</div>
-                    </a>
-                </li>
-
+                @endroles
+                @roles(1, 7, 9)
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link menu-toggle">
                         <div>Setup</div>
@@ -109,12 +93,26 @@
                                 <div>Activities</div>
                             </a>
                         </li>
+
+                        <li class="menu-item {{ request()->routeIs('admin.show.schedule.blocking') ? 'active' : '' }}">
+                            <a href="{{ route('admin.show.schedule.blocking') }}" class="menu-link">
+                                <div>Schedule Blocking</div>
+                            </a>
+                        </li>
+
+                        <li
+                            class="menu-item {{ request()->routeIs('admin.show.date.blocking.activities') ? 'active' : '' }}">
+                            <a href="{{ route('admin.show.date.blocking.activities') }}" class="menu-link">
+                                <div>Date Blocking</div>
+                            </a>
+                        </li>
                     </ul>
                 </li>
-                @endrole
+                @endroles
+
             </ul>
         </li>
-        @endroles
+
 
 
         <!-- @roles(1, 2, 3, 5, 6, 7, 8)

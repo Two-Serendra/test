@@ -23,90 +23,6 @@ class ProcessResidentCSV implements ShouldQueue
         $this->filePath = $filePath;
     }
 
-    // public function handle()
-    // {
-    //     cache()->put('upload_progress', 0);
-
-    //     $chunkSize = 500;
-    //     $batch = [];
-    //     $uploadedEmails = [];
-    //     $processed = 0;
-    //     $skipped = 0;
-
-    //     $csv = fopen($this->filePath, 'r');
-
-    //     $header = fgetcsv($csv);
-    //     if (!$header || count($header) < 2) {
-    //         fclose($csv);
-    //         return;
-    //     }
-
-    //     // Clear old data
-    //     ResidentDetails::truncate();
-
-    //     // Count total rows
-    //     $totalRows = 0;
-    //     $fileHandle = fopen($this->filePath, 'r');
-    //     while (fgetcsv($fileHandle) !== false)
-    //         $totalRows++;
-    //     fclose($fileHandle);
-
-    //     $csv = fopen($this->filePath, 'r');
-    //     fgetcsv($csv); // skip header
-
-    //     $currentRow = 0;
-
-    //     while (($row = fgetcsv($csv)) !== false) {
-    //         $currentRow++;
-
-    //         if ($currentRow % 100 == 0) {
-    //             cache()->put('upload_progress', round(($currentRow / $totalRows) * 100));
-    //         }
-
-    //         if (count($row) < 2) {
-    //             $skipped++;
-    //             continue;
-    //         }
-
-    //         $unitNo = trim($row[0]);
-    //         $email = strtolower(trim($row[1]));
-    //         $residentType = isset($row[2]) ? strtoupper(trim($row[2])) : null;
-
-    //         if (filter_var($email, FILTER_VALIDATE_EMAIL) && $unitNo !== '') {
-    //             $batch[] = [
-    //                 'unit_no' => $unitNo,
-    //                 'email' => $email,
-    //                 'resident_type' => $residentType,
-    //                 'created_at' => now(),
-    //                 'updated_at' => now(),
-    //             ];
-
-    //             $uploadedEmails[] = $email;
-    //             $processed++;
-
-    //             if (count($batch) >= $chunkSize) {
-    //                 ResidentDetails::insert($batch);
-    //                 $batch = [];
-    //             }
-    //         } else {
-    //             $skipped++;
-    //         }
-    //     }
-
-    //     if (!empty($batch)) {
-    //         ResidentDetails::insert($batch);
-    //     }
-
-    //     fclose($csv);
-
-    //     \DB::table('users')
-    //         ->where('role_id', 0)
-    //         ->whereNotIn('email', $uploadedEmails)
-    //         ->update(['is_active' => false]);
-
-    //     cache()->put('upload_progress', 100);
-    // }
-
 
     public function handle()
     {
@@ -212,10 +128,6 @@ class ProcessResidentCSV implements ShouldQueue
         fclose($csv);
         fclose($skippedHandle);
 
-        DB::table('users')
-            ->where('role_id', 0)
-            ->whereNotIn('email', $uploadedEmails)
-            ->update(['is_active' => false]);
 
         cache()->put('upload_progress', 100);
 

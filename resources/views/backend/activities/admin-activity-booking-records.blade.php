@@ -53,7 +53,9 @@
                             <th class="table-custom sticky-th">PENALTY</th>
                             <th class="table-custom sticky-th">PENALTY WAIVED</th>
                             <th class="table-custom sticky-th">WAIVED BY</th>
+                            <th class="table-custom sticky-th">WAIVED AT</th>
                             <th class="table-custom sticky-th">APPLIED BY</th>
+                            <th class="table-custom sticky-th">APPLIED AT</th>
                             <th class="table-custom sticky-th">CREATED BY</th>
                             <th class="table-custom sticky-th">CREATED AT</th>
                             <th class="table-custom sticky-th">UPDATED AT</th>
@@ -115,19 +117,32 @@
                                         @endif
                                     </td>
 
-                                    <td>{{ $activity_booking->waivedBy->name ?? 'N/A' }}</td>
-                                    <td>{{ $activity_booking->penaltyAppliedBy->name ?? 'N/A' }}</td>
+                                    <td>
+                                        {{ $booking->waivedBy->name ?? 'N/A' }}
+                                    </td>
+                                    <td>
+                                        {{ $booking->penalty_waived_at ?? 'N/A' }}
+                                    </td>
 
-                                    <td>{{ strtoupper($activity_booking->user->name ?? 'N/A') }}</td>
-                                    <td>{{ strtoupper($activity_booking->created_at ?? 'N/A') }}</td>
-                                    <td>{{ strtoupper($activity_booking->updated_at ?? 'N/A') }}</td>
+                                    <td>
+
+                                        {{ $booking->penaltyAppliedBy->name ?? 'N/A' }}
+                                    </td>
+
+                                    <td>
+                                        {{ $booking->penalty_applied_at ?? 'N/A' }}
+                                    </td>
+
+                                    <td>{{ strtoupper($booking->user->name ?? 'N/A') }}</td>
+                                    <td>{{ strtoupper($booking->created_at ?? 'N/A') }}</td>
+                                    <td>{{ strtoupper($booking->updated_at ?? 'N/A') }}</td>
 
                                     {{-- ACTION COLUMN (simplified) --}}
                                     <td class="sticky-col sticky-col-color">
                                         <div class="d-flex gap-1 justify-content-center">
 
-                                            <button type="button" class="btn btn-primary viewActivityBookingDetailsBtn btn-sm" title="View"
-                                                data-id="{{ $activity_booking->id }}">
+                                            <button type="button" class="btn btn-primary viewActivityBookingDetailsBtn btn-sm"
+                                                title="View" data-id="{{ $activity_booking->id }}">
                                                 <i class="fa-solid fa-eye"></i>
                                             </button>
 
@@ -146,5 +161,5 @@
         </div>
     </div>
     @include('backend.modal.downloadHistory-modal')
-     @include('backend.modal.activities.activities-booking-modal')
+    @include('backend.modal.activities.activities-booking-modal')
 @endsection

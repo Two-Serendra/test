@@ -135,11 +135,26 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="submit" form="AdminNewBooking" id="saveActivityBookingBtn"
-                    class="btn btn-primary d-flex align-items-center justify-content-center"
-                    style="min-width: 100px; height: 38px;">
-                    <span class="btn-text">Submit</span>
-                </button>
+                @php
+                    use Carbon\Carbon;
+
+                    $now = Carbon::now();
+                    $isFriday10AM = $now->isFriday() && $now->format('H:i') >= '10:00';
+                    $isRole6 = auth()->user()->role_id == 6;
+
+                    $isDisabled = $isRole6 && !$isFriday10AM;
+                @endphp
+                
+                <span id="submitWrapper" data-bs-toggle="tooltip"
+                    title="{{ $isDisabled ? 'Available every Friday at 10:00 AM' : '' }}"
+                    style="display: inline-block;">
+                    <button type="submit" form="AdminNewBooking" id="saveActivityBookingBtn"
+                        class="btn btn-primary d-flex align-items-center justify-content-center"
+                        style="min-width: 100px; height: 38px;" {{ $isDisabled ? 'disabled' : '' }}>
+
+                        <span class="btn-text">Submit</span>
+                    </button>
+                </span>
             </div>
         </div>
     </div>

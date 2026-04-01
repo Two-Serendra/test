@@ -351,7 +351,7 @@ class ActivitiesController extends Controller
         return response()->json(['message' => 'Date blocked successfully.'], 200);
     }
 
-    public function newDateBlocking(Request $request)
+    public function newDateBlockingActivities(Request $request)
     {
         try {
             $newBlocking = new ActivityDateBlocking();

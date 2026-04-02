@@ -63,13 +63,12 @@ class FrontendFunctionRoomBookingController extends Controller
                 });
         } elseif ($category === 'amenity') {
             $items = Activity::where('activity_status', '1')
-                ->orderBy('amenity_id') // <-- sorts by amenity_id ascending
+                ->orderBy('id', 'asc') // sort by id ascending
                 ->get()
                 ->map(function ($item) {
                     $item->type = 'amenity';
                     return $item;
                 });
-
         } elseif ($category === 'grease_trap') {
 
             $residences = auth()->check()

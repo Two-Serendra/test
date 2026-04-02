@@ -1101,6 +1101,8 @@ $(document).ready(function () {
 
                         if (status === 'Available') {
                             badgeClass = 'custom-badge bg-primary text-white';
+                        } else if (status === 'Blocked') {
+                            badgeClass = 'custom-badge bg-secondary text-white';
                         } else {
 
                             badgeClass = 'custom-badge bg-danger text-white';

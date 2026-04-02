@@ -1202,6 +1202,15 @@ class FrontendActivityBookingController extends Controller
             ->with('activity')
             ->get();
 
+        $blockedSlots = ActivityBlocking::whereHas('activity', function ($q) use ($amenityId) {
+            $q->where('amenity_id', $amenityId);
+        })->where(function ($query) use ($day) {
+            $query->where(function ($q) use ($day) {
+                $q->where('repeat_weekly', true)
+                    ->where('day', $day);
+            });
+        })->get();
+
         $slots = [];
 
         while ($start < $end) {
@@ -1212,6 +1221,27 @@ class FrontendActivityBookingController extends Controller
                 'time_range' => $slotStart->format('g:i A') . ' - ' . $slotEnd->format('g:i A'),
                 'slots' => []
             ];
+
+            $isBlocked = $blockedSlots->contains(function ($block) use ($slotStart, $slotEnd, $date) {
+                $blockStart = Carbon::parse($date . ' ' . $block->start_time);
+                $blockEnd = Carbon::parse($date . ' ' . $block->end_time);
+
+                if ($blockEnd->lessThanOrEqualTo($blockStart)) {
+                    $blockEnd->addDay();
+                }
+
+                return $blockStart->lt($slotEnd) && $blockEnd->gt($slotStart);
+            });
+
+            if ($isBlocked) {
+                for ($i = 1; $i <= $activitySpace; $i++) {
+                    $row['slots'][] = 'Blocked';
+                }
+
+                $slots[] = $row;
+                $start->addHour();
+                continue;
+            }
 
 
             $overlappingBookings = $bookings->filter(function ($booking) use ($slotStart, $slotEnd) {

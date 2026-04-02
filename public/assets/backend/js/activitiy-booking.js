@@ -1582,8 +1582,9 @@ $('.SearchSlotAdmin').submit(function (event) {
 
                     if (status === 'Available') {
                         badgeClass = 'bg-primary';
+                    } else if (status === 'Blocked') {
+                        badgeClass = 'bg-secondary'; // 👈 add this
                     } else {
-
                         badgeClass = 'bg-danger';
                     }
 

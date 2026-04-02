@@ -290,12 +290,18 @@ $(document).ready(function () {
         let timeAllowed = false;
 
         function checkTimeAvailability() {
+            if (userRole !== 6) {
+                timeAllowed = true;
+                updateButtonState();
+                return;
+            }
+
             const now = new Date();
             const day = now.getDay();
             const hours = now.getHours();
             const minutes = now.getMinutes();
 
-            const isFriday = day === 3;
+            const isFriday = day === 5;
             const isAfter10 = hours > 10 || (hours === 10 && minutes >= 0);
 
             timeAllowed = isFriday && isAfter10;

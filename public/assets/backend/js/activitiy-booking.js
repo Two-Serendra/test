@@ -304,7 +304,10 @@ $(document).ready(function () {
             const isFriday = day === 5;
             const isAfter10 = hours > 10 || (hours === 10 && minutes >= 0);
 
-            timeAllowed = isFriday && isAfter10;
+            // ❌ Only block Friday before 10 AM
+            const isRestrictedTime = isFriday && !isAfter10;
+
+            timeAllowed = !isRestrictedTime;
 
             if (!timeAllowed) {
                 $btn.attr("title", "Available every Friday at 10:00 AM");

@@ -137,14 +137,15 @@
             <div class="modal-footer">
                 @php
                     use Carbon\Carbon;
-
                     $now = Carbon::now();
-                    $isFriday10AM = $now->isFriday() && $now->format('H:i') >= '10:00';
-                    $isRole6 = auth()->user()->role_id == 6;
+                    $isFriday = $now->isFriday();
+                    $isAfter10 = $now->format('H:i') >= '10:00';
 
-                    $isDisabled = $isRole6 && !$isFriday10AM;
+                    $isRole6 = auth()->user()->role_id == 6; // ✅ ADD THIS
+                    $isRestrictedTime = $isFriday && !$isAfter10;
+                    $isDisabled = $isRole6 && $isRestrictedTime;
                 @endphp
-                
+
                 <span id="submitWrapper" data-bs-toggle="tooltip"
                     title="{{ $isDisabled ? 'Available every Friday at 10:00 AM' : '' }}"
                     style="display: inline-block;">

@@ -39,62 +39,65 @@
                     <a href="{{ route('contact') }}"
                         class="nav-item nav-link {{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a>
                 </div>
+                <div class="d-flex align-items-center ms-auto">
+                    @auth
+                        <div class="">
+                            <a href="{{ route('booking.list') }}" class="btn btn-primary custom-btn">Book Now</a>
+                        </div>
+                    @endauth
 
-                <div class="ms-auto">
-                    <a href="{{ route('booking.list') }}" class="btn btn-primary custom-btn">Book Now</a>
-                </div>
-
-                @auth
-                    <div class="nav-item dropdown ms-3 mt-2 mt-lg-0">
-                        <a href="#"
-                            class="nav-link dropdown-toggle d-flex align-items-center justify-content-center position-relative"
-                            id="notifDropdown" role="button" data-bs-toggle="dropdown"
-                            style="width: 40px; height: 40px; background-color: #008b26; border-radius: 50%; color: white;"
-                            data-bs-display="static">
-                            <i class='bx bx-bell' style="font-size: 1.4rem;"></i>
-                            @if(auth()->user()->unreadNotifications()->count() > 0)
-                                <span class="position-absolute top-0 start-100 badge rounded-pill bg-danger"
-                                    style="transform: translate(-60%, -35%);">
-                                    {{ auth()->user()->unreadNotifications()->count() }}
-                                </span>
-                            @endif
-                        </a>
-
-                        <div class="dropdown-menu bg-light rounded-0 rounded-bottom m-0"
-                            style="min-width: 320px; max-width: 350px; max-height: 300px; overflow-y: auto; word-wrap: break-word; white-space: normal;"
-                            id="notifDropdownMenu">
-
-                            @php
-                                $unread = auth()->user()->unreadNotifications()->latest()->take(5)->get();
-                                $read = auth()->user()->readNotifications()->latest()->take(max(0, 5 - $unread->count()))->get();
-                                $notifications = $unread->merge($read)->take(5);
-                            @endphp
-
-                            @forelse($notifications as $notification)
-                                @php
-                                    $message = \Illuminate\Support\Str::limit($notification->data['message'] ?? 'New notification', 80);
-                                    $url = route('notifications.show', $notification->id);
-                                @endphp
-
-                                <a href="{{ $url }}"
-                                    class="dropdown-item text-start mark-as-read {{ $notification->read_at ? 'notification-read' : 'fw-bold' }}"
-                                    data-id="{{ $notification->id }}" data-url="{{ $url }}"
-                                    style="white-space: normal; text-wrap: wrap;">
-                                    <i class="bx bx-bell me-2"></i> {{ $message }}
-                                    <br>
-                                    <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
-                                </a>
-                            @empty
-                                @if(auth()->user()->notifications()->count() === 0)
-                                    <span class="dropdown-item text-muted" style="white-space: normal; text-wrap: wrap;">
-                                        No notifications
+                    @auth
+                        <div class="nav-item dropdown ms-3 mt-2 mt-lg-0">
+                            <a href="#"
+                                class="nav-link dropdown-toggle d-flex align-items-center justify-content-center position-relative"
+                                id="notifDropdown" role="button" data-bs-toggle="dropdown"
+                                style="width: 40px; height: 40px; background-color: #008b26; border-radius: 50%; color: white;"
+                                data-bs-display="static">
+                                <i class='bx bx-bell' style="font-size: 1.4rem;"></i>
+                                @if(auth()->user()->unreadNotifications()->count() > 0)
+                                    <span class="position-absolute top-0 start-100 badge rounded-pill bg-danger"
+                                        style="transform: translate(-60%, -35%);">
+                                        {{ auth()->user()->unreadNotifications()->count() }}
                                     </span>
                                 @endif
-                            @endforelse
+                            </a>
 
+                            <div class="dropdown-menu bg-light rounded-0 rounded-bottom m-0"
+                                style="min-width: 320px; max-width: 350px; max-height: 300px; overflow-y: auto; word-wrap: break-word; white-space: normal;"
+                                id="notifDropdownMenu">
+
+                                @php
+                                    $unread = auth()->user()->unreadNotifications()->latest()->take(5)->get();
+                                    $read = auth()->user()->readNotifications()->latest()->take(max(0, 5 - $unread->count()))->get();
+                                    $notifications = $unread->merge($read)->take(5);
+                                @endphp
+
+                                @forelse($notifications as $notification)
+                                    @php
+                                        $message = \Illuminate\Support\Str::limit($notification->data['message'] ?? 'New notification', 80);
+                                        $url = route('notifications.show', $notification->id);
+                                    @endphp
+
+                                    <a href="{{ $url }}"
+                                        class="dropdown-item text-start mark-as-read {{ $notification->read_at ? 'notification-read' : 'fw-bold' }}"
+                                        data-id="{{ $notification->id }}" data-url="{{ $url }}"
+                                        style="white-space: normal; text-wrap: wrap;">
+                                        <i class="bx bx-bell me-2"></i> {{ $message }}
+                                        <br>
+                                        <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
+                                    </a>
+                                @empty
+                                    @if(auth()->user()->notifications()->count() === 0)
+                                        <span class="dropdown-item text-muted" style="white-space: normal; text-wrap: wrap;">
+                                            No notifications
+                                        </span>
+                                    @endif
+                                @endforelse
+
+                            </div>
                         </div>
-                    </div>
-                @endauth
+                    @endauth
+                </div>
 
 
                 <div class="nav-item dropdown ms-3 mt-2 mt-lg-0">
@@ -110,8 +113,8 @@
                             </a>
 
                             <!-- <a href="{{ route('soa') }}" class="dropdown-item">
-                                <i class='bx bx-file me-2'></i> SOA
-                            </a> -->
+                                        <i class='bx bx-file me-2'></i> SOA
+                                    </a> -->
 
                             <a href="{{ route('resident.booking.history') }}" class="dropdown-item">
                                 <i class='bx bx-calendar me-2'></i> Bookings

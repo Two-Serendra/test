@@ -1148,7 +1148,7 @@ class ActivitiesController extends Controller
 
         $availableEndTimes = [];
         $currentSlotStart = clone $start;
-        $maxHours = 2;
+        $maxHours = ($activityId == 3) ? 1 : 2;
         $addedHours = 0;
 
         while ($currentSlotStart < $end && $addedHours < $maxHours) {

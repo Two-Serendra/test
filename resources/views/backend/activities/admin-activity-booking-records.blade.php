@@ -118,24 +118,24 @@
                                     </td>
 
                                     <td>
-                                        {{ $booking->waivedBy->name ?? 'N/A' }}
+                                        {{ $activity_booking->waivedBy->name ?? 'N/A' }}
                                     </td>
                                     <td>
-                                        {{ $booking->penalty_waived_at ?? 'N/A' }}
-                                    </td>
-
-                                    <td>
-
-                                        {{ $booking->penaltyAppliedBy->name ?? 'N/A' }}
+                                        {{ $activity_booking->penalty_waived_at ?? 'N/A' }}
                                     </td>
 
                                     <td>
-                                        {{ $booking->penalty_applied_at ?? 'N/A' }}
+
+                                        {{ $activity_booking->penaltyAppliedBy->name ?? 'N/A' }}
                                     </td>
 
-                                    <td>{{ strtoupper($booking->user->name ?? 'N/A') }}</td>
-                                    <td>{{ strtoupper($booking->created_at ?? 'N/A') }}</td>
-                                    <td>{{ strtoupper($booking->updated_at ?? 'N/A') }}</td>
+                                    <td>
+                                        {{ $activity_booking->penalty_applied_at ?? 'N/A' }}
+                                    </td>
+
+                                    <td>{{ strtoupper($activity_booking->user->name ?? 'N/A') }}</td>
+                                    <td>{{ strtoupper($activity_booking->created_at ?? 'N/A') }}</td>
+                                    <td>{{ strtoupper($activity_booking->updated_at ?? 'N/A') }}</td>
 
                                     {{-- ACTION COLUMN (simplified) --}}
                                     <td class="sticky-col sticky-col-color">

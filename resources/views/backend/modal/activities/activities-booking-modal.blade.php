@@ -75,7 +75,7 @@
                                 </div>
                                 <button type="button" class="btn btn-outline-secondary checkUnit">Check</button>
 
-                                <span id="unitStatus" class="mt-1 text-muted">0/0</span>
+                                <span id="unitStatus" class="mt-1 ">0/0</span>
                             </div>
 
                             <div class="mb-3 position-relative">
@@ -139,15 +139,15 @@
                     use Carbon\Carbon;
                     $now = Carbon::now();
                     $isFriday = $now->isFriday();
-                    $isAfter10 = $now->format('H:i') >= '10:00';
+                    $isAfter9 = $now->format('H:i') >= '09:00';
 
                     $isRole6 = auth()->user()->role_id == 6; // ✅ ADD THIS
-                    $isRestrictedTime = $isFriday && !$isAfter10;
+                    $isRestrictedTime = $isFriday && !$isAfter9;
                     $isDisabled = $isRole6 && $isRestrictedTime;
                 @endphp
 
                 <span id="submitWrapper" data-bs-toggle="tooltip"
-                    title="{{ $isDisabled ? 'Available every Friday at 10:00 AM' : '' }}"
+                    title="{{ $isDisabled ? 'Available every Friday at 9:00 AM' : '' }}"
                     style="display: inline-block;">
                     <button type="submit" form="AdminNewBooking" id="saveActivityBookingBtn"
                         class="btn btn-primary d-flex align-items-center justify-content-center"
@@ -165,7 +165,7 @@
 <div class="modal fade" id="bookingEdit" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white position-relative">
+            <div class="modal-header bg-primary position-relative">
 
                 <!-- Centered Logo -->
                 <div class="w-100 d-flex align-items-center justify-content-center">
@@ -184,18 +184,18 @@
                 <!-- Header -->
                 <div class="text-center mb-4">
                     <h5 class="fw-bold mb-1">Booking Details</h5>
-                    <small class="text-muted">Reference #: <span id="detail-transaction-no"></span></small>
+                    <small class="">Reference #: <span id="detail-transaction-no"></span></small>
                 </div>
 
                 <!-- STATUS + PENALTY (Highlight Section) -->
                 <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded bg-light">
                     <div>
-                        <small class="text-muted d-block">Status</small>
+                        <small class=" d-block">Status</small>
                         <span id="detail-booking-status"></span>
                     </div>
 
                     <div class="text-end">
-                        <small class="text-muted d-block">Penalty</small>
+                        <small class=" d-block">Penalty</small>
                         <span id="detail-penalty-display" class="fw-semibold"></span>
                     </div>
                 </div>
@@ -208,22 +208,22 @@
                             <h6 class="fw-semibold text-primary mb-3">Guest Information</h6>
 
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Name</span>
+                                <span class="">Name</span>
                                 <span id="detail-name" class="fw-semibold text-end"></span>
                             </div>
 
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Unit</span>
+                                <span class="">Unit</span>
                                 <span id="detail-unit" class="fw-semibold"></span>
                             </div>
 
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Resident Type</span>
+                                <span class="">Resident Type</span>
                                 <span id="detail-resident-type"></span>
                             </div>
 
                             <div class="d-flex justify-content-between">
-                                <span class="text-muted">Contact</span>
+                                <span class="">Contact</span>
                                 <span id="detail-contact" class="fw-semibold"></span>
                             </div>
                         </div>
@@ -235,23 +235,28 @@
                             <h6 class="fw-semibold text-primary mb-3">Booking Information</h6>
 
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Activity</span>
+                                <span class="">Activity</span>
                                 <span id="detail-activity-name" class="fw-semibold text-end"></span>
                             </div>
 
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Booking Type</span>
+                                <span class="">Booking Type</span>
                                 <span id="detail-booking-type" class="fw-semibold"></span>
                             </div>
 
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Date</span>
+                                <span class="">Date</span>
                                 <span id="detail-booking-date" class="fw-semibold"></span>
                             </div>
 
                             <div class="d-flex justify-content-between">
-                                <span class="text-muted">Time</span>
+                                <span class="">Time</span>
                                 <span id="detail-start-time" class="fw-semibold"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <span class="">Slots:</span>
+                                <span id="detail-slot-count" class="fw-semibold"></span>
                             </div>
                         </div>
                     </div>
@@ -291,7 +296,7 @@
 
                 <!-- TITLE CARD -->
                 <div class="bg-white p-3 rounded-4 shadow-sm border-start border-4 border-primary mb-4">
-                    <small class="text-muted">Activity</small>
+                    <small class="">Activity</small>
                     <div id="calendar_activity_name" class="fs-5 fw-bold text-primary"></div>
                 </div>
 
@@ -303,20 +308,20 @@
                         <div class="card border-0 shadow-sm rounded-4 h-100">
                             <div class="card-body p-4">
 
-                                <h6 class="text-uppercase text-muted small mb-3">Resident Info</h6>
+                                <h6 class="text-uppercase  small mb-3">Resident Info</h6>
 
                                 <div class="mb-3">
-                                    <small class="text-muted">Unit</small>
+                                    <small class="">Unit</small>
                                     <div class="fw-semibold" id="calendar_unit">N/A</div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <small class="text-muted">Name</small>
+                                    <small class="">Name</small>
                                     <div class="fw-semibold" id="calendar_name">N/A</div>
                                 </div>
 
                                 <div class="mb-0">
-                                    <small class="text-muted">Contact</small>
+                                    <small class="">Contact</small>
                                     <div class="fw-semibold" id="calendar_contact_number">N/A</div>
                                 </div>
 
@@ -329,21 +334,21 @@
                         <div class="card border-0 shadow-sm rounded-4 h-100">
                             <div class="card-body p-4">
 
-                                <h6 class="text-uppercase text-muted small mb-3">Schedule</h6>
+                                <h6 class="text-uppercase  small mb-3">Schedule</h6>
 
                                 <div class="mb-3">
-                                    <small class="text-muted">Date</small>
+                                    <small class="">Date</small>
                                     <div class="fw-semibold" id="calendar_booking_date">N/A</div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <small class="text-muted">Start Time</small>
+                                    <small class="">Start Time</small>
                                     <div class="fw-semibold" id="calendar_booking_start_time">N/A</div>
                                 </div>
 
-                                <div class="mb-0">
-                                    <small class="text-muted">End Time</small>
-                                    <div class="fw-semibold" id="calendar_booking_end_time">N/A</div>
+                                <div class="mb-3">
+                                    <small class="">Slots</small>
+                                    <div class="fw-semibold" id="calendar_slot_count">N/A</div>
                                 </div>
 
                             </div>

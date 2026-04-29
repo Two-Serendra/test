@@ -186,9 +186,16 @@
                                 data.contact_number ? data.contact_number : 'N/A'
                             );
 
+                            const startTime = data.booking_start_time;
+                            const endTime = data.booking_end_time;
+
                             $('#calendar_booking_date').text(data.booking_date ?? 'N/A');
-                            $('#calendar_booking_start_time').text(data.booking_start_time ?? 'N/A');
-                            $('#calendar_booking_end_time').text(data.booking_end_time ?? 'N/A');
+                            $('#calendar_booking_start_time').text(`${startTime} - ${endTime}` ?? 'N/A');
+                            $('#calendar_slot_count').text(
+                                data.slot_count > 1
+                                    ? data.slot_count + ' slots booked'
+                                    : '1 slot booked'
+                            );
                         },
                         error: function () {
                             alert("Failed to fetch data. Please try again.");

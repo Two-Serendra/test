@@ -139,15 +139,15 @@
                     use Carbon\Carbon;
                     $now = Carbon::now();
                     $isFriday = $now->isFriday();
-                    $isAfter9 = $now->format('H:i') >= '09:00';
+                    $isAfter8 = $now->format('H:i') >= '08:00';
 
                     $isRole6 = auth()->user()->role_id == 6; // ✅ ADD THIS
-                    $isRestrictedTime = $isFriday && !$isAfter9;
+                    $isRestrictedTime = $isFriday && !$isAfter8;
                     $isDisabled = $isRole6 && $isRestrictedTime;
                 @endphp
 
                 <span id="submitWrapper" data-bs-toggle="tooltip"
-                    title="{{ $isDisabled ? 'Available every Friday at 9:00 AM' : '' }}"
+                    title="{{ $isDisabled ? 'Available every Friday at 8:00 AM' : '' }}"
                     style="display: inline-block;">
                     <button type="submit" form="AdminNewBooking" id="saveActivityBookingBtn"
                         class="btn btn-primary d-flex align-items-center justify-content-center"

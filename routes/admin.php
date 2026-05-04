@@ -190,8 +190,8 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('get-updated-fitness-hub-bookings-table', [FitnessHubBookingController::class, 'getUpdatedFitnessHubBookingsTable'])->name('get.updated.fitness.hub.bookings.table');
     Route::post('/admin-mark-no-show-fitness-hub/{booking}', [FitnessHubBookingController::class, 'markAsNoShowFitnessHubBooking'])->name('admin.mark.no.show.fitness.hub');
     Route::post('/admin-manage-penalty-fitness-hub/{booking}', [FitnessHubBookingController::class, 'managePenaltyFitnessHub']);
-    Route::get('/fetch-blocked-dates-fitness-hub', [FitnessHubBookingController::class, 'fetchFitnessHubBlockedDates'])->name('fetch.available.slot.fitness.hub');
-    Route::get('/fetch-all-slots-admin-fitness-hub', [FitnessHubBookingController::class, 'fetchAllSlotsAdminFitnessHub'])->name('fetch.available.slot.fitness.hub');
+    Route::get('/fetch-blocked-dates-fitness-hub', [FitnessHubBookingController::class, 'fetchFitnessHubBlockedDates'])->name('fetch.blocked.slot.fitness.hub');
+    Route::get('/fetch-all-slots-admin-fitness-hub', [FitnessHubBookingController::class, 'fetchAllSlotsAdminFitnessHub'])->name('admin.fetch.available.slot.fitness.hub');
     Route::get('/fitness-hub-booking-history', [FitnessHubBookingController::class, 'historyFintessHub'])->name('admin.fitnessHub.history');
     Route::get('/admin-fitness-hub-booking-calendar', [FitnessHubBookingController::class, 'AdminFitnessHubBookingCalendar'])->name('admin.fitness.hub.booking.calendar');
     Route::get('/fetch/fitness-hub-calendar-schedule/{id}', [FitnessHubBookingController::class, 'fetchFitnessHubCalendarInfo'])->name("fetchFitnessHubCalendarSchedule");

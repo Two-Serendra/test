@@ -6,7 +6,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" style="max-height: calc(100vh - 200px); overflow-y: auto;">
-                <form action="{{ route('fetch.available.slot.fitness.hub') }}" id="SearchSlotAdminFitnessHub" method="POST"
+                <form action="{{ route('admin.fetch.available.slot.fitness.hub') }}" id="SearchSlotAdminFitnessHub" method="POST"
                     class="SearchSlotAdminFitnessHub" enctype="multipart/form-data" novalidate>
                     @csrf
                     <div class="row mb-3">

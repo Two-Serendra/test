@@ -188,7 +188,7 @@ class FitnessHubBookingController extends Controller
   }
 
 
-  public function checkUnitBookingFitnessHub(Request $request)
+  public function adminCheckUnitBookingFitnessHub(Request $request)
   {
     $unit = $request->input('unit');
     $fitnessHubId = $request->input('fitness_hub_id');
@@ -386,7 +386,7 @@ class FitnessHubBookingController extends Controller
     }
   }
 
-  public function fetchInfoFitnessHubBooking($id)
+  public function adminFetchInfoFitnessHubBooking($id)
   {
     $booking = FitnessHubBooking::with(['fitnessHub'])->find($id);
     if (!$booking) {

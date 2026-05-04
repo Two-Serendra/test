@@ -184,8 +184,8 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/admin-new-booking-fitness-hub', [FitnessHubBookingController::class, 'AdminNewBookingFitnessHub'])->name('admin.new.booking.fitness.hub');
     Route::get('/fetch-available-times-fitness-hub', [FitnessHubBookingController::class, 'adminFetchAvailableTimesFitnessHub'])->name('adminFetchAvailableTimesFitnessHub');
     Route::get('/fetch-available-end-times-fitness-hub', [FitnessHubBookingController::class, 'adminFetchAvailableEndTimesFitnessHub'])->name('adminFetchAvailableEndTimesFitnessHub');
-    Route::get('/check-unit-booking-fitness-hub', [FitnessHubBookingController::class, 'checkUnitBookingFitnessHub'])->name('checkUnitBookingFitnessHub');
-    Route::get('/fetch/fitness-hub-booking/{id}', [FitnessHubBookingController::class, 'fetchInfoFitnessHubBooking'])->name('fetchInfoFitnessHubBooking');
+    Route::get('/check-unit-booking-fitness-hub', [FitnessHubBookingController::class, 'adminCheckUnitBookingFitnessHub'])->name('adminCheckUnitBookingFitnessHub');
+    Route::get('/fetch/fitness-hub-booking/{id}', [FitnessHubBookingController::class, 'adminFetchInfoFitnessHubBooking'])->name('adminFetchInfoFitnessHubBooking');
     Route::post('/cancel-fitness-hub-booking/{booking}', [FitnessHubBookingController::class, 'cancelFitnessHubBooking'])->name('cancelFitnessHubBooking');
     Route::get('get-updated-fitness-hub-bookings-table', [FitnessHubBookingController::class, 'getUpdatedFitnessHubBookingsTable'])->name('get.updated.fitness.hub.bookings.table');
     Route::post('/admin-mark-no-show-fitness-hub/{booking}', [FitnessHubBookingController::class, 'markAsNoShowFitnessHubBooking'])->name('admin.mark.no.show.fitness.hub');

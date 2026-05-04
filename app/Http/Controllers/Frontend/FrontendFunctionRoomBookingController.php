@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Models\Activity;
 use App\Models\ActivityBooking;
+use App\Models\FitnessHub;
 use App\Models\FunctionRoomAuthorization;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -69,6 +70,16 @@ class FrontendFunctionRoomBookingController extends Controller
                     $item->type = 'amenity';
                     return $item;
                 });
+
+        } elseif ($category === 'fitness_hub') {
+            $items = FitnessHub::where('fitness_hub_status', '1')
+                ->orderBy('id', 'asc') // sort by id ascending
+                ->get()
+                ->map(function ($item) {
+                    $item->type = 'fitness_hub';
+                    return $item;
+                });
+
         } elseif ($category === 'grease_trap') {
 
             $residences = auth()->check()

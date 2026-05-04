@@ -23,16 +23,23 @@
             <li><strong>Function Room:</strong> {{ $function_room }}</li>
             <li><strong>Date:</strong> {{ \Carbon\Carbon::parse($date)->format('F j, Y') }}</li>
             <li><strong>Time:</strong> {{ \Carbon\Carbon::parse($start_time)->format('h:i A') }} - {{
-                \Carbon\Carbon::parse($end_time)->format('h:i A') }}</li>
+    \Carbon\Carbon::parse($end_time)->format('h:i A') }}</li>
         </ul>
 
         @if(!empty($booking->penalty_fee) && $booking->penalty_fee > 0)
-        <p style="color:#e74c3c;"><strong>Note:</strong> Since this cancellation was made within 24 hours of your event,
-            a penalty fee of ₱{{ number_format($booking->penalty_fee, 2) }} has been applied.</p>
+            <p style="color:#e74c3c;"><strong>Note:</strong> Since this cancellation was made within 24 hours of your event,
+                a penalty fee of ₱{{ number_format($booking->penalty_fee, 2) }} has been applied.</p>
         @endif
 
-        <p style="margin-top: 30px;">Best regards,</p>
-        <p><strong>Two Serendra IT Team</strong></p>
+        <p style="margin-top:30px;">
+            Regards,<br>
+            <strong>Two Serendra</strong>
+        </p>
+
+        <!-- Footer -->
+        <div style="background:#f1f1f1; padding:15px; text-align:center; font-size:12px; color:#777;">
+            © {{ date('Y') }} Two Serendra. All rights reserved.
+        </div>
     </div>
 </body>
 

@@ -8,6 +8,8 @@ use App\Notifications\UserAmenityBookingBellNotification;
 use App\Notifications\UserFunctionRoomBookingBellNotification;
 use App\Notifications\UserGreaseTrapBookingBellNotification;
 use App\Notifications\UserPestControlBookingBellNotification;
+use App\Notifications\UserFitnessHubBookingBellNotification;
+
 class UserNotificationController extends Controller
 {
     // public function index()
@@ -53,6 +55,10 @@ class UserNotificationController extends Controller
 
             UserPestControlBookingBellNotification::class
             => redirect()->route('show.pest.control.booking.details', $bookingId),
+
+            UserFitnessHubBookingBellNotification::class
+            => redirect()->route('show.fitness.hub.booking.details', $bookingId),
+
 
 
 

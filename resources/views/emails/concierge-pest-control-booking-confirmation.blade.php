@@ -63,13 +63,13 @@
 
             <p style="margin-top:25px;">
                 Regards,<br>
-                <strong>Two Serendra System Notification</strong>
+                <strong>Two Serendra</strong>
             </p>
         </div>
 
         <!-- Footer -->
-        <div style="background:#f1f1f1; padding:12px; text-align:center; font-size:12px; color:#777;">
-            This is an automated system notification. Please do not reply.
+        <div style="background:#f1f1f1; padding:15px; text-align:center; font-size:12px; color:#777;">
+            © {{ date('Y') }} Two Serendra. All rights reserved.
         </div>
 
     </div>

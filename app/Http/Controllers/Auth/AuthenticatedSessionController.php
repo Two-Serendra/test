@@ -9,6 +9,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Models\Users;
+use App\Models\ResidentDetails;
+
 
 class AuthenticatedSessionController extends Controller
 {
@@ -22,11 +25,14 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
+        $request->session()->regenerate();
 
         $user = Auth::user();
 
         if ($user->role_id === 0) {
-            $emailExists = \DB::table('resident_details')->where('email', $user->email)->exists();
+            $emailExists = \DB::table('resident_details')
+                ->where('email', $user->email)
+                ->exists();
 
             if (!$emailExists) {
                 Auth::logout();
@@ -43,10 +49,6 @@ class AuthenticatedSessionController extends Controller
             ]);
         }
 
-        $request->session()->regenerate();
-
-        // 🔑 This will redirect back to where the guest was before login,
-        // or fallback to `/` if nothing is stored
         return redirect()->intended('/');
     }
 

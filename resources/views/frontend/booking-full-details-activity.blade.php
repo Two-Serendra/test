@@ -72,7 +72,7 @@
                                 ? 'cursor: not-allowed; opacity: 0.6;'
                                 : 'background-color: #008b26; border-color: #008b26; color: white; font-weight: bold;' }}"
                                                     {{ $isDisabled ? 'disabled' : '' }} data-bs-target="#modalActivity{{ $activity->id }}"
-                                                    data-activity-id="{{ $activity->id }}">
+                                                    data-activity-id="{{ $activity->id }}" data-amenity-id="{{ $activity->amenity_id }}">
                                                     BOOK NOW
                                                 </button>
                             @else

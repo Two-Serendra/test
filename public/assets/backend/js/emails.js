@@ -34,6 +34,8 @@ $(document).ready(function () {
                     <td class="text-uppercase">${email.unit_no || 'N/A'}</td>
                     <td>${email.email || 'N/A'}</td>
                     <td>${residentBadge}</td>
+                    <td>${email.invite_token || 'N/A'}</td>
+                    <td>${email.last_token_sent_at || 'N/A'}</td>
                     <td>${email.created_at || 'N/A'}</td>
                     <td>
                         <button type="button" class="btn btn-sm btn-icon btn-primary edit_email"
@@ -86,8 +88,78 @@ $(document).ready(function () {
         refreshTableEmails(); // it will include search term
     });
 
+    // $('#emailUploadForm').on('submit', function (e) {
+    //     e.preventDefault();
+    //     startProgressPolling();
+    //     const formData = new FormData(this);
+    //     const progressBar = $('.progress');
+    //     const progress = $('.progress-bar');
+
+    //     progressBar.show();
+    //     progress.css('width', '0%').text('0%');
+
+    //     $.ajax({
+    //         url: '/admin/admin-upload-resident-details',
+    //         type: 'POST',
+    //         data: formData,
+    //         contentType: false,
+    //         processData: false,
+
+    //         success: function (res) {
+    //             progress.css('width', '100%').text('Processing...');
+
+    //             setTimeout(() => {
+    //                 progressBar.hide();
+    //                 $('#emailInput').val('');
+
+    //                 const Toast = Swal.mixin({
+    //                     toast: true,
+    //                     position: "top-end",
+    //                     showConfirmButton: false,
+    //                     timer: 2000,
+    //                     timerProgressBar: true,
+    //                     customClass: {
+    //                         popup: 'colored-toast'
+    //                     }
+    //                 });
+
+    //                 Toast.fire({
+    //                     icon: 'success',
+    //                     title: 'File Uploaded Successfully'
+    //                 });
+
+    //                 refreshTableEmails();
+    //             }, 500);
+    //         },
+    //         error: function (err) {
+    //             progressBar.hide();
+
+    //             const Toast = Swal.mixin({
+    //                 toast: true,
+    //                 position: "top-end",
+    //                 showConfirmButton: false,
+    //                 timer: 2000,
+    //                 timerProgressBar: true,
+    //                 customClass: {
+    //                     popup: 'colored-toast-error'
+    //                 },
+    //                 didOpen: (toast) => {
+    //                     toast.onmouseenter = Swal.stopTimer;
+    //                     toast.onmouseleave = Swal.resumeTimer;
+    //                 }
+    //             });
+
+    //             Toast.fire({
+    //                 icon: 'error',
+    //                 title: 'Failed to upload file'
+    //             });
+    //         }
+    //     });
+    // });
+
     $('#emailUploadForm').on('submit', function (e) {
         e.preventDefault();
+
         const formData = new FormData(this);
         const progressBar = $('.progress');
         const progress = $('.progress-bar');
@@ -95,72 +167,66 @@ $(document).ready(function () {
         progressBar.show();
         progress.css('width', '0%').text('0%');
 
+        startProgressPolling();
+
         $.ajax({
-            xhr: function () {
-                const xhr = new XMLHttpRequest();
-                xhr.upload.addEventListener('progress', function (e) {
-                    if (e.lengthComputable) {
-                        const percent = Math.round((e.loaded / e.total) * 100);
-                        progress.css('width', percent + '%').text(percent + '%');
-                    }
-                });
-                return xhr;
-            },
             url: '/admin/admin-upload-resident-details',
             type: 'POST',
             data: formData,
             contentType: false,
             processData: false,
-            success: function (res) {
-                progressBar.hide();
-                $('#emailInput').val('');
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: "top-end",
-                    showConfirmButton: false,
-                    timer: 2000,
-                    timerProgressBar: true,
-                    customClass: {
-                        popup: 'colored-toast'
-                    },
-                    didOpen: (toast) => {
-                        toast.onmouseenter = Swal.stopTimer;
-                        toast.onmouseleave = Swal.resumeTimer;
-                    },
-                    target: 'body'
-                });
 
-                Toast.fire({
-                    icon: 'success',
-                    title: 'File Uploaded Successfully'
-                });
-                refreshTableEmails();
+            success: function () {
+                // ❌ DO NOTHING HERE (polling handles it)
             },
-            error: function (err) {
+
+            error: function () {
                 progressBar.hide();
 
-                const Toast = Swal.mixin({
+                Swal.fire({
                     toast: true,
                     position: "top-end",
-                    showConfirmButton: false,
-                    timer: 2000,
-                    timerProgressBar: true,
-                    customClass: {
-                        popup: 'colored-toast-error'
-                    },
-                    didOpen: (toast) => {
-                        toast.onmouseenter = Swal.stopTimer;
-                        toast.onmouseleave = Swal.resumeTimer;
-                    }
-                });
-
-                Toast.fire({
                     icon: 'error',
-                    title: 'Failed to upload file'
+                    title: 'Upload Failed',
+                    showConfirmButton: false,
+                    timer: 2000
                 });
             }
         });
     });
+
+    function startProgressPolling() {
+        progressInterval = setInterval(() => {
+            $.get('/admin/admin-upload-progress', function (res) {
+
+                let percent = res.progress;
+
+                $('.progress-bar')
+                    .css('width', percent + '%')
+                    .text(percent + '%');
+
+                if (percent >= 100) {
+                    clearInterval(progressInterval);
+
+                    setTimeout(() => {
+                        $('.progress').hide();
+                        $('#emailInput').val('');
+
+                        Swal.fire({
+                            toast: true,
+                            position: "top-end",
+                            icon: 'success',
+                            title: 'Upload Complete',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+
+                        refreshTableEmails();
+                    }, 500);
+                }
+            });
+        }, 500);
+    }
 
     $('#emailTable').on('click', '.edit_email', function () {
         var info_id = $(this).data("id");

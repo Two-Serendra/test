@@ -15,6 +15,9 @@ return new class extends Migration {
             $table->string('unit_no');
             $table->string('email');
             $table->enum('resident_type', ['OWNER', 'TENANT']);
+            $table->string('invite_token')->nullable();
+            $table->dateTime('last_token_sent_at')->nullable();
+             $table->dateTime('token_expires_at')->nullable();
             $table->timestamps();
         });
     }

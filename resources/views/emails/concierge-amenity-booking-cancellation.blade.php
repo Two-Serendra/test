@@ -47,7 +47,7 @@
         <br>
 
         <p style="margin-top: 30px;">Regards,</p>
-        <p><strong>Two Serendra System</strong></p>
+        <p><strong>Two Serendra</strong></p>
     </div>
 </body>
 

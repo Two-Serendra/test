@@ -21,6 +21,9 @@ use App\Http\Controllers\Backend\GreaseTrapBookingController;
 use App\Http\Controllers\Backend\AddOnsController;
 use App\Http\Controllers\Backend\PestControlController;
 use App\Http\Controllers\Frontend\FrontendFunctionRoomBookingController;
+use App\Http\Controllers\Backend\FitnessHubController;
+use App\Http\Controllers\Backend\FitnessHubBookingController;
+
 
 Route::middleware('guest:admin')->group(function () {
     Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
@@ -154,9 +157,44 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/admin-activity-booking-calendar', [ActivitiesController::class, 'AdminActivityBookingCalendar'])->name('admin.activity.booking.calendar');
     Route::get('/fetch/activity-calendar-schedule/{id}', [ActivitiesController::class, 'fetchActivityCalendarInfo'])->name("fetchActivityCalendarSchedule");
     Route::post('/admin-manage-penalty/{booking}', [ActivitiesController::class, 'managePenalty']);
-
     Route::post('/amenity-import-booking', [ActivitiesController::class, 'importAmenityBookings'])->name('booking.import');
     Route::get('/fetch/activity-booking-report/{id}', [ActivitiesController::class, 'fetchInfoBookingReport'])->name('fetchInfoBookingReport');
+
+
+    //Fitness Hub
+    Route::get('/admin-show-fitness-hub', [FitnessHubController::class, 'AdminShowFitnessHub'])->name('admin.show.fitness.hub');
+    Route::get('/search-fitness-hubs', [FitnessHubController::class, 'searchFitnessHubs'])->name('admin.search.fitness.hubs');
+    Route::post('/admin-store-fitness-hub', [FitnessHubController::class, 'storeFitnessHub'])->name('admin.store.fitness.hub');
+    Route::get('/get-updated-fitness-hubs-table', [FitnessHubController::class, 'getUpdatedFitnessHubsTable'])->name('getUpdatedFitnessHubsTable');
+    Route::get('/fetch/fitness-hub/{fitnessHubId}', [FitnessHubController::class, 'fetchFitnessHub'])->name('fetchFitnessHub');
+    Route::post('/update-fitness-hub', [FitnessHubController::class, 'updateFitnessHub'])->name('update.fitness.hub');
+    Route::post('/deactivate-fitness-hub', [FitnessHubController::class, 'deactivateFitnessHub'])->name('deactivate.fitness.hub');
+    Route::post('/activate-fitness-hub', [FitnessHubController::class, 'activateFitnessHub'])->name('activate.fitness.hub');
+    Route::get('/date-blocking-fitness-hub', [FitnessHubController::class, 'showDateBlockingFitnessHub'])->name('admin.show.date.blocking.fitness.hub');
+    Route::post('/new-date-blocking-fitness-hub', [FitnessHubController::class, 'newDateBlockingFitnessHub'])->name('admin.new.date.blocking.fitness.hub');
+    Route::get('/fetch-date-blocking-fitness-hub', [FitnessHubController::class, 'fetchDateBlockingFitnessHub'])->name('admin.fetch.date.blocking.fitness.hub');
+    Route::get('get-updated-fitness-hub-blocking', [FitnessHubController::class, 'getUpdatedFitnessHubBlockingTable'])->name('get.updated.fitness.hub.blocking.table');
+    Route::post('/delete-blocked-date-fitness-hub', [FitnessHubController::class, 'deleteBlockedDateFitnessHub'])->name('admin.delete.blocked.date.fitness.hub');
+
+
+    //Fitness Booking
+    Route::get('/admin-fitness-booking', [FitnessHubBookingController::class, 'AdminFitnessHubBooking'])->name('admin.booking.fitness');
+    Route::get('/search-booking-fitness-hub', [FitnessHubBookingController::class, 'searchBooking'])->name('admin.search.booking.fitness.hub');
+    Route::post('/fitness-hub/booking/import', [FitnessHubBookingController::class, 'importFitnessHubBookings'])->name('fitness.hub.booking.import');
+    Route::post('/admin-new-booking-fitness-hub', [FitnessHubBookingController::class, 'AdminNewBookingFitnessHub'])->name('admin.new.booking.fitness.hub');
+    Route::get('/fetch-available-times-fitness-hub', [FitnessHubBookingController::class, 'fetchAvailableTimesFitnessHub'])->name('fetchAvailableTimesFitnessHub');
+    Route::get('/fetch-available-end-times-fitness-hub', [FitnessHubBookingController::class, 'fetchAvailableEndTimesFitnessHub'])->name('fetchAvailableEndTimesFitnessHub');
+    Route::get('/check-unit-booking-fitness-hub', [FitnessHubBookingController::class, 'checkUnitBookingFitnessHub'])->name('checkUnitBookingFitnessHub');
+    Route::get('/fetch/fitness-hub-booking/{id}', [FitnessHubBookingController::class, 'fetchInfoFitnessHubBooking'])->name('fetchInfoFitnessHubBooking');
+    Route::post('/cancel-fitness-hub-booking/{booking}', [FitnessHubBookingController::class, 'cancelFitnessHubBooking'])->name('cancelFitnessHubBooking');
+    Route::get('get-updated-fitness-hub-bookings-table', [FitnessHubBookingController::class, 'getUpdatedFitnessHubBookingsTable'])->name('get.updated.fitness.hub.bookings.table');
+    Route::post('/admin-mark-no-show-fitness-hub/{booking}', [FitnessHubBookingController::class, 'markAsNoShowFitnessHubBooking'])->name('admin.mark.no.show.fitness.hub');
+    Route::post('/admin-manage-penalty-fitness-hub/{booking}', [FitnessHubBookingController::class, 'managePenaltyFitnessHub']);
+    Route::get('/fetch-blocked-dates-fitness-hub', [FitnessHubBookingController::class, 'fetchFitnessHubBlockedDates'])->name('fetch.available.slot.fitness.hub');
+    Route::get('/fetch-all-slots-admin-fitness-hub', [FitnessHubBookingController::class, 'fetchAllSlotsAdminFitnessHub'])->name('fetch.available.slot.fitness.hub');
+    Route::get('/fitness-hub-booking-history', [FitnessHubBookingController::class, 'historyFintessHub'])->name('admin.fitnessHub.history');
+    Route::get('/admin-fitness-hub-booking-calendar', [FitnessHubBookingController::class, 'AdminFitnessHubBookingCalendar'])->name('admin.fitness.hub.booking.calendar');
+    Route::get('/fetch/fitness-hub-calendar-schedule/{id}', [FitnessHubBookingController::class, 'fetchFitnessHubCalendarInfo'])->name("fetchFitnessHubCalendarSchedule");
 
     //Function Rooms
     Route::get('/admin-function-rooms', [FunctionRoomsController::class, 'showFunctionRooms'])->name('admin.show.function.rooms');

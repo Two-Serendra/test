@@ -186,13 +186,18 @@ class PestControlController extends Controller
             try {
                 DB::beginTransaction();
 
+                $user = auth()->user();
+
                 $resident = ResidentDetails::where('id', $request->resident_id_pest_control)
+                    ->where('email', $user->email)
                     ->lockForUpdate()
                     ->first();
 
                 if (!$resident) {
                     DB::rollBack();
-                    return response()->json(['message' => 'Invalid residence selected.'], 422);
+                    return response()->json([
+                        'message' => 'Unauthorized unit selection.'
+                    ], 403);
                 }
 
                 $bookingDate = Carbon::parse($request->booking_date)->toDateString();
@@ -244,8 +249,9 @@ class PestControlController extends Controller
                     'user_id' => auth()->id(),
                     'created_by' => auth()->id(),
                     'transaction_no' => '',
-                    'unit_no' => $resident->unit_no,
+                    'unit_no' => strtoupper($resident->unit_no),
                     'resident_type' => $resident->resident_type,
+                    'name' => strtoupper($user->name),
                     'booking_date' => $bookingDate,
                     'booking_time_slot' => $request->booking_time_slot,
                     'unit_area' => $areaLetter,
@@ -351,47 +357,69 @@ class PestControlController extends Controller
     public function CancelPestControlBooking(PestControlBooking $booking)
     {
         try {
-            $booking->load('user');
+            return DB::transaction(function () use ($booking) {
+                $user = auth()->user();
 
-            if ($booking->booking_status == PestControlBooking::STATUS_CANCELLED) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Booking already cancelled.'
-                ], 400);
-            }
+                $units = ResidentDetails::where('email', $user->email)
+                    ->pluck('unit_no');
 
-            if ($booking->getBookingDateTime()->lt(now())) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Cannot cancel a completed booking.'
-                ], 400);
-            }
+                $booking = PestControlBooking::where('id', $booking->id)
+                    ->whereIn('unit_no', $units)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                $booking->load('user');
+
+                if ($booking->user_id !== $user->id) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'This booking was created by another resident in your unit. Only the creator can cancel it.'
+                    ], 403);
+                }
+
+                if ($booking->booking_status !== PestControlBooking::STATUS_CONFIRMED) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Only active bookings can be cancelled.'
+                    ], 400);
+                }
+
+                if ($booking->getBookingDateTime()->lt(now())) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Cannot cancel a completed booking.'
+                    ], 400);
+                }
 
 
-            $booking->booking_status = PestControlBooking::STATUS_CANCELLED;
-            $booking->cancelled_at = now();
-            $booking->cancelled_by = auth()->id();
-            $booking->save();
+                $booking->booking_status = PestControlBooking::STATUS_CANCELLED;
+                $booking->cancelled_at = now();
+                $booking->cancelled_by = auth()->id();
+                $booking->save();
 
-            if ($booking->user) {
-                $booking->user->notify(
-                    new UserPestControlBookingBellNotification($booking)
-                );
-            }
+                DB::afterCommit(function () use ($booking) {
 
+                    if ($booking->user) {
+                        $booking->user->notify(
+                            new UserPestControlBookingBellNotification($booking)
+                        );
+                    }
 
-            if ($booking->user?->email) {
-                Mail::to($booking->user->email)
-                    ->queue(new UserPestControlBookingCancellation($booking));
-            }
+                    if ($booking->user?->email) {
+                        Mail::to($booking->user->email)
+                            ->queue(new UserPestControlBookingCancellation($booking));
+                    }
 
-            Mail::to('concierge@twoserendra.com')
-                ->queue(new ConciergePestControlBookingCancellation($booking));
+                    Mail::to('concierge@twoserendra.com')
+                        ->queue(new ConciergePestControlBookingCancellation($booking));
+                });
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Booking has been cancelled successfully.'
-            ]);
+                return response()->json([ 
+                    'success' => true,
+                    'message' => 'Booking has been cancelled successfully.'
+                ]);
+            });
+
 
         } catch (\Exception $e) {
             return response()->json([

@@ -69,9 +69,9 @@
                                 <div class="text-muted small">Resident Type</div>
                                 <div class="fw-semibold">
                                     @if($booking->resident_type === 'TENANT')
-                                        <span class="badge badge-forge bg-danger">TENANT</span>
+                                        <span class="text-danger">TENANT</span>
                                     @elseif($booking->resident_type === 'OWNER')
-                                        <span class="badge badge-forge bg-primary">OWNER</span>
+                                        <span class="text-primary">OWNER</span>
                                     @else
                                         <span class="badge bg-secondary">{{ $booking->resident_type ?? 'N/A' }}</span>
                                     @endif
@@ -108,6 +108,9 @@
                                     {{ $booking->booking_start_time ? \Carbon\Carbon::parse($booking->booking_start_time)->format('g:i A') : 'N/A' }}
                                     -
                                     {{ $booking->booking_end_time ? \Carbon\Carbon::parse($booking->booking_end_time)->format('g:i A') : 'N/A' }}
+                                </div>
+                                <div class="small mt-1">
+                                    {{ $slotCount }} {{ $slotCount > 1 ? 'slots booked' : 'slot booked' }}
                                 </div>
                             </div>
 

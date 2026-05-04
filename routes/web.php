@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Backend\ServicesController;
 use App\Http\Controllers\Frontend\ContactController;
+use App\Http\Controllers\Frontend\FrontendFitnessHubBookingController;
 use App\Http\Controllers\Frontend\UserActionsController;
 use App\Http\Controllers\Frontend\UserNotificationController;
 use App\Http\Controllers\Frontend\UserWorkPermitController;
@@ -16,6 +18,8 @@ use App\Http\Controllers\Frontend\ResidentBookingHistoryController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Frontend\GreaseTrapController;
 use App\Http\Controllers\Frontend\PestControlController;
+use App\Http\Controllers\Backend\FitnessHubController;
+use App\Http\Controllers\Frontend\FitnessHubBookingController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -34,12 +38,8 @@ Route::get('/', function () {
     return redirect()->route('home');
 });
 
-Route::get('/register', [RegisteredUserController::class, 'create'])
-    ->middleware('guest')
-    ->name('register');
 
-Route::post('/register', [RegisteredUserController::class, 'store'])
-    ->middleware('guest');
+Route::post('/register', [RegisteredUserController::class, 'storeUser'])->name('register.user')->middleware('guest');
 
 
 // Define this route separately
@@ -71,37 +71,10 @@ route::get('/request-electricity/{unitNo}/{year}/{month}', [ProfileController::c
 
 
 //Amenity/Activity Booking
-Route::get('/booking/list', [FrontendFunctionRoomBookingController::class, 'list'])->name('booking.list');
-Route::get('/booking/{type}/{id}', [FrontendFunctionRoomBookingController::class, 'fullDetails'])
-    ->name('booking.full.details');
-Route::get('/booking-activity/{type}/{activity_id}', [FrontendFunctionRoomBookingController::class, 'fullDetailsActivity'])
-    ->name('booking.full.details.activity');
 
-Route::get('/check-unit-tenant/{unitNo}', [FrontendFunctionRoomBookingController::class, 'checkUnitTenant']);
 
-Route::post('/activity-new-booking', [FrontendActivityBookingController::class, 'ActivityNewBooking'])->name('activities.new.booking');
-Route::get('/check-unit-frontend', [FrontendActivityBookingController::class, 'checkUnitBooking'])->name('checkUnitBookingFront');
 
-Route::get('/fetch-available-times-user', [FrontendActivityBookingController::class, 'fetchAvailableTimesUser']);
-Route::get('/fetch-end-times-user', [FrontendActivityBookingController::class, 'fetchEndTimesUser']);
-Route::get('/fetch-available-slots-user', [FrontendActivityBookingController::class, 'fetchAvailableSlotsUser']);
-Route::get('/resident/activity-booking/details/{id}', [FrontendActivityBookingController::class, 'getActivityBookingDetails'])
-    ->name('resident.activity.bookings.details');
 
-Route::post('/resident/activity-booking/cancel/{booking}', [FrontendActivityBookingController::class, 'cancelAmenityBooking'])
-    ->name('activity-booking.cancel');
-Route::get('/amenity-booking-details/{id}', [FrontendActivityBookingController::class, 'showAmenityBookingDetails'])
-    ->name('show.amenity.booking.details');
-
-Route::get('/fetch-blocked-dates', [FrontendActivityBookingController::class, 'fetchBlockDates'])->name('DateBlocking');
-
-Route::get('/fetch-all-slots-user', [FrontendActivityBookingController::class, 'fetchAllSlotsUser'])->name('fetchAllSlotsUser');
-
-Route::get('/check-auth', function () {
-    return response()->json([ 
-        'authenticated' => Auth::check()
-    ]);
-});
 Route::post('/send', [ContactController::class, 'send'])
     ->name('contact.send')
     ->middleware('throttle:5,1');
@@ -109,12 +82,19 @@ Route::post('/send', [ContactController::class, 'send'])
 //SOA
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile/soa', [ProfileController::class, 'soa'])->name('soa');
+    Route::get('/check-auth', function () {
+        return response()->json([
+            'authenticated' => Auth::check()
+        ]);
+    });
 });
 
 // Route::get('/request-soa', [ProfileController::class, 'Reqsoa'])->name('request.soa');
 Route::post('/generate-soa', [ProfileController::class, 'GenerateSoa'])->name(name: 'generate.soa');
 Route::get('/soa/view/{token}', [ProfileController::class, 'view']);
-
+Route::post('/send-token', [RegisteredUserController::class, 'sendToken'])
+    ->name('send.token')
+    ->middleware('throttle:3,1');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
@@ -127,11 +107,11 @@ Route::middleware(['auth'])->group(function () {
 
     //Grease Trap Booking
     Route::get('/grease-trap-booking', [GreaseTrapController::class, 'greeseTrap'])->name('grease.trap.booking');
-    Route::post('/grease-trap-booking/store', [GreaseTrapController::class, 'storeGreaseTrapBooking'])->name('grease.trap.booking.store');
+    Route::post('/grease-trap-booking/store', [GreaseTrapController::class, 'storeGreaseTrapBooking'])->name('grease.trap.booking.store')->middleware('throttle:5,1');
     Route::get('/grease-trap/booked-slots', [GreaseTrapController::class, 'getBookedSlots'])
         ->name('grease.trap.booked.slots');
     Route::post('/grease-trap-booking/cancel/{booking}', [GreaseTrapController::class, 'CancelGreaseTrapBooking'])
-        ->name('grease.trap.booking.cancel');
+        ->name('grease.trap.booking.cancel')->middleware('throttle:5,1');
     Route::get('/grease-trap-booking-details/{id}', [GreaseTrapController::class, 'showGreaseTrapBookingDetails'])
         ->name('show.grease.trap.booking.details');
     Route::get('/resident-booking-reload-table', [GreaseTrapController::class, 'GreaseTrapBookiingTableReload'])->name('grease.trap.booking.table.reload');
@@ -145,7 +125,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pest-control-booking-details/{id}', [PestControlController::class, 'showPestControlBookingDetails'])
         ->name('show.pest.control.booking.details');
     Route::post('/pest-control-booking/cancel/{booking}', [PestControlController::class, 'CancelPestControlBooking'])
-        ->name('pest.control.booking.cancel');
+        ->name('pest.control.booking.cancel')->middleware('throttle:5,1');
 
 
     // Function Room Booking
@@ -156,7 +136,21 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/view-function-room-bookings/{id}/details', [FrontendFunctionRoomBookingController::class, 'getFunctionRoomBookingDetails'])
         ->name('get.function.room.bookings.details');
 
-    // Add Ons
+    //Fitness Hub Booking
+    Route::get('/booking-fitness-hub/{type}/{fitness_hub_id}', [FrontendFitnessHubBookingController::class, 'fullDetailsFitnessHub'])
+        ->name('booking.full.details.fitness.hub');
+    Route::get('/fetch-date-blocking-fitness-hub', [FitnessHubController::class, 'fetchDateBlockingFitnessHub'])->name('admin.fetch.date.blocking.fitness.hub');
+    Route::get('/check-unit-booking-fitness-hub', [FitnessHubBookingController::class, 'checkUnitBookingFitnessHub'])->name('checkUnitBookingFitnessHub');
+    Route::get('/fetch-available-times-fitness-hub', [FitnessHubBookingController::class, 'fetchAvailableTimesFitnessHub'])->name('fetchAvailableTimesFitnessHub');
+    Route::get('/fetch-available-end-times-fitness-hub', [FitnessHubBookingController::class, 'fetchAvailableEndTimesFitnessHub'])->name('fetchAvailableEndTimesFitnessHub');
+    Route::post('/user-new-booking-fitness-hub', [FitnessHubBookingController::class, 'UserNewBookingFitnessHub'])->name('user.new.booking.fitness.hub');
+    Route::get('/resident/fitness-hub-booking/details/{id}', [FitnessHubBookingController::class, 'getFitnessHubBookingDetails'])
+        ->name('resident.fitness.hub.bookings.details');
+    Route::post('/resident/fitness-hub-booking/cancel/{booking}', [FitnessHubBookingController::class, 'cancelFitnessHubBooking'])
+        ->name('fitness.hub.booking.cancel')->middleware('throttle:5,1');
+    Route::get('/fitness-hub-booking-details/{id}', [FitnessHubBookingController::class, 'showFitnessHubBookingDetails'])
+        ->name('show.fitness.hub.booking.details');
+    // Add Ons 
     Route::get('/function-room/addons-availability', [FrontendFunctionRoomBookingController::class, 'getAddOnsAvailability']);
 
     Route::get('/notifications', [UserNotificationController::class, 'index'])->name('notifications.index');
@@ -174,7 +168,31 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/booking/{id}/cancel', [FrontendFunctionRoomBookingController::class, 'cancel'])->name('booking.cancel');
 
 
-    //Grease Trap Booking
+    Route::get('/booking/list', [FrontendFunctionRoomBookingController::class, 'list'])->name('booking.list');
+    Route::get('/booking/{type}/{id}', [FrontendFunctionRoomBookingController::class, 'fullDetails'])
+        ->name('booking.full.details');
+    Route::get('/booking-activity/{type}/{activity_id}', [FrontendFunctionRoomBookingController::class, 'fullDetailsActivity'])
+        ->name('booking.full.details.activity');
+
+    Route::get('/check-unit-tenant/{unitNo}', [FrontendFunctionRoomBookingController::class, 'checkUnitTenant']);
+
+    Route::post('/activity-new-booking', [FrontendActivityBookingController::class, 'ActivityNewBooking'])->name('activities.new.booking')->middleware('throttle:5,1');
+    Route::get('/check-unit-frontend', [FrontendActivityBookingController::class, 'checkUnitBooking'])->name('checkUnitBookingFront');
+
+    Route::get('/fetch-available-times-user', [FrontendActivityBookingController::class, 'fetchAvailableTimesUser']);
+    Route::get('/fetch-end-times-user', [FrontendActivityBookingController::class, 'fetchEndTimesUser']);
+    Route::get('/fetch-available-slots-user', [FrontendActivityBookingController::class, 'fetchAvailableSlotsUser']);
+    Route::get('/resident/activity-booking/details/{id}', [FrontendActivityBookingController::class, 'getActivityBookingDetails'])
+        ->name('resident.activity.bookings.details');
+
+    Route::post('/resident/activity-booking/cancel/{booking}', [FrontendActivityBookingController::class, 'cancelAmenityBooking'])
+        ->name('activity-booking.cancel')->middleware('throttle:5,1');
+    Route::get('/amenity-booking-details/{id}', [FrontendActivityBookingController::class, 'showAmenityBookingDetails'])
+        ->name('show.amenity.booking.details');
+
+    Route::get('/fetch-blocked-dates', [FrontendActivityBookingController::class, 'fetchBlockDates'])->name('DateBlocking');
+
+    Route::get('/fetch-all-slots-user', [FrontendActivityBookingController::class, 'fetchAllSlotsUser'])->name('fetchAllSlotsUser');
 
 });
 

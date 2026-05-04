@@ -13,6 +13,9 @@ class ResidentDetails extends Model
         'unit_no',
         'email',
         'resident_type',
+        'invite_token',
+        'last_token_sent_at',
+        'token_expires_at',
     ];
 
     public function user()

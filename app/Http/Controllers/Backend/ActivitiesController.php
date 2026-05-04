@@ -432,11 +432,28 @@ class ActivitiesController extends Controller
     public function AdminBookingActivities(Request $request)
     {
         $currentDate = Carbon::today();
+
         $bookings = ActivityBooking::with(['activity', 'user', 'cancelledBy', 'waivedBy', 'penaltyAppliedBy'])
             ->whereDate('booking_date', '>=', $currentDate)
-            ->latest()
+
+            // ✅ 1 row per transaction_no
+            ->whereIn('id', function ($query) use ($currentDate) {
+                $query->selectRaw('MIN(id)')
+                    ->from('activity_bookings')
+                    ->whereDate('booking_date', '>=', $currentDate)
+                    ->groupBy('transaction_no');
+            })
+
+            // ✅ stable ordering (IMPORTANT FIX)
+            ->orderBy('booking_date', 'desc')
+            ->orderBy('id', 'desc')
+
             ->paginate(10);
+
         foreach ($bookings as $booking) {
+
+            $booking->slot_count = ActivityBooking::where('transaction_no', $booking->transaction_no)->count();
+
             $booking->booking_start_time = Carbon::parse($booking->booking_start_time)->format('h:i A');
             $booking->booking_end_time = Carbon::parse($booking->booking_end_time)->format('h:i A');
         }
@@ -444,9 +461,14 @@ class ActivitiesController extends Controller
         $activities = Activity::with('amenity')
             ->where('activity_status', 1)
             ->get();
+
         $amenities = Amenity::all();
 
-        return view('backend.activities.admin-activity-booking', compact('bookings', 'activities', 'amenities'));
+        return view('backend.activities.admin-activity-booking', compact(
+            'bookings',
+            'activities',
+            'amenities'
+        ));
     }
 
 
@@ -456,25 +478,50 @@ class ActivitiesController extends Controller
         $currentDate = Carbon::today();
 
         $bookings = ActivityBooking::with('activity')
-            ->where('booking_date', '>=', $currentDate)
+            ->whereDate('booking_date', '>=', $currentDate)
+
+            // ✅ GROUP: 1 row per transaction
+            ->whereIn('id', function ($query) use ($currentDate, $searchBooking) {
+                $query->selectRaw('MIN(id)')
+                    ->from('activity_bookings')
+                    ->whereDate('booking_date', '>=', $currentDate)
+                    ->groupBy('transaction_no');
+            })
+
+            // ✅ SEARCH applied AFTER grouping
             ->when($searchBooking, function ($query, $searchBooking) {
-                return $query->where(function ($q) use ($searchBooking) {
+                $query->where(function ($q) use ($searchBooking) {
                     $q->where('unit', 'LIKE', "{$searchBooking}%")
-                        ->orWhere('name', 'LIKE', "%{$searchBooking}%");
+                        ->orWhere('name', 'LIKE', "%{$searchBooking}%")
+                        ->orWhere('transaction_no', 'LIKE', "%{$searchBooking}%");
                 });
             })
+
+            // ✅ consistent ordering
             ->orderBy('booking_date', 'desc')
+            ->orderBy('id', 'desc')
+
             ->paginate(10);
+
+        // ✅ attach slot count
         foreach ($bookings as $booking) {
+            $booking->slot_count = ActivityBooking::where('transaction_no', $booking->transaction_no)->count();
+
             $booking->booking_start_time = Carbon::parse($booking->booking_start_time)->format('h:i A');
             $booking->booking_end_time = Carbon::parse($booking->booking_end_time)->format('h:i A');
         }
 
         $bookings->appends(['searchBooking' => $searchBooking]);
+
         $amenities = Amenity::all();
         $activities = Activity::all();
 
-        return view('backend.activities.admin-activity-booking', compact('bookings', 'amenities', 'activities', 'searchBooking'));
+        return view('backend.activities.admin-activity-booking', compact(
+            'bookings',
+            'amenities',
+            'activities',
+            'searchBooking'
+        ));
     }
 
 
@@ -1379,19 +1426,38 @@ class ActivitiesController extends Controller
 
         $bookings = ActivityBooking::with(['activity', 'user', 'cancelledBy', 'waivedBy', 'penaltyAppliedBy'])
             ->whereDate('booking_date', '>=', $currentDate)
-            ->latest()
+
+            // ✅ 1 row per transaction_no
+            ->whereIn('id', function ($query) use ($currentDate) {
+                $query->selectRaw('MIN(id)')
+                    ->from('activity_bookings')
+                    ->whereDate('booking_date', '>=', $currentDate)
+                    ->groupBy('transaction_no');
+            })
+
+            // ✅ consistent ordering
+            ->orderBy('booking_date', 'desc')
+            ->orderBy('id', 'desc')
+
             ->paginate(10);
 
+        // ✅ transform + add slot_count
         $bookings->getCollection()->transform(function ($booking) {
+
+            $slotCount = ActivityBooking::where('transaction_no', $booking->transaction_no)->count();
+
             return [
                 'id' => $booking->id,
                 'transaction_no' => $booking->transaction_no,
+                'slot_count' => $slotCount, // ✅ NEW
+
                 'activity' => $booking->activity,
                 'user' => $booking->user,
                 'created_by' => $booking->user?->name ?? 'Admin',
-                'cancelled_by' => $booking->cancelledBy?->name ?? null, // snake_case
+                'cancelled_by' => $booking->cancelledBy?->name ?? null,
                 'cancelled_at' => $booking->cancelled_at ? Carbon::parse($booking->cancelled_at)->format('Y-m-d H:i:s') : null,
-                'waived_by' => $booking->waivedBy?->name ?? null,       // snake_case
+                'waived_by' => $booking->waivedBy?->name ?? null,
+
                 'unit' => $booking->unit,
                 'resident_type' => $booking->resident_type,
                 'name' => $booking->name,
@@ -1399,14 +1465,24 @@ class ActivitiesController extends Controller
                 'booking_type' => $booking->booking_type,
                 'booking_status' => $booking->booking_status,
                 'booking_date' => $booking->booking_date,
+
                 'penalty_amount' => $booking->penalty_amount ?? 0,
                 'penalty_waived' => $booking->penalty_waived,
+
                 'booking_start_time' => Carbon::parse($booking->booking_start_time)->format('h:i A'),
                 'booking_end_time' => Carbon::parse($booking->booking_end_time)->format('h:i A'),
-                'penalty_applied_at' => Carbon::parse($booking->penalty_applied_at)->format('Y-m-d H:i:s'),
-                'penalty_waived_at' => Carbon::parse($booking->penalty_waived_at)->format('Y-m-d H:i:s'),
+
+                'penalty_applied_at' => $booking->penalty_applied_at
+                    ? Carbon::parse($booking->penalty_applied_at)->format('Y-m-d H:i:s')
+                    : null,
+
+                'penalty_waived_at' => $booking->penalty_waived_at
+                    ? Carbon::parse($booking->penalty_waived_at)->format('Y-m-d H:i:s')
+                    : null,
+
                 'created_at' => Carbon::parse($booking->created_at)->format('Y-m-d H:i:s'),
                 'updated_at' => Carbon::parse($booking->updated_at)->format('Y-m-d H:i:s'),
+
                 'penalty_applied_by' => $booking->penaltyAppliedBy?->name ?? null,
             ];
         });
@@ -1426,7 +1502,9 @@ class ActivitiesController extends Controller
 
         $booking->booking_start_time = Carbon::parse($booking->booking_start_time)->format('h:i A');
         $booking->booking_end_time = Carbon::parse($booking->booking_end_time)->format(format: 'h:i A');
-
+        $slotCount = ActivityBooking::where('transaction_no', $booking->transaction_no)
+            ->whereIn('unit', [$booking->unit])
+            ->count();
         return response()->json([
             'booking' => [
                 'id' => $booking->id,
@@ -1441,12 +1519,11 @@ class ActivitiesController extends Controller
                 'booking_start_time' => $booking->booking_start_time,
                 'booking_end_time' => $booking->booking_end_time,
                 'booking_status' => $booking->booking_status,
-
-                // ✅ ADD THESE
                 'penalty_amount' => $booking->penalty_amount,
                 'penalty_waived' => $booking->penalty_waived,
                 'has_penalty' => $booking->penalty_amount > 0,
                 'cancelled_at' => $booking->cancelled_at,
+                'slot_count' => $slotCount,
             ]
         ]);
     }
@@ -1619,10 +1696,6 @@ class ActivitiesController extends Controller
             ->whereBetween('booking_date', [$fromDate, $toDate])
             ->get();
 
-        // Log::info("Data fetched for download", [
-        //     'total_records' => count($data),
-        //     'sample_data' => $data->take(5)->toArray()
-        // ]);
 
         $fileName = "2S_Booking_Reports_{$formattedFromDate}_to_{$formattedToDate}.csv";
 
@@ -1689,8 +1762,11 @@ class ActivitiesController extends Controller
             foreach ($bookings as $b) {
 
                 $b->penalty_amount = 1000;
-                $b->booking_status = 4; // mark as NO SHOW
-                $b->cancelled_at = now(); // optional for tracking
+                $b->booking_status = 4;
+                $b->has_penalty = true;
+                $b->penalty_applied_at = now();
+                $b->penalty_applied_by = auth()->id();
+                $b->cancelled_at = now();
                 $b->cancelled_by = auth()->id();
                 $b->save();
             }
@@ -1888,6 +1964,14 @@ class ActivitiesController extends Controller
     {
         $schedules = ActivityBooking::with('activity')
             ->where('booking_status', 1)
+
+            // ✅ group by transaction
+            ->whereIn('id', function ($query) {
+                $query->selectRaw('MIN(id)')
+                    ->from('activity_bookings')
+                    ->where('booking_status', 1)
+                    ->groupBy('transaction_no');
+            })
             ->get()
             ->map(function ($schedule) {
                 $bookingDate = Carbon::parse($schedule->booking_date);
@@ -1911,6 +1995,7 @@ class ActivitiesController extends Controller
 
     }
 
+
     public function fetchActivityCalendarInfo($id)
     {
         $schedule = ActivityBooking::with('activity')->find($id);
@@ -1919,16 +2004,31 @@ class ActivitiesController extends Controller
             return response()->json(['message' => 'Data not found'], 404);
         }
 
+        // ✅ get all slots under same transaction
+        $slots = ActivityBooking::where('transaction_no', $schedule->transaction_no)
+            ->orderBy('booking_start_time')
+            ->get();
+
+        $slotCount = $slots->count();
+
+        $startTime = $slots->first()->booking_start_time;
+        $endTime = $slots->last()->booking_end_time;
+
         return response()->json([
             'id' => $schedule->id,
+            'transaction_no' => $schedule->transaction_no,
+            'slot_count' => $slotCount, // ✅ NEW
+
             'unit' => $schedule->unit,
             'name' => $schedule->name,
             'contact_number' => $schedule->contact_number,
-            'booking_date' => date('F d, Y', strtotime($schedule->booking_date)),
-            'booking_start_time' => date('g:i A', strtotime($schedule->booking_start_time)),
-            'booking_end_time' => date('g:i A', strtotime($schedule->booking_end_time)),
-            'activity_name' => strtoupper($schedule->activity->activity_name),
 
+            'booking_date' => date('F d, Y', strtotime($schedule->booking_date)),
+
+            'booking_start_time' => date('g:i A', strtotime($startTime)), // earliest
+            'booking_end_time' => date('g:i A', strtotime($endTime)),     // latest
+
+            'activity_name' => strtoupper($schedule->activity->activity_name),
         ]);
     }
 

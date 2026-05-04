@@ -73,91 +73,93 @@
                             </tr>
                         @else
                             @foreach ($greaseTrapBookings as $greaseTrapBooking)
-                                <tr>
-                                    <td>{{ $greaseTrapBooking->transaction_no ?? 'N/A' }}</td>
-                                    <td>{{ $greaseTrapBooking->srf_no ?? 'N/A' }}</td>
-                                    <td>{{ $greaseTrapBooking->user->name ?? 'N/A' }}</td>
-                                    <td>
-                                        @php
-                                            $resType = strtolower($greaseTrapBooking->resident_type ?? '');
-                                        @endphp
+                                            <tr>
+                                                <td>{{ $greaseTrapBooking->transaction_no ?? 'N/A' }}</td>
+                                                <td>{{ $greaseTrapBooking->srf_no ?? 'N/A' }}</td>
+                                                <td>{{ $greaseTrapBooking->user->name ?? 'N/A' }}</td>
+                                                <td>
+                                                    @php
+                                                        $resType = strtolower($greaseTrapBooking->resident_type ?? '');
+                                                    @endphp
 
-                                        @if ($resType === 'tenant')
-                                            <span class="badge bg-danger text-uppercase">{{ $greaseTrapBooking->resident_type }}</span>
-                                        @elseif ($resType === 'owner')
-                                            <span class="badge bg-primary text-uppercase">{{ $greaseTrapBooking->resident_type }}</span>
-                                        @else
-                                            <span class="badge bg-secondary">N/A</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $greaseTrapBooking->unit_no ?? 'N/A' }}</td>
-
-
-                                    <td>{{ $greaseTrapBooking->booking_date ?? 'N/A' }}</td>
-                                    <td>{{ $greaseTrapBooking->booking_time_slot ?? 'N/A' }}</td>
-                                    <td>
-                                        @if ($greaseTrapBooking->charged_type === 1)
-                                            <span class="badge bg-primary text-white badge-forge ">Free</span>
-                                        @else
-                                            <span class="badge bg-danger badge-forge ">Billable</span>
-                                        @endif
-                                    </td>
-
-                                    <td>
-                                        @if ($greaseTrapBooking->emergency == 0)
-                                            <span class="badge bg-secondary badge-forge ">No</span>
-                                        @else
-                                            <span class="badge bg-danger badge-forge ">Yes</span>
-                                        @endif
-                                    </td>
-
-                                    <td>{{ $greaseTrapBooking->remarks ?? 'N/A' }}</td>
-
-                                    <td>
-                                        @if ($greaseTrapBooking->booking_status == 1)
-                                            <span class="badge bg-primary custom-badge">Booked</span>
-                                        @else
-                                            <span class="badge bg-danger custom-badge">Cancelled</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $greaseTrapBooking->cancelled_at ?? 'N/A' }}</td>
-                                    <td>
-                                        @if ($greaseTrapBooking->has_penalty)
-                                            <span
-                                                class="text-warning fw-bold">₱{{ number_format($greaseTrapBooking->penalty_amount, 2) }}</span>
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
-
-                                    <td>{{ $greaseTrapBooking->cancelledBy->name ?? 'N/A' }}</td>
+                                                    @if ($resType === 'tenant')
+                                                        <span class="badge bg-danger text-uppercase">{{ $greaseTrapBooking->resident_type }}</span>
+                                                    @elseif ($resType === 'owner')
+                                                        <span class="badge bg-primary text-uppercase">{{ $greaseTrapBooking->resident_type }}</span>
+                                                    @else
+                                                        <span class="badge bg-secondary">N/A</span>
+                                                    @endif
+                                                </td>
+                                                <td>{{ $greaseTrapBooking->unit_no ?? 'N/A' }}</td>
 
 
+                                                <td>{{ $greaseTrapBooking->booking_date ?? 'N/A' }}</td>
+                                                <td>{{ $greaseTrapBooking->booking_time_slot ?? 'N/A' }}</td>
+                                                <td>
+                                                    @if ($greaseTrapBooking->charged_type === 1)
+                                                        <span class="badge bg-primary text-white badge-forge ">Free</span>
+                                                    @else
+                                                        <span class="badge bg-danger badge-forge ">Billable</span>
+                                                    @endif
+                                                </td>
+
+                                                <td>
+                                                    @if ($greaseTrapBooking->emergency == 0)
+                                                        <span class="badge bg-secondary badge-forge ">No</span>
+                                                    @else
+                                                        <span class="badge bg-danger badge-forge ">Yes</span>
+                                                    @endif
+                                                </td>
+
+                                                <td>{{ $greaseTrapBooking->remarks ?? 'N/A' }}</td>
+
+                                                <td>
+                                                    @if ($greaseTrapBooking->booking_status == 1)
+                                                        <span class="badge bg-primary custom-badge">Booked</span>
+                                                    @else
+                                                        <span class="badge bg-danger custom-badge">Cancelled</span>
+                                                    @endif
+                                                </td>
+                                                <td>{{ $greaseTrapBooking->cancelled_at ?? 'N/A' }}</td>
+                                                <td>
+                                                    @if ($greaseTrapBooking->has_penalty)
+                                                        <span
+                                                            class="text-warning fw-bold">₱{{ number_format($greaseTrapBooking->penalty_amount, 2) }}</span>
+                                                    @else
+                                                        -
+                                                    @endif
+                                                </td>
+
+                                                <td>{{ $greaseTrapBooking->cancelledBy->name ?? 'N/A' }}</td>
 
 
-                                    <td class="sticky-col sticky-col-color">
-                                        <div class="d-flex gap-1 justify-content-center">
-                                            @php
-                                                $isCancelled = $greaseTrapBooking->booking_status == 2;
-                                            @endphp
-
-                                            <button type="button" class="btn btn-primary edit_grease_trap_booking btn-sm btn-equal"
-                                                data-bs-toggle="tooltip" data-bs-placement="left" title="View"
-                                                data-id="{{ $greaseTrapBooking->id }}">
-                                                <i class="fa-solid fa-eye"></i>
-                                            </button>
 
 
-                                            <button type="button"
-                                                class="btn btn-sm btn-equal {{ $isCancelled ? 'btn-secondary cancel-booking' : 'btn-danger admin-grease-trap-booking-cancel' }}"
-                                                data-bs-toggle="tooltip" data-bs-placement="right"
-                                                title="{{ $isCancelled ? 'Cancelled' : 'Cancel' }}"
-                                                data-id="{{ $greaseTrapBooking->id }}" {{ $isCancelled ? 'disabled' : '' }}>
-                                                <i class="fa-solid fa-ban"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                                <td class="sticky-col sticky-col-color">
+                                                    <div class="d-flex gap-1 justify-content-center">
+                                                        @php
+                                                            $isCancelled = $greaseTrapBooking->booking_status == 2;
+                                                            $isPast = $greaseTrapBooking->getBookingDateTime()->lt(now());
+                                                        @endphp
+
+                                                        <button type="button" class="btn btn-primary edit_grease_trap_booking btn-sm btn-equal"
+                                                            data-bs-toggle="tooltip" data-bs-placement="left" title="View"
+                                                            data-id="{{ $greaseTrapBooking->id }}">
+                                                            <i class="fa-solid fa-eye"></i>
+                                                        </button>
+
+
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-equal 
+                                {{ ($isCancelled || $isPast) ? 'btn-secondary cancel-booking' : 'btn-danger admin-grease-trap-booking-cancel' }}"
+                                                            data-bs-toggle="tooltip" data-bs-placement="right"
+                                                            title="{{ $isCancelled ? 'Cancelled' : ($isPast ? 'Past Booking' : 'Cancel') }}"
+                                                            data-id="{{ $greaseTrapBooking->id }}" {{ ($isCancelled || $isPast) ? 'disabled' : '' }}>
+                                                            <i class="fa-solid fa-ban"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
                             @endforeach
                         @endif
                     </tbody>

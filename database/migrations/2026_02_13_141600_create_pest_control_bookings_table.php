@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('user_id');
             $table->string('unit_no');
             $table->string('resident_type');
+            $table->string('name');
             $table->date('booking_date');
             $table->string('booking_time_slot');
             $table->string('srf_no')->nullable();

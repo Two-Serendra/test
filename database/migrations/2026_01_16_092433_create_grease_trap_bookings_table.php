@@ -13,10 +13,11 @@ return new class extends Migration {
         Schema::create('grease_trap_bookings', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('transaction_no')->unique();
+            $table->string('transaction_no')->unique()->nullable();
             $table->unsignedBigInteger('user_id');
             $table->string('unit_no');
             $table->string('resident_type');
+            $table->string('name');
             $table->date('booking_date');
             $table->string('booking_time_slot');
             $table->string('srf_no')->nullable();

@@ -104,7 +104,6 @@
                 </tr>
             @endif
         </tbody>
-
     </table>
 </div>
 <div class="pagination-container">

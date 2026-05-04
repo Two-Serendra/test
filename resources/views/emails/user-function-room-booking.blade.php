@@ -22,13 +22,20 @@
         <p><strong>Function Room(s):</strong> {{ $rooms }}</p>
         <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($date)->format('F d, Y') }}</p>
         <p><strong>Time:</strong> {{ \Carbon\Carbon::parse($start_time)->format('h:i A') }} - {{
-            \Carbon\Carbon::parse($end_time)->format('h:i A') }}</p>
+    \Carbon\Carbon::parse($end_time)->format('h:i A') }}</p>
 
         <br>
         <p style="margin-top: 30px;">We will review your booking and confirm with you shortly.</p>
 
-        <p style="margin-top: 30px;">Best regards,</p>
-        <p><strong>Two Serendra Admin Team</strong></p>
+        <p style="margin-top:30px;">
+            Regards,<br>
+            <strong>Two Serendra</strong>
+        </p>
+
+        <!-- Footer -->
+        <div style="background:#f1f1f1; padding:15px; text-align:center; font-size:12px; color:#777;">
+            © {{ date('Y') }} Two Serendra. All rights reserved.
+        </div>
     </div>
 </body>
 

@@ -56,11 +56,6 @@
                 </div>
             @endif
 
-            <p style="margin-top:20px;">
-                Please assign this request to the grease trap service provider and update the booking status
-                accordingly.
-            </p>
-
             <p style="margin-top:25px;">
                 Regards,<br>
                 <strong>Two Serendra</strong>

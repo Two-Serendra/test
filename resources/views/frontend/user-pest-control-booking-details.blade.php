@@ -67,7 +67,7 @@
 
                             <div class="mb-3">
                                 <div class="text-muted small">Name</div>
-                                <div class="fw-semibold">{{ $booking->user->name ?? $booking->name ?? 'N/A' }}</div>
+                                <div class="fw-semibold">{{ $booking->name ?? 'N/A' }}</div>
                             </div>
 
                             <div class="mb-3">

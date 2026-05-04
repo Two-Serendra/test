@@ -173,6 +173,10 @@
     <script src="{{ asset('assets/backend/js/activitiy-booking.js') }}"></script>
     <script src="{{ asset('assets/backend/js/grease-trap-booking.js') }}"></script>
     <script src="{{ asset('assets/backend/js/pest-control-booking.js') }}"></script>
+    <script src="{{ asset('assets/backend/js/fitness-hub.js') }}"></script>
+    <script src="{{ asset('assets/backend/js/fitness-hub-booking.js') }}"></script>
+    <script src="{{ asset('assets/backend/js/fitness-hub-records.js') }}"></script>
+
     @stack('scripts')
 
     @stack('js')
@@ -243,6 +247,21 @@
                 counter.classList.remove('d-none');
             }
 
+
+            function incrementFitnessHubBookingCounter() {
+                const counter = document.getElementById('fitness-hub-booking-counter');
+                let count = parseInt(counter.textContent);
+
+                if (isNaN(count)) {
+                    count = 0;
+                }
+
+                count++;
+                counter.textContent = count;
+                counter.classList.remove('d-none');
+            }
+
+
             const amenityBookingChannel = pusher.subscribe('amenity-booking');
             amenityBookingChannel.bind('amenity-booking-created', function (data) {
                 if ([1, 6, 7].includes(currentUserRoleId)) {
@@ -286,6 +305,23 @@
                 }
             });
 
+            const fitnessHubChannel = pusher.subscribe('fitness-hub-bookings');
+            fitnessHubChannel.bind('FitnessHubBookingCreated', function (data) {
+                if ([1, 6, 7].includes(currentUserRoleId)) {
+                    toastr.success(`(Unit: ${data.unit_no})`, `New Fitness Hub Booking`);
+                    incrementFitnessHubBookingCounter();
+                    refreshTableDebounced();
+                }
+            });
+
+            fitnessHubChannel.bind('FitnessHubBookingCancellation', function (data) {
+                if ([1, 6, 7].includes(currentUserRoleId)) {
+                    toastr.success(`(Unit: ${data.unit_no})`, `Fitness Hub Booking Cancelled`);
+                    incrementFitnessHubBookingCounter();
+                    refreshTableDebounced();
+                }
+            });
+
             const pestControlChannel = pusher.subscribe('pest-control-bookings');
             pestControlChannel.bind('PestContrtolBookingCreated', function (data) {
                 if ([1, 6].includes(currentUserRoleId)) {
@@ -313,6 +349,8 @@
                 }, 300);
             };
         });
+
+        window.userRole = "{{ auth()->user()->role ?? '' }}";
     </script>
 
 

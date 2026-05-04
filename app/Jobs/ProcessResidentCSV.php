@@ -10,6 +10,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
 
 
 class ProcessResidentCSV implements ShouldQueue
@@ -18,6 +20,7 @@ class ProcessResidentCSV implements ShouldQueue
     public $timeout = 600;
     public $tries = 1;
     protected $filePath;
+
 
     public function __construct($filePath)
     {
@@ -139,6 +142,15 @@ class ProcessResidentCSV implements ShouldQueue
                     continue;
                 }
 
+                $uploadedEmails[] = $email;
+                $processed++;
+
+                if (count($batch) >= $chunkSize) {
+                    ResidentDetails::insert($batch);
+                    $batch = [];
+                }
+
+
                 $batch[] = [
                     'unit_no' => $unitNo,
                     'email' => $email,
@@ -147,26 +159,19 @@ class ProcessResidentCSV implements ShouldQueue
                     'updated_at' => now(),
                 ];
 
-                $uploadedEmails[] = $email;
-                $processed++;
-
                 if (count($batch) >= $chunkSize) {
                     ResidentDetails::insert($batch);
                     $batch = [];
                 }
+
             }
 
             if (!empty($batch)) {
                 ResidentDetails::insert($batch);
             }
-
             fclose($csv);
             fclose($skippedHandle);
-
-
             cache()->put('upload_progress', 100);
-
-
             Log::info("CSV Processing complete: Processed=$processed, Skipped=$skipped. Skipped rows saved to skipped_emails.csv");
             if ($skipped > 0 && file_exists($skippedFile)) {
                 $skippedContent = file_get_contents($skippedFile);

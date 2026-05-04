@@ -3,71 +3,58 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Pest Control Booking Confirmation</title>
+    <title>Pest Control Booking Confirmed</title>
 </head>
 
-<body style="font-family: Arial, sans-serif; background-color:#f4f6f8; padding:20px; color:#333;">
-    <div
-        style="max-width: 650px; margin:auto; background:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 0 10px rgba(0,0,0,0.05);">
+<body style="font-family: Arial, sans-serif; color: #333;">
+    <div style="max-width: 600px; margin: auto; border: 1px solid #eee; padding: 30px; background-color: #f9f9f9;">
 
-        <!-- Header -->
-        <div style="padding:20px; text-align:center;">
-            <img src="https://twoserendra.com/assets/images/twoserendraemaillogo.png" alt="Two Serendra"
-                style="max-width:160px;">
+        <!-- Logo -->
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="https://twoserendra.com/assets/images/twoserendraemaillogo.png" alt="Two Serendra Logo"
+                style="max-width: 180px;">
         </div>
 
-        <!-- Body -->
-        <div style="padding:30px;">
-            <h2>Hello {{ $name }},</h2>
+        <h2 style="color: #0056b3;">Hi {{ $name }},</h2>
 
-            <p>Your pest control booking has been <strong>successfully confirmed</strong>. Below are your booking
-                details:</p>
+        <p>Your Pest Control booking with <strong>Two Serendra</strong> has been <strong>confirmed</strong>.</p>
 
-            <table style="width:100%; border-collapse:collapse; margin-top:15px;">
-                <tr>
-                    <td style="padding:8px 0;"><strong>Transaction No:</strong></td>
-                    <td>{{ $transaction_no }}</td>
-                </tr>
-                <tr>
-                    <td style="padding:8px 0;"><strong>Unit No:</strong></td>
-                    <td>{{ $unit_no }}</td>
-                </tr>
-                <tr>
-                    <td style="padding:8px 0;"><strong>Date:</strong></td>
-                    <td>{{ \Carbon\Carbon::parse($booking_date)->format('F d, Y') }}</td>
-                </tr>
-                <tr>
-                    <td style="padding:8px 0;"><strong>Time:</strong></td>
-                    <td>{{ $booking_time_slot }}</td>
-                </tr>
-            </table>
+        <!-- Details -->
+        <p><strong>Transaction No:</strong> {{ $transaction_no }}</p>
+        <p><strong>Unit No:</strong> {{ $unit_no }}</p>
+        <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($booking_date)->format('F d, Y') }}</p>
+        <p><strong>Time:</strong> {{ $booking_time_slot }}</p>
 
-            {{-- Payment Notice --}}
-            @if($charged_type == 2)
-                <div
-                    style="margin-top:20px; padding:15px; background:#fff3cd; border-left:5px solid #ffc107; border-radius:4px;">
-                    <strong>Payment Notice:</strong><br>
-                    You have already used your free monthly pest control service.
-                    This booking will be charged <strong>₱{{ number_format($fee, 2) }}</strong> and will be billed
-                    accordingly.
-                </div>
-            @else
-                <div
-                    style="margin-top:20px; padding:15px; background:#e6fffa; border-left:5px solid #28a745; border-radius:4px;">
-                    <strong>This booking is FREE.</strong> You used your complimentary monthly pest control service.
-                </div>
-            @endif
+        <!-- Payment Notice -->
+        @if($charged_type == 2)
+            <div style="margin-top:15px; padding:12px; background:#fff3cd; border-left:5px solid #ffc107;">
+                <strong>Payment Notice</strong><br>
+                You have already used your free monthly pest control service.
+                This booking will be charged <strong>₱{{ number_format($fee, 2) }}</strong> and will be billed accordingly.
+            </div>
+        @else
+            <div style="margin-top:15px; padding:12px; background:#e6fffa; border-left:5px solid #28a745;">
+                <strong>This booking is FREE</strong><br>
+                You used your complimentary monthly pest control service.
+            </div>
+        @endif
 
-            <p style="margin-top:25px;">For any further assistance, please contact the Concierge Team.</p>
+        <!-- Closing -->
+        <div style="margin-top:15px;">
+            <p style="margin:0 0 10px 0;">
+                For any further assistance, please contact the Concierge Team.
+            </p>
 
-            <p style="margin-top:30px;">
+            <p style="margin:0; line-height:1.5;">
                 Regards,<br>
                 <strong>Two Serendra Admin Team</strong>
             </p>
         </div>
 
         <!-- Footer -->
-        <div style="background:#f1f1f1; padding:15px; text-align:center; font-size:12px; color:#777;">
+        <hr style="border:none; border-top:1px solid #ddd; margin:25px 0 15px 0;">
+
+        <div style="text-align:center; font-size:12px; color:#777;">
             © {{ date('Y') }} Two Serendra. All rights reserved.
         </div>
 

@@ -24,7 +24,7 @@
                                 style="max-width: 300px;">
 
                             <div class="d-flex align-items-center gap-2" style="min-width: 200px;">
-                                <button type="submit" class="btn btn-primary" id="uploadFile">
+                                <button type="submit" class="btn btn-primary" id="uploadFile2">
                                     <i class='bx bx-upload'></i> Upload
                                 </button>
 
@@ -47,6 +47,8 @@
                             <th class="text-dark">Unit No</th>
                             <th class="text-dark">Email</th>
                             <th class="text-dark">Resident Type</th>
+                            <th class="text-dark">Token</th>
+                            <th class="text-dark">Last token sent at</th>
                             <th class="text-dark">Created at</th>
                         </tr>
                     </thead>
@@ -71,6 +73,8 @@
                                         @endif
                                     </td>
 
+                                    <td>{{($emailPaginationLink->invite_token ?? 'N/A') }}</td>
+                                    <td>{{($emailPaginationLink->last_token_sent_at ?? 'N/A') }}</td>
                                     <td>{{($emailPaginationLink->created_at ?? 'N/A') }}</td>
                                     <td>
                                         <button type="button" class="btn btn-sm btn-icon btn-primary edit_email"

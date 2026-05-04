@@ -102,16 +102,16 @@
                                     <td>{{ strtoupper($booking->booking_type ?? 'N/A') }}</td>
                                     <td>
                                         @if($booking->booking_status == 1)
-                                            <span class="badge bg-primary">Booked</span>
+                                            <span class="badge bg-primary">BOOKED</span>
 
                                         @elseif($booking->booking_status == 2)
-                                            <span class="badge bg-danger">Cancelled</span>
+                                            <span class="badge bg-danger">CANCELLED</span>
 
                                         @elseif($booking->booking_status == 3)
-                                            <span class="badge bg-warning">Penalty</span>
+                                            <span class="badge bg-warning">LATE CANCEL</span>
 
                                         @elseif($booking->booking_status == 4)
-                                            <span class="badge bg-dark">No Show</span>
+                                            <span class="badge bg-dark">NO SHOW</span>
                                         @endif
                                     </td>
 
@@ -223,7 +223,7 @@
         <div class="pagination-container">
             {{ $bookings->links('vendor.pagination.bootstrap-5') }}
         </div>
-    </div>
+    </div> 
 
     <script>
         const userRole = {{ auth()->user()->role_id }};

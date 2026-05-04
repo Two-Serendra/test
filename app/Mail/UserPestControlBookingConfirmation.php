@@ -29,7 +29,7 @@ class UserPestControlBookingConfirmation extends Mailable implements ShouldQueue
      */
     public function build()
     {
-        $name = $this->booking->user->name ?? 'Resident';
+        $name = $this->booking->name ?? 'Resident';
         $fee = 350;
 
         return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra')

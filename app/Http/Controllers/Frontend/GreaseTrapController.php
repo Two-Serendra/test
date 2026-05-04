@@ -155,12 +155,17 @@ class GreaseTrapController extends Controller
             try {
                 DB::beginTransaction();
 
-                $resident = ResidentDetails::find($request->resident_id);
+                $user = auth()->user();
+
+                $resident = ResidentDetails::where('id', $request->resident_id)
+                    ->where('email', $user->email)
+                    ->first();
+
                 if (!$resident) {
                     DB::rollBack();
                     return response()->json([
-                        'message' => 'Invalid residence selected.'
-                    ], 422);
+                        'message' => 'Unauthorized unit selection.'
+                    ], 403);
                 }
 
                 $bookingDate = Carbon::parse($request->booking_date)->toDateString();
@@ -201,25 +206,27 @@ class GreaseTrapController extends Controller
                         'message' => 'Slot already taken just now.'
                     ], 409);
                 }
-                $lastId = (GreaseTrapBooking::max('id') ?? 0) + 1;
-                $transactionNo = '2SGT-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
 
                 $booking = GreaseTrapBooking::create([
                     'user_id' => auth()->id(),
-                    'unit_no' => $resident->unit_no,
+                    'unit_no' => strtoupper($resident->unit_no),
                     'resident_type' => $resident->resident_type,
+                    'name' => strtoupper($user->name),
                     'booking_date' => $bookingDate,
                     'booking_time_slot' => $request->booking_time_slot,
                     'charged_type' => $chargedType,
-                    'transaction_no' => $transactionNo,
                 ]);
 
-     
+                $booking->transaction_no = '2SGT-' . str_pad($booking->id, 5, '0', STR_PAD_LEFT);
+                $booking->save();
+
                 $booking->load('user');
                 if ($booking->user?->email) {
                     Mail::to($booking->user->email)
                         ->queue(new UserGreaseTrapBookingConfirmation($booking));
                 }
+
+                DB::commit();
 
                 Mail::to('concierge@twoserendra.com')
                     ->queue(new ConciergeGreaseTrapBookingConfirmation($booking));
@@ -230,7 +237,6 @@ class GreaseTrapController extends Controller
                     new UserGreaseTrapBookingBellNotification($booking)
                 );
 
-                DB::commit();
 
                 return response()->json([
                     'message' => 'Grease trap booking submitted successfully.'
@@ -239,6 +245,11 @@ class GreaseTrapController extends Controller
             } catch (\Illuminate\Database\QueryException $e) {
                 DB::rollBack();
 
+                if ($e->errorInfo[1] == 1062) {
+                    return response()->json([
+                        'message' => 'Slot already taken.'
+                    ], 409);
+                }
 
                 if (in_array($e->errorInfo[1], [1213, 1205])) {
                     $attempt++;
@@ -290,204 +301,130 @@ class GreaseTrapController extends Controller
             'booked_slots' => $bookedSlots
         ]);
     }
-    // public function CancelGreaseTrapBooking($id)
-    // {
-    //     $booking = GreaseTrapBooking::findOrFail($id);
-
-    //     if ($booking->booking_status != 1) {
-    //         return response()->json([
-    //             'status' => 'error',
-    //             'message' => 'Booking is already cancelled or completed.'
-    //         ], 400);
-    //     }
-
-    //     $booking->booking_status = 0; // Cancelled
-    //     $booking->save();
-
-    //     $booking->user?->notify(new UserGreaseTrapBookingBellNotification($booking));
-
-
-    //     if ($booking->user?->email) {
-    //         Mail::to($booking->user->email)->queue(
-    //             new UserGreaseTrapBookingCancellation($booking)
-    //         );
-    //     }
-    //     Mail::to('concierge@twoserendra.com')->queue(
-    //         new ConciergeGreaseTrapBookingCancellation($booking)
-    //     );
-
-
-    //     return response()->json([
-    //         'status' => 'success',
-    //         'message' => 'Booking cancelled successfully.'
-    //     ]);
-    // }
-
-
-    // public function cancelGreaseTrapBooking(GreaseTrapBooking $booking, Request $request)
-    // {
-    //     try {
-    //         $booking->load('user');
-
-    //         if ($booking->booking_status == GreaseTrapBooking::STATUS_CANCELLED) {
-    //             return response()->json([
-    //                 'success' => false,
-    //                 'message' => 'Booking already cancelled.'
-    //             ], 400);
-    //         }
-
-    //         if ($booking->getBookingDateTime()->lt(now())) {
-    //             return response()->json([
-    //                 'success' => false,
-    //                 'message' => 'Cannot cancel a completed booking.'
-    //             ], 400);
-    //         }
-
-    //         $within24Hours = $booking->isWithin24Hours();
-    //         if (!$request->has('confirm')) {
-    //             return response()->json([
-    //                 'success' => true,
-    //                 'requires_confirmation' => true, // ALWAYS require confirmation
-    //                 'message' => $within24Hours
-    //                     ? 'Cancelling this booking within 24 hours will incur a penalty of ₱448.'
-    //                     : '<br>No penalty will be applied.'
-    //             ]);
-    //         }
-
-    //         $booking->booking_status = GreaseTrapBooking::STATUS_CANCELLED;
-    //         $booking->cancelled_at = now();
-    //         $booking->cancelled_by = auth()->id();
-
-    //         $booking->applyCancellationPenalty();
-    //         $booking->save();
-
-    //         if ($booking->user) {
-    //             $booking->user->notify(new UserGreaseTrapBookingBellNotification($booking));
-    //         }
-
-    //         if ($booking->user?->email) {
-    //             Mail::to($booking->user->email)->queue(new UserGreaseTrapBookingCancellation($booking));
-    //         }
-
-    //         Mail::to('concierge@twoserendra.com')->queue(new ConciergeGreaseTrapBookingCancellation($booking));
-
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => $booking->has_penalty
-    //                 ? 'Booking cancelled. Penalty has been applied.'
-    //                 : 'Booking has been cancelled successfully.'
-    //         ]);
-
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Failed to cancel booking.',
-    //             'error' => $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
-
 
     public function cancelGreaseTrapBooking(GreaseTrapBooking $booking, Request $request)
     {
         try {
+            return DB::transaction(function () use ($booking, $request) {
+                $user = auth()->user();
 
-            $booking->load('user');
+                $units = ResidentDetails::where('email', $user->email)
+                    ->pluck('unit_no');
 
-            if ($booking->booking_status == GreaseTrapBooking::STATUS_CANCELLED) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Booking already cancelled.'
-                ], 400);
-            }
+                $booking = GreaseTrapBooking::where('id', $booking->id)
+                    ->whereIn('unit_no', $units)
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-            if ($booking->getBookingDateTime()->lt(now())) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Cannot cancel a completed booking.'
-                ], 400);
-            }
+                $booking->load('user');
 
-            $within24Hours = $booking->isWithin24Hours();
 
-            $usedFree = GreaseTrapBooking::getUsedFreeBookings($booking->unit_no);
+                if ($booking->user_id !== $user->id) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'This booking was created by another resident in your unit. Only the creator can cancel it.'
+                    ], 403);
+                }
 
-            $freeLimit = 2;
 
-            if (!$request->has('confirm')) {
+                if ($booking->booking_status !== GreaseTrapBooking::STATUS_CONFIRMED) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Only active bookings can be cancelled.'
+                    ], 400);
+                }
 
-                $message = '';
+                if ($booking->getBookingDateTime()->lt(now())) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Cannot cancel a completed booking.'
+                    ], 400);
+                }
+
+                $within24Hours = $booking->isWithin24Hours();
+
+                $usedFree = GreaseTrapBooking::getUsedFreeBookings($booking->unit_no);
+
+                $freeLimit = 2;
+
+                if (!$request->has('confirm')) {
+
+                    $message = '';
+
+                    if ($within24Hours) {
+
+                        if ($usedFree >= $freeLimit) {
+                            $message = 'Cancelling within 24 hours will incur a penalty of ₱448 because the unit has already used its 2 free bookings.';
+                        } else {
+                            $remaining = $freeLimit - $usedFree;
+                            $message = "Cancelling within 24 hours will forfeit one of the remaining {$remaining} free grease trap bookings for this year.";
+                        }
+
+                    } else {
+                        $message = '<br>No penalty will be applied.';
+                    }
+
+                    return response()->json([
+                        'success' => true,
+                        'requires_confirmation' => true,
+                        'message' => $message
+                    ]);
+                }
+
+                $booking->booking_status = GreaseTrapBooking::STATUS_CANCELLED;
+                $booking->cancelled_at = now();
+                $booking->cancelled_by = auth()->id();
 
                 if ($within24Hours) {
 
                     if ($usedFree >= $freeLimit) {
-                        $message = 'Cancelling within 24 hours will incur a penalty of ₱448 because the unit has already used its 2 free bookings.';
+                        $booking->applyCancellationPenalty();
+
+                        $message = 'Cancelling within 24 hours incurred a penalty of ₱448 because the unit has already used its 2 free bookings.';
+
                     } else {
-                        $remaining = $freeLimit - $usedFree;
-                        $message = "Cancelling within 24 hours will forfeit one of the remaining {$remaining} free grease trap bookings for this year.";
+
+                        $booking->cancelled_within_24hrs = 1;
+
+                        $remaining = $freeLimit - $usedFree - 1;
+
+                        if ($remaining <= 0) {
+                            $message = 'Cancelling within 24 hours used up your last free grease trap booking for this year.';
+                        } else {
+                            $message = "Cancelling within 24 hours forfeited one free booking. Remaining free bookings after this: {$remaining}.";
+                        }
+
                     }
 
                 } else {
-                    $message = '<br>No penalty will be applied.';
+
+                    $message = 'Booking cancelled successfully. No penalty applied.';
+
                 }
+
+
+                $booking->save();
+
+                DB::afterCommit(function () use ($booking) {
+                    if ($booking->user) {
+                        $booking->user->notify(new UserGreaseTrapBookingBellNotification($booking));
+                    }
+
+                    if ($booking->user?->email) {
+                        Mail::to($booking->user->email)
+                            ->queue(new UserGreaseTrapBookingCancellation($booking));
+                    }
+
+                    Mail::to('concierge@twoserendra.com')
+                        ->queue(new ConciergeGreaseTrapBookingCancellation($booking));
+                });
 
                 return response()->json([
                     'success' => true,
-                    'requires_confirmation' => true,
                     'message' => $message
                 ]);
-            }
+            });
 
-            $booking->booking_status = GreaseTrapBooking::STATUS_CANCELLED;
-            $booking->cancelled_at = now();
-            $booking->cancelled_by = auth()->id();
-
-            if ($within24Hours) {
-
-                if ($usedFree >= $freeLimit) {
-                    $booking->applyCancellationPenalty();
-
-                    $message = 'Cancelling within 24 hours incurred a penalty of ₱448 because the unit has already used its 2 free bookings.';
-
-                } else {
-
-                    $booking->cancelled_within_24hrs = 1;
-
-                    $remaining = $freeLimit - $usedFree - 1;
-
-                    if ($remaining <= 0) {
-                        $message = 'Cancelling within 24 hours used up your last free grease trap booking for this year.';
-                    } else {
-                        $message = "Cancelling within 24 hours forfeited one free booking. Remaining free bookings after this: {$remaining}.";
-                    }
-
-                }
-
-            } else {
-
-                $message = 'Booking cancelled successfully. No penalty applied.';
-
-            }
-
-
-            $booking->save();
-
-            if ($booking->user) {
-                $booking->user->notify(new UserGreaseTrapBookingBellNotification($booking));
-            }
-
-            if ($booking->user?->email) {
-                Mail::to($booking->user->email)->queue(new UserGreaseTrapBookingCancellation($booking));
-            }
-
-            Mail::to('concierge@twoserendra.com')->queue(new ConciergeGreaseTrapBookingCancellation($booking));
-
-            return response()->json([
-                'success' => true,
-                'message' => $booking->has_penalty
-                    ? 'Booking cancelled. Penalty has been applied.'
-                    : 'Booking cancelled successfully.'
-            ]);
 
         } catch (\Exception $e) {
 

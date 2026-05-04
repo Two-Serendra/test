@@ -18,10 +18,7 @@
 
         <!-- Body -->
         <div style="padding:30px;">
-            <h2>Hello {{ $name }},</h2>
-
-            <p>Your amenity booking has been <strong>successfully confirmed</strong>. Below are your booking details:
-            </p>
+            <p>A new amenity booking has been submitted by a resident.</p>
 
             <table style="width:100%; border-collapse:collapse; margin-top:15px;">
                 <tr>
@@ -57,7 +54,7 @@
 
             <p style="margin-top:30px;">
                 Regards,<br>
-                <strong>Two Serendra Concierge Team</strong>
+                <strong>Two Serendra</strong>
             </p>
         </div>
 

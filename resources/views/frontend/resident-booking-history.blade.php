@@ -10,6 +10,7 @@
                         <select id="booking_type" class="form-select" name="booking_type">
                             <option value="function_room" selected>Function Room</option>
                             <option value="amenity">Amenities</option>
+                            <option value="fitness_hub">Fitness Hub</option>
                             <option value="grease_trap">Grease Trap</option>
                             <option value="pest_control">Pest Control</option>
 
@@ -35,6 +36,8 @@
                         @include('frontend.resident-function-room-booking-table')
                     @elseif($bookingType === 'amenity')
                         @include('frontend.resident-activity-booking-table')
+                    @elseif($bookingType === 'fitness_hub')
+                        @include('frontend.resident-fitness-hub-booking-table')
                     @elseif($bookingType === 'grease_trap')
                         @include('frontend.resident-grease-trap-booking-table')
                     @elseif($bookingType === 'pest_control')

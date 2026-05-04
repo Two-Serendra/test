@@ -53,28 +53,28 @@
 
                 <div class="row g-3">
 
-                    <!-- Guest Info Card -->
+                    <!-- Resident Info Card -->
                     <div class="col-md-6">
                         <div class="border rounded p-3 h-100">
-                            <h6 class="fw-semibold text-primary mb-3">Guest Information</h6>
+                            <h6 class="fw-semibold text-primary mb-3"><i class="bi bi-person-circle me-2"> </i>Resident Information</h6>
 
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Name</span>
+                                <span class="text-muted">Name:</span>
                                 <span id="detail-name" class="fw-semibold text-end"></span>
                             </div>
 
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Unit</span>
+                                <span class="text-muted">Unit:</span>
                                 <span id="detail-unit" class="fw-semibold"></span>
                             </div>
 
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Resident Type</span>
+                                <span class="text-muted">Resident Type:</span>
                                 <span id="detail-resident-type"></span>
                             </div>
 
                             <div class="d-flex justify-content-between">
-                                <span class="text-muted">Contact</span>
+                                <span class="text-muted">Contact:</span>
                                 <span id="detail-contact" class="fw-semibold"></span>
                             </div>
                         </div>
@@ -83,26 +83,31 @@
                     <!-- Booking Info Card -->
                     <div class="col-md-6">
                         <div class="border rounded p-3 h-100">
-                            <h6 class="fw-semibold text-primary mb-3">Booking Information</h6>
+                            <h6 class="fw-semibold text-primary mb-3"><i class="bi bi-calendar-event me-2"></i> Booking Information</h6>
 
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Activity</span>
+                                <span class="text-muted">Activity:</span>
                                 <span id="detail-activity-name" class="fw-semibold text-end"></span>
                             </div>
 
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Booking Type</span>
+                                <span class="text-muted">Booking Type:</span>
                                 <span id="detail-booking-type" class="fw-semibold"></span>
                             </div>
 
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Date</span>
+                                <span class="text-muted">Date:</span>
                                 <span id="detail-booking-date" class="fw-semibold"></span>
                             </div>
 
                             <div class="d-flex justify-content-between">
-                                <span class="text-muted">Time</span>
+                                <span class="text-muted">Time:</span>
                                 <span id="detail-start-time" class="fw-semibold"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Slots:</span>
+                                <span id="detail-slot-count" class="fw-semibold"></span>
                             </div>
                         </div>
                     </div>

@@ -18,82 +18,6 @@ class ResidentDetailsController extends Controller
         return view('backend.admin-registered-emails', compact('emailPaginationLinks'));
     }
 
-    // public function uploadResidentDetails(Request $request)
-    // {
-    //     $request->validate([
-    //         'email_file' => 'required|file|mimes:csv,txt',
-    //     ]);
-
-    //     $file = $request->file('email_file');
-    //     $fileName = $file->getClientOriginalName();
-    //     $destinationPath = public_path('assets/files/emails');
-    //     $file->move($destinationPath, $fileName);
-
-    //     ResidentDetails::truncate();
-    //     $filePath = $destinationPath . '/' . $fileName;
-    //     $csv = fopen($filePath, 'r');
-
-    //     $header = fgetcsv($csv);
-    //     if (!$header || count($header) < 2) {
-    //         fclose($csv);
-    //         return back()->withErrors('Invalid CSV header. Expected at least 2 columns.');
-    //     }
-
-    //     $processed = 0;
-    //     $skipped = 0;
-    //     $uploadedEmails = []; 
-
-    //     while (($row = fgetcsv($csv)) !== false) {
-    //         if (count($row) < 2) {
-    //             Log::warning('Skipped row due to insufficient columns', ['row' => $row]);
-    //             $skipped++;
-    //             continue;
-    //         }
-
-    //         $unitNo = trim($row[0]);
-    //         $email = strtolower(trim($row[1]));
-    //         $residentType = isset($row[2]) ? strtoupper(trim($row[2])) : null; 
-
-    //         if (filter_var($email, FILTER_VALIDATE_EMAIL) && $unitNo !== '') {
-    //             ResidentDetails::create([
-    //                 'unit_no' => $unitNo,
-    //                 'email' => $email,
-    //                 'resident_type' => $residentType, 
-    //             ]);
-
-    //             $uploadedEmails[] = $email;
-
-    //             Log::info('Uploaded email record', [
-    //                 'unit_no' => $unitNo,
-    //                 'email' => $email,
-    //                 'resident_type' => $residentType,
-    //             ]);
-
-    //             $processed++;
-    //         } else {
-    //             Log::warning('Invalid or missing data in row', ['row' => $row]);
-    //             $skipped++;
-    //         }
-    //     }
-
-    //     fclose($csv);
-
-    //     \DB::table('users')
-    //         ->where('role_id', 0)
-    //         ->whereNotIn('email', $uploadedEmails)
-    //         ->update(['is_active' => false]);
-
-    //     Log::info("Email CSV upload summary", [
-    //         'processed' => $processed,
-    //         'skipped' => $skipped,
-    //         'uploaded_by' => auth()->user()->email ?? 'guest'
-    //     ]);
-
-    //     Log::info("Email CSV file stored at: assets/files/emails/$fileName");
-
-    //     return back()->with('success', "CSV uploaded successfully. Processed: $processed, Skipped: $skipped");
-    // }
-
     public function uploadResidentDetails(Request $request)
     {
         $request->validate([
@@ -132,6 +56,8 @@ class ResidentDetailsController extends Controller
                 'unit_no' => $email->unit_no,
                 'email' => $email->email,
                 'resident_type' => $email->resident_type,
+                'invite_token' => $email->invite_token,
+                'last_token_sent_at' => $email->last_token_sent_at ? Carbon::parse($email->last_token_sent_at)->format('Y-m-d H:i:s') : 'N/A',
                 'created_at' => Carbon::parse($email->created_at)->format('Y-m-d H:i:s'),
             ];
         });
@@ -140,7 +66,7 @@ class ResidentDetailsController extends Controller
             'data' => $formatted,
             'links' => $emailPaginationLinks
                 ->appends(['searchEmails' => $search])
-                ->withPath('/admin/get-updated-emails-table')
+                ->withPath('/admin/get-updated-resident-details-table')
                 ->links('vendor.pagination.bootstrap-5')->render()
         ]);
     }

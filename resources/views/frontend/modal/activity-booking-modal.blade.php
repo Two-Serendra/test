@@ -15,7 +15,6 @@
                     @csrf
                     <input type="hidden" id="amenityId{{ $activity->id }}" name="amenity_id"
                         value="{{ $activity->amenity_id }}">
-                    <!-- <input type="hidden" name="activity_id" value="{{ $activity->id }}"> -->
                     <input type="hidden" name="activity_id" class="activity_id_input" value="{{ $activity->id }}">
                     <div class="row">
                         <input type="hidden" id="bookingType" name="booking_type">
@@ -34,10 +33,9 @@
                         </ul>
 
                         <div class="col-md-6">
-
                             <div class="mb-3 position-relative">
                                 <label for="dateField" class="form-label">Date <span class="required">*</span></label>
-                                <input type="text" id="dateField" class="form-control" name="booking_date" required>
+                                <input type="text dateField" id="dateField" class="form-control" name="booking_date" required>
                                 <i class="fa-regular fa-calendar position-absolute"
                                     style="top: 73%; right: 8px; transform: translateY(-50%);"></i>
                                 <div class="invalid-feedback">Required</div>
@@ -45,12 +43,9 @@
 
                             <div class="mb-3">
                                 <div class="d-flex align-items-center justify-content-between">
-                                    <!-- Label on the left -->
                                     <label class="form-label mb-0">
                                         Select Residence <span class="required">*</span>
                                     </label>
-
-                                    <!-- Unit status + info on the right -->
                                     <div class="d-flex align-items-center gap-1">
                                         <span id="unitStatus" class="text-muted">0/0</span>
                                         <span class="unitStatusInfo" style="position: relative; cursor: pointer;">
@@ -66,7 +61,7 @@
                                 </div>
 
                                 <div class="d-flex gap-2 mt-1">
-                                    <select id="residentSelect" name="resident_email_id" class="form-select flex-grow-1"
+                                    <select id="residentSelect" name="resident_id" class="form-select flex-grow-1"
                                         required>
                                         @if(count($residences) > 1)
                                             <option value="">-- Select Residence --</option>
@@ -79,15 +74,9 @@
                                             </option>
                                         @endforeach
                                     </select>
-
-                                    <!-- <button type="button"
-                                        class="btn btn-secondary customBtn checkUnit text-white">Check</button> -->
                                 </div>
                                 <div class="invalid-feedback">Required</div>
                             </div>
-
-
-
 
                             <div class="mb-3">
                                 <label for="contact" class="form-label">Contact No. </label>
@@ -95,8 +84,8 @@
                                     name="contact_number">
 
                             </div>
-
                         </div>
+                        
                         <div class="col-md-6">
                             <div class="mb-3 position-relative">
                                 <label for="startTime" class="form-label">Start Time <span

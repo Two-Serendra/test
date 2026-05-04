@@ -57,10 +57,6 @@
                 </div>
             @endif -->
 
-            <p style="margin-top:20px;">
-                Please take necessary action or update the service provider accordingly.
-            </p>
-
             <p style="margin-top:25px;">
                 Regards,<br>
                 <strong>Two Serendra</strong>

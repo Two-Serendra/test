@@ -19,6 +19,13 @@ return [
 
     'admin.show.schedule.blocking' => ['Setup', 'Schedule Blocking'],
     'admin.show.date.blocking.activities' => ['Setup', 'Date Blocking'],
+
+
+    //Fitness Hub
+    'admin.booking.fitness' => ['Fitness Hub', 'Booking'],
+    'admin.booking.fitness.calendar' => ['Fitness Hub', 'Calendar'],
+    'admin.report.fitness' => ['Fitness Hub', 'Reports'],
+    'admin.show.fitness.hub' => ['Fitness Hub', 'Setup'],
     // Grease Trap
     'admin.booking.grease.trap' => ['Grease Trap', 'Booking'],
     'admin.booking.grease.trap.calendar' => ['Grease Trap', 'Calendar'],

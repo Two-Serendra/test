@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\ActivityBooking;
 use App\Models\FunctionRoomBooking;
 use App\Models\GreaseTrapBooking;
+use App\Models\FitnessHubBooking;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 class ResidentBookingHistoryController extends Controller
@@ -70,14 +71,36 @@ class ResidentBookingHistoryController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $selectedUnit = $request->unit_no ?? $allResidences->first()->unit_no ?? null;
+
+        $allowedUnits = $allResidences->pluck('unit_no')
+            ->map(fn($u) => strtoupper($u))
+            ->toArray();
+
+        abort_unless(!empty($allowedUnits), 403, 'No residence assigned to this account.');
+
+        $selectedUnit = $allowedUnits[0] ?? null;
+
+        if ($request->filled('unit_no')) {
+            $requestedUnit = strtoupper($request->unit_no);
+
+            if (!in_array($requestedUnit, $allowedUnits, true)) {
+                abort(403, 'Unauthorized unit access.');
+            }
+
+            $selectedUnit = $requestedUnit;
+        }
+
         $bookingType = $request->booking_type ?? 'function_room';
         $bookings = collect();
+
+        $allowedTypes = ['function_room', 'amenity', 'fitness_hub', 'grease_trap', 'pest_control'];
+
+        abort_unless(in_array($bookingType, $allowedTypes, true), 400, 'Invalid booking type.');
 
         if ($bookingType === 'function_room') {
 
             $bookings = FunctionRoomBooking::with('functionRoom')
-                ->when($selectedUnit, fn($q) => $q->where('unit_no', $selectedUnit))
+                ->where('unit_no', $selectedUnit)
                 ->latest('function_room_booking_date')
                 ->paginate(5)
                 ->withQueryString();
@@ -92,10 +115,17 @@ class ResidentBookingHistoryController extends Controller
         } elseif ($bookingType === 'amenity') {
 
             $bookings = ActivityBooking::with('activity')
-                ->when($selectedUnit, fn($q) => $q->where('unit', $selectedUnit))
+                ->where('unit', $selectedUnit)
+                ->whereIn('id', function ($query) use ($selectedUnit) {
+                    $query->selectRaw('MIN(id)')
+                        ->from('activity_bookings')
+                        ->where('unit', $selectedUnit)
+                        ->groupBy('transaction_no');
+                })
                 ->latest('booking_date')
                 ->paginate(5)
                 ->withQueryString();
+
 
             if ($request->ajax()) {
                 return view(
@@ -104,10 +134,26 @@ class ResidentBookingHistoryController extends Controller
                 )->render();
             }
 
+        } elseif ($bookingType === 'fitness_hub') {
+            abort_unless($selectedUnit, 403, 'No valid unit assigned.');
+
+            $bookings = FitnessHubBooking::with('fitnessHub')
+                ->where('unit', $selectedUnit)
+                ->latest('booking_date')
+                ->paginate(5)
+                ->withQueryString();
+
+            if ($request->ajax()) {
+                return view(
+                    'frontend.resident-fitness-hub-booking-table',
+                    compact('bookings', 'selectedUnit', 'bookingType')
+                )->render();
+            }
+
         } elseif ($bookingType === 'grease_trap') {
 
             $bookings = GreaseTrapBooking::with(['cancelledBy'])
-                ->when($selectedUnit, fn($q) => $q->where('unit_no', $selectedUnit))
+                ->where('unit_no', $selectedUnit)
                 ->orderBy('booking_date', 'desc')
                 ->orderBy('booking_time_slot', 'desc')
                 ->paginate(5)
@@ -121,7 +167,7 @@ class ResidentBookingHistoryController extends Controller
             }
         } elseif ($bookingType === 'pest_control') {
 
-            $bookings = PestControlBooking::when($selectedUnit, fn($q) => $q->where('unit_no', $selectedUnit))
+            $bookings = PestControlBooking::where('unit_no', $selectedUnit)
                 ->orderBy('booking_date', 'desc')
                 ->orderBy('booking_time_slot', 'desc')
                 ->paginate(5)

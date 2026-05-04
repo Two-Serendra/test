@@ -29,7 +29,7 @@ class UserGreaseTrapBookingConfirmation extends Mailable implements ShouldQueue
      */
     public function build()
     {
-        $name = $this->booking->user->name ?? 'Resident';
+        $name = $this->booking->name ?? 'Resident';
         $fee = 448;
 
 

@@ -9,11 +9,11 @@
 
                 <form method="GET" action="{{ route('booking.list') }}">
                     <!-- <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="category" id="category_function_room"
-                                value="function_room" {{ $category == 'function_room' ? 'checked' : '' }}
-                                onchange="this.form.submit()">
-                            <label class="form-check-label" for="category_function_room">Function Rooms</label>
-                        </div> -->
+                                        <input class="form-check-input" type="radio" name="category" id="category_function_room"
+                                            value="function_room" {{ $category == 'function_room' ? 'checked' : '' }}
+                                            onchange="this.form.submit()">
+                                        <label class="form-check-label" for="category_function_room">Function Rooms</label>
+                                    </div> -->
 
                     <div class="form-check mb-2">
                         <input class="form-check-input" type="radio" name="category" id="category_amenity" value="amenity"
@@ -21,19 +21,25 @@
                         <label class="form-check-label" for="category_amenity">Amenities</label>
                     </div>
 
-                    <!-- <div class="form-check mb-2">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="category" id="category_fitness_hub" value="fitness_hub"
+                            {{ $category == 'fitness_hub' ? 'checked' : '' }} onchange="this.form.submit()">
+                        <label class="form-check-label" for="category_fitness_hub">Fitness Hubs</label>
+                    </div>
+
+                    <div class="form-check mb-2">
                         <input class="form-check-input" type="radio" name="category" id="category_grease_trap"
                             value="grease_trap" {{ $category == 'grease_trap' ? 'checked' : '' }}
                             onchange="this.form.submit()">
                         <label class="form-check-label" for="category_grease_trap">Grease Trap</label>
-                    </div> -->
+                    </div>
 
-                    <!-- <div class="form-check">
+                    <div class="form-check">
                         <input class="form-check-input" type="radio" name="category" id="category_pest_control"
                             value="pest_control" {{ $category == 'pest_control' ? 'checked' : '' }}
                             onchange="this.form.submit()">
                         <label class="form-check-label" for="category_pest_control">Pest Control</label>
-                    </div> -->
+                    </div>
                 </form>
             </div>
 
@@ -48,7 +54,8 @@
                         Function Rooms
                     @elseif($category == 'amenity')
                         Amenities
-
+                    @elseif($category == 'fitness_hub')
+                        Fitness Hubs
                     @elseif($category == 'grease_trap')
                         Grease Trap
 
@@ -167,6 +174,50 @@
                                         <div class="card-body d-flex flex-column justify-content-between">
                                             <h5 class="card-title text-black">
                                                 {{ strtoupper($activity->activity_name) }}
+                                            </h5>
+                                        </div>
+
+                                    </div>
+                                </a>
+                            </div>
+                        @empty
+                            <div class="col-12 text-center">
+                                <p>No Active Amenities Found</p>
+                            </div>
+                        @endforelse
+
+                    @endif
+
+
+                    @if($category === 'fitness_hub')
+                        @forelse($items as $fitness_hub)
+                            <div class="col-md-4 mb-4">
+                                <a
+                                    href="{{ route('booking.full.details.fitness.hub', ['type' => 'fitness_hub', 'fitness_hub_id' => $fitness_hub->id]) }}">
+                                    <div class="card h-100 shadow-lg border-0 hover-card position-relative">
+
+                                        {{-- Image --}}
+                                        <img src="{{ asset('assets/images/fitness-hubs/' . $fitness_hub->fitness_hub_image) }}"
+                                            class="card-img-top" style="height: 200px; object-fit: cover;"
+                                            alt="{{ $fitness_hub->fitness_hub_name }}">
+
+                                        {{-- 🔴 Deactivated Overlay --}}
+                                        @if($fitness_hub->fitness_hub_status == 0)
+                                            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center"
+                                                style="background: rgba(0,0,0,0.6); z-index: 2;">
+
+                                                <span class="badge bg-danger mb-2">Unavailable</span>
+
+                                                <small class="text-white text-center px-3">
+                                                    {{ $fitness_hub->fitness_hub_remarks ?? 'Not Available' }}
+                                                </small>
+                                            </div>
+                                        @endif
+
+                                        {{-- Card Body --}}
+                                        <div class="card-body d-flex flex-column justify-content-between">
+                                            <h5 class="card-title text-black">
+                                                {{ strtoupper($fitness_hub->fitness_hub_name) }}
                                             </h5>
                                         </div>
 

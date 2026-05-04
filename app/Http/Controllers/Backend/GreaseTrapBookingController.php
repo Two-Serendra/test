@@ -96,13 +96,12 @@ class GreaseTrapBookingController extends Controller
                ], 409);
             }
 
-            // Create booking first without transaction_no
             $booking = GreaseTrapBooking::create([
                'user_id' => Auth::id(),
                'name' => $request->name,
                'unit_no' => $unitNo,
                'resident_type' => strtoupper($request->selectResidentType),
-               'transaction_no' => null, // temporarily null
+               'transaction_no' => null, 
                'booking_date' => $bookingDate,
                'booking_time_slot' => $request->booking_time_slot,
                'charged_type' => $chargedType,
@@ -110,7 +109,6 @@ class GreaseTrapBookingController extends Controller
                'booking_status' => 1,
             ]);
 
-            // Generate transaction_no using auto-increment ID
             $booking->transaction_no = '2SGT-' . str_pad($booking->id, 5, '0', STR_PAD_LEFT);
             $booking->save();
 
@@ -165,7 +163,7 @@ class GreaseTrapBookingController extends Controller
          $within24Hours = $booking->isWithin24Hours();
 
          $usedFree = GreaseTrapBooking::getUsedFreeBookings($booking->unit_no);
-         $freeLimit = 2;
+      $freeLimit = 2;
 
          if (!$request->has('confirm')) {
 
@@ -179,7 +177,7 @@ class GreaseTrapBookingController extends Controller
                   $message = "Cancelling within 24 hours will forfeit one of the remaining {$remaining} free grease trap bookings for this year.";
                }
             } else {
-               $message = 'No penalty will be applied if you cancel this booking.';
+               $message = '<br>No penalty will be applied.';
             }
 
             return response()->json([

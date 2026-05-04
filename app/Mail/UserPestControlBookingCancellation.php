@@ -29,7 +29,7 @@ class UserPestControlBookingCancellation extends Mailable implements ShouldQueue
      */
     public function build()
     {
-        $name = $this->booking->user->name ?? 'Resident';
+        $name = $this->booking->name ?? 'Resident';
         $hasPenalty = $this->booking->has_penalty; // true/false
         $penaltyAmount = $this->booking->penalty_amount ?? 0; // actual penalty amount
 

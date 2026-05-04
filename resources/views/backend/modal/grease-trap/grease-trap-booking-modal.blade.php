@@ -44,7 +44,7 @@
                             <div class="">
                                 <label for="additionalDetails" class="form-label">Remarks</label>
                                 <textarea name="remarks" id="additionalDetails" class="form-control" rows="6"
-                                    required></textarea>
+                                    ></textarea>
                                 <div class="invalid-feedback">Required</div>
 
                             </div>
@@ -95,7 +95,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="submit" form="greaseTrapBookingFormAdmin" id="saveUserGreaseTrapBtn"
+                <button type="submit" form="greaseTrapBookingFormAdmin" id="saveAdminGreaseTrapBtn"
                     class="btn btn-primary d-flex align-items-center justify-content-center"
                     style="min-width: 100px; height: 38px;">
                     <span class="btn-text">Create</span>

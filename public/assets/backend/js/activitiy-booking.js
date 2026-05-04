@@ -748,7 +748,7 @@ $('#bookingTable').on('click', '.editInfo_id_booking', function () {
             const endTime = booking.booking_end_time;
 
             $('#detail-transaction-no').text(booking.transaction_no)
-                .data('booking-id', booking.id)
+                .data('booking-id', booking.id) 
                 .data('within-penalty', withinPenalty);
             $('#detail-booking-type').text(booking.booking_type ?? 'N/A');
             $('#detail-name').text(booking.name ?? booking.created_by_name ?? 'N/A');
@@ -758,7 +758,11 @@ $('#bookingTable').on('click', '.editInfo_id_booking', function () {
             $('#detail-contact').text(booking.contact ?? 'N/A');
             $('#detail-booking-date').text(formattedDate ?? 'N/A');
             $('#detail-transaction-no').data('booking-id', booking.id);
-
+            $('#detail-slot-count').text(
+                booking.slot_count > 1
+                    ? `${booking.slot_count} slots booked`
+                    : `1 slot booked`
+            );
 
             let residentBadgeClass = '';
             if (booking.resident_type === 'TENANT') residentBadgeClass = 'fw-semibold text-danger';
@@ -1068,16 +1072,16 @@ function refreshTableBookings() {
                 var bookingStatusHtml = '';
                 switch (booking.booking_status) {
                     case 1:
-                        bookingStatusHtml = `<span class="badge bg-primary">Booked</span>`;
+                        bookingStatusHtml = `<span class="badge bg-primary">BOOKED</span>`;
                         break;
                     case 2:
-                        bookingStatusHtml = `<span class="badge bg-danger">Cancelled</span>`;
+                        bookingStatusHtml = `<span class="badge bg-danger">CANCELLED</span>`;
                         break;
                     case 3:
-                        bookingStatusHtml = `<span class="badge bg-warning">Penalty</span>`;
+                        bookingStatusHtml = `<span class="badge bg-warning">LATE CANCEL</span>`;
                         break;
                     case 4:
-                        bookingStatusHtml = `<span class="badge bg-dark">No Show</span>`;
+                        bookingStatusHtml = `<span class="badge bg-dark">NO SHOW</span>`;
                         break;
                     default:
                         bookingStatusHtml = 'N/A';

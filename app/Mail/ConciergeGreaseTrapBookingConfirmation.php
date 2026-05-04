@@ -27,7 +27,7 @@ class ConciergeGreaseTrapBookingConfirmation extends Mailable implements ShouldQ
      */
     public function build()
     {
-        $name = $this->booking->user->name ?? 'Resident';
+        $name = $this->booking->name ?? 'Resident';
         $fee = 448;
 
         return $this->from('lowriseadmin@twoserendra.com', 'Two Serendra')

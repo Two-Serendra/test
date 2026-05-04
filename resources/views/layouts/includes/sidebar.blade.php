@@ -113,6 +113,68 @@
             </ul>
         </li>
 
+        @roles(1, 6, 7, 9)
+        <li class="menu-item">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-dumbbell"></i>
+                <div>Fitness Hub</div>
+                <span id="fitness-hub-booking-counter" class="badge bg-danger d-none"
+                    style="min-width: 22px; text-align: center; display: inline-flex; justify-content: center; align-items: center;">
+                    0
+                </span>
+            </a>
+
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('admin.booking.fitness') ? 'active' : '' }}">
+                    <a href="{{ route('admin.booking.fitness') }}" class="menu-link">
+                        <div>Booking</div>
+                    </a>
+                </li>
+
+                <li class="menu-item {{ request()->routeIs('admin.fitnessHub.history') ? 'active' : '' }}">
+                    <a href="{{ route('admin.fitnessHub.history') }}" class="menu-link">
+                        <div>Reports</div>
+                    </a>
+                </li>
+
+                <li class="menu-item {{ request()->routeIs('admin.fitness.hub.booking.calendar') ? 'active' : '' }}">
+                    <a href="{{ route('admin.fitness.hub.booking.calendar') }}" class="menu-link">
+                        <div>Calendar</div>
+                    </a>
+                </li>
+
+                <li class="menu-item">
+                    <a href="javascript:void(0);" class="menu-link menu-toggle">
+                        <div>Setup</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item {{ request()->routeIs('admin.show.fitness.hub') ? 'active' : '' }}">
+                            <a href="{{ route('admin.show.fitness.hub') }}" class="menu-link">
+                                <div>Fitness Hub</div>
+                            </a>
+                        </li>
+
+                        <!-- <li class="menu-item {{ request()->routeIs('admin.show.schedule.blocking') ? 'active' : '' }}">
+                            <a href="{{ route('admin.show.schedule.blocking') }}" class="menu-link">
+                                <div>Schedule Blocking</div>
+                            </a>
+                        </li> -->
+
+                        <li
+                            class="menu-item {{ request()->routeIs('admin.show.date.blocking.fitness.hub') ? 'active' : '' }}">
+                            <a href="{{ route('admin.show.date.blocking.fitness.hub') }}" class="menu-link">
+                                <div>Date Blocking</div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+            </ul>
+        </li>
+        @endroles
+
+
+
 
 
         <!-- @roles(1, 2, 3, 5, 6, 7, 8)
@@ -210,7 +272,7 @@
             </ul>
         </li> -->
         @roles(1, 6)
-        <!-- <li class="menu-item">
+        <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-wrench"></i>
                 <div data-i18n="Form Elements">
@@ -275,7 +337,7 @@
                     </a>
                 </li>
             </ul>
-        </li> -->
+        </li>
         @endroles
 
         <!-- Manage -->

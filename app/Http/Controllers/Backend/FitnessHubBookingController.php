@@ -37,7 +37,7 @@ class FitnessHubBookingController extends Controller
   }
 
 
-  public function fetchAvailableTimesFitnessHub(Request $request)
+  public function adminFetchAvailableTimesFitnessHub(Request $request)
   {
     $fitnessHubId = $request->input('fitness_hub_id');
     $date = $request->input('booking_date');
@@ -115,7 +115,7 @@ class FitnessHubBookingController extends Controller
   }
 
 
-  public function fetchAvailableEndTimesFitnessHub(Request $request)
+  public function adminFetchAvailableEndTimesFitnessHub(Request $request)
   {
     $fitnessHubId = $request->input('fitness_hub_id');
     $date = $request->input('booking_date');

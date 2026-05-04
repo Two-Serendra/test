@@ -114,7 +114,7 @@
         </li>
 
         @roles(1, 6, 7, 9)
-        <!-- <li class="menu-item">
+        <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-dumbbell"></i>
                 <div>Fitness Hub</div>
@@ -164,7 +164,7 @@
                 </li>
 
             </ul>
-        </li> -->
+        </li>
         @endroles
 
 

@@ -182,7 +182,7 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/search-booking-fitness-hub', [FitnessHubBookingController::class, 'searchBooking'])->name('admin.search.booking.fitness.hub');
     Route::post('/fitness-hub/booking/import', [FitnessHubBookingController::class, 'importFitnessHubBookings'])->name('fitness.hub.booking.import');
     Route::post('/admin-new-booking-fitness-hub', [FitnessHubBookingController::class, 'AdminNewBookingFitnessHub'])->name('admin.new.booking.fitness.hub');
-    Route::get('/fetch-available-times-fitness-hub', [FitnessHubBookingController::class, 'fetchAvailableTimesFitnessHub'])->name('fetchAvailableTimesFitnessHub');
+    Route::get('/fetch-available-times-fitness-hub', [FitnessHubBookingController::class, 'adminFetchAvailableTimesFitnessHub'])->name('adminFetchAvailableTimesFitnessHub');
     Route::get('/fetch-available-end-times-fitness-hub', [FitnessHubBookingController::class, 'fetchAvailableEndTimesFitnessHub'])->name('fetchAvailableEndTimesFitnessHub');
     Route::get('/check-unit-booking-fitness-hub', [FitnessHubBookingController::class, 'checkUnitBookingFitnessHub'])->name('checkUnitBookingFitnessHub');
     Route::get('/fetch/fitness-hub-booking/{id}', [FitnessHubBookingController::class, 'fetchInfoFitnessHubBooking'])->name('fetchInfoFitnessHubBooking');

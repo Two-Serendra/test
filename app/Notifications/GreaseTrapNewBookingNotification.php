@@ -9,7 +9,7 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Broadcasting\PrivateChannel;
 use App\Models\FunctionRoomBooking;
 
-class FunctionRoomNewBookingNotification extends Notification implements ShouldQueue
+class GreaseTrapNewBookingNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 

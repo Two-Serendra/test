@@ -11,12 +11,13 @@ $(document).ready(function () {
 
     $('.AddNewBooking').on('click', function () {
         showLoading();
-
         const activityId = $(this).data('activity-id');
         const modal = $('#modalActivity' + activityId);
-        const amenityId = modal.find('#amenityId' + activityId).val();
+        const amenityId = $(this).data('amenity-id');
         modal.data('activity-id', activityId);
-        console.log("Activity ID set on modal:", modal.data('activity-id'));
+        modal.data('amenity-id', amenityId);
+        // console.log("Activity ID set on modal:", modal.data('activity-id'));
+        // console.log("Amenity ID set on modal:", modal.data('amenity-id'));
         const bookingTabs = modal.find('#bookingTabs');
         const bookingTypeInput = modal.find('#bookingType');
         const dateField = modal.find('#dateField');
@@ -32,10 +33,9 @@ $(document).ready(function () {
 
         unitStatusInfo = modal.find('.unitStatusInfo');
         function resetFields() {
-            modal.find('input[type="text"], input[type="number"]').val('');
+            modal.find('input[type="text"], input[type="number"], input[type="email"]').val('');
             modal.find('select').prop('selectedIndex', 0);
             modal.find(`#userAvailableSlotsContainer${activityId}`).empty();
-
             dateField.val('');
             startTimeDropdown.prop('disabled', true).empty().append('<option>Select a Date First</option>');
             endTimeDropdown.prop('disabled', true).empty().append('<option>Select Start Time First</option>');
@@ -62,11 +62,11 @@ $(document).ready(function () {
         bookingTabs.find('a[data-value="Advanced Booking"]').tab('show');
         const initialType = 'Advanced Booking';
         bookingTypeInput.val(initialType);
-
         $.ajax({
             url: '/fetch-blocked-dates',
             method: 'GET',
             data: { amenity_id: amenityId },
+
             success: function (blockedDates) {
                 modal.data('blockedDates', blockedDates);
                 applyFieldToggles(initialType);
@@ -487,8 +487,6 @@ $(document).ready(function () {
                     timer: 2000,
                     showConfirmButton: false
                 });
-
-                form.reset();
                 form.classList.remove('was-validated');
             },
 
@@ -549,84 +547,6 @@ $(document).ready(function () {
             $select.prop('selectedIndex', 1).trigger('change'); // <-- trigger change
         }
     });
-
-    // $(".checkUnit").on("click", function () {
-    //     let button = $(this);
-    //     let modal = button.closest(".modal");
-    //     let activityId = modal.attr("id").replace("modalActivity", "");
-    //     // let unitNumber = modal.find(".selectResidentType option:selected").data('unit')?.toString().trim();
-    //     let selectResidentType = modal.find("#residentSelect");
-    //     let unitNumber = selectResidentType.find("option:selected").data('unit')?.toString().trim();
-
-    //     let submitButton = modal.find("#submitButton" + activityId);
-    //     let checkUnit = modal.find(".checkUnit");
-    //     let selectedDate = modal.find("#dateField").val()?.trim();
-    //     let name = modal.find("#name" + activityId);
-    //     let contact_number = modal.find("#contact_number" + activityId);
-    //     let radio = modal.find(":radio");
-    //     let bookingType = modal.find("#bookingType").val();
-
-    //     if (unitNumber === "") {
-    //         Swal.fire({
-    //             icon: "warning",
-    //             title: "Missing Information",
-    //             text: "Please enter a unit number.",
-    //         });
-    //         return;
-    //     }
-
-    //     $.ajax({
-    //         url: '/check-unit-frontend',
-    //         type: "GET",
-    //         data: {
-    //             unit: unitNumber,
-    //             activity_id: activityId,
-    //             dateField: selectedDate
-    //         },
-    //         success: function (response) {
-    //             let unitStatus = modal.find("#unitStatus");
-
-    //             if (response.success) {
-    //                 let count = response.count;
-    //                 let maxBookings = response.maxBookings;
-    //                 let statusText = `${count}/${maxBookings}`;
-    //                 unitStatus.removeClass("text-muted text-danger text-success text-primary");
-    //                 if (bookingType === "Advanced Booking") {
-    //                     if (count < maxBookings) {
-    //                         unitStatus.addClass("text-success").text(statusText);
-    //                         enableFields();
-    //                     } else {
-    //                         unitStatus.addClass("text-danger").text(statusText + " (Max)");
-    //                         disableFields();
-    //                     }
-    //                 }
-
-    //             } else {
-    //                 Swal.fire({
-    //                     icon: "error",
-    //                     title: "Error",
-    //                     text: response.message,
-    //                 });
-    //             }
-    //         },
-    //         error: function () {
-    //             Swal.fire({
-    //                 icon: "error",
-    //                 title: "Server Error",
-    //                 text: "Something went wrong. Please try again later.",
-    //             });
-    //         }
-    //     });
-    //     function enableFields() {
-    //         submitButton.prop('disabled', false);
-    //         checkUnit.prop('disabled', false);
-    //         selectResidentType.prop('disabled', false);
-    //         name.prop('disabled', false);
-    //         // contact_number.prop('disabled', false);
-    //         radio.prop('disabled', false);
-    //     }
-    // });
-
 
     function checkUnitAvailability(modal) {
         let activityId = modal.attr("id").replace("modalActivity", "");
@@ -805,11 +725,22 @@ $(document).ready(function () {
                 // PRIORITY: real booking status first
                 switch (booking.booking_status) {
                     case 1:
-                        if (bookingDate < today) {
+
+                        const now = new Date();
+                        const startDateTime = new Date(`${booking.booking_date}T${booking.booking_start_time}`);
+                        const endDateTime = new Date(`${booking.booking_date}T${booking.booking_end_time}`);
+
+                        if (now >= endDateTime) {
                             statusText = 'Completed';
                             statusClass = 'text-success';
                             $('#cancelAmenityBookingBtn').hide();
-                        } else {
+                        }
+                        else if (now >= startDateTime) {
+                            statusText = 'Ongoing';
+                            statusClass = 'text-warning';
+                            $('#cancelAmenityBookingBtn').hide(); // 🔥 KEY FIX
+                        }
+                        else {
                             statusText = 'Confirmed';
                             statusClass = 'text-success';
                             $('#cancelAmenityBookingBtn').show();
@@ -832,6 +763,7 @@ $(document).ready(function () {
                         if (booking.cancelled_at) {
                             cancelledAtText = `<small class="text-muted"> at ${formatDateTime(booking.cancelled_at)}</small>`;
                         }
+
                         $('#cancelAmenityBookingBtn').hide();
                         break;
 
@@ -884,7 +816,14 @@ $(document).ready(function () {
                     ${cancelledAtText}
                 `);
 
+                $('#detail-slot-count').text(
+                    booking.slot_count > 1
+                        ? `${booking.slot_count} slots booked`
+                        : `1 slot booked`
+                );
+
                 $('#residentActivityBookingDetailsModal').modal('show');
+
             },
             error: function () {
                 alert('Booking not found.');
@@ -962,7 +901,23 @@ $(document).ready(function () {
                             });
                         }
                     },
-                    error: function () {
+                    error: function (xhr) {
+
+                        if (xhr.status === 403) {
+                            Swal.fire('Not Allowed', xhr.responseJSON?.message || 'You are not allowed to cancel this booking.', 'warning');
+                            return;
+                        }
+
+                        if (xhr.status === 404) {
+                            Swal.fire('Not Found', xhr.responseJSON?.message || 'Booking not found.', 'error');
+                            return;
+                        }
+
+                        if (xhr.status === 429) {
+                            Swal.fire('Too Many Attempts', 'Please wait before trying again.', 'warning');
+                            return;
+                        }
+
                         Swal.fire('Error', 'Something went wrong.', 'error');
                     }
                 });

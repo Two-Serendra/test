@@ -1,5 +1,38 @@
 <x-guest-layout>
-    <!-- Session Status -->
+    <style>
+        .send-btn {
+            height: 40px;
+            padding: 0 16px;
+            background-color: #2563eb;
+            /* blue */
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            border: 1px solid #1d4ed8;
+            cursor: pointer;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .send-btn:hover {
+            background-color: #1d4ed8;
+            border-color: #1e40af;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .send-btn:disabled {
+            background-color: #9ca3af;
+            border-color: #9ca3af;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+    </style>
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
     <!-- Logo -->
@@ -15,6 +48,7 @@
             <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required
                 autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <x-input-error :messages="$errors->get('invite_token')" class="mt-2" />
         </div>
 
         <!-- Name -->
@@ -24,8 +58,6 @@
                 autofocus autocomplete="name" />
             <x-input-error :messages="$errors->get('name')" class="mt-2" />
         </div>
-
-
 
         <!-- Password -->
         <div class="mt-4">
@@ -43,29 +75,56 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
+        <div class="mt-4">
+            <x-input-label for="invite_token" value="Registration Token" />
+
+            <div class="flex items-center">
+                <div class="flex-1 min-w-0">
+                    <x-text-input id="invite_token" name="invite_token" :value="old('invite_token')" type="text"
+                        class="w-full h-10" />
+                </div>
+
+                <button type="button" onclick="sendToken()" id="sendTokenBtn"
+                    class="send-btn ml-3 px-3 h-10 w-10 flex items-center justify-center shrink-0">
+
+                    <!-- Spinner -->
+                    <svg id="sendSpinner" class="h-4 w-4 hidden animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25">
+                        </circle>
+                        <path fill="currentColor" class="opacity-75" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                    </svg>
+
+                    <!-- Icon (ONLY idle state) -->
+                    <svg id="sendIcon" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <path d="M22 2L11 13"></path>
+                        <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
+                    </svg>
+
+                    <!-- Timer (ONLY cooldown state) -->
+                    <span id="sendTimer" class="hidden text-xs sm:text-sm"></span>
+
+                </button>
+            </div>
+
+            <p id="tokenMessage" class="text-sm text-gray-500 mt-1"></p>
+        </div>
+
         <!-- Submit -->
         <div class="mt-4">
-            <!-- <x-primary-button class="w-full flex justify-center items-center text-center"
-                style="background-color: #008b26;">
-                {{ __('Register') }}
-            </x-primary-button> -->
-
-            <x-primary-button type="submit" id="loginBtn"
+            <x-primary-button type="submit" id="registerBtn"
                 class="w-full flex justify-center items-center text-center relative cursor-pointer transition-colors duration-200"
                 style="background-color: #008b26; color: white;">
-                <!-- Spinner (hidden by default) -->
-                <svg id="btnSpinner" class="h-5 w-5 text-white mr-3 hidden" xmlns="http://www.w3.org/2000/svg"
+                <!-- Spinner -->
+                <svg id="registerSpinner" class="h-5 w-5 text-white mr-3 hidden" xmlns="http://www.w3.org/2000/svg"
                     fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                 </svg>
 
-                <span id="btnText">Submit</span>
+                <span id="registerText">Submit</span>
             </x-primary-button>
         </div>
-        </div>
-
-
 
         <!-- Already Registered -->
         <div class="mt-2 text-center">
@@ -80,34 +139,147 @@
 </x-guest-layout>
 
 <script>
-    const btn = document.getElementById('loginBtn');
-    const spinner = document.getElementById('btnSpinner');
-    const text = document.getElementById('btnText');
+    document.addEventListener('DOMContentLoaded', function () {
 
-    document.querySelector('form').addEventListener('submit', function (e) {
+        const registerBtn = document.getElementById('registerBtn');
+        const registerSpinner = document.getElementById('registerSpinner');
+        const registerText = document.getElementById('registerText');
+
+        const email = document.getElementById('email');
+        const token = document.getElementById('invite_token');
+
+        function toggleRegister() {
+            if (email.value.trim() && token.value.trim()) {
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                registerBtn.disabled = true;
+                registerBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        email.addEventListener('input', toggleRegister);
+        token.addEventListener('input', toggleRegister);
+
+        toggleRegister();
+
+        const form = registerBtn.closest('form');
+
+        form.addEventListener('submit', function () {
+            if (registerBtn.disabled) return;
+
+            registerBtn.disabled = true;
+
+            // spinner ON
+            registerSpinner.classList.remove('hidden');
+
+            // text change
+            registerText.textContent = "Submitting...";
+
+            // optional UX feedback
+            registerBtn.style.backgroundColor = '#007a20';
+        });
+
+    });
+
+
+
+    let cooldownInterval = null;
+
+    window.sendToken = function () {
+        const email = document.getElementById('email').value.trim();
+        const tokenMessage = document.getElementById('tokenMessage');
+        const btn = document.getElementById('sendTokenBtn');
+
+        const spinner = document.getElementById('sendSpinner');
+        const icon = document.getElementById('sendIcon');
+        const timer = document.getElementById('sendTimer');
 
         if (btn.disabled) return;
+
+        if (!email) {
+            showMessage("Please enter your email first.", true);
+            return;
+        }
+
         btn.disabled = true;
-        btn.style.backgroundColor = '#007a20';
+
+        // UI → loading state
         spinner.classList.remove('hidden');
-        spinner.style.animation = "spin 1s linear infinite";
-        text.textContent = 'Submitting...';
-    });
+        icon.classList.add('hidden');
 
-    // Hover effect: only if button is enabled
-    btn.addEventListener('mouseenter', function () {
-        if (!btn.disabled) btn.style.backgroundColor = '#009432';
-    });
-    btn.addEventListener('mouseleave', function () {
-        if (!btn.disabled) btn.style.backgroundColor = '#008b26';
-    });
+        fetch("{{ route('send.token') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({ email })
+        })
+            .then(res => res.json())
+            .then(data => {
 
-    const style = document.createElement('style');
-    style.innerHTML = `
-@keyframes spin { 
-    0% { transform: rotate(0deg); } 
-    100% { transform: rotate(360deg); } 
-}
-`;
-    document.head.appendChild(style);
+                spinner.classList.add('hidden');
+
+                // switch to cooldown UI (NO icon)
+                icon.classList.add('hidden');
+                timer.classList.remove('hidden');
+
+                showMessage(data.message, false);
+
+                startCooldown(btn, data.retry_after || 90);
+
+                document.getElementById('invite_token').focus();
+            })
+            .catch(err => {
+
+                btn.disabled = false;
+
+                spinner.classList.add('hidden');
+                icon.classList.remove('hidden');
+                timer.classList.add('hidden');
+
+                showMessage(err.message || "Something went wrong.", true);
+            });
+    };
+
+
+    function startCooldown(btn, seconds) {
+        let remaining = seconds;
+
+        const icon = document.getElementById('sendIcon');
+        const timer = document.getElementById('sendTimer');
+
+        if (cooldownInterval) clearInterval(cooldownInterval);
+
+        btn.disabled = true;
+
+        cooldownInterval = setInterval(() => {
+
+            timer.textContent = `${remaining}s`;
+            remaining--;
+
+            if (remaining < 0) {
+                clearInterval(cooldownInterval);
+                cooldownInterval = null;
+
+                btn.disabled = false;
+
+                // RESET → ICON ONLY (your requirement)
+                timer.classList.add('hidden');
+                icon.classList.remove('hidden');
+                timer.textContent = "";
+            }
+
+        }, 1000);
+    }
+
+    function showMessage(msg, isError = false) {
+        const tokenMessage = document.getElementById('tokenMessage');
+
+        tokenMessage.innerText = msg;
+
+        tokenMessage.classList.remove('text-red-500', 'text-green-500');
+        tokenMessage.classList.add(isError ? 'text-red-500' : 'text-green-500');
+    }
 </script>

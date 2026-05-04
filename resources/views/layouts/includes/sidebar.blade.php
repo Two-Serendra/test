@@ -154,12 +154,6 @@
                             </a>
                         </li>
 
-                        <!-- <li class="menu-item {{ request()->routeIs('admin.show.schedule.blocking') ? 'active' : '' }}">
-                            <a href="{{ route('admin.show.schedule.blocking') }}" class="menu-link">
-                                <div>Schedule Blocking</div>
-                            </a>
-                        </li> -->
-
                         <li
                             class="menu-item {{ request()->routeIs('admin.show.date.blocking.fitness.hub') ? 'active' : '' }}">
                             <a href="{{ route('admin.show.date.blocking.fitness.hub') }}" class="menu-link">

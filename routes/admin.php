@@ -179,7 +179,7 @@ Route::middleware('auth:admin')->group(function () {
 
     //Fitness Booking
     Route::get('/admin-fitness-booking', [FitnessHubBookingController::class, 'AdminFitnessHubBooking'])->name('admin.booking.fitness');
-    Route::get('/search-booking-fitness-hub', [FitnessHubBookingController::class, 'searchBooking'])->name('admin.search.booking.fitness.hub');
+    Route::get('/search-booking-fitness-hub', [FitnessHubBookingController::class, 'searchBookingFitnessHub'])->name('admin.search.booking.fitness.hub');
     Route::post('/fitness-hub/booking/import', [FitnessHubBookingController::class, 'importFitnessHubBookings'])->name('fitness.hub.booking.import');
     Route::post('/admin-new-booking-fitness-hub', [FitnessHubBookingController::class, 'AdminNewBookingFitnessHub'])->name('admin.new.booking.fitness.hub');
     Route::get('/fetch-available-times-fitness-hub', [FitnessHubBookingController::class, 'adminFetchAvailableTimesFitnessHub'])->name('adminFetchAvailableTimesFitnessHub');

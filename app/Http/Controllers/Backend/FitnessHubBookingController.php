@@ -23,17 +23,28 @@ class FitnessHubBookingController extends Controller
     return view('backend.fitness-hubs.admin-fitness-hub-booking', compact('FitnessHubBookings', 'FitnessHubs'));
   }
 
-  public function searchBooking(Request $request)
+  public function searchBookingFitnessHub(Request $request)
   {
-    $searchTerm = $request->input('search');
-    $FitnessHubBookings = FitnessHubBooking::where('transaction_no', 'LIKE', '%' . $searchTerm . '%')
-      ->orWhere('unit', 'LIKE', '%' . $searchTerm . '%')
-      ->orWhere('resident_type', 'LIKE', '%' . $searchTerm . '%')
-      ->orWhere('name', 'LIKE', '%' . $searchTerm . '%')
-      ->orWhere('contact_number', 'LIKE', '%' . $searchTerm . '%')
-      ->get();
+    $searchTerm = $request->input('searchBookingFitnessHub');
 
-    return view('backend.fitness-hubs.admin-fitness-hub-booking', compact('FitnessHubBookings'));
+    $FitnessHubs = FitnessHub::all();
+
+    $FitnessHubBookings = FitnessHubBooking::with('fitnessHub')
+      ->where(function ($query) use ($searchTerm) {
+        $query->where('transaction_no', 'LIKE', "%{$searchTerm}%")
+          ->orWhere('unit', 'LIKE', "%{$searchTerm}%")
+          ->orWhere('resident_type', 'LIKE', "%{$searchTerm}%")
+          ->orWhere('name', 'LIKE', "%{$searchTerm}%")
+          ->orWhere('contact_number', 'LIKE', "%{$searchTerm}%");
+      })
+      ->paginate(10)
+      ->appends(['searchBookingFitnessHub' => $searchTerm]); // ✅ correct
+
+    return view('backend.fitness-hubs.admin-fitness-hub-booking', compact(
+      'FitnessHubBookings',
+      'FitnessHubs',
+      'searchTerm'
+    ));
   }
 
 
@@ -353,7 +364,7 @@ class FitnessHubBookingController extends Controller
           ], 409);
         }
 
-          $booking = FitnessHubBooking::create([
+        $booking = FitnessHubBooking::create([
           'fitness_hub_id' => $fitnessHubId,
           'booking_date' => $date,
           'booking_start_time' => $start->format('H:i:s'),

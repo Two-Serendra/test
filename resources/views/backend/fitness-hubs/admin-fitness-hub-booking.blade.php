@@ -21,8 +21,12 @@
                             <span class="input-group-text">
                                 <i class="fa-solid fa-magnifying-glass fa-sm"></i>
                             </span>
-                            <input type="text" name="searchBooking" value="{{ $searchBooking ?? '' }}"
-                                id="searchInputBooking" class="form-control" placeholder="Name/Unit" autocomplete="off">
+                            <input type="text" name="searchBookingFitnessHub"
+                                value="{{ $searchTerm ?? '' }}"
+                                id="searchInputBooking"
+                                class="form-control"
+                                placeholder="Name/Unit"
+                                autocomplete="off">
                         </div>
                     </form>
                 </div>
@@ -237,7 +241,7 @@
         <div class="pagination-container">
             {{ $FitnessHubBookings->links('vendor.pagination.bootstrap-5') }}
         </div>
-    </div>
+    </div> 
 
     <script>
         const userRole = {{ auth()->user()->role_id }};

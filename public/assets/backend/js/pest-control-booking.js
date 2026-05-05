@@ -23,11 +23,11 @@ $(document).ready(function () {
         slotsLoaded = false;
         $('#saveAdminPestControlBtn')
             .prop('disabled', true)
-            .removeClass('btn-success')
+            .removeClass('btn-primary')
             .addClass('btn-secondary');
 
         $('#slotStatusBadge')
-            .removeClass('bg-success bg-warning')
+            .removeClass('bg-primary bg-warning')
             .addClass('bg-secondary')
             .text(reason || 'Not checked');
     }
@@ -37,24 +37,21 @@ $(document).ready(function () {
         $('#saveAdminPestControlBtn')
             .prop('disabled', false)
             .removeClass('btn-secondary')
-            .addClass('btn-success');
+            .addClass('btn-primary');
 
         $('#slotStatusBadge')
             .removeClass('bg-secondary bg-warning')
-            .addClass('bg-success')
+            .addClass('bg-primary')
             .text('Slots loaded');
     }
 
     disableCreateBtn();
 
 
-
-
     flatpickr("#PestControlBookingDateAdmin, #PestControlBookingDateAdminEmergency", {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(1)
     });
-
 
     const $bookingSlots = $('.booking-slot-admin-pest-control');
     $bookingSlots.prop('disabled', true);
@@ -310,7 +307,7 @@ $(document).ready(function () {
                     <tr>
                         <td>${booking.transaction_no ?? 'N/A'}</td>
                         <td>${booking.srf_no ?? 'N/A'}</td>
-                        <td>${booking.user ? booking.user.name : 'CONCIERGE'}</td>
+                        <td>${booking.name  ?? 'CONCIERGE'}</td>
                         <td>${residentTypeHtml}</td>
                         <td>${booking.unit_no ?? 'N/A'}</td>
                         <td>${booking.booking_date ?? 'N/A'}</td>
@@ -506,6 +503,7 @@ $(document).ready(function () {
     $('#pestControlBookingTable').on('click', '.edit_pest_control_booking', function () {
 
         let info_id = $(this).data("id");
+        showLoading();
 
         $.get('/admin/admin-fetch-pest-control-booking/' + info_id, function (data) {
 
@@ -542,6 +540,58 @@ $(document).ready(function () {
             $('#remarks_grease_trap').val(data.remarks);
             $('#info_id').val(info_id);
             $('#pestcontrolEdit').modal('show');
+
+            hideLoading();
+        })
+            .fail(function () {
+                alert("Data not found");
+            });
+    });
+
+
+
+    $('#pestControlBookingTable').on('click', '.view_pest_control_booking', function () {
+
+        let info_id = $(this).data("id");
+        showLoading();
+
+        $.get('/admin/admin-fetch-pest-control-booking/' + info_id, function (data) {
+
+
+
+            $('#display_name_reports').text(data.name);
+            $('#display_unit_reports').text(data.unit_no);
+
+            // Resident badge
+            let residentType = data.resident_type?.toUpperCase() ?? 'N/A';
+            let residentBadge = `<span class="badge bg-secondary">${residentType}</span>`;
+
+            if (residentType === 'TENANT') residentBadge = `<span class="badge bg-danger">TENANT</span>`;
+            if (residentType === 'OWNER') residentBadge = `<span class="badge bg-primary">OWNER</span>`;
+
+            $('#display_resident_type_reports').html(residentBadge);
+
+            $('#display_booking_date_reports').text(data.booking_date);
+            let chargedType = data.charged_type;
+            let chargedBadge = `<span class="badge bg-secondary">N/A</span>`;
+
+            // Map types
+            if (chargedType == 1) chargedBadge = `<span class="badge bg-primary">FREE</span>`;
+            if (chargedType == 2) chargedBadge = `<span class="badge bg-danger">BILLABLE</span>`;
+
+            $('#display_charged_type_reports').html(chargedBadge);
+
+            // Time slot badge
+            $('#display_time_slot_reports').text(data.booking_time_slot);
+            $('#display_transaction_no_reports').text(data.transaction_no);
+
+            // Editable fields
+            $('#srf_no_reports').text(data.srf_no);
+            $('#remarks_pest_control_reports').text(data.remarks);
+            $('#info_id').val(info_id);
+            $('#viewPestControlBooking').modal('show');
+
+            hideLoading();
         })
             .fail(function () {
                 alert("Data not found");
@@ -597,7 +647,7 @@ $(document).ready(function () {
 
                 Toast.fire({
                     icon: 'success',
-                    title: 'Grease Trap Booking Updated Successfully'
+                    title: 'Pest Control Booking Updated Successfully'
                 });
 
                 form.reset();

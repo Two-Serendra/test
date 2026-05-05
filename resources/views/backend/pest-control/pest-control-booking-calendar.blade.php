@@ -123,8 +123,18 @@
 @endsection
 @push('js')
     <script>
-        var schedule = @json($events);
         $(document).ready(function () {
+
+            // ✅ GLOBAL LOADER (same as Fitness Hub)
+            window.showLoading = function () {
+                $('#loadingOverlay').css('display', 'flex').hide().fadeIn(150);
+            }
+
+            window.hideLoading = function () {
+                $('#loadingOverlay').fadeOut(150);
+            }
+
+            var schedule = @json($events);
 
             $('#calendar-pest-control-booking').fullCalendar({
                 timezone: 'local',
@@ -135,97 +145,122 @@
                 },
                 contentHeight: 750,
                 events: schedule,
+
+                // ✅ AUTO LOADER ON CALENDAR LOAD
+                loading: function (isLoading) {
+                    if (isLoading) {
+                        showLoading();
+                    } else {
+                        hideLoading();
+                    }
+                },
+
                 eventRender: function (event, element) {
                     element.find('.fc-time').remove();
                 },
+
                 eventClick: function (event) {
                     if (!event.id) {
                         alert("No event ID found.");
                         return;
                     }
+
                     var schedule_id = event.id;
-                    $.get('/admin/fetch/pest-control-calendar-details/' + schedule_id, function (data) {
-                        $('#calendarModalPestControl').modal('show');
-                        $('#edit_id').val(data.id);
-                        $('#calendar_unit').text(data.unit_no);
-                        $('#calendar_name').text(data.name);
-                        $('#calendar_booking_date').text(data.booking_date);
-                        $('#calendar_time_slot').text(data.booking_time_slot);
-                        $('#calendar_transaction_no').text(data.transaction_no);
-                        $('#calendar_srf_no').text(data.srf_no);
 
-                        let residentType = (data.resident_type || 'N/A').toUpperCase();
-                        let residentBadge = `<span class="badge bg-secondary">${residentType}</span>`;
+                    showLoading();
 
-                        if (residentType.includes('TENANT')) {
-                            residentBadge = `<span class="badge bg-danger">${residentType}</span>`;
+                    $.ajax({
+                        url: '/admin/fetch/pest-control-calendar-details/' + schedule_id,
+                        method: 'GET',
+
+                        success: function (data) {
+                            $('#calendarModalPestControl').modal('show');
+
+                            $('#edit_id').val(data.id);
+                            $('#calendar_unit').text(data.unit_no ?? 'N/A');
+                            $('#calendar_name').text(data.name ?? 'N/A');
+                            $('#calendar_booking_date').text(data.booking_date ?? 'N/A');
+                            $('#calendar_time_slot').text(data.booking_time_slot ?? 'N/A');
+                            $('#calendar_transaction_no').text(data.transaction_no ?? 'N/A');
+                            $('#calendar_srf_no').text(data.srf_no ?? 'N/A');
+
+                            // ✅ RESIDENT TYPE BADGE
+                            let residentType = (data.resident_type || 'N/A').toUpperCase();
+                            let residentBadge = `<span class="badge bg-secondary">${residentType}</span>`;
+
+                            if (residentType.includes('TENANT')) {
+                                residentBadge = `<span class="badge bg-danger">${residentType}</span>`;
+                            } else if (residentType.includes('OWNER')) {
+                                residentBadge = `<span class="badge bg-primary">${residentType}</span>`;
+                            }
+
+                            $('#display_resident_type_calendar').html(residentBadge);
+
+                            // ✅ CHARGED TYPE BADGE
+                            let chargedType = (data.charged_type || 'N/A').toString().toUpperCase();
+                            let chargedBadge = `<span class="badge bg-secondary">${chargedType}</span>`;
+
+                            if (chargedType === '1') {
+                                chargedBadge = `<span class="badge bg-primary">FREE</span>`;
+                            } else if (chargedType === '2') {
+                                chargedBadge = `<span class="badge bg-danger">BILLABLE</span>`;
+                            }
+
+                            $('#display_charged_type_calendar').html(chargedBadge);
+                        },
+
+                        error: function () {
+                            alert("Failed to fetch data. Please try again.");
+                        },
+
+                        // 🔥 THIS IS WHAT YOU WERE MISSING
+                        complete: function () {
+                            hideLoading();
                         }
-
-                        if (residentType.includes('OWNER')) {
-                            residentBadge = `<span class="badge bg-primary">${residentType}</span>`;
-                        }
-
-                        $('#display_resident_type_calendar').html(residentBadge);
-
-
-                        let chargedType = (data.charged_type || 'N/A').toString().toUpperCase();
-                        let chargedBadge = `<span class="badge bg-secondary">${chargedType}</span>`;
-
-                        // Handle numeric charged types first
-                        if (chargedType === '1') {
-                            chargedBadge = `<span class="badge bg-primary">FREE</span>`;
-                        } else if (chargedType === '2') {
-                            chargedBadge = `<span class="badge bg-danger">BILLABLE</span>`;
-                        }
-
-                        $('#display_charged_type_calendar').html(chargedBadge);
-
-                    }).fail(function () {
-                        alert("Failed to fetch data. Please try again.");
                     });
                 }
             });
-        });
 
 
-        let selectedRise = "";
+            // ✅ FILTER LOGIC (unchanged but cleaner)
+            let selectedRise = "";
 
-        $('.filter-btn-pc').on('click', function () {
+            $('.filter-btn-pc').on('click', function () {
 
-            selectedRise = $(this).data('rise');
+                selectedRise = $(this).data('rise');
 
-            $('.filter-btn-pc')
-                .removeClass('active btn-success')
-                .addClass('btn-outline-success');
+                $('.filter-btn-pc')
+                    .removeClass('active btn-success')
+                    .addClass('btn-outline-success');
 
-            $(this)
-                .addClass('active btn-success')
-                .removeClass('btn-outline-success');
+                $(this)
+                    .addClass('active btn-success')
+                    .removeClass('btn-outline-success');
 
-            if (selectedRise === "") {
+                if (selectedRise === "") {
+                    $('#calendar-pest-control-booking').fullCalendar('removeEvents');
+                    $('#calendar-pest-control-booking').fullCalendar('addEventSource', schedule);
+                    return;
+                }
+
+                var filteredEvents = schedule.filter(function (event) {
+
+                    let area = (event.unit_area || '').toUpperCase();
+
+                    if (selectedRise === "highrise") {
+                        return ['F', 'G', 'H', 'I'].includes(area);
+                    }
+
+                    if (selectedRise === "lowrise") {
+                        return ['A', 'B', 'C', 'D', 'E'].includes(area);
+                    }
+
+                });
+
                 $('#calendar-pest-control-booking').fullCalendar('removeEvents');
-                $('#calendar-pest-control-booking').fullCalendar('addEventSource', schedule);
-                return;
-            }
-
-            var filteredEvents = schedule.filter(function (event) {
-
-                let area = (event.unit_area || '').toUpperCase();
-
-                if (selectedRise === "highrise") {
-                    return ['F', 'G', 'H', 'I'].includes(area);
-                }
-
-                if (selectedRise === "lowrise") {
-                    return ['A', 'B', 'C', 'D', 'E'].includes(area);
-                }
-
+                $('#calendar-pest-control-booking').fullCalendar('addEventSource', filteredEvents);
             });
 
-            $('#calendar-pest-control-booking').fullCalendar('removeEvents');
-            $('#calendar-pest-control-booking').fullCalendar('addEventSource', filteredEvents);
         });
-
-
     </script>
 @endpush

@@ -159,7 +159,7 @@
 
                 eventRender: function (event, element) {
                     element.find('.fc-time').remove();
-                },
+                }, 
 
                 eventClick: function (event) {
                     if (!event.id) {

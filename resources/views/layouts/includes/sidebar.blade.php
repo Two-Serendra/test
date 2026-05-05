@@ -167,12 +167,8 @@
         </li>
         @endroles
 
-
-
-
-
-        <!-- @roles(1, 2, 3, 5, 6, 7, 8)
-        <li class="menu-item">
+        @roles(1, 2, 3, 5, 6, 7, 8)
+        <!-- <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-home-alt"></i>
                 <div data-i18n="Form Elements">
@@ -226,47 +222,11 @@
 
                 @endroles
             </ul>
-        </li>
-        @endroles -->
-
-        <!-- <li class="menu-item">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bx-detail"></i>
-                <div data-i18n="Form Elements">Form Elements</div>
-            </a>
-            <ul class="menu-sub">
-                <li class="menu-item">
-                    <a href="forms-basic-inputs.html" class="menu-link">
-                        <div data-i18n="Basic Inputs">Basic Inputs</div>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="forms-input-groups.html" class="menu-link">
-                        <div data-i18n="Input groups">Input groups</div>
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="menu-item">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bx-detail"></i>
-                <div data-i18n="Form Layouts">Form Layouts</div>
-            </a>
-            <ul class="menu-sub">
-                <li class="menu-item">
-                    <a href="form-layouts-vertical.html" class="menu-link">
-                        <div data-i18n="Vertical Form">Vertical Form</div>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="form-layouts-horizontal.html" class="menu-link">
-                        <div data-i18n="Horizontal Form">Horizontal Form</div>
-                    </a>
-                </li>
-            </ul>
         </li> -->
+        @endroles
+
         @roles(1, 6)
-        <!-- <li class="menu-item">
+        <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-wrench"></i>
                 <div data-i18n="Form Elements">
@@ -297,9 +257,9 @@
                     </a>
                 </li>
             </ul>
-        </li> -->
+        </li>
 
-        <!-- <li class="menu-item">
+        <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-bug"></i>
                 <div data-i18n="Form Elements">
@@ -331,7 +291,7 @@
                     </a>
                 </li>
             </ul>
-        </li> -->
+        </li>
         @endroles
 
         <!-- Manage -->

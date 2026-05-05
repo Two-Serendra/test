@@ -317,6 +317,7 @@ Route::middleware('auth:admin')->group(function () {
 
     Route::post('/pest-control-import-booking', [PestControlController::class, 'importPestControlBookings'])->name('pest.control.booking.import');
 
+    Route::get('/search-pest-control-report', [PestControlController::class, 'searchPestControlReport'])->name('admin.search.pest.control.report');
 
 
 

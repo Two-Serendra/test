@@ -5,17 +5,15 @@
             <div class="row mb-3">
                 <div class="col-6  d-flex justify-content-between align-items-center flex-wrap">
 
-                    <form action="{{ route('admin.search.grease.trap.booking') }}" method="GET"
+                    <form action="{{ route('admin.search.pest.control.report') }}" method="GET"
                         id="searchpestControlBookingForm" class="d-flex align-items-center" style="max-width: 250px;">
                         <div class="input-group text-dark w-100">
                             <span class="input-group-text">
                                 <i class='bx bx-search-alt text-dark'></i>
                             </span>
-                            <input type="text" name="searchpestControlBooking" value="{{ $searchpestControlBooking ?? '' }}"
-                                id="searchInputpestControlBooking" class="form-control" placeholder="Name/Unit"
+                            <input type="text" name="searchPestControlReport" value="{{ $searchPestControlReport ?? '' }}"
+                                id="searchInputpestControlReport" class="form-control" placeholder="Name/Unit"
                                 autocomplete="off">
-
-
                         </div>
                     </form>
                 </div>
@@ -57,7 +55,7 @@
                                 <tr>
                                     <td>{{ $pestControlBooking->transaction_no ?? 'N/A' }}</td>
                                     <td>{{ $pestControlBooking->srf_no ?? 'N/A' }}</td>
-                                    <td>{{ $pestControlBooking->user->name ?? 'N/A' }}</td>
+                                    <td>{{ $pestControlBooking->name ?? 'N/A' }}</td>
                                     <td>
                                         @php
                                             $resType = strtolower($pestControlBooking->resident_type ?? '');
@@ -66,7 +64,8 @@
                                         @if ($resType === 'tenant')
                                             <span class="badge bg-danger text-uppercase">{{ $pestControlBooking->resident_type }}</span>
                                         @elseif ($resType === 'owner')
-                                            <span class="badge bg-primary text-uppercase">{{ $pestControlBooking->resident_type }}</span>
+                                            <span
+                                                class="badge bg-primary text-uppercase">{{ $pestControlBooking->resident_type }}</span>
                                         @else
                                             <span class="badge bg-secondary">N/A</span>
                                         @endif
@@ -108,19 +107,10 @@
                                                 $isCancelled = $pestControlBooking->booking_status == 2;
                                             @endphp
 
-                                            <button type="button" class="btn btn-primary edit_grease_trap_booking btn-sm btn-equal"
+                                            <button type="button" class="btn btn-primary view_pest_control_booking btn-sm btn-equal"
                                                 data-bs-toggle="tooltip" data-bs-placement="left" title="View"
                                                 data-id="{{ $pestControlBooking->id }}">
                                                 <i class="fa-solid fa-eye"></i>
-                                            </button>
-
-
-                                            <button type="button"
-                                                class="btn btn-sm btn-equal {{ $isCancelled ? 'btn-secondary cancel-booking' : 'btn-danger admin-grease-trap-booking-cancel' }}"
-                                                data-bs-toggle="tooltip" data-bs-placement="right"
-                                                title="{{ $isCancelled ? 'Cancelled' : 'Cancel' }}"
-                                                data-id="{{ $pestControlBooking->id }}" {{ $isCancelled ? 'disabled' : '' }}>
-                                                <i class="fa-solid fa-ban"></i>
                                             </button>
                                         </div>
                                     </td>

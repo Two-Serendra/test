@@ -16,6 +16,7 @@ return [
     'admin.show.amenities' => ['Setup', 'Amenities'],
     'admin.show.activities' => ['Setup', 'Activities'],
     'admin.activity.booking.calendar' => ['Amenities', 'Calendar'],
+    'admin.search.booking' => ['Amenities', 'Booking'],
 
     'admin.show.schedule.blocking' => ['Setup', 'Schedule Blocking'],
     'admin.show.date.blocking.activities' => ['Setup', 'Date Blocking'],
@@ -26,16 +27,20 @@ return [
     'admin.booking.fitness.calendar' => ['Fitness Hub', 'Calendar'],
     'admin.report.fitness' => ['Fitness Hub', 'Reports'],
     'admin.show.fitness.hub' => ['Fitness Hub', 'Setup'],
+    'admin.search.booking.fitness.hub' => ['Fitness Hub', 'Booking'],
+
     // Grease Trap
     'admin.booking.grease.trap' => ['Grease Trap', 'Booking'],
     'admin.booking.grease.trap.calendar' => ['Grease Trap', 'Calendar'],
     'admin.report.grease.trap' => ['Grease Trap', 'Reports'],
-
+    'admin.search.grease.trap.booking' => ['Grease Trap', 'Booking'],
 
     // Pest Control
     'admin.booking.pest.control' => ['Pest Control', 'Booking'],
     'admin.booking.pest.control.calendar' => ['Pest Control', 'Calendar'],
-
+    'admin.search.pest.control.booking' => ['Pest Control', 'Booking'], // search page uses same breadcrumb
+    'admin.report.pest.control' => ['Pest Control', 'Reports'],
+    'admin.search.pest.control.report' => ['Pest Control', 'Reports'],
     // Manage Section
     'admin.show.user' => ['Manage', 'User'],
     'admin.show.resident.details' => ['Manage', 'Resident Details'],

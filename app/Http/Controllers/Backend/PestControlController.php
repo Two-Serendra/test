@@ -23,6 +23,7 @@ class PestControlController extends Controller
 
     public function searchPestControlBooking(Request $request)
     {
+
         $searchBooking = $request->input('searchPestControlBooking');
         $currentDate = Carbon::today();
 
@@ -41,7 +42,7 @@ class PestControlController extends Controller
 
         $pestControlBookings->appends(['searchPestControlBooking' => $searchBooking]);
 
-        return view('backend.pest-control.pest-control-booking', compact('pestControlBookings'));
+        return view('backend.pest-control.pest-control-booking', compact('pestControlBookings', 'searchBooking'));
     }
 
 
@@ -169,7 +170,7 @@ class PestControlController extends Controller
                     'user_id' => auth()->id(),
                     'transaction_no' => '',
                     'unit_no' => $unit,
-                    'resident_name' => $request->name,
+                    'name' => strtoupper($request->name),
                     'resident_type' => $request->selectResidentType,
                     'booking_date' => $bookingDate,
                     'booking_time_slot' => $request->booking_time_slot,
@@ -566,38 +567,27 @@ class PestControlController extends Controller
                 $lastNumber++;
                 $transactionNo = '2SPC-' . str_pad($lastNumber, 5, '0', STR_PAD_LEFT);
 
-                try {
-                    $bookingDate = Carbon::parse(trim($row[6]))->format('Y-m-d');
-                } catch (\Exception $e) {
-                    Log::error('Booking date parse error', [
-                        'row' => $row,
-                        'error' => $e->getMessage()
-                    ]);
-                    continue;
-                }
 
                 try {
                     PestControlBooking::create([
                         'transaction_no' => $transactionNo,
-                        'unit_no' => trim($row[4]),
-                        'resident_type' => trim($row[5]),
-                        'booking_date' => $bookingDate,
-                        'booking_time_slot' => trim($row[7]),
-                        'srf_no' => trim($row[8]),
-                        'unit_area' => trim($row[9]),
-                        'remarks' => null,
-                        'charged_type' => trim($row[11]),
-                        'emergency' => trim($row[12]),
-                        'booking_status' => trim($row[13]),
-                        'cancelled_by' => null,
-                        'cancelled_at' => null,
-                        'has_penalty' => trim($row[16]),
-                        'penalty_amount' => null,
-                        'created_by' => null,
-                        'created_at' => null,
-                        'updated_at' => null,
+                        'unit_no' => trim($row[4] ?? null),
+                        'resident_type' => trim($row[5] ?? null),
+                        'name' => trim($row[6] ?? null),
+                        'booking_date' => trim($row[7] ?? null),
+                        'booking_time_slot' => trim($row[8] ?? null),
+                        'srf_no' => !empty(trim($row[9] ?? '')) ? trim($row[9]) : null,
+                        'unit_area' => trim($row[10] ?? null),
+                        'remarks' => !empty(trim($row[11] ?? '')) ? trim($row[11]) : null,
+                        'charged_type' => ($row[12] ?? '') !== '' ? (int) $row[12] : null,
+                        'emergency' => ($row[13] ?? '') !== '' ? (int) $row[13] : 0,
+                        'booking_status' => ($row[14] ?? '') !== '' ? (int) $row[14] : 0,
+                        'cancelled_by' => ($row[15] ?? '') !== '' ? (int) $row[15] : null,
+                        'cancelled_at' => ($row[16] ?? '') !== '' ? $row[16] : null,
+                        'has_penalty' => ($row[17] ?? '') !== '' ? (int) $row[17] : 0,
+                        'penalty_amount' => ($row[18] ?? '') !== '' ? (float) $row[18] : null,
+                        'created_by' => ($row[19] ?? '') !== '' ? (int) $row[19] : null,
                     ]);
-
                     Log::info('Booking created', ['transaction_no' => $transactionNo]);
 
                 } catch (\Exception $e) {
@@ -618,5 +608,32 @@ class PestControlController extends Controller
             Log::error('CSV import failed', ['error' => $e->getMessage()]);
             return back()->with('error', $e->getMessage());
         }
+    }
+
+
+    public function searchPestControlReport(Request $request)
+    {
+        $searchPestControlReport = $request->input('searchPestControlReport');
+        $currentDate = Carbon::today();
+
+        $pestControlBookings = PestControlBooking::with('user')
+            ->where('booking_date', '<', $currentDate)
+            ->when($searchPestControlReport, function ($query, $searchPestControlReport) {
+                $query->where(function ($q) use ($searchPestControlReport) {
+                    $q->where('unit_no', 'LIKE', "%{$searchPestControlReport}%")
+                        ->orWhere('name', 'LIKE', "%{$searchPestControlReport}%"); // 👈 FIX HERE
+                });
+            })
+            ->orderBy('booking_date', 'desc')
+            ->paginate(10);
+
+        $pestControlBookings->appends([
+            'searchPestControlReport' => $searchPestControlReport
+        ]);
+
+        return view('backend.pest-control.pest-control-report', compact(
+            'pestControlBookings',
+            'searchPestControlReport'
+        ));
     }
 }

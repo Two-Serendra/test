@@ -11,10 +11,9 @@
                             <span class="input-group-text">
                                 <i class='bx bx-search-alt text-dark'></i>
                             </span>
-                            <input type="text" name="searchPesControlBooking" value="{{ $searchPesControlBooking ?? '' }}"
+                            <input type="text" name="searchPestControlBooking" value="{{ $searchBooking ?? '' }}"
                                 id="searchInputPesControlBooking" class="form-control" placeholder="Name/Unit"
                                 autocomplete="off">
-
 
                         </div>
                     </form>
@@ -31,7 +30,7 @@
                         <i class='bx bx-upload'></i> Upload Bookings
                     </button>
 
-                    
+
                     <button type="button" class="btn btn-primary badge AddPesControlBookingAdmin me-2">
                         <i class='bx bx-plus'></i> New Booking
                     </button>
@@ -72,7 +71,7 @@
                                 <tr>
                                     <td>{{ $pestControlBooking->transaction_no ?? 'N/A' }}</td>
                                     <td>{{ $pestControlBooking->srf_no ?? 'N/A' }}</td>
-                                    <td>{{ $pestControlBooking->user->name ?? 'N/A' }}</td>
+                                    <td>{{ $pestControlBooking->name ?? 'N/A' }}</td>
                                     <td>
                                         @php
                                             $resType = strtolower($pestControlBooking->resident_type ?? '');

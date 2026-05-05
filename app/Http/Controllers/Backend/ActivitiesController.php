@@ -438,14 +438,14 @@ class ActivitiesController extends Controller
 
             // ✅ 1 row per transaction_no
             ->whereIn('id', function ($query) use ($currentDate) {
-                $query->selectRaw('MIN(id)')
+                $query->selectRaw('MAX(id)')
                     ->from('activity_bookings')
                     ->whereDate('booking_date', '>=', $currentDate)
                     ->groupBy('transaction_no');
             })
 
             // ✅ stable ordering (IMPORTANT FIX)
-            ->orderBy('booking_date', 'desc')
+            ->orderBy('created_at', 'desc')
             ->orderBy('id', 'desc')
 
             ->paginate(10);
@@ -1429,14 +1429,14 @@ class ActivitiesController extends Controller
 
             // ✅ 1 row per transaction_no
             ->whereIn('id', function ($query) use ($currentDate) {
-                $query->selectRaw('MIN(id)')
+                $query->selectRaw('MAX(id)')
                     ->from('activity_bookings')
                     ->whereDate('booking_date', '>=', $currentDate)
                     ->groupBy('transaction_no');
             })
 
             // ✅ consistent ordering
-            ->orderBy('booking_date', 'desc')
+            ->orderBy('created_at', 'desc')
             ->orderBy('id', 'desc')
 
             ->paginate(10);

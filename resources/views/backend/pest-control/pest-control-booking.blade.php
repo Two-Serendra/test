@@ -26,9 +26,9 @@
                         <input type="file" id="PCbookingFileInput" name="file" accept=".csv,.xlsx" style="display:none;">
                     </form>
 
-                    <button type="button" class="btn btn-primary badge me-2" id="uploadBookingBtnPC">
+                    <!-- <button type="button" class="btn btn-primary badge me-2" id="uploadBookingBtnPC">
                         <i class='bx bx-upload'></i> Upload Bookings
-                    </button>
+                    </button> -->
 
 
                     <button type="button" class="btn btn-primary badge AddPesControlBookingAdmin me-2">

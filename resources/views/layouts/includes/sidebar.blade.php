@@ -225,7 +225,7 @@
         </li> -->
         @endroles
 
-        @roles(1, 6)
+        @roles(1, 6,9)
         <!-- <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-wrench"></i>

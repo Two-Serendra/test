@@ -731,13 +731,27 @@ class FitnessHubBookingController extends Controller
       ->where('booking_status', 1)
       ->get();
 
+
+
     $slots = [];
+
+    $dayOfWeek = Carbon::parse($date)->format('l');
+
+    $blockedSlots = FitnessHubScheduleBlocking::where('fitness_hub_id', $fitnessHubId)
+      ->where('day', $dayOfWeek)
+      ->get();
+
 
     while ($start < $end) {
       $slotStart = $start->copy();
       $slotEnd = $slotStart->copy()->addHour();
 
-      $isOccupied = $bookings->contains(function ($booking) use ($slotStart, $slotEnd) {
+      $status = 'Available';
+      $label = null;
+
+      // 🔴 BOOKING CHECK (highest priority)
+      $matchedBooking = $bookings->first(function ($booking) use ($slotStart, $slotEnd) {
+
         $bookingStart = Carbon::parse($booking->booking_date . ' ' . $booking->booking_start_time);
         $bookingEnd = Carbon::parse($booking->booking_date . ' ' . $booking->booking_end_time);
 
@@ -748,11 +762,40 @@ class FitnessHubBookingController extends Controller
         return $bookingStart->lt($slotEnd) && $bookingEnd->gt($slotStart);
       });
 
+      // ⚫ BLOCK CHECK
+      $isBlocked = $blockedSlots->contains(function ($block) use ($slotStart, $slotEnd, $date) {
+
+        $blockStart = Carbon::parse("$date {$block->start_time}");
+        $blockEnd = Carbon::parse("$date {$block->end_time}");
+
+        if ($blockEnd->lessThanOrEqualTo($blockStart)) {
+          $blockEnd->addDay();
+        }
+
+        return $blockStart->lt($slotEnd) && $blockEnd->gt($slotStart);
+      });
+
+      // 🎯 DECIDE STATUS
+      if ($matchedBooking) {
+
+        $status = 'Booked';
+        $label = $matchedBooking->fitnessHub->fitness_hub_name ?? 'Booked';
+
+      } elseif ($isBlocked) {
+
+        $status = 'Blocked';
+        $label = 'Blocked';
+
+      } else {
+
+        $status = 'Available';
+        $label = 'Available';
+      }
+
       $slots[] = [
         'time_range' => $slotStart->format('g:i A') . ' - ' . $slotEnd->format('g:i A'),
-        'slots' => [
-          $isOccupied ? 'Occupied' : 'Available'
-        ]
+        'status' => $status,
+        'label' => $label
       ];
 
       $start->addHour();

@@ -1130,15 +1130,26 @@ $(document).ready(function () {
             `;
 
                 response.slots.forEach(slot => {
-                    let status = slot.slots[0];
-                    let badgeClass = (status === 'Available') ? 'bg-primary' : 'bg-danger';
+                    let status = slot.status;
+                    let label = slot.label;
+                    let badgeClass = 'bg-primary';
+
+                    if (status === 'Booked') {
+                        badgeClass = 'bg-danger';
+                    } else if (status === 'Blocked') {
+                        badgeClass = 'bg-secondary';
+                    } else {
+                        badgeClass = 'bg-primary';
+                    }
+
+                    let displayText = label;
 
                     html += `
-                    <tr>
-                        <td>${slot.time_range}</td>
-                        <td><span class="badge ${badgeClass} text-uppercase">${status}</span></td>
-                    </tr>
-                `;
+<tr>
+    <td>${slot.time_range}</td>
+    <td><span class="badge ${badgeClass} text-uppercase">${displayText}</span></td>
+</tr>
+`;
                 });
 
                 html += '</tbody></table>';

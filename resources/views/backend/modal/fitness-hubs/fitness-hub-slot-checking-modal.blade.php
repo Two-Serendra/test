@@ -12,7 +12,7 @@
                     <div class="row mb-3">
                         <div class="col-4">
                             <label for="fitnessHubSelectBookingSearchAdmin" class="form-label">Select Activity *</label>
-                            <input type="text" id="fitnessHubIdBooking" name="fitness_hub_id">
+                            <input type="hidden" id="fitnessHubIdBooking" name="fitness_hub_id">
                             <select class="form-select" id="fitnessHubSelectBookingSearchAdmin" name="fitnessHub_id"
                                 required>
                                 <option value="" disabled selected>Fitness Hub</option>

@@ -176,6 +176,7 @@
     <script src="{{ asset('assets/backend/js/fitness-hub.js') }}"></script>
     <script src="{{ asset('assets/backend/js/fitness-hub-booking.js') }}"></script>
     <script src="{{ asset('assets/backend/js/fitness-hub-records.js') }}"></script>
+    <script src="{{ asset('assets/backend/js/fitness-hub-schedule-blocking.js') }}"></script>
 
     @stack('scripts')
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Models\FitnessHubScheduleBlocking;
 use Illuminate\Http\Request;
 use App\Models\FitnessHub;
 use Illuminate\Support\Facades\Log;
@@ -307,5 +308,82 @@ class FitnessHubController extends Controller
         }
     }
 
-   
+    public function fetchScheduleBlockingFitnessHub(Request $request)
+    {
+        $fitness_hub_blockings = FitnessHubScheduleBlocking::with('fitnessHub')->paginate(10);
+
+        $fitnessHubs = FitnessHub::all();
+
+        return view('backend.fitness-hubs.admin-fitness-hub-schedule-blocking', compact('fitness_hub_blockings', 'fitnessHubs'));
+
+    }
+
+
+    public function newScheduleBlockingFitnessHub(Request $request)
+    {
+        $request->validate([
+            'fitness_hub_id' => 'required',
+            'days' => 'required|array',
+            'blocking_start_time' => 'required',
+            'blocking_end_time' => 'required'
+        ]);
+
+        $created = 0;
+
+        foreach ($request->days as $day) {
+
+            $exists = FitnessHubScheduleBlocking::where('fitness_hub_id', $request->fitness_hub_id)
+                ->where('day', $day)
+                ->where('start_time', $request->blocking_start_time)
+                ->where('end_time', $request->blocking_end_time)
+                ->exists();
+
+            if (!$exists) {
+
+                FitnessHubScheduleBlocking::create([
+                    'fitness_hub_id' => $request->fitness_hub_id,
+                    'day' => $day,
+                    'start_time' => $request->blocking_start_time,
+                    'end_time' => $request->blocking_end_time,
+                    'remarks' => strtoupper($request->remarks),
+                    'repeat_weekly' => $request->repeat_weekly
+                ]);
+
+                $created++;
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => "$created blocking schedule(s) created."
+        ]);
+    }
+    public function getUpdatedFitnessHubScheduleBlockingTable()
+    {
+        $dateBlockings = FitnessHubScheduleBlocking::with('fitnessHub')->latest()
+            ->paginate(10);
+        return response()->json([
+            'data' => $dateBlockings->items(),
+            'links' => (string) $dateBlockings->links('vendor.pagination.bootstrap-5')
+        ]);
+
+    }
+
+
+    public function deleteBlockedScheduleFitnessHub(Request $request)
+    {
+        try {
+            $block = FitnessHubScheduleBlocking::find($request->block_id);
+            if (!$block) {
+                return response()->json(['status' => false, 'message' => 'Blocked schedule not found'], 404);
+            }
+
+            $block->delete();
+            return response()->json(['status' => true, 'message' => 'Blocked schedule deleted successfully']);
+        } catch (\Exception $e) {
+            \Log::error('Error deleting blocked schedule:', ['error' => $e->getMessage()]);
+            return response()->json(['status' => false, 'message' => 'Failed to delete blocked schedule']);
+        }
+    }
+
 }

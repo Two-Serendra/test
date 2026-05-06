@@ -154,6 +154,12 @@
                             </a>
                         </li>
 
+                        <li class="menu-item {{ request()->routeIs('admin.show.schedule.blocking.fitness.hub') ? 'active' : '' }}">
+                            <a href="{{ route('admin.show.schedule.blocking.fitness.hub') }}" class="menu-link">
+                                <div>Schedule Blocking</div>
+                            </a>
+                        </li>
+
                         <li
                             class="menu-item {{ request()->routeIs('admin.show.date.blocking.fitness.hub') ? 'active' : '' }}">
                             <a href="{{ route('admin.show.date.blocking.fitness.hub') }}" class="menu-link">
@@ -225,7 +231,7 @@
         </li> -->
         @endroles
 
-        @roles(1, 6,9)
+        @roles(1, 6, 9)
         <!-- <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-wrench"></i>

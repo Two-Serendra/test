@@ -175,9 +175,13 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/fetch-date-blocking-fitness-hub', [FitnessHubController::class, 'fetchDateBlockingFitnessHub'])->name('admin.fetch.date.blocking.fitness.hub');
     Route::get('get-updated-fitness-hub-blocking', [FitnessHubController::class, 'getUpdatedFitnessHubBlockingTable'])->name('get.updated.fitness.hub.blocking.table');
     Route::post('/delete-blocked-date-fitness-hub', [FitnessHubController::class, 'deleteBlockedDateFitnessHub'])->name('admin.delete.blocked.date.fitness.hub');
+    Route::get('/schedule-blocking/fitness-hub', [FitnessHubController::class, 'fetchScheduleBlockingFitnessHub'])->name('admin.show.schedule.blocking.fitness.hub');
+    Route::post('/new-schedule-blocking-fitness-hub', [FitnessHubController::class, 'newScheduleBlockingFitnessHub'])->name('admin.new.schedule.blocking.fitness.hub');
+    Route::get('get-updated-fitness-hubs-schedule-blocking-table', [FitnessHubController::class, 'getUpdatedFitnessHubScheduleBlockingTable'])->name('getUpdatedFitnessHubScheduleBlockingTable');
+    Route::post('/admin-delete-blocked-schedule-fitness-hub', [FitnessHubController::class, 'deleteBlockedScheduleFitnessHub'])->name('admin.delete.blocked.schedule.fitness.hub');
 
 
-    //Fitness Booking
+    //Fitness Hub Booking
     Route::get('/admin-fitness-booking', [FitnessHubBookingController::class, 'AdminFitnessHubBooking'])->name('admin.booking.fitness');
     Route::get('/search-booking-fitness-hub', [FitnessHubBookingController::class, 'searchBookingFitnessHub'])->name('admin.search.booking.fitness.hub');
     Route::post('/fitness-hub/booking/import', [FitnessHubBookingController::class, 'importFitnessHubBookings'])->name('fitness.hub.booking.import');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\FitnessHubDateBlocking;
+use App\Models\FitnessHubScheduleBlocking;
 use Illuminate\Http\Request;
 use App\Models\FitnessHubBooking;
 use App\Models\FitnessHub;
@@ -98,6 +99,29 @@ class FitnessHubBookingController extends Controller
       }
     }
 
+
+    $dayOfWeek = Carbon::parse($date)->format('l'); // Monday, Tuesday, etc.
+
+    $blockedSlots = FitnessHubScheduleBlocking::where('fitness_hub_id', $fitnessHubId)
+      ->where('day', $dayOfWeek)
+      ->get();
+
+    foreach ($blockedSlots as $block) {
+
+      $blockStart = Carbon::parse("$date {$block->start_time}");
+      $blockEnd = Carbon::parse("$date {$block->end_time}");
+
+      if ($blockEnd->lessThanOrEqualTo($blockStart)) {
+        $blockEnd->addDay();
+      }
+
+      while ($blockStart < $blockEnd) {
+        $occupiedSlots[$blockStart->format('H:i')] = true;
+        $blockStart->addHour();
+      }
+    }
+
+
     $availableTimePairs = [];
     $now = Carbon::now();
 
@@ -171,10 +195,34 @@ class FitnessHubBookingController extends Controller
       }
     }
 
+    $dayOfWeek = Carbon::parse($date)->format('l');
+
+    $blockedSlots = FitnessHubScheduleBlocking::where('fitness_hub_id', $fitnessHubId)
+      ->where('day', $dayOfWeek)
+      ->get();
+
+    foreach ($blockedSlots as $block) {
+
+      $blockStart = Carbon::parse("$date {$block->start_time}");
+      $blockEnd = Carbon::parse("$date {$block->end_time}");
+
+      if ($blockEnd->lessThanOrEqualTo($blockStart)) {
+        $blockEnd->addDay();
+      }
+
+      while ($blockStart < $blockEnd) {
+        $slotKey = $blockStart->format('H:i');
+
+        // 🚨 Force it to be FULLY occupied
+        $occupiedSlots[$slotKey] = $maxBooking;
+
+        $blockStart->addHour();
+      }
+    }
+
     $availableEndTimes = [];
     $current = clone $start;
 
-    // optional: limit booking duration (ex: 2 hrs max)
     $maxHours = 2;
     $addedHours = 0;
 

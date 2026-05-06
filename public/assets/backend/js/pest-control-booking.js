@@ -307,7 +307,7 @@ $(document).ready(function () {
                     <tr>
                         <td>${booking.transaction_no ?? 'N/A'}</td>
                         <td>${booking.srf_no ?? 'N/A'}</td>
-                        <td>${booking.name  ?? 'CONCIERGE'}</td>
+                        <td>${booking.name  ?? 'N/A'}</td>
                         <td>${residentTypeHtml}</td>
                         <td>${booking.unit_no ?? 'N/A'}</td>
                         <td>${booking.booking_date ?? 'N/A'}</td>

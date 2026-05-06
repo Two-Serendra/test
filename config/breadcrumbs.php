@@ -28,6 +28,7 @@ return [
     'admin.report.fitness' => ['Fitness Hub', 'Reports'],
     'admin.show.fitness.hub' => ['Fitness Hub', 'Setup'],
     'admin.search.booking.fitness.hub' => ['Fitness Hub', 'Booking'],
+    'admin.show.schedule.blocking.fitness.hub' => ['Fitness Hub', 'Schedule Blocking'],
 
     // Grease Trap
     'admin.booking.grease.trap' => ['Grease Trap', 'Booking'],

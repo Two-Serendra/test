@@ -50,9 +50,8 @@ $(document).ready(function () {
 
     flatpickr("#PestControlBookingDateAdmin, #PestControlBookingDateAdminEmergency", {
         dateFormat: "Y-m-d",
-        minDate: new Date().fp_incr(1)
+        minDate: "today"
     });
-
     const $bookingSlots = $('.booking-slot-admin-pest-control');
     $bookingSlots.prop('disabled', true);
 
@@ -307,7 +306,7 @@ $(document).ready(function () {
                     <tr>
                         <td>${booking.transaction_no ?? 'N/A'}</td>
                         <td>${booking.srf_no ?? 'N/A'}</td>
-                        <td>${booking.name  ?? 'N/A'}</td>
+                        <td>${booking.name ?? 'N/A'}</td>
                         <td>${residentTypeHtml}</td>
                         <td>${booking.unit_no ?? 'N/A'}</td>
                         <td>${booking.booking_date ?? 'N/A'}</td>

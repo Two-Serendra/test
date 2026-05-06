@@ -895,4 +895,7 @@ class FitnessHubBookingController extends Controller
 
     ]);
   }
+
+
+  
 }

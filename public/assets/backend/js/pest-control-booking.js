@@ -315,6 +315,11 @@ $(document).ready(function () {
                         <td>${emergency}</td>
                         <td>${booking.remarks ?? 'N/A'}</td>
                         <td>${bookingStatus}</td>
+                        <td>${booking.createdBy?.name ? booking.createdBy.name.toUpperCase() : 'N/A'}</td>
+                        <td>${booking.created_at ?? 'N/A'}</td>
+                        <td>${booking.cancelledBy?.name ? booking.cancelledBy.name.toUpperCase() : 'N/A'}</td>
+                        <td>${booking.cancelled_at ?? 'N/A'}</td>
+
                         <td class="sticky-col sticky-col-color">${actionButtons}</td>
                     </tr>
                 `;

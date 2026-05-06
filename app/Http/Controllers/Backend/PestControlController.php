@@ -16,7 +16,11 @@ class PestControlController extends Controller
 {
     public function AdminBookingPestControl()
     {
-        $pestControlBookings = PestControlBooking::orderBy('created_at', 'DESC')->paginate(10);
+        $pestControlBookings = PestControlBooking::with([
+            'user',
+            'createdBy',
+            'cancelledBy'
+        ])->orderBy('created_at', 'DESC')->paginate(10);
         return view('backend.pest-control.pest-control-booking', compact('pestControlBookings'));
 
     }
@@ -170,6 +174,7 @@ class PestControlController extends Controller
                     'user_id' => auth()->id(),
                     'transaction_no' => '',
                     'unit_no' => $unit,
+                    'created_by' => auth()->id(),
                     'name' => strtoupper($request->name),
                     'resident_type' => $request->selectResidentType,
                     'booking_date' => $bookingDate,
@@ -216,7 +221,7 @@ class PestControlController extends Controller
 
     public function getUpdatedPestControlTable()
     {
-        $bookings = PestControlBooking::with('user')
+        $bookings = PestControlBooking::with('user', 'createdBy', 'cancelledBy')
             ->orderByDesc('created_at') // newest first
             ->paginate(10); // 10 per page
 
@@ -265,6 +270,7 @@ class PestControlController extends Controller
                 'booking_time_slot' => $request->booking_time_slot,
                 'charged_type' => $chargedType,
                 'remarks' => $request->remarks,
+                'created_by' => auth()->id(),
                 'emergency' => 1,
                 'is_admin_created' => 1,
                 'booking_status' => 1,
@@ -340,6 +346,8 @@ class PestControlController extends Controller
             $booking->load('user');
 
             $booking->booking_status = 2;
+            $booking->cancelled_by = auth()->id();
+            $booking->cancelled_at = now();
             $booking->save();
 
             return response()->json([

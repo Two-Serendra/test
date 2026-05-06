@@ -160,34 +160,38 @@
                                 <div class="invalid-feedback">Required</div>
                             </div>
 
-                            <div class="mb-3">
+                          <div class="mb-3">
                                 @php
                                     use Carbon\Carbon;
 
                                     $slots = [];
-                                    $start = Carbon::createFromTime(6, 0); // 6:00 AM
-                                    $end = Carbon::createFromTime(22, 0);  // 10:00 PM
+                                    $start = Carbon::createFromTime(6, 0);
+                                    $end = Carbon::createFromTime(22, 0);
 
                                     while ($start->lt($end)) {
                                         $slotStart = $start->format('h:i A');
-                                        $slotEnd = $start->copy()->addHour()->format('h:i A');
+                                        $slotEnd = $start->copy()->addMinutes(30)->format('h:i A');
                                         $slots[] = "{$slotStart} - {$slotEnd}";
-                                        $start->addHour();
+                                        $start->addMinutes(30);
                                     }
                                 @endphp
 
-                                <div class="mb-3">
-                                    <label for="booking_time_slot" class="form-label">Select Time Slot</label>
-                                    <select name="booking_time_slot" id="booking_time_slot" class="form-select"
-                                        required>
+                                <label class="form-label fw-semibold">Select Time Slot</label>
+
+                               <div class="slot-container border rounded p-2">
+                                    <select name="booking_time_slot"
+                                            id="booking_time_slot"
+                                            class="form-select border-0 shadow-none"
+                                            size="8"
+                                            required>
 
                                         <option value="" disabled selected>Select a slot</option>
+
                                         @foreach ($slots as $slot)
                                             <option value="{{ $slot }}">{{ $slot }}</option>
                                         @endforeach
-                                    </select>
+                                    </select>   
                                 </div>
-
                             </div>
                         </div>
 

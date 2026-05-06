@@ -259,7 +259,7 @@ class PestControlController extends Controller
                 'user_id' => auth()->id(),
                 'transaction_no' => '',
                 'unit_no' => $unit,
-                'resident_name' => $request->name,
+                'name' => $request->name,
                 'resident_type' => $residentType,
                 'booking_date' => $bookingDate,
                 'booking_time_slot' => $request->booking_time_slot,

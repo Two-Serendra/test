@@ -271,3 +271,20 @@ td.sticky-col {
     justify-content: center;
     align-items: center;
 }
+
+.slot-container {
+    background: #fff;
+    border-radius:10px;
+}
+
+.slot-container select {
+    height: 260px;
+}
+
+.slot-container select option {
+    padding: 10px;
+}
+
+.slot-container select option:hover {
+    background-color: #f1f5f9;
+}

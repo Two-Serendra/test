@@ -224,9 +224,9 @@ class PestControlController extends Controller
     public function getUpdatedPestControlTable()
     {
         $bookings = PestControlBooking::with('user', 'createdBy', 'cancelledBy')
-            ->orderByDesc('created_at')
+            ->whereDate('booking_date', '>=', now()->toDateString())
+            ->orderBy('created_at', 'DESC')
             ->paginate(10);
-
         $bookings->getCollection()->transform(function ($b) {
             return [
                 'id' => $b->id,
@@ -245,7 +245,7 @@ class PestControlController extends Controller
                 // 👇 consistent formatting (same fix as grease trap)
                 'created_at' => optional($b->created_at)->format('Y-m-d H:i:s'),
                 'cancelled_at' => $b->cancelled_at
-                    ?Carbon::parse($b->cancelled_at)->format('Y-m-d H:i:s')
+                    ? Carbon::parse($b->cancelled_at)->format('Y-m-d H:i:s')
                     : null,
 
                 'createdBy' => $b->createdBy ? [

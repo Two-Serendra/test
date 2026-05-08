@@ -24,7 +24,7 @@ class GreaseTrapBookingController extends Controller
          ->paginate(10);
       return view('backend.grease-trap.grease-trap-booking', compact('greaseTrapBookings'));
 
-   }
+   } 
 
    public function getBookedSlotsAdmin(Request $request)
    {
@@ -47,7 +47,7 @@ class GreaseTrapBookingController extends Controller
       $bookings = GreaseTrapBooking::with(['user', 'cancelledBy', 'createdBy'])
          ->whereDate('booking_date', '>=', now()->toDateString())
          ->orderBy('created_at', 'DESC')
-         ->paginate(10);
+         ->paginate(10); 
 
       $bookings->getCollection()->transform(function ($b) {
          return [

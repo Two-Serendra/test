@@ -27,8 +27,8 @@
                     </form>
 
                     <!-- <button type="button" class="btn btn-primary badge me-2" id="uploadBookingBtnPC">
-                                            <i class='bx bx-upload'></i> Upload Bookings
-                                        </button> -->
+                                                <i class='bx bx-upload'></i> Upload Bookings
+                                            </button> -->
 
 
                     <button type="button" class="btn btn-primary badge AddPesControlBookingAdmin me-2">
@@ -111,7 +111,10 @@
                                         @endif
                                     </td>
 
-                                    <td>{{ $pestControlBooking->remarks ?? 'N/A' }}</td>
+                                    <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                                        data-bs-toggle="tooltip" title="{{ $pestControlBooking->remarks }}">
+                                        {{ $pestControlBooking->remarks ?? 'N/A' }}
+                                    </td>
 
                                     <td>
                                         @if ($pestControlBooking->booking_status == 1)

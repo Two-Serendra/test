@@ -114,7 +114,11 @@
                                                     @endif
                                                 </td>
 
-                                                <td>{{ !empty(trim($greaseTrapBooking->remarks)) ? $greaseTrapBooking->remarks : 'N/A' }}</td>
+                                             <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                                                data-bs-toggle="tooltip"
+                                                title="{{ $greaseTrapBooking->remarks }}">
+                                                {{ !empty(trim($greaseTrapBooking->remarks)) ? $greaseTrapBooking->remarks : 'N/A' }}
+                                            </td>
 
                                                 <td>
                                                     @if ($greaseTrapBooking->booking_status == 1)

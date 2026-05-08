@@ -20,7 +20,9 @@ class PestControlController extends Controller
             'user',
             'createdBy',
             'cancelledBy'
-        ])->orderBy('created_at', 'DESC')->paginate(10);
+        ])->whereDate('booking_date', '>=', now()->toDateString())
+            ->orderBy('created_at', 'DESC')
+            ->paginate(10);
         return view('backend.pest-control.pest-control-booking', compact('pestControlBookings'));
 
     }
@@ -222,8 +224,39 @@ class PestControlController extends Controller
     public function getUpdatedPestControlTable()
     {
         $bookings = PestControlBooking::with('user', 'createdBy', 'cancelledBy')
-            ->orderByDesc('created_at') // newest first
-            ->paginate(10); // 10 per page
+            ->orderByDesc('created_at')
+            ->paginate(10);
+
+        $bookings->getCollection()->transform(function ($b) {
+            return [
+                'id' => $b->id,
+                'transaction_no' => $b->transaction_no,
+                'srf_no' => $b->srf_no,
+                'name' => $b->name,
+                'resident_type' => $b->resident_type,
+                'unit_no' => $b->unit_no,
+                'booking_date' => $b->booking_date,
+                'booking_time_slot' => $b->booking_time_slot,
+                'charged_type' => $b->charged_type,
+                'emergency' => $b->emergency,
+                'remarks' => $b->remarks,
+                'booking_status' => $b->booking_status,
+
+                // 👇 consistent formatting (same fix as grease trap)
+                'created_at' => optional($b->created_at)->format('Y-m-d H:i:s'),
+                'cancelled_at' => $b->cancelled_at
+                    ?Carbon::parse($b->cancelled_at)->format('Y-m-d H:i:s')
+                    : null,
+
+                'createdBy' => $b->createdBy ? [
+                    'name' => $b->createdBy->name
+                ] : null,
+
+                'cancelledBy' => $b->cancelledBy ? [
+                    'name' => $b->cancelledBy->name
+                ] : null,
+            ];
+        });
 
         return response()->json($bookings);
     }

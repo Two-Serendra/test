@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\FitnessHub;
 use App\Models\FitnessHubBooking;
 use App\Models\ResidentDetails;
+use App\Models\FitnessHubScheduleBlocking;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -516,7 +517,7 @@ class FitnessHubBookingController extends Controller
                     ->pluck('unit_no');
 
                 $booking = FitnessHubBooking::where('id', $booking->id)
-                    ->whereIn('unit', $units) 
+                    ->whereIn('unit', $units)
                     ->lockForUpdate()
                     ->firstOrFail();
 
@@ -597,5 +598,107 @@ class FitnessHubBookingController extends Controller
     {
         $booking = FitnessHubBooking::with('user', 'fitnessHub')->findOrFail($id);
         return view('frontend.user-fitness-hub-booking-details', compact('booking'));
+    }
+
+    public function fetchAllSlotsUserFitnessHub(Request $request)
+    {
+        $fitnessHubId = $request->input('fitness_hub_id');
+        $date = $request->input('booking_date');
+
+        $fitnessHub = FitnessHub::find($fitnessHubId);
+
+        if (!$fitnessHub) {
+            return response()->json(['error' => 'Fitness Hub not found'], 404);
+        }
+
+        if (!$fitnessHub->fitness_hub_start_time || !$fitnessHub->fitness_hub_end_time) {
+            return response()->json(['error' => 'No Schedule']);
+        }
+
+        $start = Carbon::parse($date . ' ' . $fitnessHub->fitness_hub_start_time);
+        $end = Carbon::parse($date . ' ' . $fitnessHub->fitness_hub_end_time);
+
+        if ($end->lessThanOrEqualTo($start)) {
+            $end->addDay();
+        }
+        $bookings = FitnessHubBooking::where('fitness_hub_id', $fitnessHubId)
+            ->where('booking_date', $date)
+            ->where('booking_status', 1)
+            ->get();
+
+
+
+        $slots = [];
+
+        $dayOfWeek = Carbon::parse($date)->format('l');
+
+        $blockedSlots = FitnessHubScheduleBlocking::where('fitness_hub_id', $fitnessHubId)
+            ->where('day', $dayOfWeek)
+            ->get();
+
+
+        while ($start < $end) {
+            $slotStart = $start->copy();
+            $slotEnd = $slotStart->copy()->addHour();
+
+            $status = 'Available';
+            $label = null;
+
+            // 🔴 BOOKING CHECK (highest priority)
+            $matchedBooking = $bookings->first(function ($booking) use ($slotStart, $slotEnd) {
+
+                $bookingStart = Carbon::parse($booking->booking_date . ' ' . $booking->booking_start_time);
+                $bookingEnd = Carbon::parse($booking->booking_date . ' ' . $booking->booking_end_time);
+
+                if ($bookingEnd->lessThanOrEqualTo($bookingStart)) {
+                    $bookingEnd->addDay();
+                }
+
+                return $bookingStart->lt($slotEnd) && $bookingEnd->gt($slotStart);
+            });
+
+            // ⚫ BLOCK CHECK
+            $isBlocked = $blockedSlots->contains(function ($block) use ($slotStart, $slotEnd, $date) {
+
+                $blockStart = Carbon::parse("$date {$block->start_time}");
+                $blockEnd = Carbon::parse("$date {$block->end_time}");
+
+                if ($blockEnd->lessThanOrEqualTo($blockStart)) {
+                    $blockEnd->addDay();
+                }
+
+                return $blockStart->lt($slotEnd) && $blockEnd->gt($slotStart);
+            });
+
+            // 🎯 DECIDE STATUS
+            if ($matchedBooking) {
+
+                $status = 'Booked';
+                $label = $matchedBooking->fitnessHub->fitness_hub_name ?? 'Booked';
+
+            } elseif ($isBlocked) {
+
+                $status = 'Blocked';
+                $label = 'Blocked';
+
+            } else {
+
+                $status = 'Available';
+                $label = 'Available';
+            }
+
+            $slots[] = [
+                'time_range' => $slotStart->format('g:i A') . ' - ' . $slotEnd->format('g:i A'),
+                'status' => $status,
+                'label' => $label
+            ];
+
+            $start->addHour();
+        }
+
+        return response()->json([
+            'activity_space' => 1,
+            'slots' => $slots
+        ]);
     }
 }

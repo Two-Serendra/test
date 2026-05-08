@@ -58,9 +58,11 @@
                             <th class="text-dark">Emergency</th>
                             <th class="text-dark">Remarks</th>
                             <th class="text-dark">Status</th>
-                            <th class="text-dark">Cancelled_at</th>
                             <th class="text-dark">Penalty</th>
+                            <th class="text-dark">Created by</th>
+                            <th class="text-dark">Created at</th>
                             <th class="text-dark">Cancelled_by</th>
+                            <th class="text-dark">Cancelled_at</th>
                             <th class="text-dark">Action</th>
 
 
@@ -75,8 +77,9 @@
                             @foreach ($greaseTrapBookings as $greaseTrapBooking)
                                             <tr>
                                                 <td>{{ $greaseTrapBooking->transaction_no ?? 'N/A' }}</td>
-                                                <td>{{ $greaseTrapBooking->srf_no ?? 'N/A' }}</td>
-                                                <td>{{ $greaseTrapBooking->user->name ?? 'N/A' }}</td>
+                                                <td>{{ !empty(trim($greaseTrapBooking->srf_no)) ? $greaseTrapBooking->srf_no : 'N/A' }}</td>
+                                                <td>{{ !empty(trim($greaseTrapBooking->name)) ? $greaseTrapBooking->name : 'N/A' }}</td>
+
                                                 <td>
                                                     @php
                                                         $resType = strtolower($greaseTrapBooking->resident_type ?? '');
@@ -90,7 +93,7 @@
                                                         <span class="badge bg-secondary">N/A</span>
                                                     @endif
                                                 </td>
-                                                <td>{{ $greaseTrapBooking->unit_no ?? 'N/A' }}</td>
+                                                <td>{{ !empty(trim($greaseTrapBooking->unit_no)) ? $greaseTrapBooking->unit_no : 'N/A' }}</td>
 
 
                                                 <td>{{ $greaseTrapBooking->booking_date ?? 'N/A' }}</td>
@@ -111,17 +114,16 @@
                                                     @endif
                                                 </td>
 
-                                                <td>{{ $greaseTrapBooking->remarks ?? 'N/A' }}</td>
+                                                <td>{{ !empty(trim($greaseTrapBooking->remarks)) ? $greaseTrapBooking->remarks : 'N/A' }}</td>
 
                                                 <td>
                                                     @if ($greaseTrapBooking->booking_status == 1)
-                                                        <span class="badge bg-primary custom-badge">Booked</span>
+                                                        <span class="badge bg-primary custom-badge">BOOKED</span>
                                                     @else
-                                                        <span class="badge bg-danger custom-badge">Cancelled</span>
+                                                        <span class="badge bg-danger custom-badge">CANCELLED</span>
                                                     @endif
                                                 </td>
-                                                <td>{{ $greaseTrapBooking->cancelled_at ?? 'N/A' }}</td>
-                                                <td>
+                                                 <td>
                                                     @if ($greaseTrapBooking->has_penalty)
                                                         <span
                                                             class="text-warning fw-bold">₱{{ number_format($greaseTrapBooking->penalty_amount, 2) }}</span>
@@ -129,8 +131,13 @@
                                                         -
                                                     @endif
                                                 </td>
-
-                                                <td>{{ $greaseTrapBooking->cancelledBy->name ?? 'N/A' }}</td>
+                                                 <td>{{ isset($greaseTrapBooking->createdBy->name) ? strtoupper($greaseTrapBooking->createdBy->name) : 'N/A' }}            
+                                            </td>
+                                                 <td>{{ $greaseTrapBooking->created_at ?? 'N/A' }}</td>
+                                             
+                                                <td>{{ isset($greaseTrapBooking->cancelledBy->name) ? strtoupper($greaseTrapBooking->cancelledBy->name) : 'N/A' }}
+                                                </td>
+                                                <td>{{ $greaseTrapBooking->cancelled_at ?? 'N/A' }}</td>
 
 
 

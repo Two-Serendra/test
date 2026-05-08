@@ -139,7 +139,7 @@ Route::middleware(['auth'])->group(function () {
     //Fitness Hub Booking
     Route::get('/booking-fitness-hub/{type}/{fitness_hub_id}', [FrontendFitnessHubBookingController::class, 'fullDetailsFitnessHub'])
         ->name('booking.full.details.fitness.hub');
-    Route::get('/fetch-date-blocking-fitness-hub', [FitnessHubController::class, 'fetchDateBlockingFitnessHub'])->name('fetch.date.blocking.fitness.hub');
+    Route::get('/fetch-date-blocking-fitness-hub-user', [FrontendFitnessHubBookingController::class, 'fetchDateBlockingFitnessHubUser'])->name('fetch.date.blocking.fitness.hub.user');
     Route::get('/check-unit-booking-fitness-hub', [FitnessHubBookingController::class, 'checkUnitBookingFitnessHub'])->name('checkUnitBookingFitnessHub');
     Route::get('/fetch-available-times-fitness-hub', [FitnessHubBookingController::class, 'fetchAvailableTimesFitnessHub'])->name('fetchAvailableTimesFitnessHub');
     Route::get('/fetch-available-end-times-fitness-hub', [FitnessHubBookingController::class, 'fetchAvailableEndTimesFitnessHub'])->name('fetchAvailableEndTimesFitnessHub');
@@ -150,6 +150,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('fitness.hub.booking.cancel')->middleware('throttle:5,1');
     Route::get('/fitness-hub-booking-details/{id}', [FitnessHubBookingController::class, 'showFitnessHubBookingDetails'])
         ->name('show.fitness.hub.booking.details');
+    Route::get('/fetch-all-slots-user-fitness-hub', [FitnessHubBookingController::class, 'fetchAllSlotsUserFitnessHub'])->name('user.fetch.available.slot.fitness.hub');
+
     // Add Ons 
     Route::get('/function-room/addons-availability', [FrontendFunctionRoomBookingController::class, 'getAddOnsAvailability']);
 

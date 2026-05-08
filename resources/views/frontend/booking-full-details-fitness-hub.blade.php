@@ -10,13 +10,15 @@
         background-color: #fff !important;
         cursor: pointer;
     }
+
+    .thumb-img:hover {
+        opacity: 0.85;
+        border: 2px solid #007bff;
+    }
 </style>
 
 @section('content')
-
-
     <div class="container my-5">
-
         <div class="mb-3">
             <a href="{{ url()->previous() ?? route('booking.list') }}"
                 class="text-decoration-none text-primary fw-semibold">
@@ -51,7 +53,7 @@
                                                     {{ $isDisabled
                                 ? ($fitness_hub->fitness_hub_remarks ?? 'Unavailable')
                                 : 'Unavailable' 
-                                                                                                                                                                                                        }}
+                                                                                                                                                                                                                                                                                                        }}
                                                 </span>
                             @endif
 
@@ -64,15 +66,14 @@
                         </div>
                         <div>
                             @auth
-                            <button type="button"
-                                class="btn customBtn AddNewBookingFitnessHub {{ $isDisabled ? 'btn-secondary' : 'btn-outline-primary' }}"
-                                style="{{ $isDisabled
-                                    ? 'cursor: not-allowed; opacity: 0.6;'
-                                    : 'background-color: #008b26; border-color: #008b26; color: white; font-weight: bold;' }}"
-                                {{ $isDisabled ? 'disabled' : '' }}
-                                data-fitness-hub-id="{{ $fitness_hub->id }}">
-                                BOOK NOW
-                            </button>
+                                                <button type="button"
+                                                    class="btn customBtn AddNewBookingFitnessHub {{ $isDisabled ? 'btn-secondary' : 'btn-outline-primary' }}"
+                                                    style="{{ $isDisabled
+                                ? 'cursor: not-allowed; opacity: 0.6;'
+                                : 'background-color: #008b26; border-color: #008b26; color: white; font-weight: bold;' }}"
+                                                    {{ $isDisabled ? 'disabled' : '' }} data-fitness-hub-id="{{ $fitness_hub->id }}">
+                                                    BOOK NOW
+                                                </button>
                             @else
                                 @if($isDisabled)
                                     <a class="btn btn-secondary customBtn disabled" style="pointer-events: none; opacity: 0.6;">
@@ -85,7 +86,8 @@
                                     </a>
                                 @endif
                             @endauth
-                            <button type="button" class="btn customBtn SlotCheckingModalUserbBtn btn-secondary"
+
+                            <button type="button" class="btn customBtn SlotCheckingModalUserbBtnFitnessHub btn-secondary"
                                 style="color: white;">
                                 Check Slots
                             </button>
@@ -146,13 +148,7 @@
             </div>
         @endif
     </div>
-
-
-    <style>
-        .thumb-img:hover {
-            opacity: 0.85;
-            border: 2px solid #007bff;
-        }
-    </style>
+    @include('frontend.modal.fitness-hub-slot-checking-modal')
     @include('frontend.modal.fitness-hub-booking-modal')
+
 @endsection

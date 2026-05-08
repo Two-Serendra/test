@@ -40,7 +40,8 @@
                         </div>
 
                         <div class="col-12 col-md-4 mb-3 mb-md-0 d-flex justify-content-start align-items-end">
-                            <button type="submit" form="SearchSlotUser" class="btn btn-primary customBtn searchBtn slot-checking-submit-btn"
+                            <button type="submit" form="SearchSlotUser"
+                                class="btn btn-primary customBtn searchBtn slot-checking-submit-btn"
                                 style="min-width: 100px; height: 38px;">
                                 <i class="fa-solid fa-search me-1"></i><span> Search</span>
                                 <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"
@@ -48,7 +49,7 @@
                             </button>
                         </div>
                         <!-- Search Button -->
- 
+
                     </div>
 
                     <div class="all-slot-available-user">
@@ -59,3 +60,5 @@
         </div>
     </div>
 </div>
+
+

@@ -169,8 +169,8 @@
                                     $end = Carbon::createFromTime(22, 0);
 
                                     while ($start->lt($end)) {
-                                        $slotStart = $start->format('h:i A');
-                                        $slotEnd = $start->copy()->addMinutes(30)->format('h:i A');
+                                        $slotStart = $start->format('g:i A');
+                                        $slotEnd = $start->copy()->addMinutes(30)->format('g:i A');
                                         $slots[] = "{$slotStart} - {$slotEnd}";
                                         $start->addMinutes(30);
                                     }
@@ -184,9 +184,6 @@
                                             class="form-select border-0 shadow-none"
                                             size="8"
                                             required>
-
-                                        <option value="" disabled selected>Select a slot</option>
-
                                         @foreach ($slots as $slot)
                                             <option value="{{ $slot }}">{{ $slot }}</option>
                                         @endforeach

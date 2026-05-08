@@ -109,7 +109,17 @@
 @push('js')
     <script>
         $(document).ready(function () {
+
+            window.showLoading = function () {
+                $('#loadingOverlay').css('display', 'flex').hide().fadeIn(150);
+            }
+
+            window.hideLoading = function () {
+                $('#loadingOverlay').fadeOut(150);
+            }
+
             var schedule = @json($events);
+
             $('#calendar-grease-trap-booking').fullCalendar({
                 timezone: 'local',
                 header: {
@@ -119,58 +129,79 @@
                 },
                 contentHeight: 750,
                 events: schedule,
+
+                loading: function (isLoading) {
+                    isLoading ? showLoading() : hideLoading();
+                },
+
                 eventRender: function (event, element) {
                     element.find('.fc-time').remove();
                 },
+
                 eventClick: function (event) {
+
                     if (!event.id) {
                         alert("No event ID found.");
                         return;
                     }
+
                     var schedule_id = event.id;
-                    $.get('/admin/fetch/grease-trap-calendar-details/' + schedule_id, function (data) {
-                        $('#calendarModalGreaseTrap').modal('show');
-                        $('#edit_id').val(data.id);
-                        $('#calendar_unit').text(data.unit_no);
-                        $('#calendar_name').text(data.name);
-                        $('#calendar_booking_date').text(data.booking_date);
-                        $('#calendar_time_slot').text(data.booking_time_slot);
-                        $('#calendar_transaction_no').text(data.transaction_no);
-                        $('#calendar_srf_no').text(data.srf_no);
 
-                        let residentType = (data.resident_type || 'N/A').toUpperCase();
-                        let residentBadge = `<span class="badge bg-secondary">${residentType}</span>`;
+                    showLoading();
 
-                        if (residentType.includes('TENANT')) {
-                            residentBadge = `<span class="badge bg-danger">${residentType}</span>`;
+                    $.ajax({
+                        url: '/admin/fetch/grease-trap-calendar-details/' + schedule_id,
+                        method: 'GET',
+
+                        success: function (data) {
+                            $('#calendarModalGreaseTrap').modal('show');
+
+                            // ⚠️ safer targeting (avoid conflicts if reused elsewhere)
+                            $('#calendarModalGreaseTrap #edit_id').val(data.id);
+
+                            $('#calendarModalGreaseTrap #calendar_unit').text(data.unit_no ?? 'N/A');
+                            $('#calendarModalGreaseTrap #calendar_name').text(data.name ?? 'N/A');
+                            $('#calendarModalGreaseTrap #calendar_booking_date').text(data.booking_date ?? 'N/A');
+                            $('#calendarModalGreaseTrap #calendar_time_slot').text(data.booking_time_slot ?? 'N/A');
+                            $('#calendarModalGreaseTrap #calendar_transaction_no').text(data.transaction_no ?? 'N/A');
+                            $('#calendarModalGreaseTrap #calendar_srf_no').text(data.srf_no ?? 'N/A');
+
+                            // Resident Type
+                            let residentType = (data.resident_type || 'N/A').toUpperCase();
+                            let residentBadge = `<span class="badge bg-secondary">${residentType}</span>`;
+
+                            if (residentType.includes('TENANT')) {
+                                residentBadge = `<span class="badge bg-danger">${residentType}</span>`;
+                            } else if (residentType.includes('OWNER')) {
+                                residentBadge = `<span class="badge bg-primary">${residentType}</span>`;
+                            }
+
+                            $('#calendarModalGreaseTrap #display_resident_type_calendar').html(residentBadge);
+
+                            // Charged Type
+                            let chargedType = (data.charged_type || 'N/A').toString().toUpperCase();
+                            let chargedBadge = `<span class="badge bg-secondary">${chargedType}</span>`;
+
+                            if (chargedType === '1') {
+                                chargedBadge = `<span class="badge bg-primary">FREE</span>`;
+                            } else if (chargedType === '2') {
+                                chargedBadge = `<span class="badge bg-danger">BILLABLE</span>`;
+                            }
+
+                            $('#calendarModalGreaseTrap #display_charged_type_calendar').html(chargedBadge);
+                        },
+
+                        error: function () {
+                            alert("Failed to fetch data. Please try again.");
+                        },
+
+                        complete: function () {
+                            hideLoading();
                         }
-
-                        if (residentType.includes('OWNER')) {
-                            residentBadge = `<span class="badge bg-primary">${residentType}</span>`;
-                        }
-
-                        $('#display_resident_type_calendar').html(residentBadge);
-
-
-                        let chargedType = (data.charged_type || 'N/A').toString().toUpperCase();
-                        let chargedBadge = `<span class="badge bg-secondary">${chargedType}</span>`;
-
-                        // Handle numeric charged types first
-                        if (chargedType === '1') {
-                            chargedBadge = `<span class="badge bg-primary">FREE</span>`;
-                        } else if (chargedType === '2') {
-                            chargedBadge = `<span class="badge bg-danger">BILLABLE</span>`;
-                        }
-
-                        $('#display_charged_type_calendar').html(chargedBadge);
-
-                    }).fail(function () {
-                        alert("Failed to fetch data. Please try again.");
                     });
                 }
             });
+
         });
-
-
     </script>
 @endpush

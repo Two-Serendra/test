@@ -43,8 +43,8 @@
 
                             <div class="">
                                 <label for="additionalDetails" class="form-label">Remarks</label>
-                                <textarea name="remarks" id="additionalDetails" class="form-control" rows="6"
-                                    ></textarea>
+                                <textarea name="remarks" id="additionalDetails" class="form-control"
+                                    rows="6"></textarea>
                                 <div class="invalid-feedback">Required</div>
 
                             </div>
@@ -67,13 +67,13 @@
                             <div class="row g-2">
                                 @php
                                     $slots = [
-                                        '09:00 AM - 10:00 AM',
+                                        '9:00 AM - 10:00 AM',
                                         '10:00 AM - 11:00 AM',
                                         '11:00 AM - 12:00 NN',
-                                        '01:00 PM - 02:00 PM',
-                                        '02:00 PM - 03:00 PM',
-                                        '03:00 PM - 04:00 PM',
-                                        '04:00 PM - 05:00 PM',
+                                        '1:00 PM - 2:00 PM',
+                                        '2:00 PM - 3:00 PM',
+                                        '3:00 PM - 4:00 PM',
+                                        '4:00 PM - 5:00 PM',
                                     ];
                                 @endphp
 
@@ -162,25 +162,26 @@
                                     $end = Carbon::createFromTime(22, 0);  // 10:00 PM
 
                                     while ($start->lt($end)) {
-                                        $slotStart = $start->format('h:i A');
-                                        $slotEnd = $start->copy()->addHour()->format('h:i A');
+                                        $slotStart = $start->format('g:i A');
+                                        $slotEnd = $start->copy()->addHour()->format('g:i A');
+
+                                        // Optional: convert 12:00 PM to 12:00 NN
+                                        $slotEnd = str_replace('12:00 PM', '12:00 NN', $slotEnd);
+
                                         $slots[] = "{$slotStart} - {$slotEnd}";
                                         $start->addHour();
                                     }
                                 @endphp
-
-                                <div class="mb-3">
-                                    <label for="booking_time_slot" class="form-label">Select Time Slot</label>
-                                    <select name="booking_time_slot" id="booking_time_slot" class="form-select"
+                                <label for="booking_time_slot" class="form-label">Select Time Slot</label>
+                                <div class="slot-container border rounded p-2">
+                                    <select name="booking_time_slot" id="booking_time_slot" class="form-select border-0 shadow-none"  size="8"
                                         required>
-
-                                        <option value="" disabled selected>Select a slot</option>
+                                       
                                         @foreach ($slots as $slot)
                                             <option value="{{ $slot }}">{{ $slot }}</option>
                                         @endforeach
                                     </select>
                                 </div>
-
                             </div>
                         </div>
 
@@ -219,168 +220,226 @@
 
 
 <div class="modal fade" id="greastrapEdit" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-3" id="staticBackdropLabel">EDIT GREASE TRAP BOOKING</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+            <!-- HEADER -->
+            <div class="modal-header bg-primary text-white position-relative">
+
+                <div class="w-100 d-flex align-items-center justify-content-center">
+                    <img src="{{ asset('assets/images/TWO SERENDRA LOGO PNG (White).png') }}"
+                        style="height: 60px; width: auto;" alt="logo" />
+                </div>
+
+                <button type="button" class="btn-close position-absolute end-0 top-50 translate-middle-y me-2"
+                    data-bs-dismiss="modal">
+                </button>
+
             </div>
-            <div class="modal-body">
-                <form action="{{ route('admin.grease.trap.booking.update') }}" id="updateGreaseTrapBookingFormAdmin"
-                    method="POST" enctype="multipart/form-data" class="AdminNewGreaseTrapBooking needs-validation"
-                    novalidate>
-                    @csrf
-                    <input type="hidden" id="info_id" name="id">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Name</label>
-                                <p class="form-control-plaintext fw-bold" id="display_name"></p>
-                            </div>
 
+            <!-- BODY -->
+            <div class="modal-body px-4 py-3">
 
-                            <div class="mb-3">
-                                <label class="form-label">Unit</label>
-                                <p class="form-control-plaintext" id="display_unit"></p>
-                            </div>
+                <!-- TITLE -->
+                <div class="text-center mb-4">
+                    <h5 class="fw-bold mb-1">Grease Trap Booking Details</h5>
+                    <small class="text-muted">
+                        Reference #: <span id="display_transaction_no"></span>
+                    </small>
+                </div>
 
-
-                            <div class="mb-3">
-                                <label class="form-label">Resident Type</label>
-                                <p class="form-control-plaintext" id="display_resident_type"></p>
-                            </div>
-
-
-                            <div class="mb-3">
-                                <label class="form-label">Booking Date</label>
-                                <p class="form-control-plaintext" id="display_booking_date"></p>
-                            </div>
-
-                        </div>
-
-                        <!-- Time Slots -->
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label">Transaction No</label>
-                                <p class="form-control-plaintext" id="display_transaction_no"></p>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Charged Type</label>
-                                <p class="form-control-plaintext" id="display_charged_type"></p>
-                            </div>
-
-
-                            <div class="mb-3">
-                                <label class="form-label">Time Slot</label>
-                                <p class="form-control-plaintext" id="display_time_slot"></p>
-                            </div>
-
-
-                            <div class="mb-3">
-                                <label class="form-label">SRF No *</label>
-                                <input type="text" class="form-control" id="srf_no" name="srf_no">
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Remarks</label>
-                                <textarea class="form-control" id="remarks_grease_trap" name="remarks"
-                                    rows="4"></textarea>
-                            </div>
-                        </div>
+                <!-- STATUS STRIP -->
+                <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded bg-light">
+                    <div>
+                        <small class="text-muted d-block">Charged Type</small>
+                        <span id="display_charged_type" class="fw-semibold"></span>
                     </div>
+
+                    <div class="text-end">
+                        <small class="text-muted d-block">Time Slot</small>
+                        <span id="display_time_slot" class="fw-semibold"></span>
+                    </div>
+                </div>
+
+                <form action="{{ route('admin.grease.trap.booking.update') }}" id="updateGreaseTrapBookingFormAdmin"
+                    method="POST" enctype="multipart/form-data" novalidate>
+                    @csrf
+
+                    <input type="hidden" id="info_id" name="id">
+
+                    <div class="row g-3">
+
+                        <!-- LEFT CARD -->
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 h-100">
+
+                                <h6 class="fw-semibold text-primary mb-3">
+                                    Resident Information
+                                </h6>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Name</span>
+                                    <span id="display_name" class="fw-semibold text-end"></span>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Unit</span>
+                                    <span id="display_unit" class="fw-semibold"></span>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Resident Type</span>
+                                    <span id="display_resident_type"></span>
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Booking Date</span>
+                                    <span id="display_booking_date" class="fw-semibold"></span>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- RIGHT CARD -->
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 h-100">
+
+                                <h6 class="fw-semibold text-primary mb-3">
+                                    Update Information
+                                </h6>
+
+                                <div class="mb-3">
+                                    <label class="form-label">SRF No *</label>
+                                    <input type="text" class="form-control" id="grease_trap_srf_no" name="srf_no">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Remarks</label>
+                                    <textarea class="form-control" id="remarks_grease_trap" name="remarks"
+                                        rows="4"></textarea>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
                 </form>
+
             </div>
 
+            <!-- FOOTER -->
             <div class="modal-footer">
                 <button type="submit" form="updateGreaseTrapBookingFormAdmin" id="UpdateGreaseTrapBookingBtn"
-                    class="btn btn-primary d-flex align-items-center justify-content-center"
-                    style="min-width: 100px; height: 38px;">
-                    <span class="btn-text">Update</span>
+                    class="btn btn-primary btn-sm">
+                    Update
                 </button>
             </div>
 
-
         </div>
-
     </div>
 </div>
 
 
-{{-- Calendar Modal --}}
-<div class="modal fade" id="calendarModalGreaseTrap" tabindex="-1" aria-labelledby="editProductModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fs-3" id="exampleModalLabel">Calendar Schedule</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                    id="modalClose"></button>
+<div class="modal fade" id="calendarModalGreaseTrap" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+
+            <!-- HEADER -->
+            <div class="modal-header bg-primary text-white position-relative py-3">
+
+                <div class="w-100 text-center">
+                    <img src="{{ asset('assets/images/TWO SERENDRA LOGO PNG (White).png') }}" style="height: 50px;"
+                        alt="logo">
+                </div>
+
+                <button type="button" class="btn-close position-absolute end-0 top-50 translate-middle-y me-2"
+                    data-bs-dismiss="modal">
+                </button>
             </div>
-            <div class="modal-body">
-                <form action="" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="row mb-2">
-                        <input type="hidden" class="form-control" name="schedule_id" id="edit_id">
 
+            <!-- BODY -->
+            <div class="modal-body bg-light p-4">
 
-                        <div class="col-6">
+                <input type="hidden" id="edit_id">
 
-                            <div class="mb-2">
-                                <label for="" class="form-label"><b>Transaction No</b></label>
-                                <p id="calendar_transaction_no" class="form-control-static calendar-value"></p>
+                <!-- TITLE CARD -->
+                <div class="bg-white p-3 rounded-4 shadow-sm border-start border-4 border-primary mb-4">
+                    <small class="text-muted">Grease Trap</small>
+                    <div id="calendar_transaction_no" class="fs-5 fw-bold text-primary"></div>
+                </div>
+
+                <!-- GRID -->
+                <div class="row g-4">
+
+                    <!-- LEFT CARD -->
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                            <div class="card-body p-4">
+
+                                <h6 class="text-uppercase text-muted small mb-3">Resident Info</h6>
+
+                                <div class="mb-3">
+                                    <small class="text-muted">Unit</small>
+                                    <div class="fw-semibold" id="calendar_unit">N/A</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <small class="text-muted">Name</small>
+                                    <div class="fw-semibold" id="calendar_name">N/A</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <small class="text-muted">Resident Type</small>
+                                    <div class="fw-semibold" id="display_resident_type_calendar">N/A</div>
+                                </div>
+
+                                <div class="mb-0">
+                                    <small class="text-muted">SRF No</small>
+                                    <div class="fw-semibold" id="calendar_srf_no">N/A</div>
+                                </div>
+
                             </div>
-
-                            <div class="mb-2">
-                                <label for="" class="form-label"><b>Unit</b></label>
-                                <p id="calendar_unit" class="form-control-static calendar-value"></p>
-                            </div>
-
-
-                            <div class="mb-3">
-                                <label class="form-label"><b>Resident Type</b></label>
-                                <p class="form-control-plaintext" id="display_resident_type_calendar"></p>
-                            </div>
-
-
-                            <div class="mb-2">
-                                <label for="" class="form-label"><b>Name</b></label>
-                                <p id="calendar_name" class="form-control-static calendar-value"></p>
-                                <!-- Display as text -->
-                            </div>
-
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-2">
-                                <label for="" class="form-label"><b>SRF No</b></label>
-                                <p id="calendar_srf_no" class="form-control-static calendar-value"></p>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label"><b>Charged Type</b></label>
-                                <p class="form-control-plaintext" id="display_charged_type_calendar"></p>
-                            </div>
-
-                            <div class="mb-2">
-                                <label for="" class="form-label"><b>Date</b></label>
-                                <p id="calendar_booking_date" class="form-control-static calendar-value"></p>
-                                <!-- Display as text -->
-                            </div>
-
-                            <div class="mb-2">
-                                <label for="" class="form-label"><b>Time Slot</b></label>
-                                <p id="calendar_time_slot" class="form-control-static calendar-value"></p>
-                                <!-- Display as text -->
-                            </div>
-
                         </div>
                     </div>
-                    <div class="modal-footer p-2">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+
+                    <!-- RIGHT CARD -->
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                            <div class="card-body p-4">
+
+                                <h6 class="text-uppercase text-muted small mb-3">Schedule</h6>
+
+                                <div class="mb-3">
+                                    <small class="text-muted">Charged Type</small>
+                                    <div class="fw-semibold" id="display_charged_type_calendar">N/A</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <small class="text-muted">Date</small>
+                                    <div class="fw-semibold" id="calendar_booking_date">N/A</div>
+                                </div>
+
+                                <div class="mb-0">
+                                    <small class="text-muted">Time Slot</small>
+                                    <div class="fw-semibold" id="calendar_time_slot">N/A</div>
+                                </div>
+
+                            </div>
+                        </div>
                     </div>
-                </form>
+
+                </div>
+
+                <!-- FOOTER -->
+                <div class="text-end mt-4">
+                    <button type="button" class="btn btn-danger btn-sm px-4" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+
             </div>
+
         </div>
     </div>
 </div>
@@ -411,7 +470,8 @@
                         <div class="col-6 ">
                             <div class="mb-3 position-relative">
                                 <label for="DownloadEndDateGT" class="form-label">End Date *</label>
-                                <input type="text" id="DownloadEndDateGT" class="form-control" name="download_end_date_gt">
+                                <input type="text" id="DownloadEndDateGT" class="form-control"
+                                    name="download_end_date_gt">
                                 <i class="fa-regular fa-calendar position-absolute"
                                     style="top: 73%; right: 8px; transform: translateY(-50%);"></i>
                             </div>
@@ -429,6 +489,124 @@
                     <span class="btn-text">Download</span>
                 </button>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="viewGreaseTrapBooking" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <!-- HEADER -->
+            <div class="modal-header bg-primary text-white position-relative">
+
+                <div class="w-100 d-flex align-items-center justify-content-center">
+                    <img src="{{ asset('assets/images/TWO SERENDRA LOGO PNG (White).png') }}"
+                        style="height: 60px; width: auto;" alt="logo" />
+                </div>
+
+                <button type="button" class="btn-close position-absolute end-0 top-50 translate-middle-y me-2"
+                    data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <!-- BODY -->
+            <div class="modal-body px-4 py-3">
+
+                <!-- TITLE -->
+                <div class="text-center mb-4">
+                    <h5 class="fw-bold mb-1">Grease Trap Booking Details</h5>
+                    <small class="text-muted">
+                        Reference #: <span id="display_transaction_no_reports"></span>
+                    </small>
+                </div>
+
+                <!-- STATUS STRIP -->
+                <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded bg-light">
+                    <div>
+                        <small class="text-muted d-block">Charged Type</small>
+                        <span id="display_charged_type" class="fw-semibold"></span>
+                    </div>
+
+                    <div class="text-end">
+                        <small class="text-muted d-block">Time Slot</small>
+                        <span id="display_time_slot" class="fw-semibold"></span>
+                    </div>
+                </div>
+
+                <form action="{{ route('admin.grease.trap.booking.update') }}" id="updateGreaseTrapBookingFormAdmin"
+                    method="POST" enctype="multipart/form-data" novalidate>
+                    @csrf
+
+                    <input type="hidden" id="info_id" name="id">
+
+                    <div class="row g-3">
+
+                        <!-- LEFT CARD -->
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 h-100">
+
+                                <h6 class="fw-semibold text-primary mb-3">
+                                    Resident Information
+                                </h6>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Name</span>
+                                    <span id="display_name_reports" class="fw-semibold text-end"></span>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Unit</span>
+                                    <span id="display_unit_reports" class="fw-semibold"></span>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Resident Type</span>
+                                    <span id="display_resident_type_reports" class="fw-semibold"></span>
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Booking Date</span>
+                                    <span id="display_booking_date_reports" class="fw-semibold"></span>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- RIGHT CARD -->
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 h-100">
+
+                                <h6 class="fw-semibold text-primary mb-3">
+                                    Update Information
+                                </h6>
+
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="text-muted">SRF No</span>
+                                    <span id="srf_no_reports" class="fw-semibold"></span>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="text-muted">Remarks</span>
+                                    <span id="remarks_grease_trap_reports" class="fw-semibold"></span>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+
+
         </div>
     </div>
 </div>

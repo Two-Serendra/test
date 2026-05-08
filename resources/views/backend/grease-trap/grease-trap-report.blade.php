@@ -28,7 +28,7 @@
             </div>
             <div class="table-responsive">
                 <!-- <table id="userTable" class="table table-bordered table-hover table-striped"></table> -->
-                <table id="greaseTrapBookingTable" class="table">
+                <table id="greaseTrapReportTable" class="table">
                     <thead>
                         <tr>
                             <th class="text-dark">Transaction No</th>
@@ -108,23 +108,15 @@
                                                 $isCancelled = $greaseTrapBooking->booking_status == 2;
                                             @endphp
 
-                                            <button type="button" class="btn btn-primary edit_grease_trap_booking btn-sm btn-equal"
+                                            <button type="button" class="btn btn-primary view_grease_trap_booking btn-sm btn-equal"
                                                 data-bs-toggle="tooltip" data-bs-placement="left" title="View"
                                                 data-id="{{ $greaseTrapBooking->id }}">
                                                 <i class="fa-solid fa-eye"></i>
                                             </button>
 
-
-                                            <button type="button"
-                                                class="btn btn-sm btn-equal {{ $isCancelled ? 'btn-secondary cancel-booking' : 'btn-danger admin-grease-trap-booking-cancel' }}"
-                                                data-bs-toggle="tooltip" data-bs-placement="right"
-                                                title="{{ $isCancelled ? 'Cancelled' : 'Cancel' }}"
-                                                data-id="{{ $greaseTrapBooking->id }}" {{ $isCancelled ? 'disabled' : '' }}>
-                                                <i class="fa-solid fa-ban"></i>
-                                            </button>
                                         </div>
                                     </td>
-                                </tr>
+                                </tr> 
                             @endforeach
                         @endif
                     </tbody>

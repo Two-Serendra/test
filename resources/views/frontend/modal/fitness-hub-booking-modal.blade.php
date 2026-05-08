@@ -24,7 +24,7 @@
 
                         </ul>
 
-                        <div class="col-md-6"> 
+                        <div class="col-md-6">
 
                             <div class="mb-3 position-relative">
                                 <label for="dateFieldFitnessHubBooking" class="form-label">Date <span
@@ -56,8 +56,8 @@
                                 </div>
 
                                 <div class="d-flex gap-2 mt-1">
-                                    <select id="residentSelectFitnessHub" name="resident_id" class="form-select flex-grow-1"
-                                        required>
+                                    <select id="residentSelectFitnessHub" name="resident_id"
+                                        class="form-select flex-grow-1" required>
                                         @if(count($residences) > 1)
                                             <option value="">-- Select Residence --</option>
                                         @endif
@@ -123,3 +123,5 @@
         </div>
     </div>
 </div>
+
+

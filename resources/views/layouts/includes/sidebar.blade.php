@@ -232,7 +232,7 @@
         @endroles
 
         @roles(1, 6, 9)
-        <!-- <li class="menu-item">
+        <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-wrench"></i>
                 <div data-i18n="Form Elements">
@@ -263,7 +263,7 @@
                     </a>
                 </li>
             </ul>
-        </li> -->
+        </li>
 
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">

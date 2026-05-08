@@ -15,8 +15,12 @@ class GreaseTrapBookingController extends Controller
 {
    public function AdminBookingGreaseTrap()
    {
-      $greaseTrapBookings = GreaseTrapBooking::whereDate('booking_date', '>=', now()->toDateString())
-         ->orderBy('booking_date', 'asc')
+      $greaseTrapBookings = GreaseTrapBooking::with([
+         'user',
+         'createdBy',
+         'cancelledBy'
+      ])->whereDate('booking_date', '>=', now()->toDateString())
+         ->orderBy('created_at', 'DESC')
          ->paginate(10);
       return view('backend.grease-trap.grease-trap-booking', compact('greaseTrapBookings'));
 
@@ -40,10 +44,45 @@ class GreaseTrapBookingController extends Controller
 
    public function getUpdatedGreaseTrapTable()
    {
-      $bookings = GreaseTrapBooking::with(['user', 'cancelledBy'])
+      $bookings = GreaseTrapBooking::with(['user', 'cancelledBy', 'createdBy'])
          ->whereDate('booking_date', '>=', now()->toDateString())
-         ->orderBy('booking_date', 'asc')
+         ->orderBy('created_at', 'DESC')
          ->paginate(10);
+
+      $bookings->getCollection()->transform(function ($b) {
+         return [
+            'id' => $b->id,
+            'transaction_no' => $b->transaction_no,
+            'srf_no' => $b->srf_no,
+            'name' => $b->name,
+            'resident_type' => $b->resident_type,
+            'unit_no' => $b->unit_no,
+            'booking_date' => $b->booking_date,
+            'booking_time_slot' => $b->booking_time_slot,
+            'charged_type' => $b->charged_type,
+            'emergency' => $b->emergency,
+            'remarks' => $b->remarks,
+            'booking_status' => $b->booking_status,
+
+            'has_penalty' => $b->has_penalty,
+            'penalty_amount' => $b->penalty_amount,
+
+            // 👇 FORMAT DATES HERE (THIS FIXES YOUR ISSUE)
+            'created_at' => optional($b->created_at)->format('Y-m-d H:i:s'),
+            'cancelled_at' => $b->cancelled_at
+               ? Carbon::parse($b->cancelled_at)->format('Y-m-d H:i:s')
+               : null,
+            // relations
+            'createdBy' => $b->createdBy ? [
+               'name' => $b->createdBy->name
+            ] : null,
+
+            'cancelledBy' => $b->cancelledBy ? [
+               'name' => $b->cancelledBy->name
+            ] : null,
+         ];
+      });
+
       return response()->json($bookings);
    }
 
@@ -98,10 +137,11 @@ class GreaseTrapBookingController extends Controller
 
             $booking = GreaseTrapBooking::create([
                'user_id' => Auth::id(),
-               'name' => $request->name,
+               'created_by' => auth()->id(),
+               'name' => strtoupper($request->name),
                'unit_no' => $unitNo,
                'resident_type' => strtoupper($request->selectResidentType),
-               'transaction_no' => null, 
+               'transaction_no' => null,
                'booking_date' => $bookingDate,
                'booking_time_slot' => $request->booking_time_slot,
                'charged_type' => $chargedType,
@@ -163,7 +203,7 @@ class GreaseTrapBookingController extends Controller
          $within24Hours = $booking->isWithin24Hours();
 
          $usedFree = GreaseTrapBooking::getUsedFreeBookings($booking->unit_no);
-      $freeLimit = 2;
+         $freeLimit = 2;
 
          if (!$request->has('confirm')) {
 
@@ -306,22 +346,22 @@ class GreaseTrapBookingController extends Controller
 
 
    public function fetchGreaseTrapBooking($id)
-   {
+   { 
+
       $greaseTrapBooking = GreaseTrapBooking::with('user')->find($id);
 
       if (!$greaseTrapBooking) {
          return response()->json(['message' => 'Data not found'], 404);
       }
-
       return response()->json([
-         'name' => $greaseTrapBooking->user->name ?? 'N/A',
+         'name' => $greaseTrapBooking->name ?? 'N/A',
          'unit_no' => $greaseTrapBooking->unit_no,
          'resident_type' => $greaseTrapBooking->resident_type,
          'remarks' => $greaseTrapBooking->remarks,
          'transaction_no' => $greaseTrapBooking->transaction_no,
          'booking_date' => Carbon::parse($greaseTrapBooking->booking_date)->format('F d, Y'),
          'booking_time_slot' => $greaseTrapBooking->booking_time_slot,
-         'srf_no' => $greaseTrapBooking->srf_no,
+         'srf_no' => $greaseTrapBooking->srf_no ?: null,
          'charged_type' => $greaseTrapBooking->charged_type, // <-- add this
       ]);
    }

@@ -346,7 +346,7 @@ class GreaseTrapBookingController extends Controller
 
 
    public function fetchGreaseTrapBooking($id)
-   { 
+   {
 
       $greaseTrapBooking = GreaseTrapBooking::with('user')->find($id);
 
@@ -782,5 +782,30 @@ class GreaseTrapBookingController extends Controller
          Log::error('CSV import failed', ['error' => $e->getMessage()]);
          return back()->with('error', $e->getMessage());
       }
+   }
+
+
+   public function searchGreaseTrapReports(Request $request)
+   {
+      $searchBooking = $request->input('searchGreaseTrapReports');
+      $currentDate = Carbon::today();
+
+      $greaseTrapBookings = GreaseTrapBooking::with('user')
+         ->where('booking_date', '<', $currentDate)
+         ->when($searchBooking, function ($query, $searchBooking) {
+            $query->where(function ($q) use ($searchBooking) {
+               $q->where('unit_no', 'LIKE', "%{$searchBooking}%")
+                  ->orWhereHas('user', function ($userQuery) use ($searchBooking) {
+                     $userQuery->where('name', 'LIKE', "%{$searchBooking}%");
+                  });
+            });
+         })
+         ->orderBy('booking_date', 'desc')
+         ->paginate(10);
+
+      $greaseTrapBookings->appends(['searchGreaseTrapReports' => $searchBooking]);
+
+      return view('backend.grease-trap.grease-trap-report', compact('greaseTrapBookings', 'searchBooking'))
+         ->with('searchGreaseTrapReports', $searchBooking);
    }
 }

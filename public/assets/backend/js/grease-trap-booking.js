@@ -211,6 +211,9 @@ $(document).ready(function () {
         sendBooking();
     });
 
+    function displayValue(value) {
+        return value && value.toString().trim() !== '' ? value : 'N/A';
+    }
 
     function refreshGreaseTrapTableBookings() {
         $.ajax({
@@ -226,79 +229,109 @@ $(document).ready(function () {
 
                 bookings.forEach(function (booking) {
 
-                    var isCancelled = booking.booking_status == 2; // 2 = cancelled
+                    var isCancelled = booking.booking_status == 2;
+
+                    // NOTE: AJAX cannot call PHP method getBookingDateTime()
+                    // so we approximate (safe fallback)
+                    var bookingDateTime = booking.booking_date
+                        ? new Date(booking.booking_date + ' ' + (booking.booking_time_slot ?? '00:00'))
+                        : null;
+
+                    var now = new Date();
+                    var isPast = bookingDateTime ? bookingDateTime < now : false;
 
                     var actionButtons = `
-                        <div class="d-flex gap-1 justify-content-center">
-                            <button type="button" class="btn btn-primary edit_grease_trap_booking btn-sm btn-equal"
-                                data-bs-toggle="tooltip" data-bs-placement="left" title="View"
-                                data-id="${booking.id}">
-                                <i class="fa-solid fa-eye"></i>
-                            </button>
+        <div class="d-flex gap-1 justify-content-center">
+            <button type="button" class="btn btn-primary edit_grease_trap_booking btn-sm btn-equal"
+                data-bs-toggle="tooltip" data-bs-placement="left" title="View"
+                data-id="${booking.id}">
+                <i class="fa-solid fa-eye"></i>
+            </button>
 
-                            <button type="button"
-                                class="btn btn-sm btn-equal ${isCancelled ? 'btn-secondary cancel-booking' : 'btn-danger admin-grease-trap-booking-cancel'}"
-                                data-bs-toggle="tooltip" data-bs-placement="right"
-                                title="${isCancelled ? 'Cancelled' : 'Cancel'}"
-                                data-id="${booking.id}" ${isCancelled ? 'disabled' : ''}>
-                                <i class="fa-solid fa-ban"></i>
-                            </button>
-                        </div>
-                    `;
+            <button type="button"
+                class="btn btn-sm btn-equal ${(isCancelled || isPast) ? 'btn-secondary cancel-booking' : 'btn-danger admin-grease-trap-booking-cancel'}"
+                data-bs-toggle="tooltip" data-bs-placement="right"
+                title="${isCancelled ? 'Cancelled' : (isPast ? 'Past Booking' : 'Cancel')}"
+                data-id="${booking.id}" ${(isCancelled || isPast) ? 'disabled' : ''}>
+                <i class="fa-solid fa-ban"></i>
+            </button>
+        </div>
+    `;
 
+                    // Resident type (MATCH BLADE)
+                    var resType = booking.resident_type ? booking.resident_type.toLowerCase() : '';
 
-                    // Resident type badge
-                    var residentType = booking.resident_type ? booking.resident_type.toUpperCase() : 'N/A';
-                    var residentTypeHtml = residentType === 'OWNER'
-                        ? `<span class="badge bg-primary">${residentType}</span>`
-                        : residentType === 'TENANT'
-                            ? `<span class="badge bg-danger">${residentType}</span>`
-                            : `<span class="badge bg-secondary">N/A</span>`;
+                    var residentTypeHtml = '';
+                    if (resType === 'tenant') {
+                        residentTypeHtml = `<span class="badge bg-danger text-uppercase">${booking.resident_type}</span>`;
+                    } else if (resType === 'owner') {
+                        residentTypeHtml = `<span class="badge bg-primary text-uppercase">${booking.resident_type}</span>`;
+                    } else {
+                        residentTypeHtml = `<span class="badge bg-secondary">N/A</span>`;
+                    }
 
-                    // Charged type
-                    var chargedType = booking.charged_type == 1
-                        ? `<span class="badge bg-primary">Free</span>`
-                        : `<span class="badge bg-danger">Billable</span>`;
+                    // Charged type (MATCH STRICT === 1 like Blade)
+                    var chargedType = (booking.charged_type === 1 || booking.charged_type === "1")
+                        ? `<span class="badge bg-primary text-white badge-forge">Free</span>`
+                        : `<span class="badge bg-danger badge-forge">Billable</span>`;
+
+                    // Emergency (MATCH BLADE EXACTLY)
+                    var emergency = booking.emergency == 0
+                        ? `<span class="badge bg-secondary badge-forge">No</span>`
+                        : `<span class="badge bg-danger badge-forge">Yes</span>`;
 
                     // Booking status
                     var bookingStatus = booking.booking_status == 1
-                        ? `<span class="badge bg-primary">Booked</span>`
-                        : `<span class="badge bg-danger">Cancelled</span>`;
+                        ? `<span class="badge bg-primary custom-badge">BOOKED</span>`
+                        : `<span class="badge bg-danger custom-badge">CANCELLED</span>`;
 
-                    // Emergency
-                    var emergency = booking.emergency == 1
-                        ? `<span class="badge bg-danger">Yes</span>`
-                        : `<span class="badge bg-secondary">No</span>`;
-
-                    var cancelledAt = booking.cancelled_at ? booking.cancelled_at : 'N/A';
-
-                    // Penalty column
+                    // Penalty
                     var penaltyHtml = booking.has_penalty
                         ? `<span class="text-warning fw-bold">₱${parseFloat(booking.penalty_amount).toFixed(2)}</span>`
                         : `-`;
 
-                    // Cancelled By column
-                    var cancelledBy = booking.cancelled_by?.name ?? 'N/A';
+                    // Created By (MATCH Blade strtoupper + N/A)
+                    var createdBy = booking.createdBy?.name
+                        ? booking.createdBy.name.toUpperCase()
+                        : 'N/A';
+
+                    // Cancelled By (MATCH Blade)
+                    var cancelledBy = booking.cancelledBy?.name
+                        ? booking.cancelledBy.name.toUpperCase()
+                        : 'N/A';
+
+                    var cancelledAt = displayValue(booking.cancelled_at);
+
 
                     var row = `
-                    <tr>
-                        <td>${booking.transaction_no ?? 'N/A'}</td>
-                        <td>${booking.srf_no ?? 'N/A'}</td>
-                        <td>${booking.user ? booking.user.name : 'CONCIERGE'}</td>
-                        <td>${residentTypeHtml}</td>
-                        <td>${booking.unit_no ?? 'N/A'}</td>
-                        <td>${booking.booking_date ?? 'N/A'}</td>
-                        <td>${booking.booking_time_slot ?? 'N/A'}</td>
-                        <td>${chargedType}</td>
-                        <td>${emergency}</td>
-                        <td>${booking.remarks ?? 'N/A'}</td>
-                        <td>${bookingStatus}</td>
-                        <td>${cancelledAt}</td>
-                        <td>${penaltyHtml}</td>
-                        <td>${cancelledBy}</td>
-                        <td class="sticky-col sticky-col-color">${actionButtons}</td>
-                    </tr>
-                `;
+        <tr>
+            <td>${displayValue(booking.transaction_no)}</td>
+            <td>${displayValue(booking.srf_no)}</td>
+            <td>${displayValue(booking.name)}</td>
+
+            <td>${residentTypeHtml}</td>
+
+            <td>${displayValue(booking.unit_no)}</td>
+            <td>${displayValue(booking.booking_date)}</td>
+            <td>${displayValue(booking.booking_time_slot)}</td>
+
+            <td>${chargedType}</td>
+            <td>${emergency}</td>
+
+            <td>${displayValue(booking.remarks)}</td>
+            <td>${bookingStatus}</td>
+
+            <td>${penaltyHtml}</td>
+
+            <td>${displayValue(createdBy)}</td>
+            <td>${displayValue(booking.created_at)}</td>
+
+            <td>${displayValue(cancelledBy)}</td>
+            <td>${displayValue(cancelledAt)}</td>
+
+            <td class="sticky-col sticky-col-color">${actionButtons}</td>
+        </tr>
+    `;
 
                     tableBody.append(row);
                 });
@@ -523,9 +556,10 @@ $(document).ready(function () {
     $('#greaseTrapBookingTable').on('click', '.edit_grease_trap_booking', function () {
 
         let info_id = $(this).data("id");
+        showLoading();
 
         $.get('/admin/admin-fetch-grease-trap-booking/' + info_id, function (data) {
-
+            console.log(data);
             $('#greastrapEdit').modal('show');
 
             $('#display_name').text(data.name);
@@ -557,9 +591,10 @@ $(document).ready(function () {
             $('#display_transaction_no').text(data.transaction_no);
 
 
-            $('#srf_no').val(data.srf_no);
+            $('#grease_trap_srf_no').val(data.srf_no);
             $('#remarks_grease_trap').val(data.remarks);
             $('#info_id').val(info_id);
+            hideLoading();
         })
             .fail(function () {
                 alert("Data not found");
@@ -740,5 +775,52 @@ $(document).ready(function () {
     });
 
 
+    $('#greaseTrapReportTable').on('click', '.view_grease_trap_booking', function () {
 
+        let info_id = $(this).data("id");
+        showLoading();
+
+        $.get('/admin/admin-fetch-grease-trap-booking/' + info_id, function (data) {
+            console.log(data);
+            $('#viewGreaseTrapBooking').modal('show');
+
+            $('#display_name_reports').text(data.name);
+            $('#display_unit_reports').text(data.unit_no);
+            $('#srf_no_reports').text(data.srf_no);
+            $('#remarks_grease_trap_reports').text(data.remarks);
+
+            // Resident badge
+            let residentType = data.resident_type?.toUpperCase() ?? 'N/A';
+            let residentBadge = `<span class="badge bg-secondary">${residentType}</span>`;
+
+            if (residentType === 'TENANT') residentBadge = `<span class="badge bg-danger">TENANT</span>`;
+            if (residentType === 'OWNER') residentBadge = `<span class="badge bg-primary">OWNER</span>`;
+
+
+            $('#display_resident_type_reports').html(residentBadge);
+
+            $('#display_booking_date_reports').text(data.booking_date);
+
+
+            let chargedType = data.charged_type;
+            let chargedBadge = `<span class="badge bg-secondary">N/A</span>`;
+
+            // Map types
+            if (chargedType == 1) chargedBadge = `<span class="badge bg-primary">FREE</span>`;
+            if (chargedType == 2) chargedBadge = `<span class="badge bg-danger">BILLABLE</span>`;
+
+            $('#display_charged_type_reports').html(chargedBadge);
+
+            $('#display_time_slot_reports').text(data.booking_time_slot);
+            $('#display_transaction_no_reports').text(data.transaction_no);
+
+            $('#srf_no_reports').text(data.srf_no || 'N/A');
+            $('#remarks_grease_trap_reports').text(data.remarks || 'N/A');
+            $('#info_id').val(info_id);
+            hideLoading();
+        })
+            .fail(function () {
+                alert("Data not found");
+            });
+    });
 });

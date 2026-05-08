@@ -5,14 +5,14 @@
             <div class="row mb-3">
                 <div class="col-6  d-flex justify-content-between align-items-center flex-wrap">
 
-                    <form action="{{ route('admin.search.grease.trap.booking') }}" method="GET"
+                    <form action="{{ route('admin.search.grease.trap.reports') }}" method="GET"
                         id="searchGreaseTrapBookingForm" class="d-flex align-items-center" style="max-width: 250px;">
                         <div class="input-group text-dark w-100">
                             <span class="input-group-text">
                                 <i class='bx bx-search-alt text-dark'></i>
                             </span>
-                            <input type="text" name="searchGreaseTrapBooking" value="{{ $searchGreaseTrapBooking ?? '' }}"
-                                id="searchInputGreaseTrapBooking" class="form-control" placeholder="Name/Unit"
+                            <input type="text" name="searchGreaseTrapReports" value="{{ $searchGreaseTrapReports ?? '' }}"
+                                id="searchInputGreaseTrapReports" class="form-control" placeholder="Name/Unit"
                                 autocomplete="off">
 
 
@@ -55,9 +55,11 @@
                         @else
                             @foreach ($greaseTrapBookings as $greaseTrapBooking)
                                 <tr>
-                                    <td>{{ $greaseTrapBooking->transaction_no ?? 'N/A' }}</td>
-                                    <td>{{ $greaseTrapBooking->srf_no ?? 'N/A' }}</td>
-                                    <td>{{ $greaseTrapBooking->user->name ?? 'N/A' }}</td>
+                                    <td>{{ !empty(trim($greaseTrapBooking->transaction_no)) ? $greaseTrapBooking->transaction_no : 'N/A' }}
+                                    </td>
+                                    <td>{{ !empty(trim($greaseTrapBooking->srf_no)) ? $greaseTrapBooking->srf_no : 'N/A' }}</td>
+
+                                    <td>{{ !empty(trim($greaseTrapBooking->name)) ? $greaseTrapBooking->user->name : 'N/A' }}</td>
                                     <td>
                                         @php
                                             $resType = strtolower($greaseTrapBooking->resident_type ?? '');
@@ -71,11 +73,11 @@
                                             <span class="badge bg-secondary">N/A</span>
                                         @endif
                                     </td>
-                                    <td>{{ $greaseTrapBooking->unit_no ?? 'N/A' }}</td>
+                                    <td>{{ !empty(trim($greaseTrapBooking->unit_no)) ? $greaseTrapBooking->unit_no : 'N/A' }}</td>
 
 
-                                    <td>{{ $greaseTrapBooking->booking_date ?? 'N/A' }}</td>
-                                    <td>{{ $greaseTrapBooking->booking_time_slot ?? 'N/A' }}</td>
+                                    <td>{{ !empty(trim($greaseTrapBooking->booking_date)) ? $greaseTrapBooking->booking_date : 'N/A' }}</td>
+                                    <td>{{ !empty(trim($greaseTrapBooking->booking_time_slot)) ? $greaseTrapBooking->booking_time_slot : 'N/A' }}</td>
                                     <td>
                                         @if ($greaseTrapBooking->charged_type === 1)
                                             <span class="badge bg-primary text-white badge-forge ">Free</span>
@@ -92,7 +94,7 @@
                                         @endif
                                     </td>
 
-                                    <td>{{ $greaseTrapBooking->remarks ?? 'N/A' }}</td>
+                                    <td>{{ !empty(trim($greaseTrapBooking->remarks)) ? $greaseTrapBooking->remarks : 'N/A' }}</td>
 
                                     <td>
                                         @if ($greaseTrapBooking->booking_status == 1)
@@ -116,7 +118,7 @@
 
                                         </div>
                                     </td>
-                                </tr> 
+                                </tr>
                             @endforeach
                         @endif
                     </tbody>

@@ -258,34 +258,37 @@ $(document).ready(function () {
 
                 bookings.forEach(function (booking) {
 
-                    var isCancelled = booking.booking_status == 2; // 2 = cancelled
+                    var isCancelled = booking.booking_status == 2;
 
                     var actionButtons = `
-                        <div class="d-flex gap-1 justify-content-center">
-                            <button type="button" class="btn btn-primary edit_pest_control_booking btn-sm btn-equal"
-                                data-bs-toggle="tooltip" data-bs-placement="left" title="View"
-                                data-id="${booking.id}">
-                                <i class="fa-solid fa-eye"></i>
-                            </button>
+                    <div class="d-flex gap-1 justify-content-center">
+                        <button type="button" class="btn btn-primary edit_pest_control_booking btn-sm btn-equal"
+                            data-bs-toggle="tooltip" data-bs-placement="left" title="View"
+                            data-id="${booking.id}">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
 
-                            <button type="button"
-                                class="btn btn-sm btn-equal ${isCancelled ? 'btn-secondary cancel-booking' : 'btn-danger admin-pest-control-booking-cancel'}"
-                                data-bs-toggle="tooltip" data-bs-placement="right"
-                                title="${isCancelled ? 'Cancelled' : 'Cancel'}"
-                                data-id="${booking.id}" ${isCancelled ? 'disabled' : ''}>
-                                <i class="fa-solid fa-ban"></i>
-                            </button>
-                        </div>
-                    `;
+                        <button type="button"
+                            class="btn btn-sm btn-equal ${isCancelled ? 'btn-secondary cancel-booking' : 'btn-danger admin-pest-control-booking-cancel'}"
+                            data-bs-toggle="tooltip" data-bs-placement="right"
+                            title="${isCancelled ? 'Cancelled' : 'Cancel'}"
+                            data-id="${booking.id}" ${isCancelled ? 'disabled' : ''}>
+                            <i class="fa-solid fa-ban"></i>
+                        </button>
+                    </div>
+                `;
 
+                    // Resident type (same logic as grease trap)
+                    var resType = booking.resident_type ? booking.resident_type.toLowerCase() : '';
 
-                    // Resident type badge
-                    var residentType = booking.resident_type ? booking.resident_type.toUpperCase() : 'N/A';
-                    var residentTypeHtml = residentType === 'OWNER'
-                        ? `<span class="badge bg-primary">${residentType}</span>`
-                        : residentType === 'TENANT'
-                            ? `<span class="badge bg-danger">${residentType}</span>`
-                            : `<span class="badge bg-secondary">N/A</span>`;
+                    var residentTypeHtml = '';
+                    if (resType === 'tenant') {
+                        residentTypeHtml = `<span class="badge bg-danger text-uppercase">${booking.resident_type}</span>`;
+                    } else if (resType === 'owner') {
+                        residentTypeHtml = `<span class="badge bg-primary text-uppercase">${booking.resident_type}</span>`;
+                    } else {
+                        residentTypeHtml = `<span class="badge bg-secondary">N/A</span>`;
+                    }
 
                     // Charged type
                     var chargedType = booking.charged_type == 1
@@ -302,23 +305,39 @@ $(document).ready(function () {
                         ? `<span class="badge bg-danger">Yes</span>`
                         : `<span class="badge bg-secondary">No</span>`;
 
+                    // Created / Cancelled By
+                    var createdBy = booking.createdBy?.name
+                        ? booking.createdBy.name.toUpperCase()
+                        : 'N/A';
+
+                    var cancelledBy = booking.cancelledBy?.name
+                        ? booking.cancelledBy.name.toUpperCase()
+                        : 'N/A';
+
+                    var cancelledAt = booking.cancelled_at ?? 'N/A';
+
                     var row = `
                     <tr>
                         <td>${booking.transaction_no ?? 'N/A'}</td>
                         <td>${booking.srf_no ?? 'N/A'}</td>
                         <td>${booking.name ?? 'N/A'}</td>
+
                         <td>${residentTypeHtml}</td>
                         <td>${booking.unit_no ?? 'N/A'}</td>
                         <td>${booking.booking_date ?? 'N/A'}</td>
                         <td>${booking.booking_time_slot ?? 'N/A'}</td>
+
                         <td>${chargedType}</td>
                         <td>${emergency}</td>
+
                         <td>${booking.remarks ?? 'N/A'}</td>
                         <td>${bookingStatus}</td>
-                        <td>${booking.createdBy?.name ? booking.createdBy.name.toUpperCase() : 'N/A'}</td>
+
+                        <td>${createdBy}</td>
                         <td>${booking.created_at ?? 'N/A'}</td>
-                        <td>${booking.cancelledBy?.name ? booking.cancelledBy.name.toUpperCase() : 'N/A'}</td>
-                        <td>${booking.cancelled_at ?? 'N/A'}</td>
+
+                        <td>${cancelledBy}</td>
+                        <td>${cancelledAt}</td>
 
                         <td class="sticky-col sticky-col-color">${actionButtons}</td>
                     </tr>
@@ -330,7 +349,7 @@ $(document).ready(function () {
                 $('[data-bs-toggle="tooltip"]').tooltip();
             },
             error: function (xhr, status, error) {
-                console.error('Error refreshing grease trap table:', error);
+                console.error('Error refreshing pest control table:', error);
             }
         });
     }

@@ -526,12 +526,12 @@
                 <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded bg-light">
                     <div>
                         <small class="text-muted d-block">Charged Type</small>
-                        <span id="display_charged_type" class="fw-semibold"></span>
+                        <span id="display_charged_type_reports" class="fw-semibold"></span>
                     </div>
 
                     <div class="text-end">
                         <small class="text-muted d-block">Time Slot</small>
-                        <span id="display_time_slot" class="fw-semibold"></span>
+                        <span id="display_time_slot_reports" class="fw-semibold"></span>
                     </div>
                 </div>
 

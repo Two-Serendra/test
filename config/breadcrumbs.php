@@ -34,7 +34,7 @@ return [
     'admin.booking.grease.trap' => ['Grease Trap', 'Booking'],
     'admin.booking.grease.trap.calendar' => ['Grease Trap', 'Calendar'],
     'admin.report.grease.trap' => ['Grease Trap', 'Reports'],
-    'admin.search.grease.trap.booking' => ['Grease Trap', 'Booking'],
+    'admin.search.grease.trap.reports' => ['Grease Trap', 'Reports'],
 
     // Pest Control
     'admin.booking.pest.control' => ['Pest Control', 'Booking'],

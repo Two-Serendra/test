@@ -143,7 +143,7 @@ $(document).ready(function () {
             if (type === '20hrs') {
                 maxDate.setDate(today.getDate() + 1);
             } else if (type === 'Advanced Booking') {
-                maxDate.setDate(today.getDate() + 9); 
+                maxDate.setDate(today.getDate() + 9);
             }
 
             flatpickr(df, {
@@ -777,6 +777,182 @@ $(document).ready(function () {
                         Swal.fire('Error', 'Something went wrong.', 'error');
                     }
                 });
+            }
+        });
+    });
+
+    $('.SlotCheckingModalUserbBtnFitnessHub').on('click', function () {
+        $('#FitnessHubSlotCheckingModalUser').modal('show');
+        $('#SearchSlotUserFitnessHub')[0].reset();
+        $('#fitnessHubDateFieldSearchUser').prop('disabled', true);
+        $('.slot-checking-submit-btn-fitness-hub').prop('disabled', true);
+        $('.all-slot-available-user-fitness-hub').empty();
+        $('#spinner').addClass('d-none');
+    });
+
+    $('#FitnessHubSlotCheckingModalUser').on('hidden.bs.modal', function () {
+        $('.modal-backdrop').remove();
+        $('#fitnessHubDateFieldSearchUser').prop('disabled', true);
+        $('.slot-checking-submit-btn-fitness-hub').prop('disabled', true);
+        $('#SearchSlotUserFitnessHub')[0].reset();
+        $('.all-slot-available-user-fitness-hub').empty();
+        $('#spinner').addClass('d-none');
+    });
+
+    $('#fitnessHubSelectBookingSearchUser').on('change', function () {
+
+        const fitnessHubSelect = $(this);
+        const selectedFitnessHubId = fitnessHubSelect.val();
+        const dateField = $('#fitnessHubDateFieldSearchUser');
+
+        $('.all-slot-available-user-fitness-hub').empty();
+        $('#unitStatus').text('0/0').attr('class', 'mt-1 text-muted');
+        dateField.val('').prop('disabled', false);
+        $('.slot-checking-submit-btn-fitness-hub').prop('disabled', true);
+
+        if (!selectedFitnessHubId) return;
+
+        $.ajax({
+            url: '/fetch-date-blocking-fitness-hub-user',
+            method: 'GET',
+            data: {
+                fitness_hub_id: selectedFitnessHubId
+            },
+            success: function (blockedDates) {
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                let currentMonday = new Date(today);
+                currentMonday.setDate(today.getDate() - today.getDay() + 1);
+
+                let maxBookingDate = new Date(currentMonday);
+                maxBookingDate.setDate(currentMonday.getDate() + 13);
+
+                if (today.getDay() >= 5) {
+                    maxBookingDate.setDate(maxBookingDate.getDate() + 7);
+                }
+
+                if (dateField[0]._flatpickr) {
+                    dateField[0]._flatpickr.destroy();
+                }
+
+                flatpickr(dateField[0], {
+                    enableTime: false,
+                    dateFormat: "Y-m-d",
+                    minDate: today,
+                    maxDate: maxBookingDate,
+                    allowInput: true,
+                    altInput: true,
+                    altFormat: "F j, Y",
+                    disable: blockedDates,
+                    disableMobile: true,
+
+                    onChange: function (selectedDates, dateStr) {
+
+                        $('.slot-checking-submit-btn-fitness-hub')
+                            .prop('disabled', !dateStr);
+
+                        $('.all-slot-available-user-fitness-hub').empty();
+                    }
+                });
+            },
+            error: function (xhr) {
+                console.error('Failed to fetch blocked dates:', xhr.responseText);
+            }
+        });
+    });
+
+
+    $('.SearchSlotUserFitnessHub').submit(function (event) {
+        event.preventDefault();
+
+        let fitnessHubId = $('#fitnessHubSelectBookingSearchUser').val();
+        let dateField = $('#fitnessHubDateFieldSearchUser').val();
+        const $btn = $('.slot-checking-submit-btn-fitness-hub');
+        const originalWidth = $btn.outerWidth();
+        $btn
+            .attr('disabled', true)
+            .html(`<div class="spinner-border spinner-border-sm text-light"></div>`)
+            .css('width', originalWidth + 'px');
+
+
+        $.ajax({
+            url: '/fetch-all-slots-user-fitness-hub',
+            method: 'get',
+            data: {
+                fitness_hub_id: fitnessHubId,
+                booking_date: dateField
+            },
+            success: function (response) {
+                $('#spinner').addClass('d-none');
+
+                if (response.error) {
+                    $('.all-slot-available-user-fitness-hub').html(`
+                    <div class="alert alert-warning text-center mb-0">
+                        ${response.error}
+                    </div>
+                `);
+                    return;
+                }
+
+                if (!response.slots || response.slots.length === 0) {
+                    $('.all-slot-available-user-fitness-hub').html(`
+                    <div class="alert alert-info text-center mb-0">
+                        No available time slots for this day.
+                    </div>
+                `);
+                    return;
+                }
+
+                let html = `
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+                response.slots.forEach(slot => {
+                    let status = slot.status;
+                    let label = slot.label;
+                    let badgeClass = 'custom-badge bg-primary';
+
+                    if (status === 'Booked') {
+                        badgeClass = 'custom-badge bg-danger';
+                    } else if (status === 'Blocked') {
+                        badgeClass = 'custom-badge bg-secondary';
+                    } else {
+                        badgeClass = 'custom-badge bg-primary';
+                    }
+
+                    let displayText = label;
+
+                    html += `
+<tr>
+    <td>${slot.time_range}</td>
+    <td><span class="badge ${badgeClass} text-uppercase">${displayText}</span></td>
+</tr>
+`;
+                });
+
+                html += '</tbody></table>';
+                $('.all-slot-available-user-fitness-hub').html(html);
+            },
+
+            error: function () {
+                $('#spinner').addClass('d-none');
+                alert('An error occurred while fetching the data.');
+            },
+
+            complete: function () {
+                $btn
+                    .attr('disabled', false)
+                    .html(`<i class="fa-solid fa-search me-1"></i><span> Search</span>`)
+                    .css('width', '');
             }
         });
     });

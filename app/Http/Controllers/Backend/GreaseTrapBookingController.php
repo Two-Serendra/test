@@ -34,6 +34,7 @@ class GreaseTrapBookingController extends Controller
 
       $bookedSlots = GreaseTrapBooking::whereDate('booking_date', $request->date)
          ->where('booking_status', 1)
+         ->where('emergency', 0) // Exclude emergency bookings
          ->pluck('booking_time_slot')
          ->toArray();
 

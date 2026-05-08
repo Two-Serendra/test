@@ -164,12 +164,16 @@
                                     while ($start->lt($end)) {
                                         $slotStart = strtoupper($start->format('g:iA'));
                                         $slotEnd = strtoupper($start->copy()->addHour()->format('g:iA'));
-                                        $slots[] = "{$slotStart}-{$slotEnd}";
+
+                                        // Add spaces around dash
+                                        $slots[] = "{$slotStart} - {$slotEnd}";
 
                                         $start->addHour();
                                     }
                                 @endphp
+
                                 <label for="booking_time_slot" class="form-label">Select Time Slot</label>
+
                                 <div class="slot-container border rounded p-2">
                                     <select name="booking_time_slot" id="booking_time_slot"
                                         class="form-select border-0 shadow-none" size="8" required>

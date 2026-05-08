@@ -93,7 +93,7 @@
                                                         <span class="badge bg-secondary">N/A</span>
                                                     @endif
                                                 </td>
-                                                <td>{{ !empty(trim($greaseTrapBooking->unit_no)) ? $greaseTrapBooking->unit_no : 'N/A' }}</td>
+                                                 <td>{{ !empty(trim($greaseTrapBooking->unit_no)) ? $greaseTrapBooking->unit_no : 'N/A' }}</td>
 
 
                                                 <td>{{ $greaseTrapBooking->booking_date ?? 'N/A' }}</td>

@@ -67,13 +67,13 @@
                             <div class="row g-2">
                                 @php
                                     $slots = [
-                                        '9:00 AM - 10:00 AM',
-                                        '10:00 AM - 11:00 AM',
-                                        '11:00 AM - 12:00 NN',
-                                        '1:00 PM - 2:00 PM',
-                                        '2:00 PM - 3:00 PM',
-                                        '3:00 PM - 4:00 PM',
-                                        '4:00 PM - 5:00 PM',
+                                        '9:00AM - 10:00AM',
+                                        '10:00AM - 11:00AM',
+                                        '11:00AM - 12:00PM',
+                                        '1:00PM - 2:00PM',
+                                        '2:00PM - 3:00PM',
+                                        '3:00PM - 4:00PM',
+                                        '4:00PM - 5:00PM',
                                     ];
                                 @endphp
 
@@ -158,25 +158,26 @@
                                     use Carbon\Carbon;
 
                                     $slots = [];
-                                    $start = Carbon::createFromTime(6, 0); // 6:00 AM
-                                    $end = Carbon::createFromTime(22, 0);  // 10:00 PM
+                                    $start = Carbon::createFromTime(6, 0);
+                                    $end = Carbon::createFromTime(22, 0);
 
                                     while ($start->lt($end)) {
-                                        $slotStart = $start->format('g:i A');
-                                        $slotEnd = $start->copy()->addHour()->format('g:i A');
+                                        $slotStart = strtoupper($start->format('g:iA'));
+                                        $slotEnd = strtoupper($start->copy()->addHour()->format('g:iA'));
 
-                                        // Optional: convert 12:00 PM to 12:00 NN
-                                        $slotEnd = str_replace('12:00 PM', '12:00 NN', $slotEnd);
+                                        // optional replacement
+                                        $slotEnd = str_replace('12:00PM', '12:00NN', $slotEnd);
 
-                                        $slots[] = "{$slotStart} - {$slotEnd}";
+                                        $slots[] = "{$slotStart}-{$slotEnd}";
+
                                         $start->addHour();
                                     }
                                 @endphp
                                 <label for="booking_time_slot" class="form-label">Select Time Slot</label>
                                 <div class="slot-container border rounded p-2">
-                                    <select name="booking_time_slot" id="booking_time_slot" class="form-select border-0 shadow-none"  size="8"
-                                        required>
-                                       
+                                    <select name="booking_time_slot" id="booking_time_slot"
+                                        class="form-select border-0 shadow-none" size="8" required>
+
                                         @foreach ($slots as $slot)
                                             <option value="{{ $slot }}">{{ $slot }}</option>
                                         @endforeach

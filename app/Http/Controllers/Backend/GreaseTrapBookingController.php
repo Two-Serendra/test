@@ -101,7 +101,6 @@ class GreaseTrapBookingController extends Controller
             $yearStart = Carbon::now()->startOfYear()->toDateString();
             $yearEnd = Carbon::now()->endOfYear()->toDateString();
 
-            // Include cancelled_within_24hrs in the count
             $unitBookingsCount = GreaseTrapBooking::where('unit_no', $unitNo)
                ->whereBetween('booking_date', [$yearStart, $yearEnd])
                ->where(function ($q) {
@@ -729,7 +728,7 @@ class GreaseTrapBookingController extends Controller
             Log::info('Processing CSV row', ['index' => $index, 'row' => $row]);
 
             try {
-               $bookingDate = Carbon::parse(trim($row[6]))->format('Y-m-d');
+               $bookingDate = Carbon::parse(trim($row[7]))->format('Y-m-d');
             } catch (\Exception $e) {
                Log::error('Booking date parse error', [
                   'row' => $row,
@@ -744,16 +743,17 @@ class GreaseTrapBookingController extends Controller
                   'transaction_no' => null, // will assign after insert
                   'unit_no' => trim($row[4]),
                   'resident_type' => trim($row[5]),
+                  'name' => trim($row[6]),
                   'booking_date' => $bookingDate,
-                  'booking_time_slot' => trim($row[7]),
-                  'srf_no' => trim($row[8]),
+                  'booking_time_slot' => trim($row[8]),
+                  'srf_no' => trim($row[9]),
                   'remarks' => null,
-                  'charged_type' => trim($row[10]),
-                  'emergency' => trim($row[11]),
-                  'booking_status' => trim($row[12]),
+                  'charged_type' => trim($row[11]),
+                  'emergency' => trim($row[12]),
+                  'booking_status' => trim($row[13]),
                   'cancelled_by' => null,
                   'cancelled_at' => null,
-                  'has_penalty' => trim($row[14]),
+                  'has_penalty' => trim($row[15]),
                   'penalty_amount' => null,
                   'created_by' => null,
                ]);

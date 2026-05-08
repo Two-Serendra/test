@@ -65,6 +65,7 @@ Route::get('/minor-work-permit', [NavbarController::class, 'minorWorkPermit'])->
 //Work Permit
 Route::post('/submit-minor-work-permit', [UserWorkPermitController::class, 'submitMinorWorkPermit'])->middleware(['auth'])->name('submit.minor.work.permit');
 Route::get('/forms', [NavbarController::class, 'getAllDownloads'])->name('downloads');
+Route::get('/Links', [NavbarController::class, 'getAllLinks'])->name('links');
 route::get('/request-electricity/{unitNo}/{year}/{month}', [ProfileController::class, 'requestElectricity'])->name('request.electricity');
 
 

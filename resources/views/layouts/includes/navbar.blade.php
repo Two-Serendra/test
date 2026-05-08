@@ -33,6 +33,7 @@
                             <a href="{{ route('ourTeam') }}" class="dropdown-item">Our Team</a>
                             <a href="{{ route('gallery') }}" class="dropdown-item">Gallery</a>
                             <a href="{{ route('events') }}" class="dropdown-item">Events</a>
+                            <a href="{{ route('links') }}" class="dropdown-item">Quick Links</a>
                             <a href="{{ route('downloads') }}" class="dropdown-item">Forms</a>
                         </div>
                     </div>

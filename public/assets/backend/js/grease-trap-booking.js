@@ -27,6 +27,7 @@ $(document).ready(function () {
             success: function (res) {
                 resetSlots();
                 disableBookedSlots(res.booked_slots);
+                setTimeout(syncSlotState, 0);
             },
             error: function () {
                 Swal.fire({
@@ -46,6 +47,16 @@ $(document).ready(function () {
                 .addClass('btn-outline-primary')
                 .css('cursor', 'pointer');
         });
+        syncSlotState();
+
+
+    }
+
+
+    function syncSlotState() {
+        const hasAvailableSlots = $('input[name="booking_time_slot"]:not(:disabled)').length > 0;
+
+        $('#saveAdminGreaseTrapBtn').prop('disabled', !hasAvailableSlots);
     }
 
     function disableBookedSlots(bookedSlots) {
@@ -82,6 +93,32 @@ $(document).ready(function () {
         const $submitBtn = $('#saveAdminGreaseTrapBtn');
         const $bookingDate = $('#GreaseTrapBookingDateAdmin');
         const selectedDate = $bookingDate.val();
+
+        const $slots = $('input[name="booking_time_slot"]');
+        const $enabledSlots = $slots.filter(':not(:disabled)');
+        const $checkedSlot = $slots.filter(':checked');
+
+        // If no slots are available at all
+        if ($enabledSlots.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'No Available Time Slots',
+                text: 'There are no available time slots for the selected date.',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        // If slots exist but none selected
+        if ($checkedSlot.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Select Time Slot',
+                text: 'Please select an available time slot.',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
 
         if (!form.checkValidity()) {
             form.classList.add('was-validated');

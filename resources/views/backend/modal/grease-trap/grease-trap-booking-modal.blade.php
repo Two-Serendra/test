@@ -164,10 +164,6 @@
                                     while ($start->lt($end)) {
                                         $slotStart = strtoupper($start->format('g:iA'));
                                         $slotEnd = strtoupper($start->copy()->addHour()->format('g:iA'));
-
-                                        // optional replacement
-                                        $slotEnd = str_replace('12:00PM', '12:00NN', $slotEnd);
-
                                         $slots[] = "{$slotStart}-{$slotEnd}";
 
                                         $start->addHour();

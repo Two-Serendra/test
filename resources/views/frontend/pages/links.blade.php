@@ -46,7 +46,7 @@
                                 </a>
                             </li>
                             <li class="list-group-item">
-                                <a href="https://drive.google.com/file/d/17b4QwDZEL07ZLvpYV8sKa-FKhqcazBVC/view?usp=sharing" target="_blank"
+                                <a href="https://drive.google.com/file/d/1YL_9lqzPETjW2gxe1d13maXOsP1wh7zE/view" target="_blank"
                                     class="d-flex align-items-center fs-6 text-dark online-form-link">
                                     <i class='bx bx-file-blank me-2 fs-4'></i>
                                     House Rules and Regulations

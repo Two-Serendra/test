@@ -52,6 +52,7 @@ $(document).ready(function () {
         dateFormat: "Y-m-d",
         minDate: "today"
     });
+    
     const $bookingSlots = $('.booking-slot-admin-pest-control');
     $bookingSlots.prop('disabled', true);
 
@@ -73,8 +74,6 @@ $(document).ready(function () {
 
         updateSlots(date, unit);
     });
-
-
 
     function updateSlots(date, unit) {
         $.ajax({
@@ -117,6 +116,27 @@ $(document).ready(function () {
         const $submitBtn = $('#saveAdminPestControlBtn');
         const $bookingDate = $('#PestControlBookingDateAdmin');
         const modal = $bookingDate.val();
+
+        const $enabledSlots = $('input[name="booking_time_slot"]:not(:disabled)');
+        const $selectedEnabledSlot = $('input[name="booking_time_slot"]:checked:enabled');
+
+        if ($enabledSlots.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'No Available Time Slots',
+                text: 'All time slots are already booked for this date.'
+            });
+            return;
+        }
+
+        if ($selectedEnabledSlot.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Select Time Slot',
+                text: 'Please select an available time slot.'
+            });
+            return;
+        }
 
         if (!form.checkValidity()) {
             form.classList.add('was-validated');

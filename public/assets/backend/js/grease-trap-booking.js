@@ -5,12 +5,12 @@ $(document).ready(function () {
 
     const emergencyBookingPicker = flatpickr('    #GreaseTrapBookingDateAdminEmergency', {
         dateFormat: 'Y-m-d',
-        minDate:"today"
+        minDate: "today"
     });
 
     const bookingPicker = flatpickr('#GreaseTrapBookingDateAdmin', {
         dateFormat: 'Y-m-d',
-        minDate:"today"
+        minDate: "today"
     });
 
     const $bookingDate = $('#GreaseTrapBookingDateAdmin');
@@ -355,7 +355,13 @@ $(document).ready(function () {
             <td>${chargedType}</td>
             <td>${emergency}</td>
 
-            <td>${displayValue(booking.remarks)}</td>
+           <td 
+    style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+    data-bs-toggle="tooltip"
+    title="${displayValue(booking.remarks)}"
+>
+    ${displayValue(booking.remarks)}
+</td>
             <td>${bookingStatus}</td>
 
             <td>${penaltyHtml}</td>

@@ -59,7 +59,7 @@
                                     </td>
                                     <td>{{ !empty(trim($greaseTrapBooking->srf_no)) ? $greaseTrapBooking->srf_no : 'N/A' }}</td>
 
-                                    <td>{{ !empty(trim($greaseTrapBooking->name)) ? $greaseTrapBooking->user->name : 'N/A' }}</td>
+                                    <td>{{ !empty(trim($greaseTrapBooking->name)) ? $greaseTrapBooking->name : 'N/A' }}</td>
                                     <td>
                                         @php
                                             $resType = strtolower($greaseTrapBooking->resident_type ?? '');

@@ -312,13 +312,13 @@ $(document).ready(function () {
 
                     // Charged type
                     var chargedType = booking.charged_type == 1
-                        ? `<span class="badge bg-primary">Free</span>`
-                        : `<span class="badge bg-danger">Billable</span>`;
+                        ? `<span class="badge bg-primary">FREE</span>`
+                        : `<span class="badge bg-danger">BILLABLE</span>`;
 
                     // Booking status
                     var bookingStatus = booking.booking_status == 1
-                        ? `<span class="badge bg-primary">Booked</span>`
-                        : `<span class="badge bg-danger">Cancelled</span>`;
+                        ? `<span class="badge bg-primary">BOOKED</span>`
+                        : `<span class="badge bg-danger">CANCELLED</span>`;
 
                     // Emergency
                     var emergency = booking.emergency == 1
@@ -349,8 +349,15 @@ $(document).ready(function () {
 
                         <td>${chargedType}</td>
                         <td>${emergency}</td>
-
-                        <td>${booking.remarks ?? 'N/A'}</td>
+                        <td 
+                            style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                            data-bs-toggle="tooltip"
+                            title="${booking.remarks}"
+                        >
+                            ${booking.remarks ?? 'N/A'}
+                        </td>
+          
+                        
                         <td>${bookingStatus}</td>
 
                         <td>${createdBy}</td>

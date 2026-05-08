@@ -107,8 +107,10 @@ class NavbarController extends Controller
       return view('frontend.pages.downloads', compact('groupedDownloads'));
    }
 
-  
-
-
+   public function getAllLinks()
+   {
+   
+      return view('frontend.pages.links');
+   }
 
 }

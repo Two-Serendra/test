@@ -75,8 +75,25 @@ class GreaseTrapBooking extends Model
 
     public function getBookingDateTime()
     {
-        $startTime = explode(' - ', $this->booking_time_slot)[0] ?? '00:00';
-        return Carbon::parse($this->booking_date . ' ' . $startTime);
+        try {
+            if (!$this->booking_date || !$this->booking_time_slot) {
+                return null;
+            }
+
+            $normalized = str_replace(' - ', '-', $this->booking_time_slot);
+            $startTime = trim(explode('-', $normalized)[0] ?? '00:00');
+
+            return Carbon::parse($this->booking_date . ' ' . $startTime);
+
+        } catch (\Exception $e) {
+            \Log::error('Invalid booking datetime', [
+                'date' => $this->booking_date,
+                'slot' => $this->booking_time_slot,
+                'error' => $e->getMessage()
+            ]);
+
+            return null;
+        }
     }
 
     public static function getUsedFreeBookings($unitNo)

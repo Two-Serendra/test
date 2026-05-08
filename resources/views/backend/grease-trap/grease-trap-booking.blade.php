@@ -146,7 +146,10 @@
                                                     <div class="d-flex gap-1 justify-content-center">
                                                         @php
                                                             $isCancelled = $greaseTrapBooking->booking_status == 2;
-                                                            $isPast = $greaseTrapBooking->getBookingDateTime()->lt(now());
+                                                           $bookingDateTime = $greaseTrapBooking->getBookingDateTime();
+                                                          $isPast = $bookingDateTime instanceof \Carbon\Carbon
+                                                            && $bookingDateTime->isValid()
+                                                            && $bookingDateTime->lt(now());
                                                         @endphp
 
                                                         <button type="button" class="btn btn-primary edit_grease_trap_booking btn-sm btn-equal"

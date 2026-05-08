@@ -24,7 +24,7 @@ class GreaseTrapBookingController extends Controller
          ->paginate(10);
       return view('backend.grease-trap.grease-trap-booking', compact('greaseTrapBookings'));
 
-   } 
+   }
 
    public function getBookedSlotsAdmin(Request $request)
    {
@@ -47,7 +47,7 @@ class GreaseTrapBookingController extends Controller
       $bookings = GreaseTrapBooking::with(['user', 'cancelledBy', 'createdBy'])
          ->whereDate('booking_date', '>=', now()->toDateString())
          ->orderBy('created_at', 'DESC')
-         ->paginate(10); 
+         ->paginate(10);
 
       $bookings->getCollection()->transform(function ($b) {
          return [
@@ -301,6 +301,7 @@ class GreaseTrapBookingController extends Controller
             $booking = GreaseTrapBooking::create([
                'user_id' => Auth::id(),
                'name' => $request->name,
+               'created_by' => auth()->id(),
                'unit_no' => $unitNo,
                'resident_type' => strtoupper($request->selectResidentType),
                'transaction_no' => $transactionNo,
@@ -308,7 +309,7 @@ class GreaseTrapBookingController extends Controller
                'booking_time_slot' => $request->booking_time_slot,
                'charged_type' => $chargedType,
                'remarks' => $request->remarks,
-               'emergency' => 2,
+               'emergency' => 1,
                'booking_status' => 1,
             ]);
 

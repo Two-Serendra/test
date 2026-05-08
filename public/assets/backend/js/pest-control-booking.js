@@ -194,7 +194,7 @@ $(document).ready(function () {
 
                     flatpickr('#PestControlBookingDateAdmin', {
                         dateFormat: 'Y-m-d',
-                        minDate: new Date().fp_incr(1)
+                        minDate: "today"
                     });
                     updateSlots(selectedDate);
                 },
@@ -472,7 +472,7 @@ $(document).ready(function () {
 
                     flatpickr('#PestControlBookingDateAdmin', {
                         dateFormat: 'Y-m-d',
-                        minDate: new Date().fp_incr(1)
+                        minDate: "today"
                     });
 
                     updateSlots(selectedDate);

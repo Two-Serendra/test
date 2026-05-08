@@ -5,12 +5,12 @@ $(document).ready(function () {
 
     const emergencyBookingPicker = flatpickr('    #GreaseTrapBookingDateAdminEmergency', {
         dateFormat: 'Y-m-d',
-        minDate: new Date().fp_incr(1)
+        minDate:"today"
     });
 
     const bookingPicker = flatpickr('#GreaseTrapBookingDateAdmin', {
         dateFormat: 'Y-m-d',
-        minDate: new Date().fp_incr(1)
+        minDate:"today"
     });
 
     const $bookingDate = $('#GreaseTrapBookingDateAdmin');
@@ -516,7 +516,7 @@ $(document).ready(function () {
 
                     flatpickr('#GreaseTrapBookingDateAdmin', {
                         dateFormat: 'Y-m-d',
-                        minDate: new Date().fp_incr(1)
+                        minDate: "today"
                     });
 
                     updateSlots(selectedDate);

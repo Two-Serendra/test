@@ -42,9 +42,12 @@
                             <th class="text-dark">Emergency</th>
                             <th class="text-dark">Remarks</th>
                             <th class="text-dark">Status</th>
+                            <th class="text-dark">Penalty</th>
+                            <th class="text-dark">Created by</th>
+                            <th class="text-dark">Created at</th>
+                            <th class="text-dark">Cancelled_by</th>
+                            <th class="text-dark">Cancelled_at</th>
                             <th class="text-dark">Action</th>
-
-
                         </tr>
                     </thead>
                     <tbody>
@@ -55,11 +58,10 @@
                         @else
                             @foreach ($greaseTrapBookings as $greaseTrapBooking)
                                 <tr>
-                                    <td>{{ !empty(trim($greaseTrapBooking->transaction_no)) ? $greaseTrapBooking->transaction_no : 'N/A' }}
-                                    </td>
+                                    <td>{{ $greaseTrapBooking->transaction_no ?? 'N/A' }}</td>
                                     <td>{{ !empty(trim($greaseTrapBooking->srf_no)) ? $greaseTrapBooking->srf_no : 'N/A' }}</td>
-
                                     <td>{{ !empty(trim($greaseTrapBooking->name)) ? $greaseTrapBooking->name : 'N/A' }}</td>
+
                                     <td>
                                         @php
                                             $resType = strtolower($greaseTrapBooking->resident_type ?? '');
@@ -76,8 +78,8 @@
                                     <td>{{ !empty(trim($greaseTrapBooking->unit_no)) ? $greaseTrapBooking->unit_no : 'N/A' }}</td>
 
 
-                                    <td>{{ !empty(trim($greaseTrapBooking->booking_date)) ? $greaseTrapBooking->booking_date : 'N/A' }}</td>
-                                    <td>{{ !empty(trim($greaseTrapBooking->booking_time_slot)) ? $greaseTrapBooking->booking_time_slot : 'N/A' }}</td>
+                                    <td>{{ $greaseTrapBooking->booking_date ?? 'N/A' }}</td>
+                                    <td>{{ $greaseTrapBooking->booking_time_slot ?? 'N/A' }}</td>
                                     <td>
                                         @if ($greaseTrapBooking->charged_type === 1)
                                             <span class="badge bg-primary text-white badge-forge ">Free</span>
@@ -94,28 +96,52 @@
                                         @endif
                                     </td>
 
-                                    <td>{{ !empty(trim($greaseTrapBooking->remarks)) ? $greaseTrapBooking->remarks : 'N/A' }}</td>
+                                    <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                                        data-bs-toggle="tooltip" title="{{ $greaseTrapBooking->remarks }}">
+                                        {{ !empty(trim($greaseTrapBooking->remarks)) ? $greaseTrapBooking->remarks : 'N/A' }}
+                                    </td>
 
                                     <td>
                                         @if ($greaseTrapBooking->booking_status == 1)
-                                            <span class="badge bg-primary custom-badge">Completed</span>
+                                            <span class="badge bg-primary custom-badge">BOOKED</span>
                                         @else
-                                            <span class="badge bg-danger custom-badge">Cancelled</span>
+                                            <span class="badge bg-danger custom-badge">CANCELLED</span>
                                         @endif
                                     </td>
+                                    <td>
+                                        @if ($greaseTrapBooking->has_penalty)
+                                            <span
+                                                class="text-warning fw-bold">₱{{ number_format($greaseTrapBooking->penalty_amount, 2) }}</span>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                    <td>{{ isset($greaseTrapBooking->createdBy->name) ? strtoupper($greaseTrapBooking->createdBy->name) : 'N/A' }}
+                                    </td>
+                                    <td>{{ $greaseTrapBooking->created_at ?? 'N/A' }}</td>
+
+                                    <td>{{ isset($greaseTrapBooking->cancelledBy->name) ? strtoupper($greaseTrapBooking->cancelledBy->name) : 'N/A' }}
+                                    </td>
+                                    <td>{{ $greaseTrapBooking->cancelled_at ?? 'N/A' }}</td>
+
+
+
 
                                     <td class="sticky-col sticky-col-color">
                                         <div class="d-flex gap-1 justify-content-center">
                                             @php
                                                 $isCancelled = $greaseTrapBooking->booking_status == 2;
+                                                $bookingDateTime = $greaseTrapBooking->getBookingDateTime();
+                                                $isPast = $bookingDateTime instanceof \Carbon\Carbon
+                                                    && $bookingDateTime->isValid()
+                                                    && $bookingDateTime->lt(now());
                                             @endphp
 
-                                            <button type="button" class="btn btn-primary view_grease_trap_booking btn-sm btn-equal"
+                                            <button type="button" class="btn btn-primary edit_grease_trap_report btn-sm btn-equal"
                                                 data-bs-toggle="tooltip" data-bs-placement="left" title="View"
                                                 data-id="{{ $greaseTrapBooking->id }}">
                                                 <i class="fa-solid fa-eye"></i>
                                             </button>
-
                                         </div>
                                     </td>
                                 </tr>

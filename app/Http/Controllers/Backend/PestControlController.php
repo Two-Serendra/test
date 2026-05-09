@@ -65,6 +65,7 @@ class PestControlController extends Controller
 
         $bookings = PestControlBooking::whereDate('booking_date', $request->date)
             ->where('booking_status', 1)
+            ->where('emergency', 0) // Exclude emergency bookings
             ->get(['booking_time_slot', 'unit_area']);
 
         $slotStatus = [];

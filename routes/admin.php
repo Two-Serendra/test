@@ -296,6 +296,8 @@ Route::middleware('auth:admin')->group(function () {
         ->name('download.grease.trap.booking.reports');
     Route::post('/grease-trap-import-booking', [GreaseTrapBookingController::class, 'importGreaseTrapBookings'])->name('grease.trap.booking.import');
     Route::get('/search-grease-trap-report', [GreaseTrapBookingController::class, 'searchGreaseTrapReports'])->name('admin.search.grease.trap.reports');
+    Route::get('/admin-get-updated-grease-trap-report-table', [GreaseTrapBookingController::class, 'getUpdatedGreaseTrapReportTable']);
+    Route::post('/admin/grease-trap/report/update', [GreaseTrapBookingController::class, 'AdminUpdateGreaseTrapReport'])->name('admin.grease.trap.report.update');
 
 
     //Pest Control

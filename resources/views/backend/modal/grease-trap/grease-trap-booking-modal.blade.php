@@ -494,7 +494,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="viewGreaseTrapBooking" data-bs-backdrop="static" data-bs-keyboard="false">
+<div class="modal fade" id="viewGreaseTrapReport" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
 
@@ -536,11 +536,11 @@
                     </div>
                 </div>
 
-                <form action="{{ route('admin.grease.trap.booking.update') }}" id="updateGreaseTrapBookingFormAdmin"
+                <form action="{{ route('admin.grease.trap.booking.update') }}" id="updateGreaseTrapReportFormAdmin"
                     method="POST" enctype="multipart/form-data" novalidate>
                     @csrf
 
-                    <input type="hidden" id="info_id" name="id">
+                    <input type="hidden" name="id" id="info_id_reports">
 
                     <div class="row g-3">
 
@@ -583,14 +583,15 @@
                                     Update Information
                                 </h6>
 
-                                <div class="d-flex justify-content-between mb-3">
-                                    <span class="text-muted">SRF No</span>
-                                    <span id="srf_no_reports" class="fw-semibold"></span>
+                                <div class="mb-3">
+                                    <label class="form-label">SRF No *</label>
+                                    <input type="text" class="form-control" id="grease_trap_srf_no_reports" name="srf_no">
                                 </div>
 
-                                <div class="d-flex justify-content-between mb-3">
-                                    <span class="text-muted">Remarks</span>
-                                    <span id="remarks_grease_trap_reports" class="fw-semibold"></span>
+                                <div class="mb-3">
+                                    <label class="form-label">Remarks</label>
+                                    <textarea class="form-control" id="remarks_grease_trap_reports" name="remarks">
+                                        rows="4"></textarea>
                                 </div>
 
                             </div>
@@ -604,10 +605,62 @@
 
             <!-- FOOTER -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">Close</button>
+                <button type="submit" form="updateGreaseTrapReportFormAdmin" id="UpdateGreaseTrapReportBtn"
+                    class="btn btn-primary btn-sm">
+                    Update
+                </button>
             </div>
 
+        </div>
+    </div>
+</div>
 
+
+<div class="modal fade" id="DownloadGreaseTrapBookingRecords" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-3" id="staticBackdropLabel">Download Grease Trap Reports</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ route('download.grease.trap.booking.reports')}}"
+                    id="download-grease-trap-booking-reports" method="POST" enctype="multipart/form-data"
+                    class="needs-validation" novalidate>
+                    @csrf
+                    <div class="row">
+                        <div class="col-6 ">
+                            <div class="mb-3 position-relative">
+                                <label for="DownloadStartDateGT" class="form-label">Start Date *</label>
+                                <input type="text" id="DownloadStartDateGT" class="form-control"
+                                    name="download_start_date_gt">
+                                <i class="fa-regular fa-calendar position-absolute"
+                                    style="top: 73%; right: 8px; transform: translateY(-50%);"></i>
+                            </div>
+                        </div>
+
+                        <div class="col-6 ">
+                            <div class="mb-3 position-relative">
+                                <label for="DownloadEndDateGT" class="form-label">End Date *</label>
+                                <input type="text" id="DownloadEndDateGT" class="form-control"
+                                    name="download_end_date_gt">
+                                <i class="fa-regular fa-calendar position-absolute"
+                                    style="top: 73%; right: 8px; transform: translateY(-50%);"></i>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" form="download-grease-trap-booking-reports"
+                    id="download-grease-trap-booking-reports"
+                    class="btn btn-primary d-flex align-items-center justify-content-center"
+                    style="min-width: 100px; height: 38px;">
+                    <span class="btn-text">Download</span>
+                </button>
+            </div>
         </div>
     </div>
 </div>

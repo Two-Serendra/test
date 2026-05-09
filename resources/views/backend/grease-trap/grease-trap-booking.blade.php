@@ -32,6 +32,10 @@
                         <i class='bx bx-upload'></i> Upload Bookings
                     </button> -->
 
+                     <button type="button" class="btn btn-primary badge AddGreaseTrapBookingAdmin me-2">
+                         <i class='bx bx-search-alt'></i> Check Unit
+                    </button>
+
 
                     <button type="button" class="btn btn-primary badge AddGreaseTrapBookingAdmin me-2">
                         <i class='bx bx-plus'></i> New Booking
@@ -100,9 +104,9 @@
                                                 <td>{{ $greaseTrapBooking->booking_time_slot ?? 'N/A' }}</td>
                                                 <td>
                                                     @if ($greaseTrapBooking->charged_type === 1)
-                                                        <span class="badge bg-primary text-white badge-forge ">Free</span>
+                                                        <span class="badge bg-primary text-white badge-forge ">FREE</span>
                                                     @else
-                                                        <span class="badge bg-danger badge-forge ">Billable</span>
+                                                        <span class="badge bg-danger badge-forge ">BILLABLE</span>
                                                     @endif
                                                 </td>
 

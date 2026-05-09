@@ -810,4 +810,73 @@ class GreaseTrapBookingController extends Controller
       return view('backend.grease-trap.grease-trap-report', compact('greaseTrapBookings', 'searchBooking'))
          ->with('searchGreaseTrapReports', $searchBooking);
    }
+
+
+   public function getUpdatedGreaseTrapReportTable()
+   {
+      $bookings = GreaseTrapBooking::with(['user', 'cancelledBy', 'createdBy'])
+         ->whereDate('booking_date', '<', now()->toDateString())
+         ->orderBy('created_at', 'DESC')
+         ->paginate(10);
+
+      $bookings->getCollection()->transform(function ($b) {
+         return [
+            'id' => $b->id,
+            'transaction_no' => $b->transaction_no,
+            'srf_no' => $b->srf_no,
+            'name' => $b->name,
+            'resident_type' => $b->resident_type,
+            'unit_no' => $b->unit_no,
+            'booking_date' => $b->booking_date,
+            'booking_time_slot' => $b->booking_time_slot,
+            'charged_type' => $b->charged_type,
+            'emergency' => $b->emergency,
+            'remarks' => $b->remarks,
+            'booking_status' => $b->booking_status,
+
+            'has_penalty' => $b->has_penalty,
+            'penalty_amount' => $b->penalty_amount,
+
+            // 👇 FORMAT DATES HERE (THIS FIXES YOUR ISSUE)
+            'created_at' => optional($b->created_at)->format('Y-m-d H:i:s'),
+            'cancelled_at' => $b->cancelled_at
+               ? Carbon::parse($b->cancelled_at)->format('Y-m-d H:i:s')
+               : null,
+            // relations
+            'createdBy' => $b->createdBy ? [
+               'name' => $b->createdBy->name
+            ] : null,
+
+            'cancelledBy' => $b->cancelledBy ? [
+               'name' => $b->cancelledBy->name
+            ] : null,
+         ];
+      });
+
+      return response()->json($bookings);
+   }
+
+   public function AdminUpdateGreaseTrapReport(Request $request)
+   {
+
+      try {
+         $booking = GreaseTrapBooking::findOrFail($request->id);
+
+         $booking->srf_no = $request->srf_no;
+         $booking->remarks = $request->remarks;
+         $booking->save();
+
+         return response()->json([
+            'success' => true,
+            'message' => 'Grease Trap Booking updated successfully'
+         ]);
+
+      } catch (\Exception $e) {
+         return response()->json([
+            'success' => false,
+            'message' => 'Update failed',
+            'error' => $e->getMessage()
+         ], 500);
+      }
+   }
 }

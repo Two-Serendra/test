@@ -31,7 +31,7 @@ class PestControlController extends Controller
     {
 
         $searchBooking = $request->input('searchPestControlBooking');
-    
+
         $pestControlBookings = PestControlBooking::with('user')
             ->when($searchBooking, function ($query, $searchBooking) {
                 $query->where(function ($q) use ($searchBooking) {
@@ -458,7 +458,7 @@ class PestControlController extends Controller
         $fromDate = $request->input('download_start_date_pc');
         $toDate = $request->input('download_end_date_pc');
 
-        Log::info("Grease Trap Download request", [
+        Log::info("Pest Control Download request", [
             'download_start_date_pc' => $fromDate,
             'download_end_date_pc' => $toDate
         ]);
@@ -466,14 +466,16 @@ class PestControlController extends Controller
         $formattedFromDate = Carbon::parse($fromDate)->format('m-d-Y');
         $formattedToDate = Carbon::parse($toDate)->format('m-d-Y');
 
-        // Fetch data (PAST BOOKINGS ONLY)
         $data = DB::table('pest_control_bookings')
-            ->join('users', 'pest_control_bookings.user_id', '=', 'users.id')
+            ->leftJoin('users as u', 'pest_control_bookings.user_id', '=', 'u.id')
             ->select(
                 'pest_control_bookings.transaction_no',
                 'pest_control_bookings.unit_no',
                 'pest_control_bookings.resident_type',
-                'users.name',
+
+                'pest_control_bookings.name as resident_name',
+                'u.name as created_by_name', // if you have created_by column, else remove this
+
                 'pest_control_bookings.booking_date',
                 'pest_control_bookings.booking_time_slot',
                 'pest_control_bookings.srf_no',
@@ -485,7 +487,6 @@ class PestControlController extends Controller
                 'pest_control_bookings.updated_at'
             )
             ->whereBetween('booking_date', [$fromDate, $toDate])
-            ->whereDate('booking_date', '<', now()->toDateString()) // ONLY PAST BOOKINGS
             ->orderBy('booking_date', 'desc')
             ->get();
 
@@ -499,7 +500,6 @@ class PestControlController extends Controller
 
             $handle = fopen('php://output', 'w');
 
-            // CSV HEADER
             fputcsv($handle, [
                 'Transaction No',
                 'Resident Name',
@@ -512,6 +512,7 @@ class PestControlController extends Controller
                 'Charged Type',
                 'Emergency',
                 'Status',
+                'Created By',
                 'Created At',
                 'Updated At'
             ]);
@@ -520,13 +521,9 @@ class PestControlController extends Controller
 
                 $bookingDate = Carbon::parse($row->booking_date)->format('F j, Y');
 
-                // Charge Type
                 $chargeType = $row->charged_type == 1 ? 'Free' : 'Billable';
-
-                // Emergency
                 $emergency = $row->emergency == 1 ? 'Yes' : 'No';
 
-                // Status
                 $status = match ($row->booking_status) {
                     1 => 'Completed',
                     2 => 'Cancelled',
@@ -535,7 +532,7 @@ class PestControlController extends Controller
 
                 fputcsv($handle, [
                     $row->transaction_no,
-                    $row->name,
+                    $row->resident_name,
                     $row->unit_no,
                     $row->resident_type,
                     $bookingDate,
@@ -545,6 +542,7 @@ class PestControlController extends Controller
                     $chargeType,
                     $emergency,
                     $status,
+                    $row->created_by_name ?? null,
                     $row->created_at,
                     $row->updated_at
                 ]);
@@ -563,7 +561,6 @@ class PestControlController extends Controller
 
         return $response;
     }
-
 
     public function importPestControlBookings(Request $request)
     {

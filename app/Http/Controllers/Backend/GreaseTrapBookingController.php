@@ -504,12 +504,13 @@ class GreaseTrapBookingController extends Controller
 
       // Fetch data (PAST BOOKINGS ONLY)
       $data = DB::table('grease_trap_bookings')
-         ->leftJoin('users', 'grease_trap_bookings.user_id', '=', 'users.id')
+         ->leftJoin('users as u', 'grease_trap_bookings.user_id', '=', 'u.id')
          ->select(
             'grease_trap_bookings.transaction_no',
             'grease_trap_bookings.unit_no',
             'grease_trap_bookings.resident_type',
-            'users.name',
+            'grease_trap_bookings.name as resident_name',
+            'u.name as created_by_name',
             'grease_trap_bookings.booking_date',
             'grease_trap_bookings.booking_time_slot',
             'grease_trap_bookings.srf_no',
@@ -545,6 +546,7 @@ class GreaseTrapBookingController extends Controller
             'Charged Type',
             'Emergency',
             'Status',
+            'Created By',
             'Created At',
             'Updated At'
          ]);
@@ -562,7 +564,7 @@ class GreaseTrapBookingController extends Controller
 
             fputcsv($handle, [
                $row->transaction_no,
-               $row->name,
+               $row->resident_name,
                $row->unit_no,
                $row->resident_type,
                $bookingDate,
@@ -572,6 +574,7 @@ class GreaseTrapBookingController extends Controller
                $chargeType,
                $emergency,
                $status,
+               $row->created_by_name ?? null,
                $row->created_at,
                $row->updated_at
             ]);

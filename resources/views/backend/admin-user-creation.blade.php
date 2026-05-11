@@ -14,6 +14,7 @@
             7 => ['label' => 'Manager', 'class' => 'bg-dark border-dark'],
             8 => ['label' => 'Concierge Supervisor', 'class' => 'bg-dark border-dark'],
             9 => ['label' => 'Main Lobby', 'class' => 'bg-dark border-dark'],
+            10 => ['label' => 'IT Event', 'class' => 'bg-dark border-dark'],
         ];
     @endphp
 

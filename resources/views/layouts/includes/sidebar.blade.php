@@ -154,7 +154,8 @@
                             </a>
                         </li>
 
-                        <li class="menu-item {{ request()->routeIs('admin.show.schedule.blocking.fitness.hub') ? 'active' : '' }}">
+                        <li
+                            class="menu-item {{ request()->routeIs('admin.show.schedule.blocking.fitness.hub') ? 'active' : '' }}">
                             <a href="{{ route('admin.show.schedule.blocking.fitness.hub') }}" class="menu-link">
                                 <div>Schedule Blocking</div>
                             </a>
@@ -303,7 +304,6 @@
         <!-- Manage -->
         @roles(1)
         <li class="menu-header small text-uppercase"><span class="menu-header-text">Manage</span></li>
-
         <li class="menu-item {{ request()->routeIs('admin.show.user') ? 'active' : '' }}">
             <a href="{{ route('admin.show.user') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-user-circle"></i>
@@ -321,13 +321,16 @@
         </li>
         @endroles
 
-        @roles(1)
+        @roles(1,10)
         <li class="menu-item {{ request()->routeIs('admin.show.events', 'admin.search.events') ? 'active' : '' }}">
             <a href="{{ route('admin.show.events') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-calendar-star"></i>
                 <div data-i18n="Basic">Events</div>
             </a>
         </li>
+        @endroles
+        
+        @roles(1)
         <li class="menu-item">
             <a href="javascript:void(0)" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-bookmarks"></i>

@@ -28,14 +28,6 @@
                         style="width: 100%; height: auto; display: block; object-fit: contain;">
                 </div>
 
-
-
-                {{-- Created Date --}}
-                <p class="text-muted mt-3" style="font-size: 0.85rem;">
-                    <strong>Created:</strong>
-                    {{ \Carbon\Carbon::parse($event->created_at)->format('F d, Y h:i A') }}
-                </p>
-
                 {{-- Back Button --}}
                 <div class="text-end mt-4">
                     <a href="{{ route('events') }}" class="btn btn-primary">

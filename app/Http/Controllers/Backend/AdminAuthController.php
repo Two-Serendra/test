@@ -33,6 +33,7 @@ class AdminAuthController extends Controller
                 7 => 'admin.booking.activities',
                 8 => 'admin.show.function.room.bookings',
                 9 => 'admin.booking.activities',
+                10 => 'admin.show.events',
             ];
 
             // If role_id is 0 or not in the map, deny access

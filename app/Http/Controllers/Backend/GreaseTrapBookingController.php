@@ -504,7 +504,7 @@ class GreaseTrapBookingController extends Controller
 
       // Fetch data (PAST BOOKINGS ONLY)
       $data = DB::table('grease_trap_bookings')
-         ->join('users', 'grease_trap_bookings.user_id', '=', 'users.id')
+         ->leftJoin('users', 'grease_trap_bookings.user_id', '=', 'users.id')
          ->select(
             'grease_trap_bookings.transaction_no',
             'grease_trap_bookings.unit_no',
@@ -521,7 +521,6 @@ class GreaseTrapBookingController extends Controller
             'grease_trap_bookings.updated_at'
          )
          ->whereBetween('booking_date', [$fromDate, $toDate])
-         ->whereDate('booking_date', '<', now()->toDateString()) // ONLY PAST BOOKINGS
          ->orderBy('booking_date', 'desc')
          ->get();
 
@@ -534,8 +533,6 @@ class GreaseTrapBookingController extends Controller
       $response = new StreamedResponse(function () use ($data) {
 
          $handle = fopen('php://output', 'w');
-
-         // CSV HEADER
          fputcsv($handle, [
             'Transaction No',
             'Resident Name',
@@ -555,14 +552,8 @@ class GreaseTrapBookingController extends Controller
          foreach ($data as $row) {
 
             $bookingDate = Carbon::parse($row->booking_date)->format('F j, Y');
-
-            // Charge Type
             $chargeType = $row->charged_type == 1 ? 'Free' : 'Billable';
-
-            // Emergency
             $emergency = $row->emergency == 1 ? 'Yes' : 'No';
-
-            // Status
             $status = match ($row->booking_status) {
                1 => 'Completed',
                2 => 'Cancelled',

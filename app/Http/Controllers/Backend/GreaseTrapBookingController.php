@@ -394,10 +394,8 @@ class GreaseTrapBookingController extends Controller
    public function searchGreaseTrapBooking(Request $request)
    {
       $searchBooking = $request->input('searchGreaseTrapBooking');
-      $currentDate = Carbon::today();
 
       $greaseTrapBookings = GreaseTrapBooking::with('user')
-         ->where('booking_date', '>=', $currentDate)
          ->when($searchBooking, function ($query, $searchBooking) {
             $query->where(function ($q) use ($searchBooking) {
                $q->where('unit_no', 'LIKE', "%{$searchBooking}%")
@@ -409,7 +407,9 @@ class GreaseTrapBookingController extends Controller
          ->orderBy('booking_date', 'desc')
          ->paginate(10);
 
-      $greaseTrapBookings->appends(['searchGreaseTrapBooking' => $searchBooking]);
+      $greaseTrapBookings->appends([
+         'searchGreaseTrapBooking' => $searchBooking
+      ]);
 
       return view('backend.grease-trap.grease-trap-booking', compact('greaseTrapBookings', 'searchBooking'))
          ->with('searchGreaseTrapBooking', $searchBooking);

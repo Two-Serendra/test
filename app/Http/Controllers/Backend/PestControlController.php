@@ -31,10 +31,8 @@ class PestControlController extends Controller
     {
 
         $searchBooking = $request->input('searchPestControlBooking');
-        $currentDate = Carbon::today();
-
+    
         $pestControlBookings = PestControlBooking::with('user')
-            ->where('booking_date', '>=', $currentDate)
             ->when($searchBooking, function ($query, $searchBooking) {
                 $query->where(function ($q) use ($searchBooking) {
                     $q->where('unit_no', 'LIKE', "%{$searchBooking}%")

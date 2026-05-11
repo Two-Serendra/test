@@ -27,8 +27,8 @@
                     </form>
 
                     <!-- <button type="button" class="btn btn-primary badge me-2" id="uploadBookingBtnPC">
-                                                <i class='bx bx-upload'></i> Upload Bookings
-                                            </button> -->
+                                                    <i class='bx bx-upload'></i> Upload Bookings
+                                                </button> -->
 
 
                     <button type="button" class="btn btn-primary badge AddPesControlBookingAdmin me-2">
@@ -118,7 +118,13 @@
 
                                     <td>
                                         @if ($pestControlBooking->booking_status == 1)
-                                            <span class="badge bg-primary custom-badge">BOOKED</span>
+
+                                            @if (\Carbon\Carbon::parse($pestControlBooking->booking_date)->isPast())
+                                                <span class="badge bg-primary custom-badge">COMPLETED</span>
+                                            @else
+                                                <span class="badge bg-primary custom-badge">BOOKED</span>
+                                            @endif
+
                                         @else
                                             <span class="badge bg-danger custom-badge">CANCELLED</span>
                                         @endif

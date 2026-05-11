@@ -23,6 +23,7 @@
                             <option value="7">Manager</option>
                             <option value="8">Concierge Supervisor</option>
                             <option value="9">Main Lobby</option>
+                             <option value="10">IT Event</option>
 
                         </select>
                         <div class="invalid-feedback">Required</div>

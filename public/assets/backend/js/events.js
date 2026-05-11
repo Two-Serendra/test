@@ -4,7 +4,6 @@ $(document).ready(function () {
         altInput: true,
         altFormat: "F j, Y",
         dateFormat: "Y-m-d",
-        minDate: "today",
         defaultDate: "today"
     });
     $('#update_event_date').flatpickr({

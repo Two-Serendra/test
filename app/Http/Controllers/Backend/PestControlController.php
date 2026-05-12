@@ -29,24 +29,25 @@ class PestControlController extends Controller
 
     public function searchPestControlBooking(Request $request)
     {
-
         $searchBooking = $request->input('searchPestControlBooking');
 
-        $pestControlBookings = PestControlBooking::with('user')
-            ->when($searchBooking, function ($query, $searchBooking) {
-                $query->where(function ($q) use ($searchBooking) {
-                    $q->where('unit_no', 'LIKE', "%{$searchBooking}%")
-                        ->orWhereHas('user', function ($userQuery) use ($searchBooking) {
-                            $userQuery->where('name', 'LIKE', "%{$searchBooking}%");
-                        });
-                });
-            })
+        $pestControlBookings = PestControlBooking::when($searchBooking, function ($query) use ($searchBooking) {
+
+            $query->where('unit_no', 'LIKE', "%{$searchBooking}%")
+                ->orWhere('name', 'LIKE', "%{$searchBooking}%");
+
+        })
             ->orderBy('booking_date', 'desc')
             ->paginate(10);
 
-        $pestControlBookings->appends(['searchPestControlBooking' => $searchBooking]);
+        $pestControlBookings->appends([
+            'searchPestControlBooking' => $searchBooking
+        ]);
 
-        return view('backend.pest-control.pest-control-booking', compact('pestControlBookings', 'searchBooking'));
+        return view(
+            'backend.pest-control.pest-control-booking',
+            compact('pestControlBookings', 'searchBooking')
+        );
     }
 
 
@@ -653,14 +654,18 @@ class PestControlController extends Controller
         $searchPestControlReport = $request->input('searchPestControlReport');
         $currentDate = Carbon::today();
 
-        $pestControlBookings = PestControlBooking::with('user')
-            ->where('booking_date', '<', $currentDate)
-            ->when($searchPestControlReport, function ($query, $searchPestControlReport) {
+        $pestControlBookings = PestControlBooking::where('booking_date', '<', $currentDate)
+
+            ->when($searchPestControlReport, function ($query) use ($searchPestControlReport) {
+
                 $query->where(function ($q) use ($searchPestControlReport) {
+
                     $q->where('unit_no', 'LIKE', "%{$searchPestControlReport}%")
-                        ->orWhere('name', 'LIKE', "%{$searchPestControlReport}%"); // 👈 FIX HERE
+                        ->orWhere('name', 'LIKE', "%{$searchPestControlReport}%");
+
                 });
             })
+
             ->orderBy('booking_date', 'desc')
             ->paginate(10);
 
@@ -668,9 +673,12 @@ class PestControlController extends Controller
             'searchPestControlReport' => $searchPestControlReport
         ]);
 
-        return view('backend.pest-control.pest-control-report', compact(
-            'pestControlBookings',
-            'searchPestControlReport'
-        ));
+        return view(
+            'backend.pest-control.pest-control-report',
+            compact(
+                'pestControlBookings',
+                'searchPestControlReport'
+            )
+        );
     }
 }

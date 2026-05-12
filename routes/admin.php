@@ -58,7 +58,6 @@ Route::middleware('auth:admin')->group(function () {
     Route::delete('/admin-delete-services', [ServicesController::class, 'deleteService'])->name('delete.services');
     Route::get('/get-updated-services-table', [ServicesController::class, 'getUpdatedServicesTable'])->name('get.updated.services.table');
 
-
     //DOWNLOADS
     Route::get('/admin-downloads', [DownloadsController::class, 'download'])->name('admin.downloads');
     Route::get('/admin-search-downloads', [DownloadsController::class, 'searchDownload'])->name('search.downloads');
@@ -160,7 +159,6 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/amenity-import-booking', [ActivitiesController::class, 'importAmenityBookings'])->name('booking.import');
     Route::get('/fetch/activity-booking-report/{id}', [ActivitiesController::class, 'fetchInfoBookingReport'])->name('fetchInfoBookingReport');
 
-
     //Fitness Hub
     Route::get('/admin-show-fitness-hub', [FitnessHubController::class, 'AdminShowFitnessHub'])->name('admin.show.fitness.hub');
     Route::get('/search-fitness-hubs', [FitnessHubController::class, 'searchFitnessHubs'])->name('admin.search.fitness.hubs');
@@ -179,7 +177,6 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/new-schedule-blocking-fitness-hub', [FitnessHubController::class, 'newScheduleBlockingFitnessHub'])->name('admin.new.schedule.blocking.fitness.hub');
     Route::get('get-updated-fitness-hubs-schedule-blocking-table', [FitnessHubController::class, 'getUpdatedFitnessHubScheduleBlockingTable'])->name('getUpdatedFitnessHubScheduleBlockingTable');
     Route::post('/admin-delete-blocked-schedule-fitness-hub', [FitnessHubController::class, 'deleteBlockedScheduleFitnessHub'])->name('admin.delete.blocked.schedule.fitness.hub');
-
 
     //Fitness Hub Booking
     Route::get('/admin-fitness-booking', [FitnessHubBookingController::class, 'AdminFitnessHubBooking'])->name('admin.booking.fitness');
@@ -221,7 +218,6 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/admin-fetch-function-room-discount/{id}', [FunctionRoomDiscountController::class, 'fetchFunctionRoomDiscounts']);
     Route::post('/admin-update-function-room-discount', [FunctionRoomDiscountController::class, 'updateFunctionRoomDiscount'])->name(name: 'admin.update.function.room.discount');
 
-
     // Add Ons
     Route::get('/admin-add-ons-table', [AddOnsController::class, 'showAddOns'])->name('admin.show.add.ons');
     Route::post('/admin-store-add-ons-', [AddOnsController::class, 'storeAddOns'])->name('admin.store.add.ons');
@@ -232,7 +228,6 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/admin-add-ons/disable/{id}', [AddOnsController::class, 'disable']);
     Route::post('/admin-add-ons/enable/{id}', [AddOnsController::class, 'enable']);
 
-
     //Function Room Date Blocking
     Route::get('/admin-show-function-room-date-blocking-table', [FunctionRoomsController::class, 'showFunctionRoomDateBlockingTable'])
         ->name('admin.show.function.rooms.date.blocking');
@@ -241,11 +236,8 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/admin-get-updated-function-room-date-blocking', [FunctionRoomsController::class, 'getUpdatedFunctionRoomBlockingTable'])->name('get.updated.function.room.blocking.table');
     Route::delete('/admin-delete-date-blocking', [FunctionRoomsController::class, 'deleteDateBlocking']);
 
-
-
     //Function Room Bookings
     Route::get('/admin-function-room-bookings', [FunctionRoomBookingController::class, 'showFunctionRoomBookings'])->name('admin.show.function.room.bookings');
-
     // Route::get('/admin-function-room-bookings-store', [FunctionRoomBookingController::class, 'adminBookingStore'])->name('admin.booking.store');
 
     Route::post('/admin-function-room-bookings-approval', [FunctionRoomBookingController::class, 'FunctionRoomBookingApproval'])->name('admin.function.room.booking.approvals');
@@ -275,8 +267,6 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/admin-download-function-room-booking-records', [FunctionRoomBookingController::class, 'downloadFunctionRoomBookingRecords'])
         ->name('download.function.room.booking.records');
 
-
-
     //Grease Trap Bookings
     Route::get('/admin-booking-grease-trap', [GreaseTrapBookingController::class, 'AdminBookingGreaseTrap'])->name('admin.booking.grease.trap');
     Route::post('/admin/grease-trap/booking/store', [GreaseTrapBookingController::class, 'AdminStoreGreaseTrapBooking'])->name('admin.grease.trap.booking.store');
@@ -286,7 +276,7 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/admin-grease-trap-booking/cancel/{booking}', [GreaseTrapBookingController::class, 'CancelGreaseTrapBookingAdmin'])
         ->name('admin.grease.trap.booking.cancel');
     Route::post('/admin/grease-trap/emergency-booking/store', [GreaseTrapBookingController::class, 'AdminStoreEmergencyGreaseTrapBooking'])->name('admin.grease.trap.emergency.booking.store');
-    Route::get('/admin-fetch-grease-trap-booking/{id}', [GreaseTrapBookingController::class, 'fetchGreaseTrapBooking'])->name('admin.fetch.grease.trao.booking');
+    Route::get('/admin-fetch-grease-trap-booking/{id}', [GreaseTrapBookingController::class, 'fetchGreaseTrapBooking'])->name('admin.fetch.grease.trap.booking');
     Route::post('/admin/grease-trap/booking/update', [GreaseTrapBookingController::class, 'AdminUpdateGreaseTrapBooking'])->name('admin.grease.trap.booking.update');
     Route::get('/search-greast-trap-booking', [GreaseTrapBookingController::class, 'searchGreaseTrapBooking'])->name('admin.search.grease.trap.booking');
     Route::get('/admin-booking-grease-trap-calendar', [GreaseTrapBookingController::class, 'AdminBookingGreaseTrapCalendar'])->name('admin.booking.grease.trap.calendar');
@@ -298,7 +288,6 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/search-grease-trap-report', [GreaseTrapBookingController::class, 'searchGreaseTrapReports'])->name('admin.search.grease.trap.reports');
     Route::get('/admin-get-updated-grease-trap-report-table', [GreaseTrapBookingController::class, 'getUpdatedGreaseTrapReportTable']);
     Route::post('/admin/grease-trap/report/update', [GreaseTrapBookingController::class, 'AdminUpdateGreaseTrapReport'])->name('admin.grease.trap.report.update');
-
 
     //Pest Control
     Route::get('/admin-booking-pest-control', [PestControlController::class, 'AdminBookingPestControl'])->name('admin.booking.pest.control');
@@ -312,27 +301,17 @@ Route::middleware('auth:admin')->group(function () {
 
     Route::get('/admin-pest-control-trap-calendar', [PestControlController::class, 'AdminBookingPestControlCalendar'])->name('admin.booking.pest.control.calendar');
     Route::get('/fetch/pest-control-calendar-details/{id}', [PestControlController::class, 'fetchPestControlCalendarSchedule'])->name("admin.fetch.booking.pest.control.calendar");
-
     Route::get('/search-pest-control-booking', [PestControlController::class, 'searchPestControlBooking'])->name('admin.search.pest.control.booking');
-
     Route::get('/admin-pest-control/booked-slots', [PestControlController::class, 'getBookedSlotsAdminPestControl'])
         ->name('admin.pest.control.booked.slots');
     Route::get('/admin-report-pest-control', [PestControlController::class, 'AdminReportPestControl'])->name('admin.report.pest.control');
-
     Route::post('/admin-download-pest-control-booking-records', [PestControlController::class, 'downloadPestControlBookingReports'])
         ->name('download.pest.control.booking.reports');
-
     Route::post('/pest-control-import-booking', [PestControlController::class, 'importPestControlBookings'])->name('pest.control.booking.import');
-
     Route::get('/search-pest-control-report', [PestControlController::class, 'searchPestControlReport'])->name('admin.search.pest.control.report');
-
-
-
-
     Route::get('/admin-gallery', [GalleryController::class, 'showGallery'])->name('admin.show.gallery');
     Route::post('/admin/gallery/upload', [GalleryController::class, 'uploadGalleryImages'])->name('admin.gallery.upload');
     Route::get('/get-updated-gallery-table', [GalleryController::class, 'getUpdatedGalleryTable'])->name('get.updated.gallery.table');
-
 
     //Event
     Route::get('/admin-events', [EventsController::class, 'showEvents'])->name('admin.show.events');

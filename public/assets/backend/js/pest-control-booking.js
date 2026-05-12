@@ -52,7 +52,7 @@ $(document).ready(function () {
         dateFormat: "Y-m-d",
         minDate: "today"
     });
-    
+
     const $bookingSlots = $('.booking-slot-admin-pest-control');
     $bookingSlots.prop('disabled', true);
 
@@ -316,9 +316,31 @@ $(document).ready(function () {
                         : `<span class="badge bg-danger">BILLABLE</span>`;
 
                     // Booking status
-                    var bookingStatus = booking.booking_status == 1
-                        ? `<span class="badge bg-primary">BOOKED</span>`
-                        : `<span class="badge bg-danger">CANCELLED</span>`;
+                    var bookingDate = booking.booking_date
+                        ? new Date(booking.booking_date)
+                        : null;
+
+                    var today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    var isCompleted = booking.booking_status == 1 &&
+                        bookingDate &&
+                        bookingDate < today;
+
+                    var bookingStatus = '';
+
+                    if (booking.booking_status == 1) {
+
+                        if (isCompleted) {
+                            bookingStatus = `<span class="badge bg-primary custom-badge">COMPLETED</span>`;
+                        } else {
+                            bookingStatus = `<span class="badge bg-primary custom-badge">BOOKED</span>`;
+                        }
+
+                    } else {
+                        bookingStatus = `<span class="badge bg-danger custom-badge">CANCELLED</span>`;
+                    }
+
 
                     // Emergency
                     var emergency = booking.emergency == 1

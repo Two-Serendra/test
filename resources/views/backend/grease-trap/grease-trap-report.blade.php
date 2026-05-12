@@ -103,7 +103,13 @@
 
                                     <td>
                                         @if ($greaseTrapBooking->booking_status == 1)
-                                            <span class="badge bg-primary custom-badge">BOOKED</span>
+
+                                            @if (\Carbon\Carbon::parse($greaseTrapBooking->booking_date)->isPast())
+                                                <span class="badge bg-primary custom-badge">COMPLETED</span>
+                                            @else
+                                                <span class="badge bg-primary custom-badge">BOOKED</span>
+                                            @endif
+
                                         @else
                                             <span class="badge bg-danger custom-badge">CANCELLED</span>
                                         @endif

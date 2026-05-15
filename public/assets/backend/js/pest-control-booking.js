@@ -1,6 +1,100 @@
 $(document).ready(function () {
 
 
+    const philippineHolidays = [
+        "2026-01-01",
+        "2026-02-25",
+        "2026-04-09",
+        "2026-04-17",
+        "2026-04-18",
+        "2026-05-01",
+        "2026-06-12",
+        "2026-08-21",
+        "2026-08-31",
+        "2026-11-01",
+        "2026-11-30",
+        "2026-12-25",
+        "2026-12-30"
+    ];
+
+
+    let pestControlPickerAdmin = null;
+    let pestControlPickerEmergency = null;
+
+    initPestControlPicker();
+
+
+    $('#unit').on('change keyup', function () {
+
+        disableCreateBtn('Input changed');
+
+        $bookingSlots.prop('disabled', true).prop('checked', false);
+
+        initPestControlPicker(); // refresh logic properly
+    });
+
+    function initPestControlPicker() {
+
+        if (pestControlPickerAdmin) {
+            pestControlPickerAdmin.destroy();
+        }
+
+        if (pestControlPickerEmergency) {
+            pestControlPickerEmergency.destroy();
+        }
+
+        const commonOptions = {
+            dateFormat: "Y-m-d",
+            minDate: "today",
+
+            disable: [
+                function (date) {
+
+                    const unit = $('#unit').val();
+                    const category = getUnitCategory(unit);
+
+                    const formattedDate = flatpickr.formatDate(date, "Y-m-d");
+
+                    const isSunday = date.getDay() === 0;
+                    const isFriday = date.getDay() === 5;
+                    const isHoliday = philippineHolidays.includes(formattedDate);
+
+                    if (category === 'group1') {
+                        return isFriday || isSunday || isHoliday;
+                    }
+
+                    if (category === 'group2') {
+                        return isSunday || isHoliday;
+                    }
+
+                    return false;
+                }
+            ]
+        };
+
+        pestControlPickerAdmin = flatpickr("#PestControlBookingDateAdmin", commonOptions);
+        pestControlPickerEmergency = flatpickr("#PestControlBookingDateAdminEmergency", commonOptions);
+    }
+
+    function getUnitCategory(unit) {
+
+        if (!unit) return null;
+        unit = unit.replace(/[\s-]/g, '');
+
+        const lastLetter = unit.slice(-1).toUpperCase();
+
+        if (['A', 'B', 'C', 'D', 'E'].includes(lastLetter)) {
+            return 'group1';
+        }
+
+        if (['F', 'R', 'H', 'I'].includes(lastLetter)) {
+            return 'group2';
+        }
+
+        return null;
+    }
+
+
     $(document).on('click', '.AddPesControlBookingAdmin', function () {
         $('#pestcontrolAdd').modal('show');
         disableCreateBtn();

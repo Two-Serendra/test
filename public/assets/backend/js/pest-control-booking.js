@@ -142,9 +142,13 @@ $(document).ready(function () {
     disableCreateBtn();
 
 
-    flatpickr("#PestControlBookingDateAdmin, #PestControlBookingDateAdminEmergency", {
+    flatpickr("#PestControlBookingDateAdmin", {
         dateFormat: "Y-m-d",
         minDate: "today"
+    });
+
+    flatpickr("#PestControlBookingDateAdminEmergency", {
+        dateFormat: "Y-m-d",
     });
 
     const $bookingSlots = $('.booking-slot-admin-pest-control');

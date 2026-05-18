@@ -3,9 +3,8 @@ $(document).ready(function () {
         $('#greastrapAdd').modal('show');
     });
 
-    const emergencyBookingPicker = flatpickr('    #GreaseTrapBookingDateAdminEmergency', {
+    const emergencyBookingPicker = flatpickr('#GreaseTrapBookingDateAdminEmergency', {
         dateFormat: 'Y-m-d',
-        minDate: "today"
     });
 
     const bookingPicker = flatpickr('#GreaseTrapBookingDateAdmin', {

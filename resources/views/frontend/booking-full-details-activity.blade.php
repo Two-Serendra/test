@@ -53,7 +53,7 @@
                                                     {{ $isAmenityInactive
                                 ? ($activity->amenity->amenity_remarks ?? 'Unavailable')
                                 : 'Unavailable' 
-                                                                                                        }}
+                                                                                                                                }}
                                                 </span>
                             @endif
 
@@ -87,8 +87,11 @@
                                     </a>
                                 @endif
                             @endauth
-                            <button type="button" class="btn customBtn SlotCheckingModalUserbBtn btn-secondary"
-                                style="color: white;">
+                            <button type="button"
+                                class="btn customBtn SlotCheckingModalUserbBtn {{ $isDisabled ? 'btn-secondary' : 'btn-secondary' }}"
+                                style="{{ $isDisabled
+        ? 'cursor: not-allowed; opacity: 0.6; color: white;'
+        : 'color: white;' }}" {{ $isDisabled ? 'disabled' : '' }}>
                                 Check Slots
                             </button>
                         </div>
@@ -106,24 +109,24 @@
                 <div class="row z-1 position-relative">
                     @foreach($suggestions as $suggestion)
 
-    
+
                         <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
                             <a href="{{ route('booking.full.details.activity', ['type' => 'amenity', 'activity_id' => $suggestion->id]) }}"
                                 class="text-decoration-none text-dark">
                                 <div class="card shadow featured-card h-100 position-relative" style="border-radius: 5px;">
 
                                     {{-- 🔴 Overlay (same as your amenity cards) --}}
-                                  @if($suggestion->amenity && $suggestion->amenity->amenity_status == 0)
-                                    <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center"
-                                        style="background: rgba(0,0,0,0.6); z-index: 2; border-radius: 5px;">
+                                    @if($suggestion->amenity && $suggestion->amenity->amenity_status == 0)
+                                        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center"
+                                            style="background: rgba(0,0,0,0.6); z-index: 2; border-radius: 5px;">
 
-                                        <span class="badge bg-danger mb-2">Unavailable</span>
+                                            <span class="badge bg-danger mb-2">Unavailable</span>
 
-                                        <small class="text-white text-center px-3">
-                                            {{ $suggestion->amenity->amenity_remarks ?? 'Not Available' }}
-                                        </small>
-                                    </div>
-                                @endif
+                                            <small class="text-white text-center px-3">
+                                                {{ $suggestion->amenity->amenity_remarks ?? 'Not Available' }}
+                                            </small>
+                                        </div>
+                                    @endif
                                     <div class="card-body text-center">
                                         <div class="mb-3">
                                             @if(!empty($suggestion->activity_image))
@@ -150,23 +153,23 @@
     </div>
 
     <!-- <div id="loadingOverlay"
-                                            style="
-                                                display: none; /* 🔥 Keep this as default */
-                                                position: fixed;
-                                                top: 0;
-                                                left: 0;
-                                                width: 100%;
-                                                height: 100%;
-                                                background: rgba(255, 255, 255, 0.7);
-                                                z-index: 2000;
-                                                justify-content: center;
-                                                align-items: center;
-                                                                                                                                                                ">
-                                            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-                                                <span class="visually-hidden">Loading...</span>
+                                                style="
+                                                    display: none; /* 🔥 Keep this as default */
+                                                    position: fixed;
+                                                    top: 0;
+                                                    left: 0;
+                                                    width: 100%;
+                                                    height: 100%;
+                                                    background: rgba(255, 255, 255, 0.7);
+                                                    z-index: 2000;
+                                                    justify-content: center;
+                                                    align-items: center;
+                                                                                                                                                                    ">
+                                                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                     -->
+                                         -->
 
 
     <style>
@@ -176,19 +179,19 @@
         }
 
         /* #loadingOverlay {
-                                                display: none;
-                                                position: fixed;
-                                                top: 0;
-                                                left: 0;
-                                                width: 100%;
-                                                height: 100%;
-                                                background: rgba(255, 255, 255, 0.7);
-                                                z-index: 2000;
-                                                display: flex;
+                                                    display: none;
+                                                    position: fixed;
+                                                    top: 0;
+                                                    left: 0;
+                                                    width: 100%;
+                                                    height: 100%;
+                                                    background: rgba(255, 255, 255, 0.7);
+                                                    z-index: 2000;
+                                                    display: flex;
 
-                                                justify-content: center;
-                                                align-items: center;
-                                            } */
+                                                    justify-content: center;
+                                                    align-items: center;
+                                                } */
     </style>
 
     @include('frontend.modal.slot-checking-user-modal')

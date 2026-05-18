@@ -11,21 +11,21 @@
                     @csrf
                     <div class="row mb-3">
                         <div class="col-12 col-md-4 mb-3 mb-md-0">
-                            <label for="activitySelectBookingSearchUser" class="form-label">Select Activity *</label>
-                            <input type="hidden" id="amenityIdBooking" name="amenity_id">
-                            <select class="form-select" id="activitySelectBookingSearchUser" name="activity_id"
-                                required>
-                                <option value="" disabled selected>Activity</option>
-                                @foreach($activities as $activity)
-                                    <option value="{{ $activity->id }}" data-amenity-id="{{ $activity->amenity_id }}"
-                                        data-start-time="{{ \Carbon\Carbon::parse($activity->start_time)->format('H:i') }}"
-                                        data-end-time="{{ \Carbon\Carbon::parse($activity->end_time)->format('H:i') }}"
-                                        data-activity-space="{{ $activity->activity_space }}">
-                                        {{ strtoupper($activity->activity_name) }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <div class="invalid-feedback">Please select an amenity</div>
+                            <label class="form-label">Activity</label>
+
+                            {{-- Hidden values for form submission --}}
+                            <input type="hidden" name="activity_id" value="{{ $activity->id }}">
+                            <input type="hidden" name="amenity_id" value="{{ $activity->amenity_id }}">
+
+                            {{-- Readonly display --}}
+                            <input type="text" class="form-control" value="{{ strtoupper($activity->activity_name) }}"
+                                readonly>
+
+                            {{-- Optional hidden metadata --}}
+                            <input type="hidden" id="activityMeta"
+                                data-start-time="{{ \Carbon\Carbon::parse($activity->start_time)->format('H:i') }}"
+                                data-end-time="{{ \Carbon\Carbon::parse($activity->end_time)->format('H:i') }}"
+                                data-activity-space="{{ $activity->activity_space }}">
                         </div>
 
                         <!-- Date Field -->
@@ -60,5 +60,3 @@
         </div>
     </div>
 </div>
-
-

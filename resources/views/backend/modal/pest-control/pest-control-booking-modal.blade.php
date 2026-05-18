@@ -46,7 +46,7 @@
                             
                             </label>
                             <div class="row g-2">
-                                @php
+                                @php 
                                     $slots = [
                                         '8:00 AM - 9:00 AM',
                                         '9:00 AM - 10:00 AM',

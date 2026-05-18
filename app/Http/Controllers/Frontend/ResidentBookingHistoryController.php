@@ -101,6 +101,7 @@ class ResidentBookingHistoryController extends Controller
 
             $bookings = FunctionRoomBooking::with('functionRoom')
                 ->where('unit_no', $selectedUnit)
+                ->where('user_id', $request->user()->id)
                 ->latest('function_room_booking_date')
                 ->paginate(5)
                 ->withQueryString();
@@ -116,6 +117,7 @@ class ResidentBookingHistoryController extends Controller
 
             $bookings = ActivityBooking::with('activity')
                 ->where('unit', $selectedUnit)
+                ->where('user_id', $request->user()->id)
                 ->whereIn('id', function ($query) use ($selectedUnit) {
                     $query->selectRaw('MIN(id)')
                         ->from('activity_bookings')
@@ -125,7 +127,6 @@ class ResidentBookingHistoryController extends Controller
                 ->latest('booking_date')
                 ->paginate(5)
                 ->withQueryString();
-
 
             if ($request->ajax()) {
                 return view(
@@ -139,6 +140,7 @@ class ResidentBookingHistoryController extends Controller
 
             $bookings = FitnessHubBooking::with('fitnessHub')
                 ->where('unit', $selectedUnit)
+                ->where('user_id', $request->user()->id)
                 ->latest('booking_date')
                 ->paginate(5)
                 ->withQueryString();
@@ -154,6 +156,7 @@ class ResidentBookingHistoryController extends Controller
 
             $bookings = GreaseTrapBooking::with(['cancelledBy'])
                 ->where('unit_no', $selectedUnit)
+                ->where('user_id', $request->user()->id)
                 ->orderBy('booking_date', 'desc')
                 ->orderBy('booking_time_slot', 'desc')
                 ->paginate(5)
@@ -168,6 +171,7 @@ class ResidentBookingHistoryController extends Controller
         } elseif ($bookingType === 'pest_control') {
 
             $bookings = PestControlBooking::where('unit_no', $selectedUnit)
+                ->where('user_id', $request->user()->id)
                 ->orderBy('booking_date', 'desc')
                 ->orderBy('booking_time_slot', 'desc')
                 ->paginate(5)

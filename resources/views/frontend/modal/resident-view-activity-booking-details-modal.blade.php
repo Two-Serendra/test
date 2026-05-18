@@ -100,7 +100,7 @@
                                 <span id="detail-booking-date" class="fw-semibold"></span>
                             </div>
 
-                            <div class="d-flex justify-content-between">
+                            <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Time:</span>
                                 <span id="detail-start-time" class="fw-semibold"></span>
                             </div>

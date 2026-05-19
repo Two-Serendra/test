@@ -25,7 +25,7 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="PestControlBookingDate" class="form-label">Date</label>
+                                <label for="PestControlBookingDate" class="form-label">Date *</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white"><i class="bx bx-calendar"></i></span>
                                     <input type="text" class="form-control bg-white text-dark"
@@ -151,7 +151,7 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="pestControlBookingDateAdminEmergency" class="form-label">Date</label>
+                                <label for="pestControlBookingDateAdminEmergency" class="form-label">Date *</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white"><i class="bx bx-calendar"></i></span>
                                     <input type="text" class="form-control bg-white text-dark"

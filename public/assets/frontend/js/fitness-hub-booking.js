@@ -66,7 +66,7 @@ $(document).ready(function () {
         bookingTypeInput.val(initialType);
 
         $.ajax({
-            url: '/fetch-date-blocking-fitness-hub',
+            url: '/fetch-date-blocking-fitness-hub-user',
             method: 'GET',
             data: { fitness_hub_id: fitnessHubId },
             success: function (blockedDates) {

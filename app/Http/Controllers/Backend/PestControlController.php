@@ -140,6 +140,21 @@ class PestControlController extends Controller
                     ? ['A', 'B', 'C', 'D', 'E']
                     : ['F', 'G', 'H', 'I'];
 
+                $existingUnitBooking = PestControlBooking::whereDate('booking_date', $bookingDate)
+                    ->where('unit_no', $unit)
+                    ->where('booking_status', 1)
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($existingUnitBooking) {
+                    DB::rollBack();
+
+                    return response()->json([
+                        'message' => 'This unit already has a pest control booking for the selected date.',
+                        'type' => 'unit_already_booked'
+                    ], 409);
+                }
+
                 $existingBookings = PestControlBooking::whereDate('booking_date', $bookingDate)
                     ->whereIn('unit_area', $towerAreas)
                     ->where('booking_status', 1)
@@ -148,7 +163,10 @@ class PestControlController extends Controller
 
                 if ($existingBookings->contains('booking_time_slot', $request->booking_time_slot)) {
                     DB::rollBack();
-                    return response()->json(['message' => 'Slot already taken. Please refresh slots.'], 409);
+                    return response()->json([
+                        'message' => 'Slot already taken. Please refresh slots.',
+                        'type' => 'slot_taken'
+                    ], 409);
                 }
 
                 $monthStart = Carbon::parse($bookingDate)->startOfMonth()->toDateString();

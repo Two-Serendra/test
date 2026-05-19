@@ -122,6 +122,22 @@ class GreaseTrapBookingController extends Controller
                ], 409);
             }
 
+            $existingUnitBooking = GreaseTrapBooking::whereDate('booking_date', $bookingDate)
+               ->where('unit_no', $unitNo)
+               ->where('booking_status', 1)
+               ->lockForUpdate()
+               ->exists();
+
+            if ($existingUnitBooking) {
+               DB::rollBack();
+
+               return response()->json([
+                  'message' => 'This unit already has a grease trap booking for the selected date.',
+                  'type' => 'unit_already_booked'
+               ], 409);
+            }
+
+
             $isAlreadyBooked = GreaseTrapBooking::whereDate('booking_date', $bookingDate)
                ->where('booking_time_slot', $request->booking_time_slot)
                ->where('booking_status', 1)
@@ -131,7 +147,8 @@ class GreaseTrapBookingController extends Controller
             if ($isAlreadyBooked) {
                DB::rollBack();
                return response()->json([
-                  'message' => 'This time slot is already booked.'
+                  'message' => 'This time slot is already booked.',
+                  'type' => 'slot_taken'
                ], 409);
             }
 

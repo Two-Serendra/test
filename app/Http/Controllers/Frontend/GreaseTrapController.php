@@ -203,7 +203,22 @@ class GreaseTrapController extends Controller
                 if ($isAlreadyBooked) {
                     DB::rollBack();
                     return response()->json([
-                        'message' => 'Slot already taken just now.'
+                        'message' => 'Slot already taken just now.',
+                        'type' => 'slot_taken'
+                    ], 409);
+                }
+
+                $existingUnitBooking = GreaseTrapBooking::whereDate('booking_date', $bookingDate)
+                    ->where('unit_no', strtoupper($resident->unit_no))
+                    ->where('booking_status', 1)
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($existingUnitBooking) {
+                    DB::rollBack();
+                    return response()->json([
+                        'message' => 'This unit already has a grease trap booking for the selected date.',
+                        'type' => 'unit_already_booked'
                     ], 409);
                 }
 
@@ -398,7 +413,7 @@ class GreaseTrapController extends Controller
 
                 } else {
 
-                    $message = 'Booking cancelled successfully. No penalty applied.';
+                    $message = 'Booking cancelled successfully';
 
                 }
 

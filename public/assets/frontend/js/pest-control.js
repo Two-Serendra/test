@@ -76,6 +76,22 @@ $(document).ready(function () {
         const $bookingDate = $('#PestControlBookingDate');
         const selectedDate = $bookingDate.val();
 
+        const selectedSlot = $('input[name="booking_time_slot"]:checked').val();
+
+        if (!selectedSlot) {
+            $('.slot-error').show();
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Time Slot Required',
+                text: 'Please select a booking time slot.'
+            });
+
+            return;
+        } else {
+            $('.slot-error').hide();
+        }
+
         if (!form.checkValidity()) {
             form.classList.add('was-validated');
             return;
@@ -179,17 +195,32 @@ $(document).ready(function () {
                     }
 
                     if (xhr.status === 409) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Time Slot Taken',
-                            text: res.message || 'This time slot is already booked just now.',
-                            confirmButtonText: 'OK',
-                            confirmButtonColor: '#d33'
-                        });
-                        updateSlots(selectedDate);
-                        return;
-                    }
 
+                        if (res.type === 'slot_taken') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Time Slot Taken',
+                                text: res.message || 'This time slot is already booked just now.',
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#d33'
+                            });
+
+                            updateSlots(selectedDate);
+                            return;
+                        }
+
+                        if (res.type === 'unit_already_booked') {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Booking Already Exists',
+                                text: res.message,
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#3085d6'
+                            });
+
+                            return;
+                        }
+                    }
                     Swal.fire({
                         toast: true,
                         position: 'top-end',

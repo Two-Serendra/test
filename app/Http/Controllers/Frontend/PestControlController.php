@@ -220,7 +220,10 @@ class PestControlController extends Controller
                 $slotTaken = $existingBookings->contains('booking_time_slot', $request->booking_time_slot);
                 if ($slotTaken) {
                     DB::rollBack();
-                    return response()->json(['message' => 'Slot already taken just now'], 409);
+                    return response()->json([
+                        'message' => 'Slot already taken just now.',
+                        'type' => 'slot_taken'
+                    ], 409);
                 }
 
                 $monthStart = Carbon::parse($bookingDate)->startOfMonth()->toDateString();
@@ -244,6 +247,20 @@ class PestControlController extends Controller
                     ], 409);
                 }
 
+                $existingUnitBooking = PestControlBooking::whereDate('booking_date', $bookingDate)
+                    ->where('unit_no', strtoupper($resident->unit_no))
+                    ->where('booking_status', 1)
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($existingUnitBooking) {
+                    DB::rollBack();
+
+                    return response()->json([
+                        'message' => 'This unit already has a pest control booking for the selected date.',
+                        'type' => 'unit_already_booked'
+                    ], 409);
+                }
 
                 $booking = PestControlBooking::create([
                     'user_id' => auth()->id(),
@@ -414,9 +431,9 @@ class PestControlController extends Controller
                         ->queue(new ConciergePestControlBookingCancellation($booking));
                 });
 
-                return response()->json([ 
+                return response()->json([
                     'success' => true,
-                    'message' => 'Booking has been cancelled successfully.'
+                    'message' => 'Booking cancelled successfully.'
                 ]);
             });
 

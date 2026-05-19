@@ -53,7 +53,7 @@
                         <!-- Time Slots -->
                         <div class="col-6">
                             <div class="mb-3">
-                                <label for="GreaseTrapBookingDate" class="form-label">Date</label>
+                                <label for="GreaseTrapBookingDate" class="form-label">Date *</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white"><i class="bx bx-calendar"></i></span>
                                     <input type="text" class="form-control bg-white text-dark"
@@ -66,7 +66,7 @@
                             <label class="form-label">Select Time Slot *</label>
                             <div class="row g-2">
                                 @php
-                                    $slots = [ 
+                                    $slots = [  
                                         '9:00AM - 10:00AM',
                                         '10:00AM - 11:00AM',
                                         '11:00AM - 12:00PM',
@@ -144,7 +144,7 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="GreaseTrapBookingDate" class="form-label">Date</label>
+                                <label for="GreaseTrapBookingDate" class="form-label">Date *</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white"><i class="bx bx-calendar"></i></span>
                                     <input type="text" class="form-control bg-white text-dark"

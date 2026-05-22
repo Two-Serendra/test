@@ -302,13 +302,9 @@ $(document).ready(function () {
             const minutes = now.getMinutes();
 
             const isFriday = day === 5;
-            const isAfter10 = hours > 10 || (hours === 10 && minutes >= 0);
+            const isAfter8 = hours > 8 || (hours === 8 && minutes >= 0);
 
-            // ❌ Only block Friday before 10 AM
-            const isRestrictedTime = isFriday && !isAfter10;
-
-            timeAllowed = !isRestrictedTime;
-
+            timeAllowed = !(isFriday && !isAfter8);
             if (!timeAllowed) {
                 $btn.attr("title", "Available every Friday at 10:00 AM");
             } else {
@@ -748,7 +744,7 @@ $('#bookingTable').on('click', '.editInfo_id_booking', function () {
             const endTime = booking.booking_end_time;
 
             $('#detail-transaction-no').text(booking.transaction_no)
-                .data('booking-id', booking.id) 
+                .data('booking-id', booking.id)
                 .data('within-penalty', withinPenalty);
             $('#detail-booking-type').text(booking.booking_type ?? 'N/A');
             $('#detail-name').text(booking.name ?? booking.created_by_name ?? 'N/A');

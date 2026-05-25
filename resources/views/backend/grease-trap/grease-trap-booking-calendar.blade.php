@@ -93,6 +93,14 @@
             color: #fff !important;
             font-weight: bold;
         }
+
+        .fc-event.event-emergency,
+        .fc-event.event-emergency {
+            background-color: #e74c3c !important;
+            border-left: 4px solid #e74c3c !important;
+            border-color: #e74c3c !important;
+            color: #fff !important;
+        }
     </style>
 
     <div class="container">
@@ -138,10 +146,7 @@
                     element.find('.fc-time').remove();
 
                     if (event.emergency == 1) {
-                        element.find('.fc-title').css({
-                            'color': '#c0392b',
-                            'font-weight': 'bold'
-                        });
+                        element.addClass('event-emergency');
                     }
                 },
 
@@ -196,6 +201,17 @@
                             }
 
                             $('#calendarModalGreaseTrap #display_charged_type_calendar').html(chargedBadge);
+
+                            if (data.emergency == 1) {
+                                $('#calendarModalGreaseTrap #emergency')
+                                    .text('⚠ EMERGENCY')
+                                    .removeClass()
+                                    .addClass('fw-bold text-danger fs-5');
+                            } else {
+                                $('#calendarModalGreaseTrap #emergency')
+                                    .text('')
+                                    .removeClass();
+                            }
                         },
 
                         error: function () {

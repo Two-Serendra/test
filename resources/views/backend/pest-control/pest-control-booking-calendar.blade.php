@@ -93,6 +93,14 @@
             color: #fff !important;
             font-weight: bold;
         }
+
+        .fc-event.event-emergency,
+        .fc-event.event-emergency {
+            background-color: #e74c3c !important;
+            border-left: 4px solid #e74c3c !important;
+            border-color: #e74c3c !important;
+            color: #fff !important;
+        }
     </style>
 
     <div class="container">
@@ -157,6 +165,9 @@
 
                 eventRender: function (event, element) {
                     element.find('.fc-time').remove();
+                    if (event.emergency == 1) {
+                        element.addClass('event-emergency');
+                    }
                 },
 
                 eventClick: function (event) {
@@ -207,6 +218,17 @@
                             }
 
                             $('#display_charged_type_calendar').html(chargedBadge);
+
+                            if (data.emergency == 1) {
+                                $('#calendarModalPestControl #emergency')
+                                    .text('⚠ EMERGENCY')
+                                    .removeClass()
+                                    .addClass('fw-bold text-danger fs-5');
+                            } else {
+                                $('#calendarModalPestControl #emergency')
+                                    .text('')
+                                    .removeClass();
+                            }
                         },
 
                         error: function () {

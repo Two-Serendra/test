@@ -299,24 +299,55 @@ $(document).ready(function () {
 
                 error(xhr) {
 
-                    if (xhr.status === 409 && xhr.responseJSON?.requires_payment) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Free Booking Limit Reached',
-                            text: xhr.responseJSON.message,
-                            showCancelButton: true,
-                            confirmButtonText: 'Yes, continue with payment',
-                            cancelButtonText: 'Cancel',
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33'
-                        }).then(result => {
-                            if (result.isConfirmed) {
-                                sendBooking(true);
-                            } else {
-                                unlockSubmitBtn();
-                            }
-                        });
-                        return;
+                    if (xhr.status === 409) {
+
+                        const res = xhr.responseJSON || {};
+
+                        if (res.requires_payment) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Free Booking Limit Reached',
+                                text: res.message,
+                                showCancelButton: true,
+                                confirmButtonText: 'Yes, continue with payment',
+                                cancelButtonText: 'Cancel',
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33'
+                            }).then(result => {
+                                if (result.isConfirmed) {
+                                    sendBooking(true);
+                                } else {
+                                    unlockSubmitBtn();
+                                }
+                            });
+
+                            return;
+                        }
+
+                        if (res.type === 'slot_taken') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Time Slot Taken',
+                                text: res.message,
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#d33'
+                            });
+
+                            updateSlots($bookingDate.val());
+                            return;
+                        }
+
+                        if (res.type === 'unit_already_booked') {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Booking already exist',
+                                text: res.message,
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#3085d6'
+                            });
+
+                            return;
+                        }
                     }
 
 
@@ -756,8 +787,8 @@ $(document).ready(function () {
             $('#display_transaction_no_reports').text(data.transaction_no);
 
             // Editable fields
-            $('#srf_no_reports').text(data.srf_no);
-            $('#remarks_pest_control_reports').text(data.remarks);
+            $('#srf_no_reports').text(data.srf_no ?? 'N/A');
+            $('#remarks_pest_control_reports').text(data.remarks ?? 'N/A');
             $('#info_id').val(info_id);
             $('#viewPestControlBooking').modal('show');
 

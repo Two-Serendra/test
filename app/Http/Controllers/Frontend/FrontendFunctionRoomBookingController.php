@@ -91,8 +91,6 @@ class FrontendFunctionRoomBookingController extends Controller
             $items = collect();
 
 
-
-
         } elseif ($category === 'pest_control') {
 
             $residences = auth()->check()
@@ -103,16 +101,23 @@ class FrontendFunctionRoomBookingController extends Controller
                 : collect();
             $items = collect();
 
+        } elseif ($category === 'ausi') {
 
+            $residences = auth()->check()
+                ? DB::table('resident_details')
+                    ->where('email', auth()->user()->email)
+                    ->select('id', 'unit_no', 'resident_type')
+                    ->get()
+                : collect();
+            $items = collect();
 
+            
         } else {
             $functionRooms = FunctionRoom::with(['firstImage', 'discounts'])
                 ->get()
                 ->map(function ($item) {
                     $item->type = 'function_room';
                     $item->imageFolder = 'function-rooms';
-
-                    // get active discount
                     $activeDiscount = $item->discounts
                         ->where('start_date', '<=', now())
                         ->where('end_date', '>=', now())

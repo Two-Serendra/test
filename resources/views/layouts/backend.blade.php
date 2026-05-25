@@ -46,7 +46,7 @@
         href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@3.10.5/dist/fullcalendar.min.css">
 
-
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 
 </head>
 
@@ -177,6 +177,8 @@
     <script src="{{ asset('assets/backend/js/fitness-hub-booking.js') }}"></script>
     <script src="{{ asset('assets/backend/js/fitness-hub-records.js') }}"></script>
     <script src="{{ asset('assets/backend/js/fitness-hub-schedule-blocking.js') }}"></script>
+    <script src="{{ asset('assets/backend/js/ausi-booking.js') }}"></script>
+
 
     @stack('scripts')
 
@@ -340,6 +342,23 @@
                 }
             });
 
+
+            const ausiChannel = pusher.subscribe('ausi-bookings');
+            ausiChannel.bind('AusiBookingCreated', function (data) {
+                if ([1, 6].includes(currentUserRoleId)) {
+                    toastr.success(`(Unit: ${data.unit_no})`, `New Ausi Booking`);
+                    incrementAusiBookingCounter();
+                    refreshTableDebounced();
+                }
+            });
+
+            ausiChannel.bind('AusiBookingCancellation', function (data) {
+                if ([1, 6].includes(currentUserRoleId)) {
+                    toastr.success(`(Unit: ${data.unit_no})`, `Ausi Booking Cancelled`);
+                    incrementAusiBookingCounter();
+                    refreshTableDebounced();
+                }
+            });
 
 
 

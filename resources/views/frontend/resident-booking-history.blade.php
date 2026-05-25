@@ -13,6 +13,8 @@
                             <option value="fitness_hub">Fitness Hub</option>
                             <option value="grease_trap">Grease Trap</option>
                             <option value="pest_control">Pest Control</option>
+                            <option value="ausi">AUSI</option>
+
 
                         </select>
                     </div>
@@ -42,6 +44,8 @@
                         @include('frontend.resident-grease-trap-booking-table')
                     @elseif($bookingType === 'pest_control')
                         @include('frontend.resident-pest-control-booking-table')
+                    @elseif($bookingType === 'ausi')
+                        @include('frontend.resident-ausi-booking-table')
                     @endif
 
                 </div>

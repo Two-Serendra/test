@@ -132,7 +132,7 @@
     <script src="{{ asset('assets/frontend/js/activity-booking.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/resident-booking-history.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/fitness-hub-booking.js') }}"></script>
-
+    <script src="{{ asset('assets/frontend/js/ausi-booking.js') }}"></script>
 
     <script>
         Pusher.logToConsole = false;

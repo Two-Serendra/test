@@ -858,3 +858,41 @@ select.form-select:not(:disabled) {
     /* red */
     color: #fff;
 }
+
+.slot-error-gt {
+    display: none;
+}
+
+#slotWrapper {
+    position: relative;
+    display: block;
+    min-height: 120px;
+}
+
+.slot-loading {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+#slotWrapper-gt {
+    position: relative;
+    display: block;
+    min-height: 120px;
+}
+
+
+.gt-slot-loading {
+    position: relative;
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}

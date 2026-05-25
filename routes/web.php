@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Frontend\FrontendAusiBookingController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Backend\ServicesController;
 use App\Http\Controllers\Frontend\ContactController;
@@ -128,6 +129,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/pest-control-booking/cancel/{booking}', [PestControlController::class, 'CancelPestControlBooking'])
         ->name('pest.control.booking.cancel')->middleware('throttle:5,1');
 
+
+    //Ausi Booking
+    Route::get('/ausi-booking', [FrontendAusiBookingController::class, 'ausiBookingUser'])->name('ausi.booking');
+    Route::get('/ausi-booked-slots', [FrontendAusiBookingController::class, 'getBookedSlotsAusi'])->name('ausi.booked.slots');
+    Route::post('/ausi-booking/store', [FrontendAusiBookingController::class, 'storeAusiBooking'])->name('ausi.booking.store');
+    Route::post('/ausi-booking/cancel/{booking}', [FrontendAusiBookingController::class, 'CancelAusiBooking'])
+        ->name('ausi.booking.cancel')->middleware('throttle:5,1');
+    Route::get('/ausi-booking-details/{id}', [FrontendAusiBookingController::class, 'showAusiBookingDetails'])
+        ->name('show.ausi.booking.details');
 
     // Function Room Booking
     Route::post('/booking/store', [FrontendFunctionRoomBookingController::class, 'store'])->name('booking.store');

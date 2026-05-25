@@ -23,7 +23,7 @@ use App\Http\Controllers\Backend\PestControlController;
 use App\Http\Controllers\Frontend\FrontendFunctionRoomBookingController;
 use App\Http\Controllers\Backend\FitnessHubController;
 use App\Http\Controllers\Backend\FitnessHubBookingController;
-
+use App\Http\Controllers\Backend\AusiBookingController;
 
 Route::middleware('guest:admin')->group(function () {
     Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
@@ -298,7 +298,6 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/admin/pest-control/booking/update', [PestControlController::class, 'AdminUpdatePestControlBooking'])->name('admin.pest.control.booking.update');
     Route::post('/admin-pest-control-booking/cancel/{booking}', [PestControlController::class, 'CancelPestControlBookingAdmin'])
         ->name('admin.pest.control.booking.cancel');
-
     Route::get('/admin-pest-control-trap-calendar', [PestControlController::class, 'AdminBookingPestControlCalendar'])->name('admin.booking.pest.control.calendar');
     Route::get('/fetch/pest-control-calendar-details/{id}', [PestControlController::class, 'fetchPestControlCalendarSchedule'])->name("admin.fetch.booking.pest.control.calendar");
     Route::get('/search-pest-control-booking', [PestControlController::class, 'searchPestControlBooking'])->name('admin.search.pest.control.booking');
@@ -309,9 +308,35 @@ Route::middleware('auth:admin')->group(function () {
         ->name('download.pest.control.booking.reports');
     Route::post('/pest-control-import-booking', [PestControlController::class, 'importPestControlBookings'])->name('pest.control.booking.import');
     Route::get('/search-pest-control-report', [PestControlController::class, 'searchPestControlReport'])->name('admin.search.pest.control.report');
+
+
+    //AUSI
+    Route::get('/admin-booking-ausi', [AusiBookingController::class, 'AdminBookingAusi'])->name('admin.booking.ausi');
+    Route::post('/admin-ausi-booking-store', [AusiBookingController::class, 'AdminStoreAusiBooking'])->name('admin.ausi.booking.store');
+    Route::get('/admin-ausi/booked-slots', [AusiBookingController::class, 'getBookedSlotsAdminAusi'])
+        ->name('admin.ausi.booked.slots');
+    Route::get('/search-ausi-booking', [AusiBookingController::class, 'searchAusiBooking'])->name('admin.search.ausi.booking');
+    Route::get('/admin-report-ausi', [AusiBookingController::class, 'AdminReportAusi'])->name('admin.report.ausi');
+    Route::post('/ausi-import-booking', [AusiBookingController::class, 'importAusiBookings'])->name('ausi.booking.import');
+    Route::get('/admin-get-updated-ausi-table', [AusiBookingController::class, 'getUpdatedAusiTable'])->name('admin.get.updated.ausi.table');
+    Route::post('/admin-ausi-booking/cancel/{booking}', [AusiBookingController::class, 'CancelAusiBookingAdmin'])
+        ->name('admin.ausi.booking.cancel');
+    Route::get('/admin-ausi-calendar', [AusiBookingController::class, 'AdminBookingAusiCalendar'])->name('admin.booking.ausi.calendar');
+    Route::get('/fetch/ausi-calendar-details/{id}', [AusiBookingController::class, 'fetchAusiCalendarSchedule'])->name("admin.fetch.booking.ausi.calendar");
+    Route::get('/admin-fetch-ausi-booking/{id}', [AusiBookingController::class, 'fetchAusiBooking'])->name('admin.fetch.ausi.control.booking');
+    Route::post('/admin/ausi/booking/update', [AusiBookingController::class, 'AdminUpdateAusiBooking'])->name('admin.ausi.booking.update');
+    Route::get('/search-ausi-report', [AusiBookingController::class, 'searchAusiReport'])->name('admin.search.ausi.report');
+    Route::post('/admin-download-ausi-booking-records', [AusiBookingController::class, 'downloadAusiBookingReports'])
+        ->name('download.ausi.booking.reports');
+
+
+
+
     Route::get('/admin-gallery', [GalleryController::class, 'showGallery'])->name('admin.show.gallery');
     Route::post('/admin/gallery/upload', [GalleryController::class, 'uploadGalleryImages'])->name('admin.gallery.upload');
     Route::get('/get-updated-gallery-table', [GalleryController::class, 'getUpdatedGalleryTable'])->name('get.updated.gallery.table');
+
+
 
     //Event
     Route::get('/admin-events', [EventsController::class, 'showEvents'])->name('admin.show.events');

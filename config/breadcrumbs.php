@@ -43,6 +43,13 @@ return [
     'admin.search.pest.control.booking' => ['Pest Control', 'Booking'], // search page uses same breadcrumb
     'admin.report.pest.control' => ['Pest Control', 'Reports'],
     'admin.search.pest.control.report' => ['Pest Control', 'Reports'],
+
+    // AUSI
+    'admin.booking.ausi' => ['AUSI', 'Booking'],
+    'admin.booking.ausi.calendar' => ['AUSI', 'Calendar'],
+    'admin.search.ausi.booking' => ['AUSI', 'Booking'], // search page uses same breadcrumb
+    'admin.report.ausi' => ['AUSI', 'Reports'],
+    'admin.search.ausi.report' => ['AUSI', 'Reports'],
     // Manage Section
     'admin.show.user' => ['Manage', 'User'],
     'admin.show.resident.details' => ['Manage', 'Resident Details'],

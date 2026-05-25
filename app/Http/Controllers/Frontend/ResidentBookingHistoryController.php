@@ -9,6 +9,7 @@ use App\Models\ActivityBooking;
 use App\Models\FunctionRoomBooking;
 use App\Models\GreaseTrapBooking;
 use App\Models\FitnessHubBooking;
+use App\Models\AusiBooking;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 class ResidentBookingHistoryController extends Controller
@@ -93,7 +94,7 @@ class ResidentBookingHistoryController extends Controller
         $bookingType = $request->booking_type ?? 'function_room';
         $bookings = collect();
 
-        $allowedTypes = ['function_room', 'amenity', 'fitness_hub', 'grease_trap', 'pest_control'];
+        $allowedTypes = ['function_room', 'amenity', 'fitness_hub', 'grease_trap', 'pest_control', 'ausi'];
 
         abort_unless(in_array($bookingType, $allowedTypes, true), 400, 'Invalid booking type.');
 
@@ -180,6 +181,21 @@ class ResidentBookingHistoryController extends Controller
             if ($request->ajax()) {
                 return view(
                     'frontend.resident-pest-control-booking-table',
+                    compact('bookings', 'selectedUnit', 'bookingType')
+                )->render();
+            }
+        } elseif ($bookingType === 'ausi') {
+
+            $bookings = AusiBooking::where('unit_no', $selectedUnit)
+                ->where('user_id', $request->user()->id)
+                ->orderBy('booking_date', 'desc')
+                ->orderBy('booking_time_slot', 'desc')
+                ->paginate(5)
+                ->withQueryString();
+
+            if ($request->ajax()) {
+                return view(
+                    'frontend.resident-ausi-booking-table',
                     compact('bookings', 'selectedUnit', 'bookingType')
                 )->render();
             }

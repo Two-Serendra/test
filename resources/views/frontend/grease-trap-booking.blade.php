@@ -32,7 +32,7 @@
                     $slots = [
                         '9:00AM - 10:00AM',
                         '10:00AM - 11:00AM',
-                        '11:00AM - 12:00PM', 
+                        '11:00AM - 12:00PM',
                         '1:00PM - 2:00PM',
                         '2:00PM - 3:00PM',
                         '3:00PM - 4:00PM',
@@ -40,24 +40,33 @@
                     ];
                 @endphp
 
-                @foreach ($slots as $slot)
-                    <div class="col-md-12 col-sm-12">
-                        <input type="radio" class="btn-check booking-slot" name="booking_time_slot"
-                            id="slot{{ $loop->index }}" value="{{ $slot }}" data-slot="{{ $slot }}" required>
-                        <label class="btn btn-outline-primary w-100" for="slot{{ $loop->index }}">
-                            {{ $slot }}
-                        </label>
+                <div id="slotWrapper-gt" class="position-relative">
+                    <div id="gt-slot-loading" class="gt-slot-loading d-none">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
-                @endforeach
-            </div>
+                    <div class="row g-2">
+                        @foreach ($slots as $slot)
+                            <div class="col-md-12 col-sm-12">
+                                <input type="radio" class="btn-check booking-slot" name="booking_time_slot"
+                                    id="slot{{ $loop->index }}" value="{{ $slot }}" data-slot="{{ $slot }}" required>
+                                <label class="btn btn-outline-primary w-100" for="slot{{ $loop->index }}">
+                                    {{ $slot }}
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
 
-            <div class="d-grid">
-                <button type="submit" form="userGreaseTrapNewBooking" id="saveUserGreaseTrapBtn"
-                    class="btn btn-primary d-flex align-items-center justify-content-center customBtn"
-                    style="min-width: 100px; height: 38px;">
-                    <span class="btn-text">SUBMIT</span>
-                </button>
+                <div class="d-grid">
+                    <button type="submit" form="userGreaseTrapNewBooking" id="saveUserGreaseTrapBtn"
+                        class="btn btn-primary d-flex align-items-center justify-content-center customBtn"
+                        style="min-width: 100px; height: 38px;">
+                        <span class="btn-text">SUBMIT</span>
+                    </button>
 
+                </div>
             </div>
         </form>
     </div>

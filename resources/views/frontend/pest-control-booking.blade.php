@@ -13,6 +13,7 @@
                             <option value="{{ $residence->id }}">
                                 {{ ucfirst($residence->resident_type) }} - Unit {{ $residence->unit_no }}
                             </option>
+                            
                         @endforeach
                     </select>
                 </div>

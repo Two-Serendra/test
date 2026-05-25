@@ -10,7 +10,7 @@ class PestControlBooking extends Model
 {
     use HasFactory;
     protected $table = 'pest_control_bookings';
-    protected $fillable = [
+    protected $fillable = [ 
         'transaction_no',
         'user_id',
         'unit_no',

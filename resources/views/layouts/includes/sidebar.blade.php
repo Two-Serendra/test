@@ -299,6 +299,40 @@
                 </li>
             </ul>
         </li>
+
+
+        <li class="menu-item">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-shield-quarter"></i>
+                <div data-i18n="Form Elements">
+                    AUSI
+                    <span id="ausi-booking-counter" class="badge bg-danger d-none"
+                        style="min-width: 22px; text-align: center; display: inline-flex; justify-content: center; align-items: center;">
+                        0
+                    </span>
+
+                </div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('admin.booking.ausi') ? 'active' : '' }}">
+                    <a href="{{ route('admin.booking.ausi') }}" class="menu-link">
+                        <div data-i18n="Typography">Booking</div>
+                    </a>
+                </li>
+
+                <li class="menu-item {{ request()->routeIs('admin.booking.ausi.calendar') ? 'active' : '' }}">
+                    <a href="{{ route('admin.booking.ausi.calendar') }}" class="menu-link">
+                        <div data-i18n="Typography">Calendar</div>
+                    </a>
+                </li>
+
+                <li class="menu-item {{ request()->routeIs('admin.report.ausi') ? 'active' : '' }}">
+                    <a href="{{ route('admin.report.ausi') }}" class="menu-link">
+                        <div data-i18n="Typography">Reports</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
         @endroles
 
         <!-- Manage -->
@@ -321,7 +355,7 @@
         </li>
         @endroles
 
-        @roles(1,10)
+        @roles(1, 10)
         <li class="menu-item {{ request()->routeIs('admin.show.events', 'admin.search.events') ? 'active' : '' }}">
             <a href="{{ route('admin.show.events') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-calendar-star"></i>
@@ -329,7 +363,7 @@
             </a>
         </li>
         @endroles
-        
+
         @roles(1)
         <li class="menu-item">
             <a href="javascript:void(0)" class="menu-link menu-toggle">

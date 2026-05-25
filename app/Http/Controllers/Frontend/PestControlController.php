@@ -21,6 +21,7 @@ class PestControlController extends Controller
 {
     public function pestControl()
     {
+
         $residences = auth()->check()
             ? DB::table('resident_details')
                 ->where('email', auth()->user()->email)

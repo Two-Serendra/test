@@ -3,11 +3,8 @@
         <thead class="table-light">
             <tr>
                 <th>Booking ID</th>
-                <!-- <th>SRF No</th> -->
                 <th>Date</th>
                 <th>Time</th>
-                <th>Charge Type</th>
-                <!-- <th>Emergency</th> -->
                 <th>Status</th>
                 <th>Action</th>
             </tr>
@@ -21,20 +18,6 @@
                         <!-- <td>{{ $b->srf_no ?? 'N/A' }}</td> -->
                         <td>{{ \Carbon\Carbon::parse($b->booking_date)->format('F d, Y') }}</td>
                         <td>{{ $b->booking_time_slot }}</td>
-
-                        <td>
-                            @if ($b->charged_type === 1)
-                                <span class="text-primary">
-                                    Free
-                                </span>
-                            @else
-                                <span class="text-danger">
-                                    ₱{{ number_format(350, 2) }}
-                                </span>
-                            @endif
-
-                        </td>
-                            
 
                         <td>
                             @php
@@ -76,7 +59,8 @@
                             @if ($b->booking_status == 2)
                                 {{-- Cancelled: disabled button --}}
                                 <div data-bs-toggle="tooltip" title="Cancelled">
-                                    <button class="btn btn-secondary text-white badge-forge pest-control-booking-cancelled" disabled>
+                                    <button class="btn btn-secondary text-white badge-forge ausi-booking-cancelled"
+                                        disabled>
                                         <i class="fa-solid fa-ban"></i>
                                     </button>
                                 </div>
@@ -84,7 +68,7 @@
                             @elseif ($b->booking_status == 1)
                                 {{-- Active: wrap button in div so tooltip works even if disabled --}}
                                 <div data-bs-toggle="tooltip" title="Cancel">
-                                    <button class="btn btn-danger pest-control-booking-cancel text-white badge-forge"
+                                    <button class="btn btn-danger ausi-booking-cancel text-white badge-forge"
                                         data-id="{{ $b->id }}" {{ $disabled }}>
                                         <i class="fa-solid fa-ban"></i>
                                     </button>
@@ -114,3 +98,4 @@
 <div class="pagination-container">
     {{ $bookings->links('vendor.pagination.bootstrap-4') }}
 </div>
+@include('frontend.modal.resident-view-activity-booking-details-modal')

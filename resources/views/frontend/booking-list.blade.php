@@ -9,11 +9,11 @@
 
                 <form method="GET" action="{{ route('booking.list') }}">
                     <!-- <div class="form-check mb-2">
-                                        <input class="form-check-input" type="radio" name="category" id="category_function_room"
-                                            value="function_room" {{ $category == 'function_room' ? 'checked' : '' }}
-                                            onchange="this.form.submit()">
-                                        <label class="form-check-label" for="category_function_room">Function Rooms</label>
-                                    </div> -->
+                        <input class="form-check-input" type="radio" name="category" id="category_function_room"
+                            value="function_room" {{ $category == 'function_room' ? 'checked' : '' }}
+                            onchange="this.form.submit()">
+                        <label class="form-check-label" for="category_function_room">Function Rooms</label>
+                    </div>
 
                     <div class="form-check mb-2">
                         <input class="form-check-input" type="radio" name="category" id="category_amenity" value="amenity"
@@ -22,10 +22,11 @@
                     </div>
 
                     <div class="form-check mb-2">
-                        <input class="form-check-input" type="radio" name="category" id="category_fitness_hub" value="fitness_hub"
-                            {{ $category == 'fitness_hub' ? 'checked' : '' }} onchange="this.form.submit()">
+                        <input class="form-check-input" type="radio" name="category" id="category_fitness_hub"
+                            value="fitness_hub" {{ $category == 'fitness_hub' ? 'checked' : '' }}
+                            onchange="this.form.submit()">
                         <label class="form-check-label" for="category_fitness_hub">Fitness Hubs</label>
-                    </div>
+                    </div> -->
 
                     <div class="form-check mb-2">
                         <input class="form-check-input" type="radio" name="category" id="category_grease_trap"
@@ -34,12 +35,19 @@
                         <label class="form-check-label" for="category_grease_trap">Grease Trap</label>
                     </div>
 
-                    <div class="form-check">
+                    <div class="form-check mb-2">
                         <input class="form-check-input" type="radio" name="category" id="category_pest_control"
                             value="pest_control" {{ $category == 'pest_control' ? 'checked' : '' }}
                             onchange="this.form.submit()">
                         <label class="form-check-label" for="category_pest_control">Pest Control</label>
                     </div>
+
+                    <div class="form-check">
+                            <input class="form-check-input" type="radio" name="category" id="category_ausi"
+                                value="ausi" {{ $category == 'ausi' ? 'checked' : '' }}
+                                onchange="this.form.submit()">
+                            <label class="form-check-label" for="category_ausi">Ausi</label>
+                        </div>
                 </form>
             </div>
 
@@ -61,6 +69,9 @@
 
                     @elseif($category == 'pest_control')
                         Pest Control
+
+                    @elseif($category == 'ausi')
+                        Ausi
 
                     @else
                         All (Function Rooms & Amenities)
@@ -89,6 +100,19 @@
                         @else
                             <script>
                                 window.location.href = "{{ route('login', ['redirect' => route('pest.control.booking')]) }}";
+                            </script>
+                        @endauth
+                    @endif
+
+
+                    @if($category === 'ausi')
+                        @auth
+                            <div class="col-12">
+                                @include('frontend.ausi-booking')
+                            </div>
+                        @else
+                            <script>
+                                window.location.href = "{{ route('login', ['redirect' => route('ausi.booking')]) }}";
                             </script>
                         @endauth
                     @endif

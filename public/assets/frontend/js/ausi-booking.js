@@ -1,49 +1,42 @@
 $(document).ready(function () {
-
-
-    flatpickr("#GreaseTrapBookingDate", {
+    flatpickr("#AusiBookingDate", {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(1)
+
     });
 
 
-    function showLoadingGt() {
-        $('#gt-slot-loading').removeClass('d-none');
-        $bookingSlots.prop('disabled', true);
-    }
+    const $bookingDate = $('#AusiBookingDate');
+    const $bookingSlots = $('.ausi-booking-slot');
+    const $submitBtn = $('#saveUserAusiBtn');
 
-    function hideLoadingGt() {
-        $('#gt-slot-loading').addClass('d-none');
-    }
-
-    const $bookingDate = $('#GreaseTrapBookingDate');
-    const $bookingSlots = $('.booking-slot');
-    const $submitBtn = $('#saveUserGreaseTrapBtn');
-
-    function updateSlots(date) {
+    function updateSlots(date) { 
         if (!date) return;
-        showLoadingGt();
+
+        const residentId = $('select[name="resident_id_ausi"]').val();
+
+        showLoading();
 
         $.ajax({
-            url: '/grease-trap/booked-slots',
+            url: '/ausi-booked-slots',
             type: 'GET',
-            data: { date },
+            data: {
+                date: date,
+                resident_id: residentId
+            },
             success: function (res) {
                 resetSlots();
-                disableBookedSlots(res.booked_slots);
+                disableBookedSlots(res.blocked_for_user);
             },
             error: function () {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Unable to load available slots.'
-                });
+                console.log('Failed to load slots');
             },
             complete: function () {
-                hideLoadingGt();
+                hideLoading();
             }
         });
     }
+
 
     function resetSlots() {
         $bookingSlots.each(function () {
@@ -57,7 +50,8 @@ $(document).ready(function () {
 
     function disableBookedSlots(bookedSlots) {
         bookedSlots.forEach(slot => {
-            const $radio = $('.booking-slot[data-slot="' + slot + '"]');
+            const $radio = $('.ausi-booking-slot[data-slot="' + slot + '"]');
+
 
             if ($radio.length) {
                 $radio.prop('disabled', true);
@@ -71,19 +65,33 @@ $(document).ready(function () {
 
     $bookingSlots.prop('disabled', true);
 
-
     $bookingDate.on('change', function () {
         const selectedDate = $(this).val();
         updateSlots(selectedDate);
     });
 
+    $('select[name="resident_id_ausi"]').on('change', function () {
+        updateSlots($bookingDate.val());
+    });
 
-    $('#userGreaseTrapNewBooking').on('submit', function (event) {
+    function showLoading() {
+        $('#slotLoading').removeClass('d-none');
+        $bookingSlots.prop('disabled', true);
+    }
+
+    function hideLoading() {
+        $('#slotLoading').addClass('d-none');
+    }
+
+
+
+
+    $('#userAusiNewBooking').on('submit', function (event) {
         event.preventDefault();
 
         const form = this;
-        const $submitBtn = $('#saveUserGreaseTrapBtn');
-        const $bookingDate = $('#GreaseTrapBookingDate');
+        const $submitBtn = $('#saveUserAusiBtn');
+        const $bookingDate = $('#AusiBookingDate');
         const selectedDate = $bookingDate.val();
 
         const selectedSlot = $('input[name="booking_time_slot"]:checked').val();
@@ -124,10 +132,10 @@ $(document).ready(function () {
                 .css('width', '');
         };
 
-        const sendBooking = (forcePayment = false) => {
+        const sendBooking = (forceOverride = false) => {
             const formData = new FormData(form);
-            if (forcePayment) {
-                formData.append('force_payment', true);
+            if (forceOverride) {
+                formData.append('force_override', true);
             }
 
             lockSubmitBtn();
@@ -143,6 +151,7 @@ $(document).ready(function () {
                 contentType: false,
 
                 success(response) {
+
                     Swal.fire({
                         icon: 'success',
                         title: 'Booking Submitted!',
@@ -152,41 +161,22 @@ $(document).ready(function () {
                     });
 
 
-
                     form.reset();
                     $(form).removeClass('was-validated');
 
                     resetSlots();
                     $bookingSlots.prop('disabled', true);
 
-                    flatpickr('#GreaseTrapBookingDate', {
+                    flatpickr('#AusiBookingDate', {
                         dateFormat: 'Y-m-d',
                         minDate: new Date().fp_incr(1)
                     });
                 },
 
+
                 error(xhr) {
                     const res = xhr.responseJSON || {};
 
-                    if (res.requires_payment) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Free Booking Limit Reached',
-                            text: res.message,
-                            showCancelButton: true,
-                            confirmButtonText: 'Yes, continue with payment',
-                            cancelButtonText: 'Cancel',
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33'
-                        }).then(result => {
-                            if (result.isConfirmed) {
-                                sendBooking(true);
-                            } else {
-                                unlockSubmitBtn();
-                            }
-                        });
-                        return;
-                    }
 
                     if (xhr.status === 422) {
                         let msg = 'Please check the form fields.';
@@ -209,7 +199,7 @@ $(document).ready(function () {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Time Slot Taken',
-                                text: res.message,
+                                text: res.message || 'This time slot is already booked just now.',
                                 confirmButtonText: 'OK',
                                 confirmButtonColor: '#d33'
                             });
@@ -219,18 +209,28 @@ $(document).ready(function () {
                         }
 
                         if (res.type === 'unit_already_booked') {
+
                             Swal.fire({
                                 icon: 'warning',
-                                title: 'Booking already exists',
+                                title: 'Booking Already Exists',
                                 text: res.message,
-                                confirmButtonText: 'OK',
-                                confirmButtonColor: '#3085d6'
+                                showCancelButton: true,
+                                confirmButtonText: 'Yes, book anyway',
+                                cancelButtonText: 'Cancel',
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33'
+                            }).then((result) => {
+
+                                if (result.isConfirmed) {
+                                    sendBooking(true); 
+                                } else {
+                                    unlockSubmitBtn();
+                                }
                             });
 
                             return;
                         }
                     }
-
                     Swal.fire({
                         toast: true,
                         position: 'top-end',
@@ -250,71 +250,48 @@ $(document).ready(function () {
         sendBooking();
     });
 
+    $(document).on('click', '.ausi-booking-cancel', function () {
 
-    $(document).on('click', '.grease-trap-booking-cancel', function () {
         const bookingId = $(this).data('id');
+        // console.log("Cancel clicked", bookingId);
 
-        $.ajax({
-            url: '/grease-trap-booking/cancel/' + bookingId,
-            type: 'POST',
-            data: {
-                _token: $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function (res) {
-                if (!res.success) {
-                    Swal.fire('Error', res.message || 'Failed to cancel booking.', 'error');
-                    return;
-                }
+        Swal.fire({
+            title: 'Cancel Booking',
+            text: 'Are you sure you want to cancel this booking?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, cancel it',
+            cancelButtonText: 'No, keep it'
+        }).then((result) => {
+            if (result.isConfirmed) {
 
+                $.ajax({
+                    url: '/ausi-booking/cancel/' + bookingId,
+                    type: 'POST',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (res) {
 
-                if (res.requires_confirmation) {
-                    Swal.fire({
-                        title: 'Cancel Booking',
-                        html:
-                            'Are you sure you want to cancel this booking?' +
-                            res.message,
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#6c757d',
-                        confirmButtonText: 'Yes, cancel it',
-                        cancelButtonText: 'No, keep it'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: '/grease-trap-booking/cancel/' + bookingId,
-                                type: 'POST',
-                                data: {
-                                    _token: $('meta[name="csrf-token"]').attr('content'),
-                                    confirm: 1
-                                },
-                                success: function (res2) {
-                                    Swal.fire('Cancelled!', res2.message, 'success')
-                                        .then(() => {
-                                            let page = $('.pagination .active span').text() || 1;
-                                            loadBookings(page);
-                                        });
-                                },
-                                error: function () {
-                                    Swal.fire('Error', 'Something went wrong while cancelling.', 'error');
-                                }
+                        Swal.fire('Cancelled!', res.message, 'success')
+                            .then(() => {
+                                let page = $('.pagination .active span').text() || 1;
+                                loadBookings(page);
                             });
-                        }
-                    });
-                } else {
 
-                    Swal.fire('Cancelled!', res.message, 'success')
-                        .then(() => {
-                            let page = $('.pagination .active span').text() || 1;
-                            loadBookings(page);
-                        });
-                }
-            },
-            error: function () {
-                Swal.fire('Error', 'Something went wrong while cancelling.', 'error');
+                    },
+                    error: function (xhr) {
+                        Swal.fire('Error',
+                            xhr.responseJSON?.message || 'Something went wrong while cancelling.',
+                            'error'
+                        );
+                    }
+                });
+
             }
         });
     });
 
-
-});
+}); 

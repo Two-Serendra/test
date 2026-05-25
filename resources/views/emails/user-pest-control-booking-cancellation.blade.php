@@ -49,7 +49,7 @@
 
             <p style="margin:0; line-height:1.5;">
                 Regards,<br>
-                <strong>Two Serendra Admin Team</strong>
+                <strong>Two Serendra</strong>
             </p>
         </div>
 

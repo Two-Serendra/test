@@ -456,6 +456,7 @@ class GreaseTrapBookingController extends Controller
                   'start' => $schedule->booking_date . ' ' . Carbon::parse($start)->format('H:i:s'),
                   'end' => $schedule->booking_date . ' ' . Carbon::parse($end)->format('H:i:s'),
                   'allDay' => false,
+                  'emergency' => $schedule->emergency,
                ];
             }
 
@@ -465,6 +466,7 @@ class GreaseTrapBookingController extends Controller
                'title' => $schedule->unit_no . ' (No Time Slot)',
                'start' => $schedule->booking_date,
                'allDay' => true,
+               'emergency' => $schedule->emergency,
             ];
          });
 

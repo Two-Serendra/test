@@ -136,6 +136,13 @@
 
                 eventRender: function (event, element) {
                     element.find('.fc-time').remove();
+
+                    if (event.emergency == 1) {
+                        element.find('.fc-title').css({
+                            'color': 'red',
+                            'font-weight': 'bold'
+                        });
+                    }
                 },
 
                 eventClick: function (event) {

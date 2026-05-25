@@ -97,7 +97,7 @@ $(document).ready(function () {
         const $enabledSlots = $slots.filter(':not(:disabled)');
         const $checkedSlot = $slots.filter(':checked');
 
-        // If no slots are available at all
+
         if ($enabledSlots.length === 0) {
             Swal.fire({
                 icon: 'warning',
@@ -216,15 +216,31 @@ $(document).ready(function () {
                     }
 
                     if (xhr.status === 409) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Time Slot Taken',
-                            text: res.message || 'This time slot is already booked just now.',
-                            confirmButtonText: 'OK',
-                            confirmButtonColor: '#d33'
-                        });
-                        updateSlots(selectedDate);
-                        return;
+
+                        if (res.type === 'slot_taken') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Time Slot Taken',
+                                text: res.message,
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#d33'
+                            });
+
+                            updateSlots(selectedDate);
+                            return;
+                        }
+
+                        if (res.type === 'unit_already_booked') {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Booking already exist',
+                                text: res.message,
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#3085d6'
+                            });
+
+                            return;
+                        }
                     }
 
                     Swal.fire({

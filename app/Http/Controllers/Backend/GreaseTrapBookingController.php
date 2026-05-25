@@ -495,6 +495,7 @@ class GreaseTrapBookingController extends Controller
          'transaction_no' => $schedule->transaction_no,
          'srf_no' => $schedule->srf_no ?? 'N/A',
          'charged_type' => $schedule->charged_type,
+         'emergency' => $schedule->emergency,
       ]);
    }
 

@@ -434,6 +434,7 @@ class PestControlController extends Controller
                     'end' => $schedule->booking_date . ' ' . Carbon::parse(trim($end))->format('H:i:s'),
                     'allDay' => false,
                     'unit_area' => $schedule->unit_area,
+                    'emergency' => $schedule->emergency,
                 ];
             });
 
@@ -460,6 +461,7 @@ class PestControlController extends Controller
             'transaction_no' => $schedule->transaction_no,
             'srf_no' => $schedule->srf_no ?? 'N/A',
             'charged_type' => $schedule->charged_type,
+            'emergency' => $schedule->emergency,
         ]);
     }
 

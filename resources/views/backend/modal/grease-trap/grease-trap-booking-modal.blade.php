@@ -66,11 +66,11 @@
                             <label class="form-label">Select Time Slot *</label>
                             <div class="row g-2">
                                 @php
-                                    $slots = [  
+                                    $slots = [
                                         '9:00AM - 10:00AM',
                                         '10:00AM - 11:00AM',
                                         '11:00AM - 12:00PM',
-                                        '1:00PM - 2:00PM', 
+                                        '1:00PM - 2:00PM',
                                         '2:00PM - 3:00PM',
                                         '3:00PM - 4:00PM',
                                         '4:00PM - 5:00PM',
@@ -367,7 +367,10 @@
                 <!-- TITLE CARD -->
                 <div class="bg-white p-3 rounded-4 shadow-sm border-start border-4 border-primary mb-4">
                     <small class="text-muted">Grease Trap</small>
-                    <div id="calendar_transaction_no" class="fs-5 fw-bold text-primary"></div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div id="calendar_transaction_no" class="fs-5 fw-bold text-primary"></div>
+                        <div id="emergency"></div>
+                    </div>
                 </div>
 
                 <!-- GRID -->
@@ -585,7 +588,8 @@
 
                                 <div class="mb-3">
                                     <label class="form-label">SRF No *</label>
-                                    <input type="text" class="form-control" id="grease_trap_srf_no_reports" name="srf_no">
+                                    <input type="text" class="form-control" id="grease_trap_srf_no_reports"
+                                        name="srf_no">
                                 </div>
 
                                 <div class="mb-3">

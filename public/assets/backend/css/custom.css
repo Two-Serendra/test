@@ -274,7 +274,7 @@ td.sticky-col {
 
 .slot-container {
     background: #fff;
-    border-radius:10px;
+    border-radius: 10px;
 }
 
 .slot-container select {
@@ -287,4 +287,10 @@ td.sticky-col {
 
 .slot-container select option:hover {
     background-color: #f1f5f9;
+}
+
+.event-emergency {
+    background-color: #fdecea !important;
+    border-left: 4px solid #e74c3c;
+    border-radius: 4px;
 }

@@ -487,7 +487,10 @@
                 <!-- TITLE CARD -->
                 <div class="bg-white p-3 rounded-4 shadow-sm border-start border-4 border-primary mb-4">
                     <small class="text-muted">Pest Control</small>
-                    <div id="calendar_transaction_no" class="fs-5 fw-bold text-primary"></div>
+                   <div class="d-flex justify-content-between align-items-center">
+                      <div id="calendar_transaction_no" class="fs-5 fw-bold text-primary"></div>
+                    <div id="emergency"></div>
+                   </div>
                 </div>
 
                 <!-- GRID -->

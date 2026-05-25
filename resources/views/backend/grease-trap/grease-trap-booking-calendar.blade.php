@@ -139,7 +139,7 @@
 
                     if (event.emergency == 1) {
                         element.find('.fc-title').css({
-                            'color': 'red',
+                            'color': '#c0392b',
                             'font-weight': 'bold'
                         });
                     }

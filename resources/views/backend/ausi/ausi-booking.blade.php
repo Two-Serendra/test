@@ -35,9 +35,9 @@
                         <i class='bx bx-plus'></i> New Booking
                     </button>
 
-                    <button type="button" class="btn btn-danger badge AddEmergencyAusiBooking me-2">
+                    <!-- <button type="button" class="btn btn-danger badge AddEmergencyAusiBooking me-2">
                         <i class='bx bx-plus'></i> Emergency Booking
-                    </button>
+                    </button> -->
                 </div>
             </div>
             <div class="table-responsive">

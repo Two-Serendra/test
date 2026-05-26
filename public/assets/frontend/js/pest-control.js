@@ -9,10 +9,21 @@ $(document).ready(function () {
     const $bookingSlots = $('.pest-control-booking-slot');
     const $submitBtn = $('#saveUserPestControlBtn');
 
+
+    function showLoadingPc() {
+        $('#pc-slot-loading').removeClass('d-none');
+        $bookingSlots.prop('disabled', true);
+    }
+
+    function hideLoadingPc() {
+        $('#pc-slot-loading').addClass('d-none');
+    }
+
     function updateSlots(date) {
         if (!date) return;
 
         const residentId = $('select[name="resident_id_pest_control"]').val();
+        showLoadingPc();
 
         $.ajax({
             url: '/pest-control/booked-slots',
@@ -24,6 +35,9 @@ $(document).ready(function () {
             success: function (res) {
                 resetSlots();
                 disableBookedSlots(res.blocked_for_user);
+            },
+            complete: function () {
+                hideLoadingPc();
             }
         });
     }

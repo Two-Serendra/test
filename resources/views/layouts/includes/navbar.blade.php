@@ -5,10 +5,65 @@
                 <img src="{{ asset('assets/images/TWO SERENDRA LOGO PNG (White).png') }}"
                     style="height: 50px; width: auto; object-fit: contain;" alt="2serendra" />
             </a>
-            <button type="button" class="navbar-toggler me-0" data-bs-toggle="collapse"
-                data-bs-target="#navbarCollapse">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <div class="d-flex align-items-center d-lg-none ms-auto">
+
+                @auth
+                    <!-- MOBILE NOTIFICATION -->
+                    <a href="#"
+                        class="nav-link dropdown-toggle d-flex align-items-center justify-content-center position-relative notif-toggle"
+                        id="notifDropdown" role="button" data-bs-toggle="dropdown" data-bs-display="static">
+                        <i class='bx bx-bell notif-icon'></i>
+                        @if(auth()->user()->unreadNotifications()->count() > 0)
+                            <span class="position-absolute top-0 start-100 badge rounded-pill bg-danger"
+                                style="transform: translate(-60%, -35%);">
+                                {{ auth()->user()->unreadNotifications()->count() }}
+                            </span>
+                        @endif
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end bg-light rounded-0 rounded-bottom m-0" style="min-width: 320px; max-width: 350px; max-height: 300px;
+                                                            overflow-y: auto; word-wrap: break-word; white-space: normal;
+                                                            position: absolute;" id="notifDropdownMenu"
+                        id="mobileNotifDropdown">
+
+                        @php
+                            $unread = auth()->user()->unreadNotifications()->latest()->take(5)->get();
+                            $read = auth()->user()->readNotifications()->latest()->take(max(0, 5 - $unread->count()))->get();
+                            $notifications = $unread->merge($read)->take(5);
+                        @endphp
+
+                        @forelse($notifications as $notification)
+                            @php
+                                $message = \Illuminate\Support\Str::limit($notification->data['message'] ?? 'New notification', 80);
+                                $url = route('notifications.show', $notification->id);
+                            @endphp
+
+                            <a href="{{ $url }}"
+                                class="dropdown-item text-start mark-as-read {{ $notification->read_at ? 'notification-read' : 'fw-bold' }}"
+                                data-id="{{ $notification->id }}" data-url="{{ $url }}"
+                                style="white-space: normal; text-wrap: wrap;">
+                                <i class="bx bx-bell me-2"></i> {{ $message }}
+                                <br>
+                                <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
+                            </a>
+                        @empty
+                            @if(auth()->user()->notifications()->count() === 0)
+                                <span class="dropdown-item text-muted" style="white-space: normal; text-wrap: wrap;">
+                                    No notifications
+                                </span>
+                            @endif
+                        @endforelse
+
+                    </div>
+                @endauth
+
+                <!-- HAMBURGER -->
+                <button type="button" class="navbar-toggler me-0 border-0 shadow-none" data-bs-toggle="collapse"
+                    data-bs-target="#navbarCollapse">
+
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+            </div>
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <div class="navbar-nav">
                     <a href="{{ route('home') }}"
@@ -48,7 +103,7 @@
                     @endauth
 
                     @auth
-                        <div class="nav-item dropdown remove-on-mobile">
+                        <div class="nav-item dropdown remove-on-mobile position-relative d-none d-lg-block">
                             <a href="#"
                                 class="nav-link dropdown-toggle d-flex align-items-center justify-content-center position-relative notif-toggle"
                                 id="notifDropdown" role="button" data-bs-toggle="dropdown" data-bs-display="static">
@@ -60,10 +115,9 @@
                                     </span>
                                 @endif
                             </a>
-
-                            <div class="dropdown-menu bg-light rounded-0 rounded-bottom m-0"
-                                style="min-width: 320px; max-width: 350px; max-height: 300px; overflow-y: auto; word-wrap: break-word; white-space: normal;"
-                                id="notifDropdownMenu">
+                            <div class="dropdown-menu dropdown-menu-end bg-light rounded-0 rounded-bottom m-0" style="min-width: 320px; max-width: 350px; max-height: 300px;
+                                                            overflow-y: auto; word-wrap: break-word; white-space: normal;
+                                                            position: absolute;" id="notifDropdownMenu">
 
                                 @php
                                     $unread = auth()->user()->unreadNotifications()->latest()->take(5)->get();
@@ -98,7 +152,6 @@
                     @endauth
                 </div>
 
-
                 <div class="nav-item dropdown ms-3 mt-2 mt-lg-0 remove-on-mobile">
                     <a href="#"
                         class="nav-link dropdown-toggle d-flex align-items-center justify-content-center user-toggle"
@@ -121,8 +174,8 @@
                             </a>
 
                             <!-- <a href="{{ route('soa') }}" class="dropdown-item">
-                                                <i class='bx bx-file me-2'></i> SOA
-                                            </a> -->
+                                                                                            <i class='bx bx-file me-2'></i> SOA
+                                                                                        </a> -->
 
                             <a href="{{ route('resident.booking.history') }}" class="dropdown-item">
                                 <i class='bx bx-calendar me-2'></i> Bookings

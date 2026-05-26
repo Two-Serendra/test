@@ -351,7 +351,5 @@
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
-
 </body>
-
 </html>

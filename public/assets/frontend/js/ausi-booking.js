@@ -1,8 +1,7 @@
-$(document).ready(function () {
+$(document).ready(function () { 
     flatpickr("#AusiBookingDate", {
         dateFormat: "Y-m-d",
-        minDate: new Date().fp_incr(1)
-
+        minDate: new Date().fp_incr(1),
     });
 
 
@@ -10,7 +9,7 @@ $(document).ready(function () {
     const $bookingSlots = $('.ausi-booking-slot');
     const $submitBtn = $('#saveUserAusiBtn');
 
-    function updateSlots(date) { 
+    function updateSlots(date) {
         if (!date) return;
 
         const residentId = $('select[name="resident_id_ausi"]').val();
@@ -27,6 +26,7 @@ $(document).ready(function () {
             success: function (res) {
                 resetSlots();
                 disableBookedSlots(res.blocked_for_user);
+                disablePastSlots(date);
             },
             error: function () {
                 console.log('Failed to load slots');
@@ -83,7 +83,26 @@ $(document).ready(function () {
         $('#slotLoading').addClass('d-none');
     }
 
+    function disablePastSlots(selectedDate) {
+        if (!selectedDate) return;
 
+        const now = new Date();
+
+        $bookingSlots.each(function () {
+            const slot = $(this).data('slot');
+            const startTime = slot.split(' - ')[0];
+            const normalizedStartTime = startTime.replace('NN', 'PM');
+            const slotDateTime = new Date(`${selectedDate} ${normalizedStartTime}`);
+            if (slotDateTime <= now) {
+                $(this).prop('disabled', true);
+
+                $('label[for="' + $(this).attr('id') + '"]')
+                    .removeClass('btn-outline-primary')
+                    .addClass('btn-secondary disabled')
+                    .css('cursor', 'not-allowed');
+            }
+        });
+    }
 
 
     $('#userAusiNewBooking').on('submit', function (event) {
@@ -222,7 +241,7 @@ $(document).ready(function () {
                             }).then((result) => {
 
                                 if (result.isConfirmed) {
-                                    sendBooking(true); 
+                                    sendBooking(true);
                                 } else {
                                     unlockSubmitBtn();
                                 }

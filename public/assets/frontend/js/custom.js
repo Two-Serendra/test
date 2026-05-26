@@ -293,7 +293,28 @@ $(document).ready(function () {
     //     });
     // });
 
-   
+    const navbarCollapse = document.getElementById('navbarCollapse');
+
+    // Bootstrap collapse instance
+    const navbarInstance = bootstrap.Collapse.getOrCreateInstance(navbarCollapse, {
+        toggle: false
+    });
+
+    // WHEN MOBILE NOTIFICATION IS CLICKED
+    $('.d-lg-none #notifDropdown').on('click', function () {
+
+        // Close navbar if open
+        if ($('#navbarCollapse').hasClass('show')) {
+            navbarInstance.hide();
+        }
+    });
+
+    // WHEN NAVBAR IS OPENED
+    $('#navbarCollapse').on('show.bs.collapse', function () {
+
+        // Close mobile notification dropdown if open
+        $('.d-lg-none .dropdown-menu.show').removeClass('show');
+    });
 });
 
 

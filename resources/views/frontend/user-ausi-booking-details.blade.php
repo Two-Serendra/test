@@ -39,7 +39,7 @@
                             $statusClass = 'bg-danger';
                         } elseif ($booking->booking_status == 1 && $bookingDateTime && $bookingDateTime->isPast()) {
                             $statusText = 'Completed';
-                            $statusClass = 'bg-secondary';
+                            $statusClass = 'bg-primary';
                         } elseif ($booking->booking_status == 1) {
                             $statusText = 'Confirmed';
                             $statusClass = 'bg-primary';

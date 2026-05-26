@@ -13,7 +13,7 @@
                             <option value="{{ $residence->id }}">
                                 {{ ucfirst($residence->resident_type) }} - Unit {{ $residence->unit_no }}
                             </option>
-                            
+
                         @endforeach
                     </select>
                 </div>
@@ -41,25 +41,32 @@
                         '4:00 PM - 5:00 PM',
                     ];
                 @endphp
-
-                @foreach ($slots as $slot)
-                    <div class="col-md-12 col-sm-12">
-                        <input type="radio" class="btn-check pest-control-booking-slot" name="booking_time_slot"
-                            id="slot{{ $loop->index }}" value="{{ $slot }}" data-slot="{{ $slot }}" required>
-                        <label class="btn btn-outline-primary w-100" for="slot{{ $loop->index }}">
-                            {{ $slot }}
-                        </label>
+                <div id="slotWrapper-pc" class="position-relative">
+                    <div id="pc-slot-loading" class="pc-slot-loading d-none">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
-                @endforeach
-            </div>
+                    <div class="row g-2"> @foreach ($slots as $slot)
+                        <div class="col-md-12 col-sm-12">
+                            <input type="radio" class="btn-check pest-control-booking-slot" name="booking_time_slot"
+                                id="slot{{ $loop->index }}" value="{{ $slot }}" data-slot="{{ $slot }}" required>
+                            <label class="btn btn-outline-primary w-100" for="slot{{ $loop->index }}">
+                                {{ $slot }}
+                            </label>
+                        </div>
+                    @endforeach
+                    </div>
+                </div>
 
-            <div class="d-grid">
-                <button type="submit" form="userPestControlNewBooking" id="saveUserPestControlBtn"
-                    class="btn btn-primary d-flex align-items-center justify-content-center customBtn"
-                    style="min-width: 100px; height: 38px;">
-                    <span class="btn-text">SUBMIT</span>
-                </button>
+                <div class="d-grid">
+                    <button type="submit" form="userPestControlNewBooking" id="saveUserPestControlBtn"
+                        class="btn btn-primary d-flex align-items-center justify-content-center customBtn"
+                        style="min-width: 100px; height: 38px;">
+                        <span class="btn-text">SUBMIT</span>
+                    </button>
 
+                </div>
             </div>
         </form>
     </div>

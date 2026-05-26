@@ -290,7 +290,7 @@
             if (typeof window.Echo !== 'undefined') {
                 window.Echo.private(`App.Models.User.{{ auth()->id() }}`)
                     .notification((notification) => {
-                        console.log('🔔 New Notification:', notification);
+                        // console.log('🔔 New Notification:', notification);
                         addNotification(notification);
 
                         toastr.options = {
@@ -303,7 +303,7 @@
                         toastr.info(notification.data?.message || 'You have a new notification');
                     });
             } else {
-                console.warn('❌ Echo is not defined. Check your bootstrap.js/Vite setup.');
+                // console.warn('❌ Echo is not defined. Check your bootstrap.js/Vite setup.');
             }
 
             // Mark notification as read

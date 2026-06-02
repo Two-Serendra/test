@@ -107,7 +107,7 @@
 
                     @if($category === 'ausi')
                         @auth
-                            <div class="col-12">
+                            <div class="col-12" x-data = "ausiBooking">
                                 @include('frontend.ausi-booking')
                             </div>
                         @else

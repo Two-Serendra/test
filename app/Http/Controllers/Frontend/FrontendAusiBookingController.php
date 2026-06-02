@@ -30,22 +30,17 @@ class FrontendAusiBookingController extends Controller
 
     public function ausiBookingUser(Request $request)
     {
-        // 1. WEB LOGIN (Laravel session)
         $email = auth()->check()
             ? auth()->user()->email
             : null;
 
-        // 2. MOBILE LOGIN (fallback from request)
         if (!$email) {
             $email = $request->get('email');
         }
-
-        // 3. SAFETY CHECK
         if (!$email) {
             abort(401, 'Unauthorized');
         }
 
-        // 4. SAME LOGIC FOR BOTH
         $residences = DB::table('resident_details')
             ->where('email', $email)
             ->select('id', 'unit_no', 'resident_type')

@@ -98,6 +98,8 @@ Route::post('/send-token', [RegisteredUserController::class, 'sendToken'])
     ->name('send.token')
     ->middleware('throttle:3,1');
 
+
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -207,6 +209,16 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/fetch-all-slots-user', [FrontendActivityBookingController::class, 'fetchAllSlotsUser'])->name('fetchAllSlotsUser');
 
+});
+
+Route::middleware(['miniapp.trust'])->group(function () {
+    Route::get('/ausi-booking-mobile', [FrontendAusiBookingController::class, 'ausiBookingUser'])->name('ausi.booking.mobile');
+    Route::get('/ausi-booked-slots-mobile', [FrontendAusiBookingController::class, 'getBookedSlotsAusi'])->name('ausi.booked.slots.mobile');
+    Route::post('/ausi-booking-mobile/store', [FrontendAusiBookingController::class, 'storeAusiBooking'])->name('ausi.booking.store.mobile');
+    Route::post('/ausi-booking-mobile/cancel/{booking}', [FrontendAusiBookingController::class, 'CancelAusiBooking'])
+        ->name('ausi.booking.cancel.mobile')->middleware('throttle:5,1');
+    Route::get('/ausi-booking-details/{id}', [FrontendAusiBookingController::class, 'showAusiBookingDetails'])
+        ->name('show.ausi.booking.details');
 });
 
 Route::middleware('web')

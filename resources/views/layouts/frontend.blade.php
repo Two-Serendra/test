@@ -58,8 +58,15 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100" x-data>
-    @include('layouts.includes.topbar')
-    @include('layouts.includes.navbar')
+
+    @php
+        $isSuperapp = request()->get('mode') === 'superapp';
+    @endphp
+
+    @if(!$isSuperapp)
+        @include('layouts.includes.topbar')
+        @include('layouts.includes.navbar')
+    @endif
     <main class="flex-grow-1">
         <div class="wrapper">
             <div class="main">
@@ -75,11 +82,13 @@
     </main>
 
     <footer class="mt-auto">
-        @include('layouts.includes.footer')
-        @include('layouts.includes.copyright')
+        @if(!$isSuperapp)
+            <footer class="mt-auto">
+                @include('layouts.includes.footer')
+                @include('layouts.includes.copyright')
+            </footer>
+        @endif
     </footer>
-
-
 
     <a href="#" class="btn btn-lg btn-lg-square back-to-top text-light" style="background-color: #004d1a;"><i
             class="bi bi-arrow-up"></i></a>
@@ -352,4 +361,5 @@
         </div>
     </div>
 </body>
+
 </html>

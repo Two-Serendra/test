@@ -15,12 +15,11 @@ class MiniappTrust
      */
     public function handle($request, Closure $next)
     {
-        // 1. Ensure request came from shell (IMPORTANT)
+      
         if ($request->header('X-SHELL') !== 'twoserendra-shell') {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        // 2. Inject user identity from bridge payload
         if ($request->has('user_id')) {
             auth()->loginUsingId($request->user_id);
         }

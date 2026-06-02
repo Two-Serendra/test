@@ -9,7 +9,7 @@
 
             <div class="row mb-3">
                 <div class="col-md-6 mb-3 mb-md-0">
-                    <label class="form-label">Select Residence <span class="required">*</span></label>
+                    <!-- <label class="form-label">Select Residence <span class="required">*</span></label>
                     <select name="resident_id_ausi" class="form-select" required>
                         <option value="">-- Select Residence --</option>
 
@@ -21,9 +21,38 @@
 
                     </select>
 
-                    <input type="hidden" name="superapp_email" x-bind:value="$store.superapp.user?.email">
                     <input type="hidden" name="superapp_unit" x-bind:value="$store.superapp.unit?.unit_no">
-                    <input type="hidden" name="superapp_role" x-bind:value="$store.superapp.user?.role">
+                    <input type="hidden" name="superapp_role" x-bind:value="$store.superapp.user?.role"> -->
+
+                    <div class="card">
+                        <h2>User</h2>
+                        <dl>
+                            <dt>Name</dt>
+                            <dd x-text="$store.superapp.user?.name  ?? '—'"></dd>
+                            <dt>Email</dt>
+                            <dd x-text="$store.superapp.user?.email ?? '—'"></dd>
+                            <dt>Role</dt>
+                            <dd x-text="$store.superapp.user?.role  ?? '—'"></dd>
+                        </dl>
+
+                        <template x-if="$store.superapp.accounts.length > 1">
+                            <div>
+                                <p class="muted"
+                                    style="margin:14px 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;font-weight:600">
+                                    Linked Accounts</p>
+                                <template x-for="(acc, i) in $store.superapp.accounts" :key="acc.email">
+                                    <div :class="i > 0 ? 'unit-row unit-row--divider' : 'unit-row'">
+                                        <dl>
+                                            <dt>Name</dt>
+                                            <dd x-text="acc.name"></dd>
+                                            <dt>Email</dt>
+                                            <dd x-text="acc.email"></dd>
+                                        </dl>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
 
                 </div>
                 <div class="col-md-6">
@@ -94,5 +123,3 @@
         </form>
     </div>
 </div>
-
-@endauth

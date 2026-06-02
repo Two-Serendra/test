@@ -30,10 +30,10 @@ class FrontendAusiBookingController extends Controller
 
     public function ausiBookingUserMobile(Request $request)
     {
-        $email = $request->get('email');
+        $email = $request->input('superapp_email');
 
         if (!$email) {
-            abort(401);
+            abort(401, 'Missing SuperApp identity');
         }
 
         $residences = DB::table('resident_details')

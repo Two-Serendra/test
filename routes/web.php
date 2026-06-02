@@ -212,7 +212,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware(['miniapp.trust'])->group(function () {
-    Route::get('/ausi-booking-mobile', [FrontendAusiBookingController::class, 'ausiBookingUser'])->name('ausi.booking.mobile');
+    Route::get('/ausi-booking-mobile', [FrontendAusiBookingController::class, 'ausiBookingUserMobile'])->name('ausi.booking.mobile');
     Route::get('/ausi-booked-slots-mobile', [FrontendAusiBookingController::class, 'getBookedSlotsAusi'])->name('ausi.booked.slots.mobile');
     Route::post('/ausi-booking-mobile/store', [FrontendAusiBookingController::class, 'storeAusiBooking'])->name('ausi.booking.store.mobile');
     Route::post('/ausi-booking-mobile/cancel/{booking}', [FrontendAusiBookingController::class, 'CancelAusiBooking'])

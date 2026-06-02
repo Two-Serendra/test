@@ -17,14 +17,40 @@ use App\Mail\UserAusiBookingCancellation;
 use App\Mail\ConciergeAusiBookingCancellation;
 class FrontendAusiBookingController extends Controller
 {
-    public function ausiBookingUser()
+    // public function ausiBookingUser()
+    // {
+    //     $residences = auth()->check()
+    //         ? DB::table('resident_details')
+    //             ->where('email', auth()->user()->email)
+    //             ->select('id', 'unit_no', 'resident_type')
+    //             ->get()
+    //         : collect();
+    //     return view('frontend.ausi-booking', compact('residences'));
+    // }
+
+    public function ausiBookingUser(Request $request)
     {
-        $residences = auth()->check()
-            ? DB::table('resident_details')
-                ->where('email', auth()->user()->email)
-                ->select('id', 'unit_no', 'resident_type')
-                ->get()
-            : collect();
+        // 1. WEB LOGIN (Laravel session)
+        $email = auth()->check()
+            ? auth()->user()->email
+            : null;
+
+        // 2. MOBILE LOGIN (fallback from request)
+        if (!$email) {
+            $email = $request->get('email');
+        }
+
+        // 3. SAFETY CHECK
+        if (!$email) {
+            abort(401, 'Unauthorized');
+        }
+
+        // 4. SAME LOGIC FOR BOTH
+        $residences = DB::table('resident_details')
+            ->where('email', $email)
+            ->select('id', 'unit_no', 'resident_type')
+            ->get();
+
         return view('frontend.ausi-booking', compact('residences'));
     }
 
@@ -95,10 +121,23 @@ class FrontendAusiBookingController extends Controller
             try {
                 DB::beginTransaction();
 
-                $user = auth()->user();
+                $isSuperapp = $request->filled('superapp_email');
+
+                $email = $isSuperapp
+                    ? $request->superapp_email
+                    : auth()->user()->email;
+
+                $user = $isSuperapp
+                    ? (object) [
+                        'email' => $email,
+                        'name' => $request->superapp_user_name ?? 'Superapp User'
+                    ]
+                    : auth()->user();
+
+                $userId = $isSuperapp ? null : auth()->id();
 
                 $resident = ResidentDetails::where('id', $request->resident_id_ausi)
-                    ->where('email', $user->email)
+                    ->where('email', $email)
                     ->lockForUpdate()
                     ->first();
 
@@ -135,9 +174,6 @@ class FrontendAusiBookingController extends Controller
                     ], 409);
                 }
 
-
-
-
                 $existingUnitBooking = AusiBooking::where('unit_no', strtoupper($resident->unit_no))
                     ->where('booking_status', 1)
                     ->whereYear('booking_date', Carbon::parse($bookingDate)->year)
@@ -156,8 +192,8 @@ class FrontendAusiBookingController extends Controller
                 }
 
                 $booking = AusiBooking::create([
-                    'user_id' => auth()->id(),
-                    'created_by' => auth()->id(),
+                    'user_id' => $userId,
+                    'created_by' => $userId,
                     'transaction_no' => '',
                     'unit_no' => strtoupper($resident->unit_no),
                     'resident_type' => $resident->resident_type,
@@ -174,9 +210,11 @@ class FrontendAusiBookingController extends Controller
                 DB::commit();
 
                 $booking->load('user');
-                DB::afterCommit(function () use ($booking) {
-                    if ($booking->user?->email) {
-                        Mail::to($booking->user->email)
+                $recipientEmail = $email;
+                DB::afterCommit(function () use ($booking, $recipientEmail) {
+
+                    if ($recipientEmail) {
+                        Mail::to($recipientEmail)
                             ->queue(new UserAusiBookingConfirmation($booking));
                     }
 
@@ -184,7 +222,10 @@ class FrontendAusiBookingController extends Controller
                         ->queue(new ConciergeAusiBookingConfirmation($booking));
 
                     event(new AusiBookingCreated($booking));
-                    $booking->user?->notify(new UserAusiBookingBellNotification($booking));
+
+                    if ($booking->user) {
+                        $booking->user->notify(new UserAusiBookingBellNotification($booking));
+                    }
                 });
 
                 return response()->json(['message' => 'Ausi booking submitted successfully.']);

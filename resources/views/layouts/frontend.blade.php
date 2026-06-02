@@ -57,7 +57,7 @@
 
 </head>
 
-<body class="d-flex flex-column min-vh-100">
+<body class="d-flex flex-column min-vh-100" x-data>
     @include('layouts.includes.topbar')
     @include('layouts.includes.navbar')
     <main class="flex-grow-1">

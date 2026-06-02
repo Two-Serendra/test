@@ -16,7 +16,12 @@
                             </option>
                         @endforeach
 
-                    </select> 
+                    </select>
+
+                    <input type="hidden" name="superapp_email" x-bind:value="$store.superapp.user?.email">
+                    <input type="hidden" name="superapp_unit" x-bind:value="$store.superapp.unit?.unit_no">
+                    <input type="hidden" name="superapp_role" x-bind:value="$store.superapp.user?.role">
+                    
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Date <span class="required">*</span></label>
@@ -46,7 +51,7 @@
                         '1:00 PM - 1:30 PM',
                         '1:30 PM - 2:00 PM',
                         '2:00 PM - 2:30 PM',
-                        '2:30 PM - 3:00 PM', 
+                        '2:30 PM - 3:00 PM',
                         '3:00 PM - 3:30 PM',
                         '3:30 PM - 4:00 PM',
                         '4:00 PM - 4:30 PM',

@@ -28,17 +28,12 @@ class FrontendAusiBookingController extends Controller
     //     return view('frontend.ausi-booking', compact('residences'));
     // }
 
-    public function ausiBookingUser(Request $request)
+    public function ausiBookingUserMobile(Request $request)
     {
-        $email = auth()->check()
-            ? auth()->user()->email
-            : null;
+        $email = $request->get('email');
 
         if (!$email) {
-            $email = $request->get('email');
-        }
-        if (!$email) {
-            abort(401, 'Unauthorized');
+            abort(401);
         }
 
         $residences = DB::table('resident_details')
@@ -46,7 +41,7 @@ class FrontendAusiBookingController extends Controller
             ->select('id', 'unit_no', 'resident_type')
             ->get();
 
-        return view('frontend.ausi-booking', compact('residences'));
+        return view('frontend.ausi-booking-mobile', compact('residences'));
     }
 
     public function getBookedSlotsAusi(Request $request)

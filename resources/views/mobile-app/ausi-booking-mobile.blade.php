@@ -32,6 +32,7 @@
                                 <dd x-text="$store.superapp.user?.email ?? '—'"></dd>
                                 <dt>Role</dt>
                                 <dd x-text="$store.superapp.user?.role  ?? '—'"></dd>
+
                             </dl>
 
                             <select x-model="selectedResidence">
@@ -43,6 +44,10 @@
                                     </option>
                                 </template>
                             </select>
+
+                            <template x-if="residences.length === 0">
+                                <small class="text-muted">No units found for this account.</small>
+                            </template>
 
                         </div>
                         <div class="col-md-6">

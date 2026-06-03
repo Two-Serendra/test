@@ -134,41 +134,6 @@
                     Alpine.store('superapp').bridge?.setHeader(payload);
                 },
             }));
-
-            Alpine.data('dashboardPage', () => ({
-                inShell: window.self !== window.top,
-                apiStatus: '',
-
-                init() {
-                    // Root page of the miniapp — sticky bar, no back button
-                    Alpine.store('superapp').bridge?.setHeader({
-                        mode: 'sticky-no-back',
-                        title: 'Bridge Demo',
-                        backgroundColor: '#1e3a5f',
-                        textStyle: 'white',
-                        showHome: false,
-                    });
-                },
-
-                async fetchUnitData() {
-                    const store = Alpine.store('superapp');
-                    if (!store.unit || !store.token) {
-                        this.apiStatus = 'No unit or token — not running inside the shell.';
-                        return;
-                    }
-                    this.apiStatus = 'Fetching…';
-                    try {
-                        const res = await fetch(`/api/unit-data?unitId=${store.unit.id}`, {
-                            headers: { Authorization: `Bearer ${store.token}` },
-                        });
-                        const body = await res.text();
-                        console.log('[Bridge Demo] API response:', body);
-                        this.apiStatus = `Response status: ${res.status}`;
-                    } catch (err) {
-                        this.apiStatus = `Error: ${err.message}`;
-                    }
-                },
-            }));
         });
 
         document.addEventListener('alpine:init', () => {
@@ -177,9 +142,12 @@
                 selectedResidence: null,
 
                 init() {
-                    this.loadResidences();
+                    this.waitForUserThenLoad();
+                    this.setHeader();
+                },
 
-                    Alpine.store('superapp').bridge?.setHeader({
+                setHeader() {
+                    Alpine.store('superapp')?.bridge?.setHeader({
                         mode: 'sticky-no-back',
                         title: 'Bridge Demo',
                         backgroundColor: '#1e3a5f',
@@ -188,20 +156,24 @@
                     });
                 },
 
-                async loadResidences() {
-                    const user = Alpine.store('superapp')?.user;
+                waitForUserThenLoad() {
+                    const interval = setInterval(() => {
+                        const user = Alpine.store('superapp')?.user;
 
-                    if (!user?.email) {
-                        console.warn('No user email from bridge');
-                        return;
-                    }
+                        if (user?.email) {
+                            clearInterval(interval);
+                            this.loadResidences(user.email);
+                        }
+                    }, 200);
+                },
 
+                async loadResidences(email) {
                     try {
-                        const res = await fetch(`/mobile/residences?email=${encodeURIComponent(user.email)}`);
-                        const data = await res.json();
+                        const res = await fetch(
+                            `/mobile/residences?email=${encodeURIComponent(email)}`
+                        );
 
-                        this.residences = data;
-
+                        this.residences = await res.json();
                     } catch (err) {
                         console.error('Failed to load residences:', err);
                     }

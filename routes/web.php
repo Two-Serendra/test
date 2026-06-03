@@ -44,7 +44,6 @@ Route::post('/register', [RegisteredUserController::class, 'storeUser'])->name('
 
 
 // Define this route separately
-Route::get('/ausi-booking-mobile', [FrontendAusiBookingController::class, 'ausiBookingUserMobile'])->name('ausi.booking.mobile');
 Route::get('/home', [NavbarController::class, 'home'])->name('home');
 Route::get('/about', [NavbarController::class, 'about'])->name('about');
 Route::get('/services', [NavbarController::class, 'services'])->name('services');
@@ -212,16 +211,14 @@ Route::middleware(['auth'])->group(function () {
 
 });
 
-Route::middleware(['miniapp.trust'])->group(function () {
-
-    Route::get('/ausi-booked-slots-mobile', [FrontendAusiBookingController::class, 'getBookedSlotsAusi'])->name('ausi.booked.slots.mobile');
-    Route::post('/ausi-booking-mobile/store', [FrontendAusiBookingController::class, 'storeAusiBooking'])->name('ausi.booking.store.mobile');
+Route::middleware(['miniapp.trust', 'miniapp.webview'])->group(function () {
+    Route::get('/ausi-booking-mobile', [FrontendAusiBookingController::class, 'ausiBookingUserMobile']);
+    Route::get('/ausi-booked-slots-mobile', [FrontendAusiBookingController::class, 'getBookedSlotsAusi']);
+    Route::post('/ausi-booking-mobile/store', [FrontendAusiBookingController::class, 'storeAusiBooking']);
     Route::post('/ausi-booking-mobile/cancel/{booking}', [FrontendAusiBookingController::class, 'CancelAusiBooking'])
-        ->name('ausi.booking.cancel.mobile')->middleware('throttle:5,1');
-    Route::get('/ausi-booking-details/{id}', [FrontendAusiBookingController::class, 'showAusiBookingDetails'])
-        ->name('show.ausi.booking.details');
+        ->middleware('throttle:5,1');
+    Route::get('/ausi-booking-details/{id}', [FrontendAusiBookingController::class, 'showAusiBookingDetails']);
 });
-
 Route::middleware('web')
     ->prefix('admin')
     ->group(base_path('routes/admin.php'));

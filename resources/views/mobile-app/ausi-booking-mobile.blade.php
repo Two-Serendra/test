@@ -34,6 +34,16 @@
                                 <dd x-text="$store.superapp.user?.role  ?? '—'"></dd>
                             </dl>
 
+                            <select x-model="selectedResidence">
+                                <option value="">-- Select Residence --</option>
+
+                                <template x-for="residence in residences" :key="residence.id">
+                                    <option :value="residence.id"
+                                        x-text="`${residence.resident_type} - Unit ${residence.unit_no}`">
+                                    </option>
+                                </template>
+                            </select>
+
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Date <span class="required">*</span></label>
@@ -160,6 +170,12 @@
                 },
             }));
         });
+
+        fetch('/mobile/residences?email=' + this.$store.superapp.user.email)
+            .then(res => res.json())
+            .then(data => {
+                this.residences = data;
+            });
     </script>
 
 @endsection

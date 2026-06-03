@@ -17,24 +17,38 @@ use App\Mail\UserAusiBookingCancellation;
 use App\Mail\ConciergeAusiBookingCancellation;
 class FrontendAusiBookingController extends Controller
 {
-    // public function ausiBookingUser()
-    // {
-    //     $residences = auth()->check()
-    //         ? DB::table('resident_details')
-    //             ->where('email', auth()->user()->email)
-    //             ->select('id', 'unit_no', 'resident_type')
-    //             ->get()
-    //         : collect();
-    //     return view('frontend.ausi-booking', compact('residences'));
-    // }
+    public function ausiBookingUser()
+    {
+        $residences = auth()->check()
+            ? DB::table('resident_details')
+                ->where('email', auth()->user()->email)
+                ->select('id', 'unit_no', 'resident_type')
+                ->get()
+            : collect();
+        return view('frontend.ausi-booking', compact('residences'));
+    }
 
     public function ausiBookingUserMobile(Request $request)
     {
         // dd($request->all(), $request->headers->all());
 
-      
+
 
         return view('mobile-app.ausi-booking-mobile');
+    }
+
+    public function mobileResidences(Request $request)
+    {
+        $email = $request->input('email');
+
+        if (!$email) {
+            return response()->json([]);
+        }
+
+        return DB::table('resident_details')
+            ->where('email', $email)
+            ->select('id', 'unit_no', 'resident_type')
+            ->get();
     }
 
     public function getBookedSlotsAusi(Request $request)

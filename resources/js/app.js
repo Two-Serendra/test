@@ -8,38 +8,38 @@ window.Alpine = Alpine;
 let _bridge = null;
 
 Alpine.store('superapp', {
-    user: null,
-    unit: null,
-    units: [],
-    accounts: [],
-    token: null,
-    isLoading: false,
+  user: null,
+  unit: null,
+  units: [],
+  accounts: [],
+  token: null,
+  isLoading: false,
 
-    // Getter returns the raw bridge instance, not a reactive proxy of it.
-    get bridge() { return _bridge; },
+  // Getter returns the raw bridge instance, not a reactive proxy of it.
+  get bridge() { return _bridge; },
 
-    init() {
-        if (!isInsideShell()) return;
+  init() {
+    if (!isInsideShell()) return;
 
-        this.isLoading = true;
-        _bridge = new CondoBridge();
+    this.isLoading = true;
+    _bridge = new CondoBridge();
 
-        _bridge
-            .getContext()
-            .then((ctx) => {
-                this.user = ctx.user;
-                this.unit = ctx.unit ?? null;
-                this.units = ctx.units ?? [];
-                this.accounts = ctx.accounts ?? [];
-                this.token = ctx.token;
-            })
-            .catch((err) => {
-                console.error('[SuperappStore] Failed to get shell context:', err);
-            })
-            .finally(() => {
-                this.isLoading = false;
-            });
-    },
+    _bridge
+      .getContext()
+      .then((ctx) => {
+        this.user     = ctx.user;
+        this.unit     = ctx.unit     ?? null;
+        this.units    = ctx.units    ?? [];
+        this.accounts = ctx.accounts ?? [];
+        this.token    = ctx.token;
+      })
+      .catch((err) => {
+        console.error('[SuperappStore] Failed to get shell context:', err);
+      })
+      .finally(() => {
+        this.isLoading = false;
+      });
+  },
 });
 
 Alpine.start();

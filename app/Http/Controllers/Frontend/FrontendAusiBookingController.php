@@ -30,6 +30,8 @@ class FrontendAusiBookingController extends Controller
 
     public function ausiBookingUserMobile(Request $request)
     {
+        // dd($request->all(), $request->headers->all());
+
         $email = $request->input('superapp_email');
 
         if (!$email) {

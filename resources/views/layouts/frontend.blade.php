@@ -53,7 +53,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
 
-
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
 </head>
 

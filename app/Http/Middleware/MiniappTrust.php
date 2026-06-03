@@ -15,15 +15,14 @@ class MiniappTrust
      */
     public function handle($request, Closure $next)
     {
-      
-        if ($request->header('X-SHELL') !== 'twoserendra-shell') {
-            return response()->json(['error' => 'Unauthorized'], 401);
+
+        if ($request->header('X-SHELL') === 'twoserendra-shell') {
+            if ($request->has('user_id')) {
+                auth()->loginUsingId($request->user_id);
+            }
         }
 
-        if ($request->has('user_id')) {
-            auth()->loginUsingId($request->user_id);
-        }
-
+        // allow request to continue ALWAYS for now
         return $next($request);
     }
 }

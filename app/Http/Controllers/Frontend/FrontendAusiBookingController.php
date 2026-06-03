@@ -30,10 +30,6 @@ class FrontendAusiBookingController extends Controller
 
     public function ausiBookingUserMobile(Request $request)
     {
-        // dd($request->all(), $request->headers->all());
-
-
-
         return view('mobile-app.ausi-booking-mobile');
     }
 

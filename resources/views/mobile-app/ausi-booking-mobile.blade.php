@@ -171,11 +171,43 @@
             }));
         });
 
-        fetch('/mobile/residences?email=' + this.$store.superapp.user.email)
-            .then(res => res.json())
-            .then(data => {
-                this.residences = data;
-            });
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('dashboardPage', () => ({
+                residences: [],
+                selectedResidence: null,
+
+                init() {
+                    this.loadResidences();
+
+                    Alpine.store('superapp').bridge?.setHeader({
+                        mode: 'sticky-no-back',
+                        title: 'Bridge Demo',
+                        backgroundColor: '#1e3a5f',
+                        textStyle: 'white',
+                        showHome: false,
+                    });
+                },
+
+                async loadResidences() {
+                    const user = Alpine.store('superapp')?.user;
+
+                    if (!user?.email) {
+                        console.warn('No user email from bridge');
+                        return;
+                    }
+
+                    try {
+                        const res = await fetch(`/mobile/residences?email=${encodeURIComponent(user.email)}`);
+                        const data = await res.json();
+
+                        this.residences = data;
+
+                    } catch (err) {
+                        console.error('Failed to load residences:', err);
+                    }
+                }
+            }));
+        });
     </script>
 
 @endsection

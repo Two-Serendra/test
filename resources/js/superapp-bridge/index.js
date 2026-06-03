@@ -2,52 +2,54 @@ const BridgeMessageType = Object.freeze({
     GET_CONTEXT: 'GET_CONTEXT',
     INIT_CONTEXT: 'INIT_CONTEXT',
     SET_HEADER: 'SET_HEADER',
-    TOGGLE_HEADER: 'TOGGLE_HEADER',
+    TOGGLE_UI: 'TOGGLE_UI',
 });
 
 class CondoBridge {
-    #context = null;
+    // Regular property instead of private field — Alpine/Vue reactive proxies
+    // wrap class instances and private fields (#field) are inaccessible through
+    // a Proxy, which would silently break getContext().
+    _context = null;
 
     constructor() {
         if (typeof window !== 'undefined') {
-            window.addEventListener('message', this.#handleMessage.bind(this));
+            window.addEventListener('message', this._handleMessage.bind(this));
         }
     }
 
-    #handleMessage(event) {
+    _handleMessage(event) {
         const message = event.data;
         if (!message?.type) return;
 
         if (message.type === BridgeMessageType.INIT_CONTEXT) {
-            this.#context = message.payload;
+            this._context = message.payload;
         }
     }
 
     async getContext() {
-        if (this.#context) return this.#context;
+        if (this._context) return this._context;
 
         if (typeof window !== 'undefined') {
-            const request = {
-                id: crypto.randomUUID(),
-                type: BridgeMessageType.GET_CONTEXT,
-                timestamp: Date.now(),
-            };
-            window.parent.postMessage(request, '*');
-            if (window.top !== window.parent) {
-                window.top?.postMessage(request, '*');
-            }
+            window.parent.postMessage(
+                {
+                    id: crypto.randomUUID(),
+                    type: BridgeMessageType.GET_CONTEXT,
+                    timestamp: Date.now(),
+                },
+                '*'
+            );
         }
 
         return new Promise((resolve, reject) => {
             const interval = setInterval(() => {
-                if (this.#context) {
+                if (this._context) {
                     clearInterval(interval);
-                    resolve(this.#context);
+                    resolve(this._context);
                 }
             }, 100);
 
             setTimeout(() => {
-                if (!this.#context) {
+                if (!this._context) {
                     clearInterval(interval);
                     reject(new Error('Timeout waiting for shell context'));
                 }
@@ -55,15 +57,30 @@ class CondoBridge {
         });
     }
 
+    // Shell schema requires id + timestamp on every message (BaseMessageSchema).
     setHeader(payload) {
         if (typeof window === 'undefined') return;
-        window.parent.postMessage({ type: BridgeMessageType.SET_HEADER, payload }, '*');
+        window.parent.postMessage(
+            {
+                id: crypto.randomUUID(),
+                type: BridgeMessageType.SET_HEADER,
+                payload,
+                timestamp: Date.now(),
+            },
+            '*'
+        );
     }
 
+    // Shell type is TOGGLE_UI with { isVisible }, not TOGGLE_HEADER / { visible }.
     toggleHeader(visible) {
         if (typeof window === 'undefined') return;
         window.parent.postMessage(
-            { type: BridgeMessageType.TOGGLE_HEADER, payload: { visible } },
+            {
+                id: crypto.randomUUID(),
+                type: BridgeMessageType.TOGGLE_UI,
+                payload: { isVisible: visible },
+                timestamp: Date.now(),
+            },
             '*'
         );
     }

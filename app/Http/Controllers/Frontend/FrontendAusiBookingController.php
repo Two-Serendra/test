@@ -32,18 +32,9 @@ class FrontendAusiBookingController extends Controller
     {
         // dd($request->all(), $request->headers->all());
 
-        $email = $request->input('superapp_email');
+      
 
-        if (!$email) {
-            abort(401, 'Missing SuperApp identity');
-        }
-
-        $residences = DB::table('resident_details')
-            ->where('email', $email)
-            ->select('id', 'unit_no', 'resident_type')
-            ->get();
-
-        return view('mobile-app.ausi-booking-mobile', compact('residences'));
+        return view('mobile-app.ausi-booking-mobile');
     }
 
     public function getBookedSlotsAusi(Request $request)

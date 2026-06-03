@@ -41,7 +41,7 @@ class FrontendAusiBookingController extends Controller
             ->select('id', 'unit_no', 'resident_type')
             ->get();
 
-        return view('frontend.ausi-booking-mobile', compact('residences'));
+        return view('mobile-app.ausi-booking-mobile', compact('residences'));
     }
 
     public function getBookedSlotsAusi(Request $request)

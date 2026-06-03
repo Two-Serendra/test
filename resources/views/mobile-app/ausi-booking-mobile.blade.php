@@ -168,14 +168,23 @@
                 },
 
                 async loadResidences(email) {
-                    try {
-                        const res = await fetch(
-                            `/mobile/residences?email=${encodeURIComponent(email)}`
-                        );
+                    console.log('🔥 loadResidences CALLED with:', email);
 
-                        this.residences = await res.json();
+                    try {
+                        const url = `/mobile/residences?email=${encodeURIComponent(email)}`;
+                        console.log('🌐 Fetching:', url);
+
+                        const res = await fetch(url);
+
+                        console.log('📡 Response status:', res.status);
+
+                        const data = await res.json();
+                        console.log('📦 Data received:', data);
+
+                        this.residences = data;
+
                     } catch (err) {
-                        console.error('Failed to load residences:', err);
+                        console.error('❌ Failed to load residences:', err);
                     }
                 }
             }));

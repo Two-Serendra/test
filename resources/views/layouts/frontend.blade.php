@@ -52,12 +52,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
-
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-
 </head>
 
-<body class="d-flex flex-column min-vh-100" x-data>
+<body class="d-flex flex-column min-vh-100">
 
     @include('layouts.includes.topbar')
     @include('layouts.includes.navbar')
@@ -69,7 +66,6 @@
                     <div id="app">
                         <div id="notifications-container"></div>
                     </div>
-
                     @yield('content')
                 </div>
             </div>

@@ -40,7 +40,7 @@
                                         <option value="">-- Select Residence --</option>
 
                                         <template x-for="(unit, index) in $store.superapp.units" :key="index">
-                                            <option :value="unit.id" x-text="unit.name">
+                                            <option :value="unit.id" x-text="formatUnit(unit.name)">
                                             </option>
                                         </template>
                                     </select>
@@ -213,6 +213,30 @@
                     this.loadResidences(cleanEmail);
                 },
 
+                formatUnit(name) {
+                    if (!name) return '';
+
+                    const parts = name.split(' ');
+
+                    // expected: "Meranti 999"
+                    const tower = parts[0];   // Meranti
+                    const number = parts[1];  // 999
+
+                    const map = {
+                        "Almond": "A",
+                        "Belize": "B",
+                        "Callery": "C",
+                        "Dolce": "D",
+                        "Encino": "E",
+                        "Aston": "F",
+                        "ReadOak": "G",
+                        "Meranti": "H",
+                        "Sequoia": "I",
+                    };
+
+                    return `${number}${map[tower] ?? ''}`;
+                },
+
                 async loadResidences(email) {
                     this.log("Fetching residences for: " + email);
 
@@ -235,24 +259,9 @@
                         this.log("❌ ERROR: " + err.message);
                     }
                 }
+
+
             }));
-
-
-            getTowerCode(name) {
-                const map = {
-                    "Almond": "A",
-                    "Belize": "B",
-                    "Callery": "C",
-                    "Dolce": "D",
-                    "Encino": "E",
-                    "Aston": "F",
-                    "ReadOak": "G",
-                    "Meranti": "H",
-                    "Sequoia": "I",
-                };
-
-                return map[name] ?? '';
-            }
         });
     </script>
 

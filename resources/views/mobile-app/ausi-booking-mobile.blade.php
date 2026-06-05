@@ -277,7 +277,9 @@
                     this.log("Fetching residences for: " + email);
 
                     try {
-                        const url = `/mobile/residences?email=${encodeURIComponent(email)}`;
+                        const url = `https://twoserendra.com/mobile/residences?email=${encodeURIComponent(email)}`;
+
+                        const res = await fetch(url);
 
                         this.log("Request URL: " + url);
 

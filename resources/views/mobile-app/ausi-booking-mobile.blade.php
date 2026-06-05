@@ -33,6 +33,9 @@
                                 <dt>Role</dt>
                                 <dd x-text="$store.superapp.user?.role  ?? '—'"></dd>
 
+                                <dt>Name</dt>
+                                <dd x-text="u.name"></dd>
+
                             </dl>
 
                             <select x-model="selectedResidence">

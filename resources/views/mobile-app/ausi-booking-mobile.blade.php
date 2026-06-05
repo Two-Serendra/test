@@ -155,86 +155,26 @@
                     this.log("🚀 INIT STARTED");
                     this.setHeader();
 
-                    const interval = setInterval(() => {
-                        const user = Alpine.store('superapp')?.user;
+                    this.$watch(
+                        () => Alpine.store('superapp')?.user,
+                        (user) => {
+                            if (!user) return;
 
-                        if (!user) return;
-
-                        const email =
-                            typeof user === 'string'
+                            const email = typeof user === 'string'
                                 ? user
                                 : user?.email;
 
-                        if (!email) return;
-
-                        const cleanEmail = email.trim().toLowerCase();
-
-                        this.debugEmail = cleanEmail;
-
-                        this.log("🔥 USER READY: " + cleanEmail);
-
-                        clearInterval(interval);
-
-                        this.loadResidences(cleanEmail);
-                    }, 200);
-                },
-
-                watchEmail() {
-                    const interval = setInterval(() => {
-
-                        const email = Alpine.store('superapp')?.user?.email;
-
-                        if (!email) return;
-
-                        clearInterval(interval);
-
-                        const cleanEmail = email.trim().toLowerCase();
-
-                        this.loadResidences(cleanEmail);
-
-                    }, 200);
-                },
-
-                startUserListener() {
-                    this.log("👀 Waiting for superapp user...");
-
-                    let attempts = 0;
-
-                    const interval = setInterval(() => {
-                        const user = Alpine.store('superapp')?.user;
-
-                        this.log("CHECK #" + attempts + " user = " + JSON.stringify(user));
-
-                        attempts++;
-
-                        // ❌ stop if no store yet
-                        if (!user) return;
-
-                        const email =
-                            typeof user === 'string'
-                                ? user
-                                : user?.email;
-
-                        if (email && email !== 'undefined' && email !== 'null') {
+                            if (!email) return;
 
                             const cleanEmail = email.trim().toLowerCase();
 
-                            // ✅ update UI debug
                             this.debugEmail = cleanEmail;
 
-                            this.log("🔥 FINAL EMAIL READY: " + cleanEmail);
-
-                            clearInterval(interval);
+                            this.log("🔥 USER DETECTED: " + cleanEmail);
 
                             this.loadResidences(cleanEmail);
                         }
-
-                        if (attempts > 50) {
-                            clearInterval(interval);
-                            this.log("❌ STOPPED: user never became available");
-                        }
-
-                    }, 300);
+                    );
                 },
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({
@@ -256,17 +196,16 @@
 
                         const res = await fetch(url);
 
-                        this.log("HTTP STATUS: " + res.status);
-
                         const data = await res.json();
 
-                        this.residences = Array.isArray(data) ? data : [];
+                        console.log("API RESPONSE:", data);
+
+                        this.residences = data;
 
                         this.log("Residences loaded: " + this.residences.length);
 
                     } catch (err) {
                         this.log("❌ ERROR: " + err.message);
-                        this.residences = [];
                     }
                 }
             }));

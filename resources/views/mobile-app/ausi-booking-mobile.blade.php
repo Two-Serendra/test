@@ -173,7 +173,7 @@
 
                             this.log("🔥 USER DETECTED: " + cleanEmail);
 
-                            this.loadResidences('davidzul08@gmail.com');
+                            this.loadResidences(cleanEmail);
                         }
                     );
                 },
@@ -189,7 +189,7 @@
 
                         const cleanEmail = email.trim().toLowerCase();
 
-                        this.loadResidences('davidzul08@gmail.com');
+                        this.loadResidences(cleanEmail);
 
                     }, 200);
                 },
@@ -225,7 +225,7 @@
 
                             clearInterval(interval);
 
-                            this.loadResidences('davidzul08@gmail.com');
+                            this.loadResidences(cleanEmail);
                         }
 
                         if (attempts > 50) {
@@ -251,19 +251,13 @@
                     try {
                         const url = `https://twoserendra.com/mobile/residences?email=${encodeURIComponent(email)}`;
 
-                        const res = await fetch(url);
-
                         this.log("Request URL: " + url);
 
                         const res = await fetch(url);
 
                         this.log("HTTP STATUS: " + res.status);
 
-                        const text = await res.text();
-
-                        this.log("RAW RESPONSE: " + text);
-
-                        const data = JSON.parse(text);
+                        const data = await res.json();
 
                         this.residences = Array.isArray(data) ? data : [];
 

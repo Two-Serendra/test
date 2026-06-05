@@ -6,9 +6,6 @@ const BridgeMessageType = Object.freeze({
 });
 
 class CondoBridge {
-    // Regular property instead of private field — Alpine/Vue reactive proxies
-    // wrap class instances and private fields (#field) are inaccessible through
-    // a Proxy, which would silently break getContext().
     _context = null;
 
     constructor() {
@@ -57,7 +54,6 @@ class CondoBridge {
         });
     }
 
-    // Shell schema requires id + timestamp on every message (BaseMessageSchema).
     setHeader(payload) {
         if (typeof window === 'undefined') return;
         window.parent.postMessage(
@@ -71,7 +67,6 @@ class CondoBridge {
         );
     }
 
-    // Shell type is TOGGLE_UI with { isVisible }, not TOGGLE_HEADER / { visible }.
     toggleHeader(visible) {
         if (typeof window === 'undefined') return;
         window.parent.postMessage(

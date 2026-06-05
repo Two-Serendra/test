@@ -33,7 +33,13 @@ Alpine.store('superapp', {
       .then((ctx) => {
         console.log('[Superapp] CTX:', ctx);
 
-        this.user = ctx?.user ?? null;
+        const rawUser = ctx?.user;
+
+        this.user =
+          typeof rawUser === 'string'
+            ? { email: rawUser }
+            : rawUser ?? null;
+
         this.unit = ctx?.unit ?? null;
         this.units = ctx?.units ?? [];
         this.accounts = ctx?.accounts ?? [];

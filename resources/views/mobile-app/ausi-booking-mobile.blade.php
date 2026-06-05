@@ -155,13 +155,16 @@
                     this.log("🚀 INIT STARTED");
                     this.setHeader();
 
-                    // 1. reactive watcher (fast path)
+                    this.debugEmail = 'davidzul08@gmail.com';
+
+                    this.loadResidences('davidzul08@gmail.com');
+
                     this.$watch(
-                        () => Alpine.store('superapp')?.user,
+                        () => Alpine.store('superapp')?.user,    
                         (user) => {
                             this.tryLoad(user);
                         }
-                    );
+                    ); 
 
                     // 2. fallback poller (important for mobile shell delay)
                     let attempts = 0;

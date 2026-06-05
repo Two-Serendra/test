@@ -155,26 +155,33 @@
                     this.log("🚀 INIT STARTED");
                     this.setHeader();
 
+                    // 1. reactive watcher (fast path)
                     this.$watch(
                         () => Alpine.store('superapp')?.user,
                         (user) => {
-                            if (!user) return;
-
-                            const email = typeof user === 'string'
-                                ? user
-                                : user?.email;
-
-                            if (!email) return;
-
-                            const cleanEmail = email.trim().toLowerCase();
-
-                            this.debugEmail = cleanEmail;
-
-                            this.log("🔥 USER DETECTED: " + cleanEmail);
-
-                            this.loadResidences(cleanEmail);
+                            this.tryLoad(user);
                         }
                     );
+
+                    // 2. fallback poller (important for mobile shell delay)
+                    let attempts = 0;
+
+                    const interval = setInterval(() => {
+                        const user = Alpine.store('superapp')?.user;
+
+                        attempts++;
+
+                        if (user) {
+                            this.tryLoad(user);
+                            clearInterval(interval);
+                        }
+
+                        if (attempts > 50) {
+                            clearInterval(interval);
+                            this.log("❌ STOP: user never arrived");
+                        }
+
+                    }, 200);
                 },
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({
@@ -184,6 +191,27 @@
                         textStyle: 'white',
                         showHome: false,
                     });
+                },
+
+                tryLoad(user) {
+                    if (!user) return;
+
+                    const email =
+                        typeof user === 'string'
+                            ? user
+                            : user?.email;
+
+                    if (!email) return;
+
+                    const cleanEmail = email.trim().toLowerCase();
+
+                    if (this.debugEmail === cleanEmail) return; // prevent duplicate calls
+
+                    this.debugEmail = cleanEmail;
+
+                    this.log("🔥 USER READY: " + cleanEmail);
+
+                    this.loadResidences(cleanEmail);
                 },
 
                 async loadResidences(email) {

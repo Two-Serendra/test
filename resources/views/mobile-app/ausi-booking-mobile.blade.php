@@ -155,27 +155,28 @@
                     this.log("🚀 INIT STARTED");
                     this.setHeader();
 
-                    this.$watch(
-                        () => Alpine.store('superapp')?.user,
-                        (user) => {
-                            if (!user) return;
+                    const interval = setInterval(() => {
+                        const user = Alpine.store('superapp')?.user;
 
-                            const email =
-                                typeof user === 'string'
-                                    ? user
-                                    : user?.email;
+                        if (!user) return;
 
-                            if (!email) return;
+                        const email =
+                            typeof user === 'string'
+                                ? user
+                                : user?.email;
 
-                            const cleanEmail = email.trim().toLowerCase();
+                        if (!email) return;
 
-                            this.debugEmail = cleanEmail;
+                        const cleanEmail = email.trim().toLowerCase();
 
-                            this.log("🔥 USER DETECTED: " + cleanEmail);
+                        this.debugEmail = cleanEmail;
 
-                            this.loadResidences(cleanEmail);
-                        }
-                    );
+                        this.log("🔥 USER READY: " + cleanEmail);
+
+                        clearInterval(interval);
+
+                        this.loadResidences(cleanEmail);
+                    }, 200);
                 },
 
                 watchEmail() {

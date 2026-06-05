@@ -29,11 +29,11 @@
                             <label class="form-label">Select Residence <span class="required">*</span></label>
                             <dl>
                                 <dt>Name</dt>
-                                <dd x-text="$store.superapp.user?.name  ?? '—'"></dd>
+                                <dd x-text="$store.superapp.u?.name  ?? '—'"></dd>
                                 <dt>Email</dt>
                                 <dd x-text="$store.superapp.user?.email ?? '—'"></dd>
                                 <dt>Role</dt>
-                                <dd x-text="$store.superapp.user?.role  ?? '—'"></dd>
+                                <dd x-text="$store.superapp.u?.role  ?? '—'"></dd>
                             </dl>
 
                             <select x-model="selectedResidence" name="residence_id">
@@ -166,7 +166,6 @@
                         }
                     ); 
 
-                    // 2. fallback poller (important for mobile shell delay)
                     let attempts = 0;
 
                     const interval = setInterval(() => {

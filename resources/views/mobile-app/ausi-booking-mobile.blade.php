@@ -35,6 +35,7 @@
                                 <dt>Role</dt>
                                 <dd x-text="$store.superapp.user?.role  ?? '—'"></dd>
                                 <dd x-text="$store.superapp.units[0]?.name  ?? '—'"></dd>
+                                <!-- <dd x-text="$store.superapp.units[0]?.role   ?? '—'"></dd> -->
                             </dl>
 
                             <select x-model="selectedResidence" name="residence_id">

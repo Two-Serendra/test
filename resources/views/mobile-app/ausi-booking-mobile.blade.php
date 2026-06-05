@@ -120,15 +120,6 @@
             </div>
         </div>
 
-        <div class="alert alert-dark mt-2" style="white-space: pre-wrap; font-size: 12px;">
-            <strong>DEBUG PANEL</strong><br>
-            <div x-text="debugLog"></div>
-        </div>
-
-        <div class="alert alert-danger mt-2" x-show="debugLog.includes('ERROR')">
-            Something went wrong. Check debug logs below.
-        </div>
-
         <div class="alert alert-info">
             <div><strong>User:</strong> <span x-text="$store.superapp.user?.email ?? 'NO USER'"></span></div>
 
@@ -162,16 +153,25 @@
                 },
                 init() {
                     this.log("🚀 INIT STARTED");
+
                     this.setHeader();
 
-                    this.watchEmail();
-                    this.setHeader();
-                    console.log('🚀 SUPERAPP INIT CALLED');
+                    this.$watch(
+                        () => Alpine.store('superapp')?.user?.email,
+                        (email) => {
+                            if (!email) {
+                                this.log("⏳ waiting for email...");
+                                return;
+                            }
 
-                    // extra safety delay (VERY important for mobile shells)
-                    setTimeout(() => {
-                        this.startUserListener();
-                    }, 500);
+                            const cleanEmail = email.trim().toLowerCase();
+
+                            this.debugEmail = cleanEmail;
+                            this.log("🔥 EMAIL READY (WATCHER): " + cleanEmail);
+
+                            this.loadResidences(cleanEmail);
+                        }
+                    );
                 },
 
                 watchEmail() {

@@ -236,24 +236,26 @@
                         this.log("❌ ERROR: " + err.message);
                     }
                 }
+
+                    getTowerCode(name) {
+                    const map = {
+                        "Almond": "A",
+                        "Belize": "B",
+                        "Callery": "C",
+                        "Dolce": "D",
+                        "Encino": "E",
+                        "Aston": "F",
+                        "ReadOak": "G",
+                        "Meranti": "H",
+                        "Sequoia": "I",
+                    };
+
+                    return map[name] ?? '';
+                }
             }));
 
 
-            getTowerCode(name) {
-                const map = {
-                    "Almond": "A",
-                    "Belize": "B",
-                    "Callery": "C",
-                    "Dolce": "D",
-                    "Encino": "E",
-                    "Aston": "F",
-                    "ReadOak": "G",
-                    "Meranti": "H",
-                    "Sequoia": "I",
-                };
 
-                return map[name] ?? '';
-            }
         });
     </script>
 

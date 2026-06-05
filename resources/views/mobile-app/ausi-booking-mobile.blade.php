@@ -18,6 +18,12 @@
 
         <div class="card shadow-sm mb-4">
             <div class="card-body">
+                <div class="alert alert-info">
+                    <div><strong>User:</strong> <span x-text="$store.superapp.user?.email ?? 'NO USER'"></span></div>
+                    <div><strong>Residences:</strong> <span x-text="residences.length"></span></div>
+                    <div><strong>Selected:</strong> <span x-text="selectedResidence ?? 'NONE'"></span></div>
+                </div>
+                
                 <form method="POST" action="{{ route('ausi.booking.store') }}" enctype="multipart/form-data"
                     id="userAusiNewBooking" class="needs-validation" novalidate>
                     @csrf
@@ -119,37 +125,43 @@
         </div>
     </div>
 
+    <div class="alert alert-dark mt-2" style="white-space: pre-wrap; font-size: 12px;">
+        <strong>DEBUG PANEL</strong><br>
+        <div x-text="debugLog"></div>
+    </div>
+
+    <div class="alert alert-danger mt-2" x-show="debugLog.includes('ERROR')">
+        Something went wrong. Check debug logs below.
+    </div>
+
     <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('headerControls', () => ({
-                mode: 'sticky-no-back',
-                title: 'Bridge Demo',
-                subtitle: '',
-                backgroundColor: '#1e3a5f',
-                textStyle: 'white',
-                showHome: false,
-
-                applyHeader() {
-                    const payload = { mode: this.mode, textStyle: this.textStyle };
-                    if (this.title) payload.title = this.title;
-                    if (this.subtitle) payload.subtitle = this.subtitle;
-                    if (this.backgroundColor) payload.backgroundColor = this.backgroundColor;
-                    payload.showHome = this.showHome;
-                    Alpine.store('superapp').bridge?.setHeader(payload);
-                },
-            }));
-        });
-
         document.addEventListener('alpine:init', () => {
             Alpine.data('dashboardPage', () => ({
                 residences: [],
                 selectedResidence: null,
+                debugLog: '',
 
-                init() {
-                    this.waitForUserThenLoad();
-                    this.setHeader();
+                log(msg) {
+                    console.log(msg);
+                    this.debugLog += msg + "\n";
                 },
+                startUserListener() {
+                    const interval = setInterval(() => {
+                        const user = Alpine.store('superapp')?.user;
 
+                        this.log("Checking user... " + JSON.stringify(user));
+
+                        if (user?.email) {
+                            clearInterval(interval);
+
+                            const email = user.email.trim().toLowerCase();
+
+                            this.log("✅ USER FOUND: " + email);
+
+                            this.loadResidences(email);
+                        }
+                    }, 200);
+                },
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({
                         mode: 'sticky-no-back',
@@ -160,37 +172,30 @@
                     });
                 },
 
-                waitForUserThenLoad() {
-                    const interval = setInterval(() => {
-                        const user = Alpine.store('superapp')?.user;
-
-                        if (user?.email) {
-                            clearInterval(interval);
-                            this.loadResidences(user.email);
-                        }
-                    }, 200);
-                },
-
                 async loadResidences(email) {
-                    console.log('🔥 loadResidences CALLED with:', email);
+                    this.log("Fetching residences for: " + email);
 
                     try {
                         const url = `/mobile/residences?email=${encodeURIComponent(email)}`;
 
+                        this.log("Request URL: " + url);
+
                         const res = await fetch(url);
 
-                        if (!res.ok) {
-                            throw new Error(`HTTP ${res.status}`);
-                        }
+                        this.log("HTTP STATUS: " + res.status);
 
-                        const data = await res.json();
+                        const text = await res.text();
 
-                        console.log('📦 Data received:', data);
+                        this.log("RAW RESPONSE: " + text);
+
+                        const data = JSON.parse(text);
 
                         this.residences = Array.isArray(data) ? data : [];
 
+                        this.log("Residences loaded: " + this.residences.length);
+
                     } catch (err) {
-                        console.error('❌ Failed to load residences:', err);
+                        this.log("❌ ERROR: " + err.message);
                         this.residences = [];
                     }
                 }

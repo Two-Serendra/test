@@ -40,7 +40,8 @@
                                         <option value="">-- Select Residence --</option>
 
                                         <template x-for="(unit, index) in $store.superapp.units" :key="index">
-                                            <option :value="unit.id" x-text="unit.name">
+                                            <option :value="unit.id"
+                                                x-text="`${unit.unit_no}${getTowerCode(unit.tower_name)}`">
                                             </option>
                                         </template>
                                     </select>
@@ -236,6 +237,23 @@
                     }
                 }
             }));
+
+
+            getTowerCode(name) {
+                const map = {
+                    "Almond": "A",
+                    "Belize": "B",
+                    "Callery": "C",
+                    "Dolce": "D",
+                    "Encino": "E",
+                    "Aston": "F",
+                    "ReadOak": "G",
+                    "Meranti": "H",
+                    "Sequoia": "I",
+                };
+
+                return map[name] ?? '';
+            }
         });
     </script>
 

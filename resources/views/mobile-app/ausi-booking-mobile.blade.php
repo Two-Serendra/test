@@ -34,23 +34,10 @@
                                 <dd x-text="$store.superapp.user?.email ?? '—'"></dd>
                                 <dt>Role</dt>
                                 <dd x-text="$store.superapp.user?.role  ?? '—'"></dd>
+                                <dt>Units</dt>
                                 <dd x-text="$store.superapp.units[0]?.name  ?? '—'"></dd>
-                                <!-- <dd x-text="$store.superapp.units[0]?.role   ?? '—'"></dd> -->
                             </dl>
 
-                            <select x-model="selectedResidence" name="residence_id">
-                                <option value="">-- Select Residence --</option>
-
-                                <template x-for="residence in residences" :key="residence.id">
-                                    <option :value="residence.id"
-                                        x-text="`${residence.resident_type} - Unit ${residence.unit_no}`">
-                                    </option>
-                                </template>
-                            </select>
-
-                            <template x-if="residences.length === 0">
-                                <small class="text-muted">No units found for this account.</small>
-                            </template>
 
                         </div>
                         <div class="col-md-6">

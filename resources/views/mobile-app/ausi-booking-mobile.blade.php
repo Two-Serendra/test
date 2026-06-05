@@ -134,8 +134,6 @@
         </div>
     </div>
 
-
-
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('dashboardPage', () => ({
@@ -152,7 +150,7 @@
 
                     this.setHeader();
                     console.log('🚀 SUPERAPP INIT CALLED');
-                    console.log('inside shell:', isInsideShell());
+
                     // extra safety delay (VERY important for mobile shells)
                     setTimeout(() => {
                         this.startUserListener();

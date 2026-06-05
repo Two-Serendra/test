@@ -14,12 +14,6 @@
 
         <div class="card shadow-sm mb-4">
             <div class="card-body">
-                <div class="alert alert-info">
-                    <div><strong>User:</strong> <span x-text="$store.superapp.user?.email ?? 'NO USER'"></span></div>
-                    <div><strong>Residences:</strong> <span x-text="residences.length"></span></div>
-                    <div><strong>Selected:</strong> <span x-text="selectedResidence ?? 'NONE'"></span></div>
-                </div>
-
                 <form method="POST" action="{{ route('ausi.booking.store') }}" enctype="multipart/form-data"
                     id="userAusiNewBooking" class="needs-validation" novalidate>
                     @csrf
@@ -28,19 +22,12 @@
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label">Select Residence <span class="required">*</span></label>
                             <dl>
-                                <dt>Name</dt>
-                                <dd x-text="$store.superapp.user?.name  ?? '—'"></dd>
-                                <dt>Email</dt>
-                                <dd x-text="$store.superapp.user?.email ?? '—'"></dd>
-                                <dt>Role</dt>
-                                <dd x-text="$store.superapp.user?.role  ?? '—'"></dd>
-                                <dt>Units</dt>
                                 <dd>
                                     <select name="unit_id" class="form-select" required>
                                         <option value="">-- Select Residence --</option>
 
                                         <template x-for="(unit, index) in $store.superapp.units" :key="index">
-                                            <option :value="unit.id" x-text="formatUnit(unit.name)">
+                                            <option :value="unit.id" x-text="`${unit.role ?? ''} ${formatUnit(unit.name)}`">
                                             </option>
                                         </template>
                                     </select>

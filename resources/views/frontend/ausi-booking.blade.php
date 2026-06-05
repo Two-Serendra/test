@@ -16,12 +16,7 @@
                             </option>
                         @endforeach
 
-                    </select> 
-
-                    <input type="hidden" name="superapp_email" x-bind:value="$store.superapp.user?.email">
-                    <input type="hidden" name="superapp_unit" x-bind:value="$store.superapp.unit?.unit_no">
-                    <input type="hidden" name="superapp_role" x-bind:value="$store.superapp.user?.role">
-                    
+                    </select>                     
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Date <span class="required">*</span></label>

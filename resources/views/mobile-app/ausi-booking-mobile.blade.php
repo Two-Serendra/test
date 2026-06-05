@@ -117,14 +117,14 @@
                     console.log(msg);
                     this.debugLog += msg + "\n";
                 },
-
                 init() {
                     this.log("🚀 INIT STARTED");
                     this.setHeader();
-
                     this.$watch(
                         () => Alpine.store('superapp')?.user,
-                        (user) => this.tryLoad(user)
+                        (user) => {
+                            this.tryLoad(user);
+                        }
                     );
 
                     let attempts = 0;
@@ -143,9 +143,16 @@
                             clearInterval(interval);
                             this.log("❌ STOP: user never arrived");
                         }
-                    }, 200);
-                },
 
+                    }, 200);
+
+                    this.residences = data;
+                    Alpine.store('superapp').units = data;
+
+                    this.$nextTick(() => {
+                        window.dispatchEvent(new Event('units-ready'));
+                    });
+                },
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({
                         mode: 'sticky-no-back',
@@ -156,55 +163,14 @@
                     });
                 },
 
-                tryLoad(user) {
-                    if (!user) return;
-
-                    const email = typeof user === 'string' ? user : user?.email;
-                    if (!email) return;
-
-                    const cleanEmail = email.trim().toLowerCase();
-
-                    if (this.debugEmail === cleanEmail) return;
-
-                    this.debugEmail = cleanEmail;
-
-                    this.log("🔥 USER READY: " + cleanEmail);
-
-                    this.loadResidences(cleanEmail);
-                },
-
-                async loadResidences(email) {
-                    this.log("Fetching residences for: " + email);
-
-                    try {
-                        const url = `https://twoserendra.com/mobile/residences?email=${encodeURIComponent(email)}`;
-
-                        const res = await fetch(url);
-                        const data = await res.json();
-
-                        console.log("API RESPONSE:", data);
-
-                        this.residences = data;
-
-                        // ✅ sync to global store
-                        Alpine.store('superapp').units = data;
-
-                        // ✅ FIX: run AFTER DOM updates
-                        this.$nextTick(() => {
-                            $('select[name="resident_id_ausi"]').trigger('change');
-                        });
-
-                    } catch (err) {
-                        this.log("❌ ERROR: " + err.message);
-                    }
-                },
-
                 formatUnit(name) {
                     if (!name) return '';
 
                     const parts = name.split(' ');
-                    const tower = parts[0];
-                    const number = parts[1];
+
+                    // expected: "Meranti 999"
+                    const tower = parts[0];   // Meranti
+                    const number = parts[1];  // 999
 
                     const map = {
                         "Almond": "A",
@@ -219,7 +185,8 @@
                     };
 
                     return `${number}${map[tower] ?? ''}`;
-                }
+                },
+
             }));
         });
     </script>

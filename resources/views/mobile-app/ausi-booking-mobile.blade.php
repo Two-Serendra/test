@@ -4,13 +4,9 @@
 
 @section('content')
     <div class="" x-data="dashboardPage()">
-
-        {{-- Loading ──────────────────────────────────────────────── --}}
         <div class="loading" x-show="$store.superapp.isLoading">
             <p>Waiting for shell context…</p>
         </div>
-
-        {{-- Dev warning (not inside the shell) ──────────────────── --}}
         <div class="warning-banner" x-show="!inShell && !$store.superapp.isLoading">
             Running outside the shell — bridge data is unavailable.
             In production this page runs inside the shell iframe.
@@ -132,6 +128,13 @@
         <div class="alert alert-danger mt-2" x-show="debugLog.includes('ERROR')">
             Something went wrong. Check debug logs below.
         </div>
+
+        <div class="alert alert-info">
+            <div><strong>User:</strong> <span x-text="$store.superapp.user?.email ?? 'NO USER'"></span></div>
+
+            <!-- ADD THIS -->
+            <div><strong>DEBUG EMAIL:</strong> <span x-text="debugEmail ?? 'NOT SET'"></span></div>
+        </div>
     </div>
 
     <script>
@@ -140,7 +143,8 @@
                 residences: [],
                 selectedResidence: null,
                 debugLog: '',
-
+                debugEmail: null,
+                
                 log(msg) {
                     console.log(msg);
                     this.debugLog += msg + "\n";

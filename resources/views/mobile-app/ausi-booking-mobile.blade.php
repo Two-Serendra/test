@@ -151,13 +151,14 @@
                     this.log("🚀 INIT STARTED");
 
                     this.setHeader();
-
+                    console.log('🚀 SUPERAPP INIT CALLED');
+                    console.log('inside shell:', isInsideShell());
                     // extra safety delay (VERY important for mobile shells)
                     setTimeout(() => {
                         this.startUserListener();
                     }, 500);
                 },
-                
+
                 startUserListener() {
                     this.log("👀 Waiting for superapp user...");
 

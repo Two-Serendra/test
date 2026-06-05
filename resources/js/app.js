@@ -19,22 +19,28 @@ Alpine.store('superapp', {
   get bridge() { return _bridge; },
 
   init() {
-    if (!isInsideShell()) return;
-
     this.isLoading = true;
+
     _bridge = new CondoBridge();
 
-    _bridge
-      .getContext()
+    if (!isInsideShell()) {
+      console.warn('[Superapp] Not in shell - skipping bridge');
+      this.isLoading = false;
+      return;
+    }
+
+    _bridge.getContext()
       .then((ctx) => {
-        this.user     = ctx.user;
-        this.unit     = ctx.unit     ?? null;
-        this.units    = ctx.units    ?? [];
-        this.accounts = ctx.accounts ?? [];
-        this.token    = ctx.token;
+        console.log('[Superapp] CTX:', ctx);
+
+        this.user = ctx?.user ?? null;
+        this.unit = ctx?.unit ?? null;
+        this.units = ctx?.units ?? [];
+        this.accounts = ctx?.accounts ?? [];
+        this.token = ctx?.token ?? null;
       })
       .catch((err) => {
-        console.error('[SuperappStore] Failed to get shell context:', err);
+        console.error('[Superapp] Bridge error:', err);
       })
       .finally(() => {
         this.isLoading = false;
@@ -43,3 +49,4 @@ Alpine.store('superapp', {
 });
 
 Alpine.start();
+Alpine.store('superapp').init();

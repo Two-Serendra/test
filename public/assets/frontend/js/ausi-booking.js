@@ -2,11 +2,12 @@ $(document).ready(function () {
     flatpickr("#AusiBookingDate", {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(1),
+        onChange: function (selectedDates, dateStr) {
+            window.updateSlots(dateStr);
+        }
     });
-
-
     const $bookingDate = $('#AusiBookingDate');
-    const $bookingSlots = $('.ausi-booking-slot');
+
     const $submitBtn = $('#saveUserAusiBtn');
 
     window.updateSlots = function (date) {
@@ -39,8 +40,9 @@ $(document).ready(function () {
 
 
     function resetSlots() {
-        $bookingSlots.each(function () {
+        $('.ausi-booking-slot').each(function () {
             $(this).prop('disabled', false).prop('checked', false);
+
             $('label[for="' + this.id + '"]')
                 .removeClass('disabled btn-secondary')
                 .addClass('btn-outline-primary')
@@ -52,9 +54,9 @@ $(document).ready(function () {
         bookedSlots.forEach(slot => {
             const $radio = $('.ausi-booking-slot[data-slot="' + slot + '"]');
 
-
             if ($radio.length) {
                 $radio.prop('disabled', true);
+
                 $('label[for="' + $radio.attr('id') + '"]')
                     .removeClass('btn-outline-primary')
                     .addClass('btn-secondary disabled')
@@ -70,13 +72,27 @@ $(document).ready(function () {
         updateSlots(selectedDate);
     });
 
+    function safeInitSlots() {
+        const date = $('#AusiBookingDate').val();
+        if (date) {
+            window.updateSlots(date);
+        }
+    }
+
+    setTimeout(() => {
+        const date = $('#AusiBookingDate').val();
+        if (date) window.updateSlots(date);
+    }, 500);
+
+    window.addEventListener('units-ready', safeInitSlots);
+
     $(document).on('change', 'select[name="resident_id_ausi"]', function () {
-        window.updateSlots($bookingDate.val());
+        window.updateSlots($('#AusiBookingDate').val());
     });
 
     function showLoading() {
         $('#slotLoading').removeClass('d-none');
-        $bookingSlots.prop('disabled', true);
+        $('.ausi-booking-slot').prop('disabled', true);
     }
 
     function hideLoading() {
@@ -88,11 +104,13 @@ $(document).ready(function () {
 
         const now = new Date();
 
-        $bookingSlots.each(function () {
+        $('.ausi-booking-slot').each(function () {
             const slot = $(this).data('slot');
             const startTime = slot.split(' - ')[0];
             const normalizedStartTime = startTime.replace('NN', 'PM');
+
             const slotDateTime = new Date(`${selectedDate} ${normalizedStartTime}`);
+
             if (slotDateTime <= now) {
                 $(this).prop('disabled', true);
 

@@ -39,7 +39,7 @@
                                     <select name="unit_id" class="form-select" required>
                                         <option value="">-- Select Residence --</option>
 
-                                        <template x-for="(unit, index) in $store.superapp.units" :key="index">
+                                        <template x-for="(unit, index) in residences" :key="index">
                                             <option :value="unit.id"
                                                 x-text="`${unit.unit_no}${getTowerCode(unit.tower_name)}`">
                                             </option>
@@ -149,6 +149,23 @@
                     console.log(msg);
                     this.debugLog += msg + "\n";
                 },
+
+                getTowerCode(name) {
+                    const map = {
+                        "Almond": "A",
+                        "Belize": "B",
+                        "Callery": "C",
+                        "Dolce": "D",
+                        "Encino": "E",
+                        "Aston": "F",
+                        "ReadOak": "G",
+                        "Meranti": "H",
+                        "Sequoia": "I",
+                    };
+
+                    return map[name] ?? '';
+                },
+
                 init() {
                     this.log("🚀 INIT STARTED");
                     this.setHeader();
@@ -159,9 +176,7 @@
 
                     this.$watch(
                         () => Alpine.store('superapp')?.user,
-                        (user) => {
-                            this.tryLoad(user);
-                        }
+                        (user) => this.tryLoad(user)
                     );
 
                     let attempts = 0;
@@ -180,9 +195,9 @@
                             clearInterval(interval);
                             this.log("❌ STOP: user never arrived");
                         }
-
                     }, 200);
                 },
+
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({
                         mode: 'sticky-no-back',
@@ -196,16 +211,12 @@
                 tryLoad(user) {
                     if (!user) return;
 
-                    const email =
-                        typeof user === 'string'
-                            ? user
-                            : user?.email;
-
+                    const email = typeof user === 'string' ? user : user?.email;
                     if (!email) return;
 
                     const cleanEmail = email.trim().toLowerCase();
 
-                    if (this.debugEmail === cleanEmail) return; // prevent duplicate calls
+                    if (this.debugEmail === cleanEmail) return;
 
                     this.debugEmail = cleanEmail;
 
@@ -220,15 +231,15 @@
                     try {
                         const url = `https://twoserendra.com/mobile/residences?email=${encodeURIComponent(email)}`;
 
-                        this.log("Request URL: " + url);
-
                         const res = await fetch(url);
-
                         const data = await res.json();
 
                         console.log("API RESPONSE:", data);
 
                         this.residences = data;
+
+                        // IMPORTANT: sync to store if you're using $store.superapp.units
+                        Alpine.store('superapp').units = data;
 
                         this.log("Residences loaded: " + this.residences.length);
 
@@ -236,26 +247,7 @@
                         this.log("❌ ERROR: " + err.message);
                     }
                 }
-
-                    getTowerCode(name) {
-                    const map = {
-                        "Almond": "A",
-                        "Belize": "B",
-                        "Callery": "C",
-                        "Dolce": "D",
-                        "Encino": "E",
-                        "Aston": "F",
-                        "ReadOak": "G",
-                        "Meranti": "H",
-                        "Sequoia": "I",
-                    };
-
-                    return map[name] ?? '';
-                }
             }));
-
-
-
         });
     </script>
 

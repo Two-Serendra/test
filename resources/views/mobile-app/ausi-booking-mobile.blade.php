@@ -23,7 +23,7 @@
                     <div><strong>Residences:</strong> <span x-text="residences.length"></span></div>
                     <div><strong>Selected:</strong> <span x-text="selectedResidence ?? 'NONE'"></span></div>
                 </div>
-                
+
                 <form method="POST" action="{{ route('ausi.booking.store') }}" enctype="multipart/form-data"
                     id="userAusiNewBooking" class="needs-validation" novalidate>
                     @csrf
@@ -123,16 +123,18 @@
                 </form>
             </div>
         </div>
+
+        <div class="alert alert-dark mt-2" style="white-space: pre-wrap; font-size: 12px;">
+            <strong>DEBUG PANEL</strong><br>
+            <div x-text="debugLog"></div>
+        </div>
+
+        <div class="alert alert-danger mt-2" x-show="debugLog.includes('ERROR')">
+            Something went wrong. Check debug logs below.
+        </div>
     </div>
 
-    <div class="alert alert-dark mt-2" style="white-space: pre-wrap; font-size: 12px;">
-        <strong>DEBUG PANEL</strong><br>
-        <div x-text="debugLog"></div>
-    </div>
 
-    <div class="alert alert-danger mt-2" x-show="debugLog.includes('ERROR')">
-        Something went wrong. Check debug logs below.
-    </div>
 
     <script>
         document.addEventListener('alpine:init', () => {
@@ -145,22 +147,48 @@
                     console.log(msg);
                     this.debugLog += msg + "\n";
                 },
+                init() {
+                    this.log("🚀 INIT STARTED");
+
+                    this.setHeader();
+
+                    // extra safety delay (VERY important for mobile shells)
+                    setTimeout(() => {
+                        this.startUserListener();
+                    }, 500);
+                },
+                
                 startUserListener() {
+                    this.log("👀 Waiting for superapp user...");
+
+                    let attempts = 0;
+
                     const interval = setInterval(() => {
                         const user = Alpine.store('superapp')?.user;
 
-                        this.log("Checking user... " + JSON.stringify(user));
+                        this.log("CHECK #" + attempts + " user = " + JSON.stringify(user));
 
-                        if (user?.email) {
+                        attempts++;
+
+                        const email = user?.email;
+
+                        if (email && email !== 'undefined' && email !== 'null') {
+                            const cleanEmail = email.trim().toLowerCase();
+
+                            this.log("🔥 FINAL EMAIL READY: " + cleanEmail);
+
                             clearInterval(interval);
 
-                            const email = user.email.trim().toLowerCase();
-
-                            this.log("✅ USER FOUND: " + email);
-
-                            this.loadResidences(email);
+                            this.loadResidences(cleanEmail);
                         }
-                    }, 200);
+
+                        // safety stop (prevents infinite loop)
+                        if (attempts > 50) {
+                            clearInterval(interval);
+                            this.log("❌ STOPPED: user never became available");
+                        }
+
+                    }, 300);
                 },
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({

@@ -60,65 +60,44 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-{{--
-x-data on
 
-<body> is required. It makes Alpine's $store magic
-    property available in every child element on the page.
-    --}}
+<body x-data>
+    @yield('content')
 
-    <body x-data>
-        @yield('content')
-
-        <script>
-            function isMobile() {
-                return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-            }
-        </script>
+    <script>
+        function isMobile() {
+            return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        }
+    </script>
 
 
 
 
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-        <script src="{{ asset('assets/frontend/lib/wow/wow.min.js') }}"></script>
-        <script src="{{ asset('assets/frontend/lib/easing/easing.min.js') }}"></script>
-        <script src="{{ asset('assets/frontend/lib/waypoints/waypoints.min.js') }}"></script>
-        <script src="{{ asset('assets/frontend/lib/counterup/counterup.min.js') }}"></script>
-        <script src="{{ asset('assets/frontend/lib/owlcarousel/owl.carousel.min.js') }}"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-        <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
-        <script src="https://js.pusher.com/8.2/pusher.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/laravel-echo/1.15.2/echo.iife.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-                tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-                    new bootstrap.Tooltip(tooltipTriggerEl)
-                })
-            });
-        </script>
-
-        <!-- Template Javascript -->
-        <script src="{{ asset('assets/frontend/js/main.js') }}"></script>
-        <script src="{{ asset('assets/frontend/js/custom.js')}}?v=2 }}"></script>
-        <script src="{{ asset('assets/frontend/js/work-permit.js') }}"></script>
-        <script src="{{ asset('assets/frontend/js/profile.js') }}"></script>
-        <script src="{{ asset('assets/frontend/js/function-room.js') }}"></script>
-        <script src="{{ asset('assets/frontend/js/test-email.js') }}"></script>
-        <script src="{{ asset('assets/frontend/js/soa.js') }}?v=2"></script>
-        <script src="{{ asset('assets/frontend/js/resident-booking-history.js') }}"></script>
-        <script src="{{ asset('assets/frontend/js/grease-trap.js') }}"></script>
-        <script src="{{ asset('assets/frontend/js/pest-control.js') }}"></script>
-        <script src="{{ asset('assets/frontend/js/activity-booking.js') }}"></script>
-        <script src="{{ asset('assets/frontend/js/resident-booking-history.js') }}"></script>
-        <script src="{{ asset('assets/frontend/js/fitness-hub-booking.js') }}"></script>
-        <script src="{{ asset('assets/frontend/js/ausi-booking.js') }}"></script>
-    </body>
+    <script src="{{ asset('assets/frontend/lib/wow/wow.min.js') }}"></script>
+    <script src="{{ asset('assets/frontend/lib/easing/easing.min.js') }}"></script>
+    <script src="{{ asset('assets/frontend/lib/waypoints/waypoints.min.js') }}"></script>
+    <script src="{{ asset('assets/frontend/lib/counterup/counterup.min.js') }}"></script>
+    <script src="{{ asset('assets/frontend/lib/owlcarousel/owl.carousel.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <script src="https://js.pusher.com/8.2/pusher.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/laravel-echo/1.15.2/echo.iife.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                new bootstrap.Tooltip(tooltipTriggerEl)
+            })
+        });
+    </script>
+    <script src="{{ asset('assets/frontend/js/ausi-booking.js') }}"></script>
+</body>
 
 </html>

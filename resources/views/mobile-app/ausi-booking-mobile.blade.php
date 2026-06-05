@@ -35,9 +35,17 @@
                                 <dt>Role</dt>
                                 <dd x-text="$store.superapp.user?.role  ?? '—'"></dd>
                                 <dt>Units</dt>
-                                <dd x-text="$store.superapp.units[0]?.name  ?? '—'"></dd>
-                            </dl>
+                                <dd>
+                                    <select name="unit_id" class="form-select" required>
+                                        <option value="">-- Select Residence --</option>
 
+                                        <template x-for="(unit, index) in $store.superapp.units" :key="index">
+                                            <option :value="unit.id" x-text="unit.name">
+                                            </option>
+                                        </template>
+                                    </select>
+                                </dd>
+                            </dl>
 
                         </div>
                         <div class="col-md-6">

@@ -70,13 +70,7 @@ Route::get('/Links', [NavbarController::class, 'getAllLinks'])->name('links');
 route::get('/request-electricity/{unitNo}/{year}/{month}', [ProfileController::class, 'requestElectricity'])->name('request.electricity');
 
 
-
-
 //Amenity/Activity Booking
-
-
-
-
 Route::post('/send', [ContactController::class, 'send'])
     ->name('contact.send')
     ->middleware('throttle:5,1');

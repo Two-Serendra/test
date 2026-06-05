@@ -35,15 +35,12 @@ class FrontendAusiBookingController extends Controller
 
     public function mobileResidences(Request $request)
     {
-        \Log::info('MOBILE RESIDENCES HIT', [
-            'email' => $request->email,
-        ]);
+        $email = strtolower(trim($request->email ?? ''));
 
         $data = DB::table('resident_details')
-            ->select('id', 'unit_no', 'resident_type', 'email')
+            ->whereRaw('LOWER(TRIM(REPLACE(email, CHAR(160), ""))) = ?', [$email])
+            ->select('id', 'unit_no', 'resident_type')
             ->get();
-
-        \Log::info('SAMPLE ROWS', $data->toArray());
 
         return $data;
     }

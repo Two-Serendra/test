@@ -17,6 +17,9 @@ $(document).ready(function () {
 
         showLoading();
 
+        // ✅ FORCE RESET IMMEDIATELY
+        resetSlots();
+
         $.ajax({
             url: '/ausi-booked-slots',
             type: 'GET',
@@ -25,18 +28,15 @@ $(document).ready(function () {
                 resident_id: residentId
             },
             success: function (res) {
-                resetSlots();
+                resetSlots(); // safe double reset
                 disableBookedSlots(res.blocked_for_user);
                 disablePastSlots(date);
-            },
-            error: function () {
-                console.log('Failed to load slots');
             },
             complete: function () {
                 hideLoading();
             }
         });
-    }
+    };
 
 
     function resetSlots() {
@@ -65,7 +65,7 @@ $(document).ready(function () {
         });
     }
 
-    $bookingSlots.prop('disabled', true);
+
 
     $bookingDate.on('change', function () {
         const selectedDate = $(this).val();

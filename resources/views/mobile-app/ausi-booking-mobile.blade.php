@@ -150,7 +150,9 @@
                     Alpine.store('superapp').units = data;
 
                     this.$nextTick(() => {
-                        window.dispatchEvent(new Event('units-ready'));
+                        setTimeout(() => {
+                            window.updateSlots($('#AusiBookingDate').val());
+                        }, 800);
                     });
                 },
                 setHeader() {

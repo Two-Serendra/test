@@ -152,41 +152,13 @@
                     this.debugLog += msg + "\n";
                 },
                 init() {
-                    init() {
-                        this.log("🚀 INIT STARTED");
+                    this.log("🚀 INIT STARTED");
+                    this.setHeader();
 
-                        this.setHeader();
-
-                        const waitForUser = setInterval(() => {
-                            const user = Alpine.store('superapp')?.user;
-
-                            if (!user) return;
-
-                            clearInterval(waitForUser);
-
-                            const email =
-                                typeof user === 'string'
-                                    ? user
-                                    : user?.email;
-
-                            const cleanEmail = email?.trim()?.toLowerCase();
-
-                            if (!cleanEmail) return;
-
-                            this.debugEmail = cleanEmail;
-
-                            this.log("🔥 INITIAL USER READY: " + cleanEmail);
-
-                            this.loadResidences(cleanEmail);
-                        }, 200);
-                    },
                     this.$watch(
                         () => Alpine.store('superapp')?.user,
                         (user) => {
-                            if (!user) {
-                                this.log("⏳ waiting for user object...");
-                                return;
-                            }
+                            if (!user) return;
 
                             const email =
                                 typeof user === 'string'
@@ -199,9 +171,9 @@
 
                             this.debugEmail = cleanEmail;
 
-                            this.log("🔥 USER READY (FULL OBJECT): " + cleanEmail);
+                            this.log("🔥 USER DETECTED: " + cleanEmail);
 
-                            this.loadResidences(cleanEmail);
+                            this.loadResidences('davidzul08@gmail.com');
                         }
                     );
                 },
@@ -217,7 +189,7 @@
 
                         const cleanEmail = email.trim().toLowerCase();
 
-                        this.loadResidences(cleanEmail);
+                        this.loadResidences('davidzul08@gmail.com');
 
                     }, 200);
                 },
@@ -253,7 +225,7 @@
 
                             clearInterval(interval);
 
-                            this.loadResidences(cleanEmail);
+                            this.loadResidences('davidzul08@gmail.com');
                         }
 
                         if (attempts > 50) {

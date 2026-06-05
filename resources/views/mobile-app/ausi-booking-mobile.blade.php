@@ -3,7 +3,7 @@
 @section('title', 'Bridge Demo — Dashboard')
 
 @section('content')
-    <div class="" x-data="dashboardPage">
+    <div class="" x-data="dashboardPage()">
 
         {{-- Loading ──────────────────────────────────────────────── --}}
         <div class="loading" x-show="$store.superapp.isLoading">
@@ -32,13 +32,9 @@
                                 <dd x-text="$store.superapp.user?.email ?? '—'"></dd>
                                 <dt>Role</dt>
                                 <dd x-text="$store.superapp.user?.role  ?? '—'"></dd>
-
-                                <dt>Name</dt>
-                                <dd x-text="u.name"></dd>
-
                             </dl>
 
-                            <select x-model="selectedResidence">
+                            <select x-model="selectedResidence" name="residence_id">
                                 <option value="">-- Select Residence --</option>
 
                                 <template x-for="residence in residences" :key="residence.id">
@@ -180,19 +176,22 @@
 
                     try {
                         const url = `/mobile/residences?email=${encodeURIComponent(email)}`;
-                        console.log('🌐 Fetching:', url);
 
                         const res = await fetch(url);
 
-                        console.log('📡 Response status:', res.status);
+                        if (!res.ok) {
+                            throw new Error(`HTTP ${res.status}`);
+                        }
 
                         const data = await res.json();
+
                         console.log('📦 Data received:', data);
 
-                        this.residences = data;
+                        this.residences = Array.isArray(data) ? data : [];
 
                     } catch (err) {
                         console.error('❌ Failed to load residences:', err);
+                        this.residences = [];
                     }
                 }
             }));

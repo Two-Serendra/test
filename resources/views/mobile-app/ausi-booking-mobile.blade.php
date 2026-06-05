@@ -135,6 +135,17 @@
             <!-- ADD THIS -->
             <div><strong>DEBUG EMAIL:</strong> <span x-text="debugEmail ?? 'NOT SET'"></span></div>
         </div>
+
+        <div class="alert alert-warning mt-2">
+            <div><strong>STORE USER:</strong></div>
+            <pre x-text="JSON.stringify($store.superapp.user, null, 2)"></pre>
+
+            <div><strong>EMAIL DETECTED:</strong></div>
+            <pre x-text="debugEmail ?? 'NOT READY'"></pre>
+
+            <div><strong>RESIDENCES COUNT:</strong></div>
+            <pre x-text="residences.length"></pre>
+        </div>
     </div>
 
     <script>
@@ -151,7 +162,9 @@
                 },
                 init() {
                     this.log("🚀 INIT STARTED");
+                    this.setHeader();
 
+                    this.watchEmail();
                     this.setHeader();
                     console.log('🚀 SUPERAPP INIT CALLED');
 
@@ -159,6 +172,22 @@
                     setTimeout(() => {
                         this.startUserListener();
                     }, 500);
+                },
+
+                watchEmail() {
+                    const interval = setInterval(() => {
+
+                        const email = Alpine.store('superapp')?.user?.email;
+
+                        if (!email) return;
+
+                        clearInterval(interval);
+
+                        const cleanEmail = email.trim().toLowerCase();
+
+                        this.loadResidences(cleanEmail);
+
+                    }, 200);
                 },
 
                 startUserListener() {

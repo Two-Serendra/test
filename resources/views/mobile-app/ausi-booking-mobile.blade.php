@@ -23,7 +23,7 @@
                             <label class="form-label">Select Residence <span class="required">*</span></label>
                             <dl>
                                 <dd>
-                                    <select name="unit_id" class="form-select" required>
+                                    <select name="resident_id_ausi" class="form-select" required>
                                         <option value="">-- Select Residence --</option>
 
                                         <template x-for="(unit, index) in $store.superapp.units" :key="index">
@@ -102,24 +102,6 @@
                     </div>
                 </form>
             </div>
-        </div>
-
-        <div class="alert alert-info">
-            <div><strong>User:</strong> <span x-text="$store.superapp.user?.email ?? 'NO USER'"></span></div>
-
-            <!-- ADD THIS -->
-            <div><strong>DEBUG EMAIL:</strong> <span x-text="debugEmail ?? 'NOT SET'"></span></div>
-        </div>
-
-        <div class="alert alert-warning mt-2">
-            <div><strong>STORE USER:</strong></div>
-            <pre x-text="JSON.stringify($store.superapp.user, null, 2)"></pre>
-
-            <div><strong>EMAIL DETECTED:</strong></div>
-            <pre x-text="debugEmail ?? 'NOT READY'"></pre>
-
-            <div><strong>RESIDENCES COUNT:</strong></div>
-            <pre x-text="residences.length"></pre>
         </div>
     </div>
 

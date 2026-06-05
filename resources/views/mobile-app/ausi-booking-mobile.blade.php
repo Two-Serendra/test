@@ -29,11 +29,12 @@
                             <label class="form-label">Select Residence <span class="required">*</span></label>
                             <dl>
                                 <dt>Name</dt>
-                                <dd x-text="$store.superapp.u?.name  ?? '—'"></dd>
+                                <dd x-text="$store.superapp.user?.name  ?? '—'"></dd>
                                 <dt>Email</dt>
                                 <dd x-text="$store.superapp.user?.email ?? '—'"></dd>
                                 <dt>Role</dt>
-                                <dd x-text="$store.superapp.u?.role  ?? '—'"></dd>
+                                <dd x-text="$store.superapp.user?.role  ?? '—'"></dd>
+                                <dd x-text="$store.superapp.units[0]?.name  ?? '—'"></dd>
                             </dl>
 
                             <select x-model="selectedResidence" name="residence_id">
@@ -160,11 +161,11 @@
                     this.loadResidences('davidzul08@gmail.com');
 
                     this.$watch(
-                        () => Alpine.store('superapp')?.user,    
+                        () => Alpine.store('superapp')?.user,
                         (user) => {
                             this.tryLoad(user);
                         }
-                    ); 
+                    );
 
                     let attempts = 0;
 

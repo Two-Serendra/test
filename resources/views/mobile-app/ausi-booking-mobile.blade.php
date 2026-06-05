@@ -117,19 +117,14 @@
                     console.log(msg);
                     this.debugLog += msg + "\n";
                 },
+
                 init() {
                     this.log("🚀 INIT STARTED");
                     this.setHeader();
 
-                    this.debugEmail = 'davidzul08@gmail.com';
-
-                    this.loadResidences('davidzul08@gmail.com');
-
                     this.$watch(
                         () => Alpine.store('superapp')?.user,
-                        (user) => {
-                            this.tryLoad(user);
-                        }
+                        (user) => this.tryLoad(user)
                     );
 
                     let attempts = 0;
@@ -148,9 +143,9 @@
                             clearInterval(interval);
                             this.log("❌ STOP: user never arrived");
                         }
-
                     }, 200);
                 },
+
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({
                         mode: 'sticky-no-back',
@@ -164,16 +159,12 @@
                 tryLoad(user) {
                     if (!user) return;
 
-                    const email =
-                        typeof user === 'string'
-                            ? user
-                            : user?.email;
-
+                    const email = typeof user === 'string' ? user : user?.email;
                     if (!email) return;
 
                     const cleanEmail = email.trim().toLowerCase();
 
-                    if (this.debugEmail === cleanEmail) return; // prevent duplicate calls
+                    if (this.debugEmail === cleanEmail) return;
 
                     this.debugEmail = cleanEmail;
 
@@ -182,14 +173,38 @@
                     this.loadResidences(cleanEmail);
                 },
 
+                async loadResidences(email) {
+                    this.log("Fetching residences for: " + email);
+
+                    try {
+                        const url = `https://twoserendra.com/mobile/residences?email=${encodeURIComponent(email)}`;
+
+                        const res = await fetch(url);
+                        const data = await res.json();
+
+                        console.log("API RESPONSE:", data);
+
+                        this.residences = data;
+
+                        // ✅ sync to global store
+                        Alpine.store('superapp').units = data;
+
+                        // ✅ FIX: run AFTER DOM updates
+                        this.$nextTick(() => {
+                            $('select[name="resident_id_ausi"]').trigger('change');
+                        });
+
+                    } catch (err) {
+                        this.log("❌ ERROR: " + err.message);
+                    }
+                },
+
                 formatUnit(name) {
                     if (!name) return '';
 
                     const parts = name.split(' ');
-
-                    // expected: "Meranti 999"
-                    const tower = parts[0];   // Meranti
-                    const number = parts[1];  // 999
+                    const tower = parts[0];
+                    const number = parts[1];
 
                     const map = {
                         "Almond": "A",
@@ -204,32 +219,7 @@
                     };
 
                     return `${number}${map[tower] ?? ''}`;
-                },
-
-                async loadResidences(email) {
-                    this.log("Fetching residences for: " + email);
-
-                    try {
-                        const url = `https://twoserendra.com/mobile/residences?email=${encodeURIComponent(email)}`;
-
-                        this.log("Request URL: " + url);
-
-                        const res = await fetch(url);
-
-                        const data = await res.json();
-
-                        console.log("API RESPONSE:", data);
-
-                        this.residences = data;
-
-                        this.log("Residences loaded: " + this.residences.length);
-
-                    } catch (err) {
-                        this.log("❌ ERROR: " + err.message);
-                    }
                 }
-
-
             }));
         });
     </script>

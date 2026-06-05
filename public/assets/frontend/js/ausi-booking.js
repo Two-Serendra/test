@@ -1,4 +1,4 @@
-$(document).ready(function () { 
+$(document).ready(function () {
     flatpickr("#AusiBookingDate", {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(1),
@@ -9,7 +9,7 @@ $(document).ready(function () {
     const $bookingSlots = $('.ausi-booking-slot');
     const $submitBtn = $('#saveUserAusiBtn');
 
-    function updateSlots(date) {
+    window.updateSlots = function (date) {
         if (!date) return;
 
         const residentId = $('select[name="resident_id_ausi"]').val();
@@ -70,8 +70,8 @@ $(document).ready(function () {
         updateSlots(selectedDate);
     });
 
-    $('select[name="resident_id_ausi"]').on('change', function () {
-        updateSlots($bookingDate.val());
+    $(document).on('change', 'select[name="resident_id_ausi"]', function () {
+        window.updateSlots($bookingDate.val());
     });
 
     function showLoading() {

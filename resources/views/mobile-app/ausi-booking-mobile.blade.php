@@ -144,7 +144,7 @@
                 selectedResidence: null,
                 debugLog: '',
                 debugEmail: null,
-                
+
                 log(msg) {
                     console.log(msg);
                     this.debugLog += msg + "\n";
@@ -173,10 +173,20 @@
 
                         attempts++;
 
-                        const email = user?.email;
+                        // ❌ stop if no store yet
+                        if (!user) return;
+
+                        const email =
+                            typeof user === 'string'
+                                ? user
+                                : user?.email;
 
                         if (email && email !== 'undefined' && email !== 'null') {
+
                             const cleanEmail = email.trim().toLowerCase();
+
+                            // ✅ update UI debug
+                            this.debugEmail = cleanEmail;
 
                             this.log("🔥 FINAL EMAIL READY: " + cleanEmail);
 
@@ -185,7 +195,6 @@
                             this.loadResidences(cleanEmail);
                         }
 
-                        // safety stop (prevents infinite loop)
                         if (attempts > 50) {
                             clearInterval(interval);
                             this.log("❌ STOPPED: user never became available");

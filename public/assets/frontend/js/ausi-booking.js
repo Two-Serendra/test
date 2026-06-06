@@ -247,59 +247,59 @@ $(document).ready(function () {
                     alert("STATUS: " + xhr.status);
                     alert(xhr.responseText.substring(0, 500));
                     
-                    // if (xhr.status === 422) {
-                    //     let msg = 'Please check the form fields.';
-                    //     if (res.errors) {
-                    //         msg = Object.values(res.errors).map(e => e[0]).join('\n');
-                    //     }
-                    //     Swal.fire({
-                    //         icon: 'error',
-                    //         title: 'Validation Error',
-                    //         text: msg,
-                    //         confirmButtonText: 'OK',
-                    //         confirmButtonColor: '#d33'
-                    //     });
-                    //     return;
-                    // }
+                    if (xhr.status === 422) {
+                        let msg = 'Please check the form fields.';
+                        if (res.errors) {
+                            msg = Object.values(res.errors).map(e => e[0]).join('\n');
+                        }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Validation Error',
+                            text: msg,
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#d33'
+                        });
+                        return;
+                    }
 
-                    // if (xhr.status === 409) {
+                    if (xhr.status === 409) {
 
-                    //     if (res.type === 'slot_taken') {
-                    //         Swal.fire({
-                    //             icon: 'error',
-                    //             title: 'Time Slot Taken',
-                    //             text: res.message || 'This time slot is already booked just now.',
-                    //             confirmButtonText: 'OK',
-                    //             confirmButtonColor: '#d33'
-                    //         });
+                        if (res.type === 'slot_taken') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Time Slot Taken',
+                                text: res.message || 'This time slot is already booked just now.',
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#d33'
+                            });
 
-                    //         updateSlots(selectedDate);
-                    //         return;
-                    //     }
+                            updateSlots(selectedDate);
+                            return;
+                        }
 
-                    //     if (res.type === 'unit_already_booked') {
+                        if (res.type === 'unit_already_booked') {
 
-                    //         Swal.fire({
-                    //             icon: 'warning',
-                    //             title: 'Booking Already Exists',
-                    //             text: res.message,
-                    //             showCancelButton: true,
-                    //             confirmButtonText: 'Yes, book anyway',
-                    //             cancelButtonText: 'Cancel',
-                    //             confirmButtonColor: '#3085d6',
-                    //             cancelButtonColor: '#d33'
-                    //         }).then((result) => {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Booking Already Exists',
+                                text: res.message,
+                                showCancelButton: true,
+                                confirmButtonText: 'Yes, book anyway',
+                                cancelButtonText: 'Cancel',
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33'
+                            }).then((result) => {
 
-                    //             if (result.isConfirmed) {
-                    //                 sendBooking(true);
-                    //             } else {
-                    //                 unlockSubmitBtn();
-                    //             }
-                    //         });
+                                if (result.isConfirmed) {
+                                    sendBooking(true);
+                                } else {
+                                    unlockSubmitBtn();
+                                }
+                            });
 
-                    //         return;
-                    //     }
-                    // }
+                            return;
+                        }
+                    }
                     Swal.fire({
                         toast: true,
                         position: 'top-end',

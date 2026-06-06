@@ -132,6 +132,9 @@ $(document).ready(function () {
         });
     }
 
+    $(document).on('click', '#saveUserAusiBtn', function () {
+        alert("BUTTON CLICK");
+    });
 
     $(document).on('submit', '#userAusiNewBooking', function (event) {
 
@@ -189,6 +192,15 @@ $(document).ready(function () {
             }
 
             lockSubmitBtn();
+
+            alert($(form).attr('action'));
+            alert($(form).attr('method'));
+
+            const formData = new FormData(form);
+
+            for (const pair of formData.entries()) {
+                alert(pair[0] + " = " + pair[1]);
+            }
 
             $.ajax({
 

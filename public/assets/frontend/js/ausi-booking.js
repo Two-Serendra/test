@@ -1,4 +1,14 @@
 $(document).ready(function () {
+
+    window.onerror = function (message, source, lineno, colno, error) {
+        alert(
+            "JS Error:\n\n" +
+            message +
+            "\n\nLine: " +
+            lineno
+        );
+    };
+
     flatpickr("#AusiBookingDate", {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(1),
@@ -7,7 +17,7 @@ $(document).ready(function () {
         }
     });
     const $bookingDate = $('#AusiBookingDate');
-
+    const $bookingSlots = $('.ausi-booking-slot');
     const $submitBtn = $('#saveUserAusiBtn');
 
     window.updateSlots = function (date) {
@@ -123,7 +133,9 @@ $(document).ready(function () {
     }
 
 
-    $('#userAusiNewBooking').on('submit', function (event) {
+    $(document).on('submit', '#userAusiNewBooking', function (event) {
+
+        alert("SUBMIT FIRED");
         event.preventDefault();
 
         const form = this;
@@ -170,6 +182,7 @@ $(document).ready(function () {
         };
 
         const sendBooking = (forceOverride = false) => {
+            alert("sending ajax");
             const formData = new FormData(form);
             if (forceOverride) {
                 formData.append('force_override', true);
@@ -178,6 +191,7 @@ $(document).ready(function () {
             lockSubmitBtn();
 
             $.ajax({
+
                 url: $(form).attr('action'),
                 type: $(form).attr('method'),
                 headers: {
@@ -186,6 +200,10 @@ $(document).ready(function () {
                 data: formData,
                 processData: false,
                 contentType: false,
+
+                beforeSend: function () {
+                    alert("AJAX START");
+                },
 
                 success(response) {
 

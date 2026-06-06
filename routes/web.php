@@ -220,3 +220,4 @@ Route::middleware('web')
     ->group(base_path('routes/admin.php'));
 
 require __DIR__ . '/auth.php';
+   

@@ -97,8 +97,7 @@
             })
         });
     </script>
-    <script
-        src="{{ asset('assets/frontend/js/ausi-booking.js') }}?v={{ filemtime(public_path('assets/frontend/js/ausi-booking.js')) }}"></script>
+    <script src="{{ asset('assets/frontend/js/ausi-booking.js') }}"></script>
 </body>
 
-</html>
+</html> 

@@ -116,20 +116,29 @@ class FrontendAusiBookingController extends Controller
             try {
                 DB::beginTransaction();
 
+                \Log::info('AUSI BOOKING REQUEST', [
+                    'auth' => auth()->check(),
+                    'email' => auth()->user()->email ?? null,
+                    'superapp_email' => $request->superapp_email,
+                ]);
+
                 $isSuperapp = $request->filled('superapp_email');
 
                 $email = $isSuperapp
                     ? $request->superapp_email
-                    : auth()->user()->email;
+                    : optional(auth()->user())->email;
 
                 $user = $isSuperapp
                     ? (object) [
                         'email' => $email,
                         'name' => $request->superapp_user_name ?? 'Superapp User'
                     ]
-                    : auth()->user();
+                    : auth()->user() ?? (object) [
+                        'email' => $email,
+                        'name' => 'Guest User'
+                    ];
 
-                $userId = $isSuperapp ? null : auth()->id();
+                $userId = $isSuperapp ? null : optional(auth()->user())->id;
 
                 $resident = ResidentDetails::where('id', $request->resident_id_ausi)
                     ->where('email', $email)

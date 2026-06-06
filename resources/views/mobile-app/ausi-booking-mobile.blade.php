@@ -14,7 +14,7 @@
 
         <div class="card shadow-sm mb-4">
             <div class="card-body">
-                <form method="POST" action="{{ route('ausi.booking.store.mobile') }}" enctype="multipart/form-data"
+                <form method="POST" action="{{ route('ausi.booking.store') }}" enctype="multipart/form-data"
                     id="userAusiNewBooking" class="needs-validation" novalidate>
                     @csrf
 

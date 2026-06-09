@@ -1,6 +1,13 @@
 $(document).ready(function () {
 
-    window.DEBUG_LOG = [];
+    console.log("🔥 AUSI BOOKING JS LOADED");
+    window.DEBUG_LOG = window.DEBUG_LOG || [];
+    window.DEBUG_LOG.push("JS LOADED " + new Date().toISOString());
+    
+    console.log("🔥 AUSI BOOKING JS LOADED");
+    window.DEBUG_LOG = window.DEBUG_LOG || [];
+    window.DEBUG_LOG.push("JS FILE LOADED");
+    window.DEBUG_LOG = window.DEBUG_LOG || [];
 
     function logDebug(...args) {
         const msg = args.map(a =>
@@ -9,37 +16,20 @@ $(document).ready(function () {
 
         window.DEBUG_LOG.push(msg);
 
-        console.log("🧪", msg);
+        console.log("🧪 DEBUG:", msg);
 
         const el = document.getElementById("debugLog");
         if (el) {
-            el.innerHTML = window.DEBUG_LOG.slice(-200).join("<br>");
+            el.innerHTML = window.DEBUG_LOG.slice(-100).join("<br>");
         }
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const el = document.getElementById("AusiBookingDate");
-
-        if (!el) {
-            console.log("❌ Date input missing");
-            return;
+    flatpickr("#AusiBookingDate", {
+        dateFormat: "Y-m-d",
+        minDate: new Date().fp_incr(1),
+        onChange: function (selectedDates, dateStr) {
+            window.updateSlots(dateStr);
         }
-
-        const picker = flatpickr(el, {
-            dateFormat: "Y-m-d",
-            minDate: new Date().fp_incr(1),
-            onChange: function (_, dateStr) {
-                console.log("📅 flatpickr fired:", dateStr);
-
-                if (typeof window.updateSlots === "function") {
-                    window.updateSlots(dateStr);
-                } else {
-                    console.error("updateSlots NOT defined");
-                }
-            }
-        });
-
-        console.log("✅ flatpickr initialized", picker);
     });
 
     const $bookingDate = $('#AusiBookingDate');
@@ -128,14 +118,14 @@ $(document).ready(function () {
         window.updateSlots(date);
     });
 
-    // function safeInitSlots() {
-    //     const date = $('#AusiBookingDate').val();
-    //     if (date) {
-    //         window.updateSlots(date);
-    //     }
-    // }
+    function safeInitSlots() {
+        const date = $('#AusiBookingDate').val();
+        if (date) {
+            window.updateSlots(date);
+        }
+    }
 
-    // window.addEventListener('units-ready', safeInitSlots);
+    window.addEventListener('units-ready', safeInitSlots);
 
     $(document).on('change', 'select[name="resident_id_ausi"]', function () {
         const date = $('#AusiBookingDate').val();

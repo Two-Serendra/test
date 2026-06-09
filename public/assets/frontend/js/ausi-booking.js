@@ -1,25 +1,5 @@
 $(document).ready(function () {
 
-    console.log("🔥 AUSI BOOKING JS LOADED");
-    window.DEBUG_LOG = window.DEBUG_LOG || [];
-    window.DEBUG_LOG.push("JS FILE LOADED");
-    window.DEBUG_LOG = window.DEBUG_LOG || [];
-
-    function logDebug(...args) {
-        const msg = args.map(a =>
-            typeof a === 'object' ? JSON.stringify(a) : a
-        ).join(" ");
-
-        window.DEBUG_LOG.push(msg);
-
-        console.log("🧪 DEBUG:", msg);
-
-        const el = document.getElementById("debugLog");
-        if (el) {
-            el.innerHTML = window.DEBUG_LOG.slice(-100).join("<br>");
-        }
-    }
-
     flatpickr("#AusiBookingDate", {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(1),

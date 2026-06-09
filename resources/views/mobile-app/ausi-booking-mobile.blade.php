@@ -23,7 +23,8 @@
                             <label class="form-label">Select Residence <span class="required">*</span></label>
                             <dl>
                                 <dd>
-                                    <select name="resident_id_ausi" class="form-select" x-model="$store.superapp.selectedUnit" required>
+                                    <select id="resident_id_ausi" name="resident_id_ausi" class="form-select"
+                                        x-model="$store.superapp.selectedUnit" required>
                                         <option value="">-- Select Residence --</option>
 
                                         <template x-for="(unit, index) in $store.superapp.units" :key="index">
@@ -128,27 +129,6 @@
                     this.log("🚀 INIT STARTED");
 
                     this.setHeader();
-
-                    this.$nextTick(() => {
-                        setTimeout(() => {
-
-                            const el = document.getElementById('AusiBookingDate');
-
-                            if (!el) {
-                                console.warn("Date input not found");
-                                return;
-                            }
-
-                            if (typeof flatpickr === 'undefined') {
-                                console.error("flatpickr not loaded");
-                                return;
-                            }
-
-                            this.$nextTick(() => {
-                                initAusiDatePicker();
-                            });
-                        }, 300);
-                    });
                 },
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({

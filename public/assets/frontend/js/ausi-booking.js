@@ -19,13 +19,15 @@ $(document).ready(function () {
             el.innerHTML = window.DEBUG_LOG.slice(-100).join("<br>");
         }
     }
-    // flatpickr("#AusiBookingDate", {
-    //     dateFormat: "Y-m-d",
-    //     minDate: new Date().fp_incr(1),
-    //     onChange: function (selectedDates, dateStr) {
-    //         window.updateSlots(dateStr);
-    //     }
-    // });
+
+    flatpickr("#AusiBookingDate", {
+        dateFormat: "Y-m-d",
+        minDate: new Date().fp_incr(1),
+        onChange: function (selectedDates, dateStr) {
+            window.updateSlots(dateStr);
+        }
+    });
+    
     const $bookingDate = $('#AusiBookingDate');
     const $bookingSlots = $('.ausi-booking-slot');
     const $submitBtn = $('#saveUserAusiBtn');

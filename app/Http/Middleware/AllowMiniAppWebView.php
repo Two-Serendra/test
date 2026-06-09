@@ -11,17 +11,24 @@ class AllowMiniAppWebView
     {
         $response = $next($request);
 
-        // ✅ Allow iframe / WebView embedding
-        $response->headers->set('X-Frame-Options', 'ALLOWALL');
-
-        // ✅ Safer CSP for mini-app embedding
-        $response->headers->set(
-            'Content-Security-Policy',
-            "frame-ancestors *"
+        $trustedOrigin = config(
+            'app.miniapp_origin',
+            'https://dev.serendra.ity.ph'
         );
 
-        // Optional: prevent caching issues in mobile shells
-        $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+        // Allow embedding only from your app and your own site
+        $response->headers->set(
+            'Content-Security-Policy',
+            "frame-ancestors 'self' {$trustedOrigin}"
+        );
+
+        // Remove invalid header
+        $response->headers->remove('X-Frame-Options');
+
+        $response->headers->set(
+            'Cache-Control',
+            'no-store, no-cache, must-revalidate, max-age=0'
+        );
 
         return $response;
     }

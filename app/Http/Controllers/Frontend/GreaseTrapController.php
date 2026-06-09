@@ -453,7 +453,9 @@ class GreaseTrapController extends Controller
 
     public function showGreaseTrapBookingDetails($id)
     {
-        $booking = GreaseTrapBooking::with('user')->findOrFail($id);
+        $booking = GreaseTrapBooking::with('user')->where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
         return view('frontend.user-grease-trap-booking-details', compact('booking'));
     }
     public function GreaseTrapBookiingTableReload(Request $request)

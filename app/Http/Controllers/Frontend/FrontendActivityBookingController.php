@@ -1420,8 +1420,9 @@ class FrontendActivityBookingController extends Controller
 
     public function showAmenityBookingDetails($id)
     {
-        $booking = ActivityBooking::with(['user', 'activity'])->findOrFail($id);
-
+        $booking = ActivityBooking::with(['user', 'activity'])->where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
         // ✅ get all slots under same transaction
         $slots = ActivityBooking::where('transaction_no', $booking->transaction_no)
             ->orderBy('booking_start_time')

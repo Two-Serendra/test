@@ -111,7 +111,7 @@ class FrontendFunctionRoomBookingController extends Controller
                 : collect();
             $items = collect();
 
-            
+
         } else {
             $functionRooms = FunctionRoom::with(['firstImage', 'discounts'])
                 ->get()
@@ -338,7 +338,9 @@ class FrontendFunctionRoomBookingController extends Controller
     public function showFunctionRoomBookingDetails($id)
     {
         $booking = FunctionRoomBooking::with(['user', 'functionRoom', 'suppliers', 'addOns'])
-            ->findOrFail($id);
+            ->where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
 
         // Load all bookings under the same transaction number
         $bookings = FunctionRoomBooking::where('transaction_no', $booking->transaction_no)
@@ -691,7 +693,9 @@ class FrontendFunctionRoomBookingController extends Controller
 
     public function getFunctionRoomBookingDetails($id)
     {
-        $booking = FunctionRoomBooking::with(['user', 'functionRoom', 'suppliers', 'addOns', 'createdBy'])->findOrFail($id);
+        $booking = FunctionRoomBooking::with(['user', 'functionRoom', 'suppliers', 'addOns', 'createdBy'])->where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
         $userRole = auth()->user()->role_id;
 
         $booking->event_start_time = $booking->event_start_time

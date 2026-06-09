@@ -367,7 +367,11 @@ class PestControlController extends Controller
 
     public function showPestControlBookingDetails($id)
     {
-        $booking = PestControlBooking::with('user')->findOrFail($id);
+        $booking = PestControlBooking::with('user')
+            ->where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+            
         return view('frontend.user-pest-control-booking-details', compact('booking'));
     }
 

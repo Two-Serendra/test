@@ -596,7 +596,9 @@ class FitnessHubBookingController extends Controller
 
     public function showFitnessHubBookingDetails($id)
     {
-        $booking = FitnessHubBooking::with('user', 'fitnessHub')->findOrFail($id);
+        $booking = FitnessHubBooking::with('user', 'fitnessHub')->where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
         return view('frontend.user-fitness-hub-booking-details', compact('booking'));
     }
 

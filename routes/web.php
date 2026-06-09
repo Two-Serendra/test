@@ -205,9 +205,9 @@ Route::middleware(['auth'])->group(function () {
 
 });
 
-Route::middleware(['miniapp.trust', 'miniapp.webview'])->group(function () {
+Route::middleware(['miniapp.webview'])->group(function () {
     Route::get('/ausi-booking-mobile', [FrontendAusiBookingController::class, 'ausiBookingUserMobile']);
-    Route::get('/mobile/residences', [FrontendAusiBookingController::class, 'mobileResidences']);
+
     
     Route::get('/ausi-booked-slots-mobile', [FrontendAusiBookingController::class, 'getBookedSlotsAusi']);
     Route::post('/ausi-booking-mobile/store', [FrontendAusiBookingController::class, 'storeAusiBooking']);

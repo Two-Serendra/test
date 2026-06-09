@@ -33,22 +33,6 @@ class FrontendAusiBookingController extends Controller
         return view('mobile-app.ausi-booking-mobile');
     }
 
-    public function mobileResidences(Request $request)
-    {
-        $email = 'davidzul08@gmail.com';
-
-        \Log::info('FORCED EMAIL TEST', ['email' => $email]);
-
-        $data = DB::table('resident_details')
-            ->where('email', $email)
-            ->select('id', 'unit_no', 'resident_type', 'email')
-            ->get();
-
-        \Log::info('RESULT COUNT', ['count' => $data->count()]);
-
-        return $data;
-    }
-
     public function getBookedSlotsAusi(Request $request)
     {
 
@@ -95,6 +79,165 @@ class FrontendAusiBookingController extends Controller
         ]);
     }
 
+    // public function storeAusiBooking(Request $request)
+    // {
+    //     $maxRetries = 3;
+    //     $attempt = 0;
+
+    //     $towerGroups = [
+    //         'A' => 'lowrise',
+    //         'B' => 'lowrise',
+    //         'C' => 'lowrise',
+    //         'D' => 'lowrise',
+    //         'E' => 'lowrise',
+    //         'F' => 'highrise',
+    //         'G' => 'highrise',
+    //         'H' => 'highrise',
+    //         'I' => 'highrise',
+    //     ];
+
+    //     while ($attempt < $maxRetries) {
+    //         try {
+    //             DB::beginTransaction();
+
+    //             \Log::info('AUSI BOOKING REQUEST', [
+    //                 'auth' => auth()->check(),
+    //                 'email' => auth()->user()->email ?? null,
+    //                 'superapp_email' => $request->superapp_email,
+    //             ]);
+
+    //             $isSuperapp = $request->filled('superapp_email');
+
+    //             $email = $isSuperapp
+    //                 ? $request->superapp_email
+    //                 : optional(auth()->user())->email;
+
+    //             $user = $isSuperapp
+    //                 ? (object) [
+    //                     'email' => $email,
+    //                     'name' => $request->superapp_user_name ?? 'Superapp User'
+    //                 ]
+    //                 : auth()->user() ?? (object) [
+    //                     'email' => $email,
+    //                     'name' => 'Guest User'
+    //                 ];
+
+    //             $userId = $isSuperapp ? null : optional(auth()->user())->id;
+
+    //             $resident = ResidentDetails::where('id', $request->resident_id_ausi)
+    //                 ->where('email', $email)
+    //                 ->lockForUpdate()
+    //                 ->first();
+
+    //             if (!$resident) {
+    //                 DB::rollBack();
+    //                 return response()->json([
+    //                     'message' => 'Unauthorized unit selection.'
+    //                 ], 403);
+    //             }
+
+    //             $bookingDate = Carbon::parse($request->booking_date)->toDateString();
+
+    //             $areaLetter = preg_replace('/[^A-Z]/', '', $resident->unit_no);
+    //             $towerGroup = $towerGroups[$areaLetter] ?? null;
+
+    //             if (!$towerGroup) {
+    //                 DB::rollBack();
+    //                 return response()->json(['message' => 'Unknown area for your unit.'], 422);
+    //             }
+    //             $towerAreas = $towerGroup == 'lowrise' ? ['A', 'B', 'C', 'D', 'E'] : ['F', 'G', 'H', 'I'];
+    //             $existingBookings = AusiBooking::whereDate('booking_date', $bookingDate)
+    //                 ->whereIn('unit_area', $towerAreas)
+    //                 ->where('booking_status', 1)
+    //                 ->lockForUpdate()
+    //                 ->get();
+
+
+    //             $slotTaken = $existingBookings->contains('booking_time_slot', $request->booking_time_slot);
+    //             if ($slotTaken) {
+    //                 DB::rollBack();
+    //                 return response()->json([
+    //                     'message' => 'Slot already taken just now.',
+    //                     'type' => 'slot_taken'
+    //                 ], 409);
+    //             }
+
+    //             $existingUnitBooking = AusiBooking::where('unit_no', strtoupper($resident->unit_no))
+    //                 ->where('booking_status', 1)
+    //                 ->whereYear('booking_date', Carbon::parse($bookingDate)->year)
+    //                 ->lockForUpdate()
+    //                 ->exists();
+
+    //             $forceOverride = $request->boolean('force_override');
+
+    //             if ($existingUnitBooking && !$forceOverride) {
+    //                 DB::rollBack();
+
+    //                 return response()->json([
+    //                     'message' => 'This unit already has a booking for this year. Do you want to proceed anyway?',
+    //                     'type' => 'unit_already_booked'
+    //                 ], 409);
+    //             }
+
+    //             $booking = AusiBooking::create([
+    //                 'user_id' => $userId,
+    //                 'created_by' => $userId,
+    //                 'transaction_no' => '',
+    //                 'unit_no' => strtoupper($resident->unit_no),
+    //                 'resident_type' => $resident->resident_type,
+    //                 'name' => strtoupper($user->name),
+    //                 'booking_date' => $bookingDate,
+    //                 'booking_time_slot' => $request->booking_time_slot,
+    //                 'unit_area' => $areaLetter,
+
+    //             ]);
+
+    //             $booking->transaction_no = '2AUSI-' . str_pad($booking->id, 5, '0', STR_PAD_LEFT);
+    //             $booking->save();
+
+    //             DB::commit();
+
+    //             $booking->load('user');
+    //             $recipientEmail = $email;
+    //             DB::afterCommit(function () use ($booking, $recipientEmail) {
+
+    //                 if ($recipientEmail) {
+    //                     Mail::to($recipientEmail)
+    //                         ->queue(new UserAusiBookingConfirmation($booking));
+    //                 }
+
+    //                 Mail::to('concierge@twoserendra.com')
+    //                     ->queue(new ConciergeAusiBookingConfirmation($booking));
+
+    //                 event(new AusiBookingCreated($booking));
+
+    //                 if ($booking->user) {
+    //                     $booking->user->notify(new UserAusiBookingBellNotification($booking));
+    //                 }
+    //             });
+
+    //             return response()->json(['message' => 'Ausi booking submitted successfully.']);
+
+    //         } catch (\Illuminate\Database\QueryException $e) {
+    //             DB::rollBack();
+
+    //             if (in_array($e->errorInfo[1], [1213, 1205])) {
+    //                 $attempt++;
+    //                 usleep(100000);
+    //                 continue;
+    //             }
+    //             Log::error('Ausi Booking Error', ['error' => $e->getMessage()]);
+    //             return response()->json(['message' => 'Something went wrong while saving the booking.'], 500);
+    //         } catch (\Throwable $e) {
+    //             DB::rollBack();
+    //             Log::error('Ausi Booking Fatal Error', ['error' => $e->getMessage()]);
+    //             return response()->json(['message' => 'Something went wrong.'], 500);
+    //         }
+    //     }
+
+    //     return response()->json(['message' => 'Could not complete booking. Please try again.'], 500);
+    // }
+
     public function storeAusiBooking(Request $request)
     {
         $maxRetries = 3;
@@ -116,29 +259,22 @@ class FrontendAusiBookingController extends Controller
             try {
                 DB::beginTransaction();
 
-                \Log::info('AUSI BOOKING REQUEST', [
-                    'auth' => auth()->check(),
-                    'email' => auth()->user()->email ?? null,
-                    'superapp_email' => $request->superapp_email,
+                $user = auth()->user();
+
+                if (!$user) {
+                    return response()->json([
+                        'message' => 'Unauthenticated.'
+                    ], 401);
+                }
+
+                $email = $user->email;
+                $userId = $user->id;
+
+                Log::info('AUSI BOOKING REQUEST', [
+                    'auth' => true,
+                    'user_id' => $userId,
+                    'email' => $email,
                 ]);
-
-                $isSuperapp = $request->filled('superapp_email');
-
-                $email = $isSuperapp
-                    ? $request->superapp_email
-                    : optional(auth()->user())->email;
-
-                $user = $isSuperapp
-                    ? (object) [
-                        'email' => $email,
-                        'name' => $request->superapp_user_name ?? 'Superapp User'
-                    ]
-                    : auth()->user() ?? (object) [
-                        'email' => $email,
-                        'name' => 'Guest User'
-                    ];
-
-                $userId = $isSuperapp ? null : optional(auth()->user())->id;
 
                 $resident = ResidentDetails::where('id', $request->resident_id_ausi)
                     ->where('email', $email)
@@ -161,15 +297,19 @@ class FrontendAusiBookingController extends Controller
                     DB::rollBack();
                     return response()->json(['message' => 'Unknown area for your unit.'], 422);
                 }
-                $towerAreas = $towerGroup == 'lowrise' ? ['A', 'B', 'C', 'D', 'E'] : ['F', 'G', 'H', 'I'];
+
+                $towerAreas = $towerGroup == 'lowrise'
+                    ? ['A', 'B', 'C', 'D', 'E']
+                    : ['F', 'G', 'H', 'I'];
+
                 $existingBookings = AusiBooking::whereDate('booking_date', $bookingDate)
                     ->whereIn('unit_area', $towerAreas)
                     ->where('booking_status', 1)
                     ->lockForUpdate()
                     ->get();
 
-
                 $slotTaken = $existingBookings->contains('booking_time_slot', $request->booking_time_slot);
+
                 if ($slotTaken) {
                     DB::rollBack();
                     return response()->json([
@@ -180,7 +320,7 @@ class FrontendAusiBookingController extends Controller
 
                 $existingUnitBooking = AusiBooking::where('unit_no', strtoupper($resident->unit_no))
                     ->where('booking_status', 1)
-                    ->whereYear('booking_date', Carbon::parse($bookingDate)->year)
+                    ->whereYear('booking_date', $bookingDate)
                     ->lockForUpdate()
                     ->exists();
 
@@ -188,7 +328,6 @@ class FrontendAusiBookingController extends Controller
 
                 if ($existingUnitBooking && !$forceOverride) {
                     DB::rollBack();
-
                     return response()->json([
                         'message' => 'This unit already has a booking for this year. Do you want to proceed anyway?',
                         'type' => 'unit_already_booked'
@@ -205,7 +344,6 @@ class FrontendAusiBookingController extends Controller
                     'booking_date' => $bookingDate,
                     'booking_time_slot' => $request->booking_time_slot,
                     'unit_area' => $areaLetter,
-
                 ]);
 
                 $booking->transaction_no = '2AUSI-' . str_pad($booking->id, 5, '0', STR_PAD_LEFT);
@@ -214,13 +352,11 @@ class FrontendAusiBookingController extends Controller
                 DB::commit();
 
                 $booking->load('user');
-                $recipientEmail = $email;
-                DB::afterCommit(function () use ($booking, $recipientEmail) {
 
-                    if ($recipientEmail) {
-                        Mail::to($recipientEmail)
-                            ->queue(new UserAusiBookingConfirmation($booking));
-                    }
+                DB::afterCommit(function () use ($booking, $email) {
+
+                    Mail::to($email)
+                        ->queue(new UserAusiBookingConfirmation($booking));
 
                     Mail::to('concierge@twoserendra.com')
                         ->queue(new ConciergeAusiBookingConfirmation($booking));
@@ -232,7 +368,9 @@ class FrontendAusiBookingController extends Controller
                     }
                 });
 
-                return response()->json(['message' => 'Ausi booking submitted successfully.']);
+                return response()->json([
+                    'message' => 'Ausi booking submitted successfully.'
+                ]);
 
             } catch (\Illuminate\Database\QueryException $e) {
                 DB::rollBack();
@@ -242,8 +380,10 @@ class FrontendAusiBookingController extends Controller
                     usleep(100000);
                     continue;
                 }
+
                 Log::error('Ausi Booking Error', ['error' => $e->getMessage()]);
                 return response()->json(['message' => 'Something went wrong while saving the booking.'], 500);
+
             } catch (\Throwable $e) {
                 DB::rollBack();
                 Log::error('Ausi Booking Fatal Error', ['error' => $e->getMessage()]);
@@ -333,7 +473,10 @@ class FrontendAusiBookingController extends Controller
 
     public function showAusiBookingDetails($id)
     {
-        $booking = AusiBooking::with('user')->findOrFail($id);
+        $booking = AusiBooking::with('user')->where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
         return view('frontend.user-ausi-booking-details', compact('booking'));
     }
 

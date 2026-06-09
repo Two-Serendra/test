@@ -29,7 +29,7 @@ class AllowMiniAppWebView
 
         $trustedOrigin = config(
             'app.miniapp_origin',
-            'https://dev.serendra.ity.ph'
+            'https://serendra.dev.ity.ph'
         );
 
         $response->headers->set(

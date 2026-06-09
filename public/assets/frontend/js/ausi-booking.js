@@ -1,21 +1,24 @@
 $(document).ready(function () {
-    window.DEBUG_LOG = [];
 
-    function logDebug(msg, data = null) {
-        const time = new Date().toLocaleTimeString();
+    console.log("🔥 AUSI BOOKING JS LOADED");
+    window.DEBUG_LOG = window.DEBUG_LOG || [];
+    window.DEBUG_LOG.push("JS FILE LOADED");
+    window.DEBUG_LOG = window.DEBUG_LOG || [];
 
-        const fullMsg = `[${time}] ${msg}` + (data ? " " + JSON.stringify(data) : "");
+    function logDebug(...args) {
+        const msg = args.map(a =>
+            typeof a === 'object' ? JSON.stringify(a) : a
+        ).join(" ");
 
-        window.DEBUG_LOG.push(fullMsg);
+        window.DEBUG_LOG.push(msg);
 
-        console.log(fullMsg);
+        console.log("🧪 DEBUG:", msg);
 
         const el = document.getElementById("debugLog");
         if (el) {
-            el.innerHTML = window.DEBUG_LOG.slice(-50).join("<br>");
+            el.innerHTML = window.DEBUG_LOG.slice(-100).join("<br>");
         }
     }
-
     // flatpickr("#AusiBookingDate", {
     //     dateFormat: "Y-m-d",
     //     minDate: new Date().fp_incr(1),

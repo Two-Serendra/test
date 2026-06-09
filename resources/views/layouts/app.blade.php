@@ -97,7 +97,7 @@
             })
         });
     </script>
-    <script src="{{ asset('js/ausi-booking-mobile.js') }}"></script>
+    <script src="{{ asset('assets/frontend/js/ausi-booking-mobile.js') }}"></script>
 </body>
 
-</html>
+</html> 

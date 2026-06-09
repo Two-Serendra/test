@@ -44,11 +44,8 @@ class FrontendAusiBookingController extends Controller
             'auth' => auth()->check(),
             'user' => auth()->user()?->email,
         ]);
-
-        $resident = ResidentDetails::where('id', $request->resident_id)
-            ->where('user_id', auth()->id())
-            ->firstOrFail();
-
+        $resident = ResidentDetails::findOrFail($request->resident_id);
+        
         $areaLetter = preg_replace('/[^A-Z]/', '', $resident->unit_no);
 
         $lowrise = ['A', 'B', 'C', 'D', 'E'];

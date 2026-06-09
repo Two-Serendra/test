@@ -9,13 +9,13 @@ $(document).ready(function () {
         );
     };
 
-    flatpickr("#AusiBookingDate", {
-        dateFormat: "Y-m-d",
-        minDate: new Date().fp_incr(1),
-        onChange: function (selectedDates, dateStr) {
-            window.updateSlots(dateStr);
-        }
-    });
+    // flatpickr("#AusiBookingDate", {
+    //     dateFormat: "Y-m-d",
+    //     minDate: new Date().fp_incr(1),
+    //     onChange: function (selectedDates, dateStr) {
+    //         window.updateSlots(dateStr);
+    //     }
+    // });
     const $bookingDate = $('#AusiBookingDate');
     const $bookingSlots = $('.ausi-booking-slot');
     const $submitBtn = $('#saveUserAusiBtn');
@@ -23,7 +23,7 @@ $(document).ready(function () {
     window.updateSlots = function (date) {
         if (!date) return;
 
-        const residentId = $('select[name="resident_id_ausi"]').val();
+        const residentId = document.querySelector('select[name="resident_id_ausi"]')?.value;
 
         showLoading();
 
@@ -88,11 +88,6 @@ $(document).ready(function () {
             window.updateSlots(date);
         }
     }
-
-    setTimeout(() => {
-        const date = $('#AusiBookingDate').val();
-        if (date) window.updateSlots(date);
-    }, 500);
 
     window.addEventListener('units-ready', safeInitSlots);
 
@@ -246,7 +241,7 @@ $(document).ready(function () {
 
                     alert("STATUS: " + xhr.status);
                     alert(xhr.responseText.substring(0, 500));
-                    
+
                     if (xhr.status === 422) {
                         let msg = 'Please check the form fields.';
                         if (res.errors) {

@@ -119,40 +119,33 @@
                 },
                 init() {
                     this.log("🚀 INIT STARTED");
+
                     this.setHeader();
-                    this.$watch(
-                        () => Alpine.store('superapp')?.user,
-                        (user) => {
-                            this.tryLoad(user);
-                        }
-                    );
-
-                    let attempts = 0;
-
-                    const interval = setInterval(() => {
-                        const user = Alpine.store('superapp')?.user;
-
-                        attempts++;
-
-                        if (user) {
-                            this.tryLoad(user);
-                            clearInterval(interval);
-                        }
-
-                        if (attempts > 50) {
-                            clearInterval(interval);
-                            this.log("❌ STOP: user never arrived");
-                        }
-
-                    }, 200);
-
-                    this.residences = data;
-                    Alpine.store('superapp').units = data;
 
                     this.$nextTick(() => {
                         setTimeout(() => {
-                            window.updateSlots($('#AusiBookingDate').val());
-                        }, 800);
+
+                            const el = document.getElementById('AusiBookingDate');
+
+                            if (!el) {
+                                console.warn("Date input not found");
+                                return;
+                            }
+
+                            if (typeof flatpickr === 'undefined') {
+                                console.error("flatpickr not loaded");
+                                return;
+                            }
+
+                            flatpickr(el, {
+                                dateFormat: "Y-m-d",
+                                minDate: new Date().fp_incr(1),
+                                onChange: (selectedDates, dateStr) => {
+                                    window.safeUpdateSlots(dateStr);
+                                }
+                            });
+
+                        }, 300);
                     });
                 },
                 setHeader() {

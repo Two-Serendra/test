@@ -1,6 +1,24 @@
 $(function () {
 
-    console.log("🚀 Mobile Booking JS Loaded");
+    function logDebug(...args) {
+
+        const msg = args.map(a =>
+            typeof a === 'object'
+                ? JSON.stringify(a)
+                : a
+        ).join(' ');
+
+        console.log(msg);
+
+        const el = document.getElementById('debugPanel');
+
+        if (el) {
+            el.innerHTML += msg + "<br>";
+            el.scrollTop = el.scrollHeight;
+        }
+    }
+
+    logDebug("🚀 Mobile Booking JS Loaded");
 
     flatpickr("#AusiBookingDate", {
         dateFormat: "Y-m-d",
@@ -12,7 +30,7 @@ $(function () {
 
     function updateSlots(date) {
 
-        console.log("updateSlots", date);
+        logDebug("updateSlots", date);
 
         if (!date) return;
 
@@ -21,7 +39,7 @@ $(function () {
                 'select[name="resident_id_ausi"]'
             )?.value;
 
-        console.log("resident", residentId);
+        logDebug("resident", residentId);
 
         if (!residentId) return;
 
@@ -36,20 +54,17 @@ $(function () {
             type: "GET",
 
             data: {
-
-                date: date,
-
+                date,
                 resident_id: residentId
-
             },
 
             success: function (res) {
 
+                logDebug("AJAX SUCCESS", res);
+
                 resetSlots();
 
-                disableBookedSlots(
-                    res.blocked_for_user || []
-                );
+                disableBookedSlots(res.blocked_for_user || []);
 
                 disablePastSlots(date);
 
@@ -57,11 +72,16 @@ $(function () {
 
             error: function (xhr) {
 
-                console.log(xhr);
+                logDebug("AJAX ERROR", {
+                    status: xhr.status,
+                    response: xhr.responseText
+                });
 
             },
 
             complete: function () {
+
+                logDebug("AJAX COMPLETE");
 
                 hideLoading();
 

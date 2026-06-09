@@ -33,6 +33,8 @@ class FrontendAusiBookingController extends Controller
         return view('mobile-app.ausi-booking-mobile');
     }
 
+    
+
     public function getBookedSlotsAusi(Request $request)
     {
 

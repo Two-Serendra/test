@@ -1,24 +1,3 @@
-function initAusiDatePicker() {
-    const el = document.getElementById('AusiBookingDate');
-
-    if (!el || el._flatpickr) return;
-
-    if (typeof flatpickr === 'undefined') return;
-
-    el._flatpickr = flatpickr(el, {
-        dateFormat: "Y-m-d",
-        minDate: new Date().fp_incr(1),
-        onChange: function (_, dateStr) {
-            window.updateSlots(dateStr);
-        }
-    });
-
-    el.addEventListener('change', function () {
-        window.updateSlots(this.value);
-    });
-}
-
-
 $(document).ready(function () {
 
     flatpickr("#AusiBookingDate", {
@@ -34,17 +13,25 @@ $(document).ready(function () {
     const $submitBtn = $('#saveUserAusiBtn');
 
     window.updateSlots = function (date) {
+        logDebug("🚀 updateSlots called", { date });
 
-        const store = Alpine.store('superapp');
+        if (!date) {
+            logDebug("❌ No date provided");
+            return;
+        }
 
-        const residentId = store?.selectedUnit;
+        const residentId = document.querySelector('select[name="resident_id_ausi"]')?.value;
 
-        if (!date || !residentId) {
-            console.log("missing data", { date, residentId });
+        logDebug("👤 Resident ID", { residentId });
+
+        if (!residentId) {
+            logDebug("❌ resident_id missing");
             return;
         }
 
         showLoading();
+        logDebug("⏳ Loading shown");
+
         resetSlots();
 
         $.ajax({
@@ -53,12 +40,22 @@ $(document).ready(function () {
             data: { date, resident_id: residentId },
 
             success: function (res) {
+                logDebug("✅ AJAX SUCCESS", res);
+
                 resetSlots();
                 disableBookedSlots(res.blocked_for_user || []);
                 disablePastSlots(date);
             },
 
+            error: function (xhr) {
+                logDebug("❌ AJAX ERROR", {
+                    status: xhr.status,
+                    response: xhr.responseText
+                });
+            },
+
             complete: function () {
+                logDebug("🏁 AJAX COMPLETE");
                 hideLoading();
             }
         });
@@ -90,6 +87,26 @@ $(document).ready(function () {
         });
     }
 
+
+
+    $(document).on('change', '#AusiBookingDate', function () {
+        const date = $(this).val();
+        window.updateSlots(date);
+    });
+
+    function safeInitSlots() {
+        const date = $('#AusiBookingDate').val();
+        if (date) {
+            window.updateSlots(date);
+        }
+    }
+
+    window.addEventListener('units-ready', safeInitSlots);
+
+    $(document).on('change', 'select[name="resident_id_ausi"]', function () {
+        const date = $('#AusiBookingDate').val();
+        window.updateSlots(date);
+    });
 
     function showLoading() {
         $('#slotLoading').removeClass('d-none');

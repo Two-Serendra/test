@@ -23,7 +23,7 @@
                             <label class="form-label">Select Residence <span class="required">*</span></label>
                             <dl>
                                 <dd>
-                                    <select name="resident_id_ausi" class="form-select" required>
+                                    <select name="resident_id_ausi" class="form-select" x-model="$store.superapp.selectedUnit" required>
                                         <option value="">-- Select Residence --</option>
 
                                         <template x-for="(unit, index) in $store.superapp.units" :key="index">
@@ -144,12 +144,9 @@
                                 return;
                             }
 
-                            flatpickr(el, {
-                                dateFormat: "Y-m-d",
-                                minDate: new Date().fp_incr(1),
-                                onChange: (d, dateStr) => window.updateSlots(dateStr)
+                            this.$nextTick(() => {
+                                initAusiDatePicker();
                             });
-
                         }, 300);
                     });
                 },

@@ -14,7 +14,6 @@ $(document).ready(function () {
 
     window.updateSlots = function (date) {
         if (!date) {
-            logDebug("❌ No date provided");
             return;
         }
 

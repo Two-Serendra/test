@@ -49,15 +49,15 @@ $(function () {
 
         $.ajax({
 
-            url: "/ausi-booked-slots",
-
+            url: "/ausi-booked-slots-mobile",
             type: "GET",
-
+            headers: {
+                "x-miniapp-token": Alpine.store('superapp')?.token
+            },
             data: {
                 date,
                 resident_id: residentId
             },
-
             success: function (res) {
 
                 logDebug("AJAX SUCCESS", res);

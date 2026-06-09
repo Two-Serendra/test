@@ -104,9 +104,9 @@ $(document).ready(function () {
 
 
 
-    $bookingDate.on('change', function () {
-        const selectedDate = $(this).val();
-        updateSlots(selectedDate);
+    $(document).on('change', '#AusiBookingDate', function () {
+        const date = $(this).val();
+        window.updateSlots(date);
     });
 
     function safeInitSlots() {
@@ -119,7 +119,8 @@ $(document).ready(function () {
     window.addEventListener('units-ready', safeInitSlots);
 
     $(document).on('change', 'select[name="resident_id_ausi"]', function () {
-        window.updateSlots($('#AusiBookingDate').val());
+        const date = $('#AusiBookingDate').val();
+        window.updateSlots(date);
     });
 
     function showLoading() {

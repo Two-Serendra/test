@@ -13,8 +13,6 @@ $(document).ready(function () {
     const $submitBtn = $('#saveUserAusiBtn');
 
     window.updateSlots = function (date) {
-        logDebug("🚀 updateSlots called", { date });
-
         if (!date) {
             logDebug("❌ No date provided");
             return;

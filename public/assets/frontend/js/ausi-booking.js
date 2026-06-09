@@ -1,18 +1,19 @@
 $(document).ready(function () {
+    window.DEBUG_LOG = [];
 
-    window.onerror = function (message, source, lineno, colno, error) {
-        alert(
-            "JS Error:\n\n" +
-            message +
-            "\n\nLine: " +
-            lineno
-        );
-    };
+    function logDebug(msg, data = null) {
+        const time = new Date().toLocaleTimeString();
 
-    window.DEBUG_AUSI = [];
-    function debugPush(msg) {
-        window.DEBUG_AUSI.push(msg);
-        console.log(msg);
+        const fullMsg = `[${time}] ${msg}` + (data ? " " + JSON.stringify(data) : "");
+
+        window.DEBUG_LOG.push(fullMsg);
+
+        console.log(fullMsg);
+
+        const el = document.getElementById("debugLog");
+        if (el) {
+            el.innerHTML = window.DEBUG_LOG.slice(-50).join("<br>");
+        }
     }
 
     // flatpickr("#AusiBookingDate", {
@@ -27,37 +28,34 @@ $(document).ready(function () {
     const $submitBtn = $('#saveUserAusiBtn');
 
     window.updateSlots = function (date) {
-        console.log("🚀 updateSlots called:", date);
+        logDebug("🚀 updateSlots called", { date });
 
         if (!date) {
-            console.warn("❌ No date provided");
+            logDebug("❌ No date provided");
             return;
         }
 
         const residentId = document.querySelector('select[name="resident_id_ausi"]')?.value;
 
-        console.log("👤 Resident ID:", residentId);
+        logDebug("👤 Resident ID", { residentId });
 
         if (!residentId) {
-            console.warn("❌ resident_id not ready");
+            logDebug("❌ resident_id missing");
             return;
         }
 
         showLoading();
-        console.log("⏳ Loading shown");
+        logDebug("⏳ Loading shown");
 
         resetSlots();
 
         $.ajax({
             url: '/ausi-booked-slots',
             type: 'GET',
-            data: {
-                date: date,
-                resident_id: residentId
-            },
+            data: { date, resident_id: residentId },
 
             success: function (res) {
-                console.log("✅ AJAX SUCCESS:", res);
+                logDebug("✅ AJAX SUCCESS", res);
 
                 resetSlots();
                 disableBookedSlots(res.blocked_for_user || []);
@@ -65,12 +63,14 @@ $(document).ready(function () {
             },
 
             error: function (xhr) {
-                console.error("❌ AJAX ERROR:", xhr.status, xhr.responseText);
-                alert("AJAX FAILED: " + xhr.status);
+                logDebug("❌ AJAX ERROR", {
+                    status: xhr.status,
+                    response: xhr.responseText
+                });
             },
 
             complete: function () {
-                console.log("🏁 AJAX COMPLETE");
+                logDebug("🏁 AJAX COMPLETE");
                 hideLoading();
             }
         });
@@ -154,10 +154,6 @@ $(document).ready(function () {
             }
         });
     }
-
-    $(document).on('click', '#saveUserAusiBtn', function () {
-        alert("BUTTON CLICK");
-    });
 
     $(document).on('submit', '#userAusiNewBooking', function (event) {
 

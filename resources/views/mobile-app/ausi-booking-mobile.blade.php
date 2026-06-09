@@ -103,6 +103,26 @@
                 </form>
             </div>
         </div>
+
+        <div id="debugPanel" style="
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    max-height: 220px;
+                    overflow: auto;
+                    background: #111;
+                    color: #0f0;
+                    font-size: 11px;
+                    padding: 10px;
+                    z-index: 99999;
+                    font-family: monospace;
+                ">
+            <strong>DEBUG PANEL</strong><br>
+            <div id="debugLog"></div>
+        </div>
+
+
     </div>
 
     <script>
@@ -118,29 +138,27 @@
                     this.debugLog += msg + "\n";
                 },
                 init() {
-                    this.log("🚀 INIT STARTED");
-
-                    this.setHeader();
+                    logDebug("🚀 ALPINE INIT STARTED");
 
                     this.$nextTick(() => {
                         setTimeout(() => {
 
                             const el = document.getElementById('AusiBookingDate');
 
-                            if (!el) {
-                                console.warn("Date input not found");
+                            logDebug("📅 Date input found?", { exists: !!el });
+
+                            if (typeof flatpickr === 'undefined') {
+                                logDebug("❌ flatpickr NOT loaded");
                                 return;
                             }
 
-                            if (typeof flatpickr === 'undefined') {
-                                console.error("flatpickr not loaded");
-                                return;
-                            }
+                            logDebug("✅ flatpickr loaded");
 
                             flatpickr(el, {
                                 dateFormat: "Y-m-d",
                                 minDate: new Date().fp_incr(1),
-                                onChange: (selectedDates, dateStr) => {
+                                onChange: (dates, dateStr) => {
+                                    logDebug("📅 Date selected", { dateStr });
                                     window.updateSlots(dateStr);
                                 }
                             });
@@ -184,6 +202,13 @@
 
             }));
         });
+
+        logDebug("🔐 AUTH CHECK", {
+            auth: @json(auth()->check()),
+            user: @json(auth()->user()?->email)
+        });
     </script>
+
+
 
 @endsection

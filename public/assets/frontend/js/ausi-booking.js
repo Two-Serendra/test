@@ -9,6 +9,12 @@ $(document).ready(function () {
         );
     };
 
+    window.DEBUG_AUSI = [];
+    function debugPush(msg) {
+        window.DEBUG_AUSI.push(msg);
+        console.log(msg);
+    }
+
     // flatpickr("#AusiBookingDate", {
     //     dateFormat: "Y-m-d",
     //     minDate: new Date().fp_incr(1),
@@ -21,16 +27,25 @@ $(document).ready(function () {
     const $submitBtn = $('#saveUserAusiBtn');
 
     window.updateSlots = function (date) {
-        if (!date) return;
+        console.log("🚀 updateSlots called:", date);
+
+        if (!date) {
+            console.warn("❌ No date provided");
+            return;
+        }
 
         const residentId = document.querySelector('select[name="resident_id_ausi"]')?.value;
 
+        console.log("👤 Resident ID:", residentId);
+
         if (!residentId) {
-            console.warn("resident_id not ready yet");
+            console.warn("❌ resident_id not ready");
             return;
         }
 
         showLoading();
+        console.log("⏳ Loading shown");
+
         resetSlots();
 
         $.ajax({
@@ -40,17 +55,26 @@ $(document).ready(function () {
                 date: date,
                 resident_id: residentId
             },
+
             success: function (res) {
+                console.log("✅ AJAX SUCCESS:", res);
+
                 resetSlots();
                 disableBookedSlots(res.blocked_for_user || []);
                 disablePastSlots(date);
             },
+
+            error: function (xhr) {
+                console.error("❌ AJAX ERROR:", xhr.status, xhr.responseText);
+                alert("AJAX FAILED: " + xhr.status);
+            },
+
             complete: function () {
+                console.log("🏁 AJAX COMPLETE");
                 hideLoading();
             }
         });
     };
-
 
     function resetSlots() {
         $('.ausi-booking-slot').each(function () {

@@ -27,7 +27,7 @@ $(document).ready(function () {
             window.updateSlots(dateStr);
         }
     });
-    
+
     const $bookingDate = $('#AusiBookingDate');
     const $bookingSlots = $('.ausi-booking-slot');
     const $submitBtn = $('#saveUserAusiBtn');
@@ -219,8 +219,6 @@ $(document).ready(function () {
 
             alert($(form).attr('action'));
             alert($(form).attr('method'));
-
-            const formData = new FormData(form);
 
             for (const pair of formData.entries()) {
                 alert(pair[0] + " = " + pair[1]);

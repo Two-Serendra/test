@@ -2,6 +2,10 @@ $(document).ready(function () {
 
     console.log("🔥 AUSI BOOKING JS LOADED");
     window.DEBUG_LOG = window.DEBUG_LOG || [];
+    window.DEBUG_LOG.push("JS LOADED " + new Date().toISOString());
+    
+    console.log("🔥 AUSI BOOKING JS LOADED");
+    window.DEBUG_LOG = window.DEBUG_LOG || [];
     window.DEBUG_LOG.push("JS FILE LOADED");
     window.DEBUG_LOG = window.DEBUG_LOG || [];
 

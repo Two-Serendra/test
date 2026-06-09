@@ -20,15 +20,12 @@ $(document).ready(function () {
 
         const residentId = document.querySelector('select[name="resident_id_ausi"]')?.value;
 
-        logDebug("👤 Resident ID", { residentId });
-
         if (!residentId) {
-            logDebug("❌ resident_id missing");
             return;
         }
 
         showLoading();
-        logDebug("⏳ Loading shown");
+     
 
         resetSlots();
 
@@ -38,22 +35,19 @@ $(document).ready(function () {
             data: { date, resident_id: residentId },
 
             success: function (res) {
-                logDebug("✅ AJAX SUCCESS", res);
-
                 resetSlots();
                 disableBookedSlots(res.blocked_for_user || []);
                 disablePastSlots(date);
             },
 
             error: function (xhr) {
-                logDebug("❌ AJAX ERROR", {
+                console.error("Error fetching booked slots", {
                     status: xhr.status,
                     response: xhr.responseText
                 });
             },
 
             complete: function () {
-                logDebug("🏁 AJAX COMPLETE");
                 hideLoading();
             }
         });

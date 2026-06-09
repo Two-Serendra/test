@@ -25,9 +25,12 @@ $(document).ready(function () {
 
         const residentId = document.querySelector('select[name="resident_id_ausi"]')?.value;
 
-        showLoading();
+        if (!residentId) {
+            console.warn("resident_id not ready yet");
+            return;
+        }
 
-        // ✅ FORCE RESET IMMEDIATELY
+        showLoading();
         resetSlots();
 
         $.ajax({
@@ -38,8 +41,8 @@ $(document).ready(function () {
                 resident_id: residentId
             },
             success: function (res) {
-                resetSlots(); // safe double reset
-                disableBookedSlots(res.blocked_for_user);
+                resetSlots();
+                disableBookedSlots(res.blocked_for_user || []);
                 disablePastSlots(date);
             },
             complete: function () {

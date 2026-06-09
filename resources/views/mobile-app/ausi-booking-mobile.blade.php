@@ -105,19 +105,19 @@
         </div>
 
         <div id="debugPanel" style="
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        max-height: 220px;
-        overflow: auto;
-        background: #111;
-        color: #0f0;
-        font-size: 11px;
-        padding: 10px;
-        z-index: 99999;
-        font-family: monospace;
-    ">
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-height: 220px;
+            overflow: auto;
+            background: #111;
+            color: #0f0;
+            font-size: 11px;
+            padding: 10px;
+            z-index: 99999;
+            font-family: monospace;
+        ">
             <strong>DEBUG PANEL</strong><br>
             <div id="debugLog"></div>
         </div>
@@ -126,6 +126,9 @@
     </div>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            alert("JS IS RUNNING");
+        });
         document.addEventListener('alpine:init', () => {
             Alpine.data('ausiBookingPage', () => ({
                 residences: [],

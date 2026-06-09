@@ -141,7 +141,7 @@
                                 dateFormat: "Y-m-d",
                                 minDate: new Date().fp_incr(1),
                                 onChange: (selectedDates, dateStr) => {
-                                    window.safeUpdateSlots(dateStr);
+                                    window.updateSlots(dateStr);
                                 }
                             });
 

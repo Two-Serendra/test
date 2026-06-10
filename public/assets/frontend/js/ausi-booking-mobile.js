@@ -52,7 +52,7 @@ $(function () {
         resetSlots();
 
         $.ajax({
-            url: "/mobile/ausi-booked-slots",
+            url: "/ausi-booked-slots-mobile",
             type: "GET",
             data: {
                 date,

@@ -32,7 +32,8 @@ $(function () {
 
         logDebug("updateSlots", date);
 
-        const unitName = Alpine.store('superapp')?.selectedUnit;
+        const unitName =
+            document.querySelector('select[name="resident_id_ausi"]')?.value;
 
         logDebug("unitName", unitName);
 

@@ -33,59 +33,11 @@ class FrontendAusiBookingController extends Controller
         return view('mobile-app.ausi-booking-mobile');
     }
 
-    private function normalizeUnitNo($input)
-    {
-        $input = trim($input);
-
-        $map = [
-            "Almond" => "A",
-            "Belize" => "B",
-            "Callery" => "C",
-            "Dolce" => "D",
-            "Encino" => "E",
-            "Aston" => "F",
-            "ReadOak" => "G",
-            "Meranti" => "H",
-            "Sequoia" => "I",
-        ];
-
-        // CASE 1: already 999H
-        if (preg_match('/^(\d+)([A-Z])$/', $input, $m)) {
-            return $m[1] . $m[2];
-        }
-
-        // CASE 2: "Meranti 999"
-        if (str_contains($input, ' ')) {
-            [$tower, $number] = array_pad(explode(' ', $input), 2, null);
-
-            if (!$tower || !$number)
-                return null;
-
-            $letter = $map[$tower] ?? null;
-
-            if (!$letter)
-                return null;
-
-            return $number . $letter;
-        }
-
-        return null;
-    }
-
 
 
     public function getBookedSlotsAusi(Request $request)
     {
-        $unitNo = $this->normalizeUnitNo($request->resident_id);
-
-        if (!$unitNo) {
-            return response()->json([
-                'message' => 'Invalid unit format',
-            ], 422);
-        }
-
-        $resident = ResidentDetails::where('unit_no', $unitNo)->firstOrFail();
-
+        $resident = ResidentDetails::where('unit_no', $request->unit_no)->firstOrFail();
         $areaLetter = preg_replace('/[^A-Z]/', '', $resident->unit_no);
 
         $lowrise = ['A', 'B', 'C', 'D', 'E'];
@@ -116,16 +68,23 @@ class FrontendAusiBookingController extends Controller
         $blockedForUser = [];
 
         foreach ($slotStatus as $slot => $status) {
+            // If same tower already booked → block for user
             if ($status[$userGroup]) {
                 $blockedForUser[] = $slot;
             }
         }
+
+        \Log::info('AUSI SLOT RESPONSE', [
+            'blocked_for_user' => $blockedForUser,
+            'raw_status_count' => count($slotStatus),
+        ]);
 
         return response()->json([
             'blocked_for_user' => $blockedForUser,
             'raw_status' => $slotStatus
         ]);
     }
+
     // public function storeAusiBooking(Request $request)
     // {
     //     $maxRetries = 3;

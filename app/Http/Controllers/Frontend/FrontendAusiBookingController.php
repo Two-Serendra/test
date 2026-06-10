@@ -37,72 +37,16 @@ class FrontendAusiBookingController extends Controller
 
     public function getBookedSlotsAusi(Request $request)
     {
-        \Log::info('AUSI SLOT REQUEST START', [
-            'raw_resident_id' => $request->resident_id,
+
+        \Log::info('AUSI SLOT REQUEST', [
+            'resident_id' => $request->resident_id,
             'date' => $request->date,
-            'auth_check' => auth()->check(),
-            'user_email' => auth()->user()?->email,
+            'auth' => auth()->check(),
+            'user' => auth()->user()?->email,
         ]);
-
-        $unit = trim($request->resident_id);
-
-        // default values
-        $number = null;
-        $towerLetter = null;
-
-        // CASE 1: "Meranti 999"
-        if (str_contains($unit, ' ')) {
-            $parts = explode(' ', $unit);
-
-            $tower = $parts[0] ?? null;
-            $number = $parts[1] ?? null;
-
-            $map = [
-                "Almond" => "A",
-                "Belize" => "B",
-                "Callery" => "C",
-                "Dolce" => "D",
-                "Encino" => "E",
-                "Aston" => "F",
-                "ReadOak" => "G",
-                "Meranti" => "H",
-                "Sequoia" => "I",
-            ];
-
-            $towerLetter = $map[$tower] ?? null;
-        }
-
-        // CASE 2: "999H"
-        else {
-            preg_match('/^(\d+)([A-Z])$/', $unit, $matches);
-
-            $number = $matches[1] ?? null;
-            $towerLetter = $matches[2] ?? null;
-        }
-
-        if (!$number || !$towerLetter) {
-            return response()->json([
-                'message' => 'Invalid unit format',
-                'unit' => $unit
-            ], 422);
-        }
-
-
-
-        $unitNo = $number . $towerLetter;
-
-        $resident = ResidentDetails::where('unit_no', $unitNo)->firstOrFail();
-
-        $unitNo = $number . ($map[$tower] ?? '');
-
-        \Log::info('RESIDENT FOUND', [
-            'unit_no_lookup' => $unitNo,
-            'resident_id' => $resident->id ?? null,
-            'resident_unit_no' => $resident->unit_no ?? null,
-        ]);
-
+        $resident = ResidentDetails::findOrFail($request->resident_id);
+        
         $areaLetter = preg_replace('/[^A-Z]/', '', $resident->unit_no);
-
 
         $lowrise = ['A', 'B', 'C', 'D', 'E'];
         $highrise = ['F', 'G', 'H', 'I'];
@@ -145,16 +89,7 @@ class FrontendAusiBookingController extends Controller
 
         return response()->json([
             'blocked_for_user' => $blockedForUser,
-            'raw_status' => $slotStatus,
-
-            'debug' => [
-                'input_unit' => $unit,
-                'parsed_number' => $number,
-                'parsed_tower' => $towerLetter,
-                'computed_unit_no' => $unitNo,
-                'resident_found' => $resident->unit_no ?? null,
-                'user_group' => $userGroup,
-            ]
+            'raw_status' => $slotStatus
         ]);
     }
 

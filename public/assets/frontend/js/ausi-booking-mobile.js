@@ -28,11 +28,18 @@ $(function () {
         }
     });
 
+    document.addEventListener('change', (e) => {
+        if (e.target.id === 'resident_id_ausi') {
+            Alpine.store('superapp').selectedUnit = e.target.value;
+            logDebug("SYNC STORE", e.target.value);
+        }
+    });
+
     function updateSlots(date) {
 
         logDebug("updateSlots", date);
 
-        const unitName = Alpine.store('superapp')?.selectedUnit;
+        const unitName = document.querySelector('#resident_id_ausi')?.value || '';
 
         logDebug("unitName", unitName);
 

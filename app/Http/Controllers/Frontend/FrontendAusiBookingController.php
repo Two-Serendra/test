@@ -37,14 +37,9 @@ class FrontendAusiBookingController extends Controller
 
     public function getBookedSlotsAusi(Request $request)
     {
-
-        \Log::info('AUSI SLOT REQUEST', [
-            'resident_id' => $request->resident_id,
-            'date' => $request->date,
-            'auth' => auth()->check(),
-            'user' => auth()->user()?->email,
-        ]);
         $resident = ResidentDetails::findOrFail($request->resident_id);
+
+        dd($resident);
         
         $areaLetter = preg_replace('/[^A-Z]/', '', $resident->unit_no);
 

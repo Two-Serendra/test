@@ -38,7 +38,6 @@ class FrontendAusiBookingController extends Controller
     public function getBookedSlotsAusi(Request $request)
     {
         $resident = ResidentDetails::findOrFail($request->resident_id);
-
         $areaLetter = preg_replace('/[^A-Z]/', '', $resident->unit_no);
 
         $lowrise = ['A', 'B', 'C', 'D', 'E'];

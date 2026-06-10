@@ -21,6 +21,7 @@ use App\Http\Controllers\Frontend\GreaseTrapController;
 use App\Http\Controllers\Frontend\PestControlController;
 use App\Http\Controllers\Backend\FitnessHubController;
 use App\Http\Controllers\Frontend\FitnessHubBookingController;
+use App\Http\Controllers\MobileAppController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -206,14 +207,12 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware(['miniapp.webview'])->group(function () {
-    Route::get('/ausi-booking-mobile', [FrontendAusiBookingController::class, 'ausiBookingUserMobile']);
-
-    
-    Route::get('/ausi-booked-slots-mobile', [FrontendAusiBookingController::class, 'getBookedSlotsAusi']);
-    Route::post('/ausi-booking-mobile/store', [FrontendAusiBookingController::class, 'storeAusiBooking']);
-    Route::post('/ausi-booking-mobile/cancel/{booking}', [FrontendAusiBookingController::class, 'CancelAusiBooking'])
+    Route::get('/ausi-booking-mobile', [MobileAppController::class, 'ausiBookingUserMobile']);
+    Route::get('/ausi-booked-slots-mobile', [MobileAppController::class, 'getBookedSlotsAusiMobile']);
+    Route::post('/ausi-booking-mobile/store', [MobileAppController::class, 'storeAusiBooking']);
+    Route::post('/ausi-booking-mobile/cancel/{booking}', [MobileAppController::class, 'CancelAusiBooking'])
         ->middleware('throttle:5,1');
-    Route::get('/ausi-booking-details/{id}', [FrontendAusiBookingController::class, 'showAusiBookingDetails']);
+    Route::get('/ausi-booking-details/{id}', [MobileAppController::class, 'showAusiBookingDetails']);
 });
 Route::middleware('web')
     ->prefix('admin')

@@ -38,6 +38,9 @@ $(function () {
 
         if (!date || !unitName) return;
 
+        logDebug("STORE TEST", Alpine.store('superapp'));
+        logDebug("SELECTED UNIT", Alpine.store('superapp')?.selectedUnit);
+
         showLoading();
         resetSlots();
 
@@ -70,7 +73,7 @@ $(function () {
             }
         });
     }
-    
+
     $(document).on(
         "change",
         "#AusiBookingDate",

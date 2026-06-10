@@ -105,18 +105,18 @@
         </div>
 
         <div id="debugPanel" style="
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 200px;
-            overflow: auto;
-            background: black;
-            color: #00ff00;
-            font-size: 11px;
-            z-index: 99999;
-            padding: 10px;
-        "></div>
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 200px;
+                overflow: auto;
+                background: black;
+                color: #00ff00;
+                font-size: 11px;
+                z-index: 99999;
+                padding: 10px;
+            "></div>
 
     </div>
 
@@ -125,6 +125,13 @@
             alert("JS IS RUNNING");
         });
         document.addEventListener('alpine:init', () => {
+            Alpine.store('superapp', {
+                selectedUnit: '',
+                units: [],
+                isLoading: false,
+                bridge: null
+            });
+            
             Alpine.data('ausiBookingPage', () => ({
                 residences: [],
                 selectedResidence: null,

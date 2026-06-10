@@ -34,7 +34,6 @@
                                     </select>
                                 </dd>
                             </dl>
-
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Date <span class="required">*</span></label>

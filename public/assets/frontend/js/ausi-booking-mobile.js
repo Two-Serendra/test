@@ -32,8 +32,7 @@ $(function () {
 
         logDebug("updateSlots", date);
 
-        const unitName =
-            document.querySelector('select[name="resident_id_ausi"]')?.value;
+        const unitName = Alpine.store('superapp')?.selectedUnit;
 
         logDebug("unitName", unitName);
 
@@ -71,6 +70,7 @@ $(function () {
             }
         });
     }
+    
     $(document).on(
         "change",
         "#AusiBookingDate",

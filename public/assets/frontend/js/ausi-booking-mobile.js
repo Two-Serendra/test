@@ -32,63 +32,44 @@ $(function () {
 
         logDebug("updateSlots", date);
 
-        if (!date) return;
+        const unitName =
+            document.querySelector('select[name="resident_id_ausi"]')?.value;
 
-        const residentId =
-            document.querySelector(
-                'select[name="resident_id_ausi"]'
-            )?.value;
+        logDebug("unitName", unitName);
 
-        logDebug("resident", residentId);
-
-        if (!residentId) return;
+        if (!date || !unitName) return;
 
         showLoading();
-
         resetSlots();
 
         $.ajax({
-
-            url: "/ausi-booked-slots-mobile",
+            url: "/mobile/ausi-booked-slots",
             type: "GET",
-            headers: {
-                "x-miniapp-token": Alpine.store('superapp')?.token
-            },
             data: {
                 date,
-                resident_id: residentId
+                unit_name: unitName
             },
-            success: function (res) {
 
-                logDebug("AJAX SUCCESS", res);
+            success: function (res) {
+                logDebug("SUCCESS", res);
 
                 resetSlots();
-
                 disableBookedSlots(res.blocked_for_user || []);
-
                 disablePastSlots(date);
-
             },
 
             error: function (xhr) {
-
-                logDebug("AJAX ERROR", {
+                logDebug("ERROR", {
                     status: xhr.status,
                     response: xhr.responseText
                 });
-
             },
 
             complete: function () {
-
-                logDebug("AJAX COMPLETE");
-
+                logDebug("COMPLETE");
                 hideLoading();
-
             }
-
         });
-
     }
 
     $(document).on(

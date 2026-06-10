@@ -16,15 +16,11 @@ class MobileAppController extends Controller
     public function getBookedSlotsAusiMobile(Request $request)
     {
         $unitName = trim($request->unit_name);
-        // e.g. "Meranti 999"
-
         if (!$unitName) {
             return response()->json([
                 'message' => 'unit_name is required'
             ], 422);
         }
-
-        // same mapping as your frontend
         $map = [
             "Almond" => "A",
             "Belize" => "B",
@@ -55,8 +51,6 @@ class MobileAppController extends Controller
                 'message' => 'Unknown tower',
             ], 422);
         }
-
-        // convert to DB format: 999H
         $unitNo = $number . $towerLetter;
 
         $resident = ResidentDetails::where('unit_no', $unitNo)->first();

@@ -35,13 +35,18 @@ $(function () {
         const unitName =
             document.querySelector('select[name="resident_id_ausi"]')?.value
             || Alpine.store('superapp')?.selectedUnit;
-            
+
         logDebug("unitName", unitName);
 
         if (!date || !unitName) return;
 
         showLoading();
         resetSlots();
+
+        logDebug("REQUEST PAYLOAD", {
+            date: date,
+            unit_name: unitName
+        });
 
         $.ajax({
             url: "/mobile/ausi-booked-slots",
@@ -123,8 +128,7 @@ $(function () {
 
         bookedSlots.forEach(function (slot) {
 
-            const radio =
-                $('.ausi-booking-slot[data-slot="' + slot + '"]');
+            const unitName = Alpine.store('superapp').selectedUnit;
 
             if (!radio.length) return;
 

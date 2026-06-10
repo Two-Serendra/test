@@ -28,7 +28,7 @@
                                         <option value="">-- Select Residence --</option>
 
                                         <template x-for="(unit, index) in $store.superapp.units" :key="index">
-                                            <option :value="unit.id" x-text="`${unit.role ?? ''} ${formatUnit(unit.name)}`">
+                                            <option :value="unit.name" x-text="`${unit.role ?? ''} ${unit.name}`">
                                             </option>
                                         </template>
                                     </select>
@@ -106,18 +106,18 @@
         </div>
 
         <div id="debugPanel" style="
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 200px;
-        overflow: auto;
-        background: black;
-        color: #00ff00;
-        font-size: 11px;
-        z-index: 99999;
-        padding: 10px;
-    "></div>
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            overflow: auto;
+            background: black;
+            color: #00ff00;
+            font-size: 11px;
+            z-index: 99999;
+            padding: 10px;
+        "></div>
 
     </div>
 
@@ -150,31 +150,6 @@
                         showHome: false,
                     });
                 },
-
-                formatUnit(name) {
-                    if (!name) return '';
-
-                    const parts = name.split(' ');
-
-                    // expected: "Meranti 999"
-                    const tower = parts[0];   // Meranti
-                    const number = parts[1];  // 999
-
-                    const map = {
-                        "Almond": "A",
-                        "Belize": "B",
-                        "Callery": "C",
-                        "Dolce": "D",
-                        "Encino": "E",
-                        "Aston": "F",
-                        "ReadOak": "G",
-                        "Meranti": "H",
-                        "Sequoia": "I",
-                    };
-
-                    return `${number}${map[tower] ?? ''}`;
-                },
-
             }));
         });
     </script>

@@ -38,14 +38,40 @@ class FrontendAusiBookingController extends Controller
     public function getBookedSlotsAusi(Request $request)
     {
 
-        \Log::info('AUSI SLOT REQUEST', [
-            'resident_id' => $request->resident_id,
-            'date' => $request->date,
-            'auth' => auth()->check(),
-            'user' => auth()->user()?->email,
-        ]);
-        $resident = ResidentDetails::findOrFail($request->resident_id);
-        
+        $unit = trim($request->resident_id);
+
+        // Already in database format: 999H
+        if (preg_match('/^\d+[A-Z]$/', $unit)) {
+
+            $unitNo = $unit;
+
+        } else {
+
+            // Mobile format: Meranti 999
+            $parts = explode(' ', $unit);
+
+            $tower = $parts[0];
+            $number = $parts[1];
+
+            $map = [
+                "Almond" => "A",
+                "Belize" => "B",
+                "Callery" => "C",
+                "Dolce" => "D",
+                "Encino" => "E",
+                "Aston" => "F",
+                "ReadOak" => "G",
+                "Meranti" => "H",
+                "Sequoia" => "I",
+            ];
+
+            $unitNo = $number . ($map[$tower] ?? '');
+        }
+
+        $resident = ResidentDetails::where('unit_no', $unitNo)->firstOrFail();
+
+        $unitNo = $number . ($map[$tower] ?? '');
+
         $areaLetter = preg_replace('/[^A-Z]/', '', $resident->unit_no);
 
         $lowrise = ['A', 'B', 'C', 'D', 'E'];

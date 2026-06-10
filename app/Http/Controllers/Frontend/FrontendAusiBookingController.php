@@ -33,15 +33,13 @@ class FrontendAusiBookingController extends Controller
         return view('mobile-app.ausi-booking-mobile');
     }
 
-
+    
 
     public function getBookedSlotsAusi(Request $request)
     {
 
-        $resident = ResidentDetails::where('id', $request->resident_id)
-            ->where('user_id', auth()->id())
-            ->firstOrFail();
-
+        $resident = ResidentDetails::findOrFail($request->resident_id);
+        
         $areaLetter = preg_replace('/[^A-Z]/', '', $resident->unit_no);
 
         $lowrise = ['A', 'B', 'C', 'D', 'E'];
@@ -77,11 +75,6 @@ class FrontendAusiBookingController extends Controller
                 $blockedForUser[] = $slot;
             }
         }
-
-        \Log::info('AUSI SLOT RESPONSE', [
-            'blocked_for_user' => $blockedForUser,
-            'raw_status_count' => count($slotStatus),
-        ]);
 
         return response()->json([
             'blocked_for_user' => $blockedForUser,

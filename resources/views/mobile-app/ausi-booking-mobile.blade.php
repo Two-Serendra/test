@@ -125,11 +125,7 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            alert("JS IS RUNNING");
-        });
         document.addEventListener('alpine:init', () => {
-
             Alpine.data('ausiBookingPage', () => ({
                 residences: [],
                 selectedResidence: null,

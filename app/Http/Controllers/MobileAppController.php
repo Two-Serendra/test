@@ -191,20 +191,20 @@ class MobileAppController extends Controller
 
                 $email = $request->email;
 
-                $resident = ResidentDetails::where('email', $email)
-                    ->lockForUpdate()
-                    ->first();
+                if (!$email) {
+                    return response()->json(['message' => 'Missing email'], 401);
+                }
 
-                $userId = $resident->user_id;
-                $unitNo = $resident->unit_no; // OR mapped if needed
-                
+                $resident = ResidentDetails::where('email', $email)->first();
+
                 if (!$resident) {
                     return response()->json([
-                        'message' => 'Resident not found for email',
-                        'debug' => ['email' => $email]
+                        'message' => 'Resident not found',
+                        'debug' => $email
                     ], 404);
                 }
 
+                $userId = $resident->user_id;
                 if (!$resident) {
                     DB::rollBack();
                     return response()->json([

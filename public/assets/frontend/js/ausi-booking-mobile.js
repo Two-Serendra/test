@@ -220,4 +220,182 @@ $(function () {
         $(".ausi-booking-slot").prop("disabled", true);
 
     });
+
+    $(document).on('submit', '#userAusiNewBooking', function (event) {
+
+        event.preventDefault();
+
+        logDebug("SUBMIT FIRED");
+
+        const form = this;
+        const $submitBtn = $('#saveUserAusiBtn');
+
+        const selectedDate = $('#AusiBookingDate').val();
+        const selectedUnit = $('#resident_id_ausi').val();
+        const selectedSlot = $('input[name="booking_time_slot"]:checked').val();
+
+        // =====================
+        // VALIDATION
+        // =====================
+
+        if (!selectedUnit) {
+            logDebug("NO UNIT SELECTED");
+            return;
+        }
+
+        if (!selectedDate) {
+            logDebug("NO DATE SELECTED");
+            return;
+        }
+
+        if (!selectedSlot) {
+            logDebug("NO SLOT SELECTED");
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Time Slot Required',
+                text: 'Please select a booking time slot.'
+            });
+
+            return;
+        }
+
+        // native validation
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return;
+        }
+
+        form.classList.remove('was-validated');
+
+        // =====================
+        // BUTTON LOCK
+        // =====================
+
+        const originalHtml = $submitBtn.html();
+
+        function lockBtn() {
+            $submitBtn
+                .prop('disabled', true)
+                .html(`<div class="spinner-border spinner-border-sm text-light"></div>`);
+        }
+
+        function unlockBtn() {
+            $submitBtn
+                .prop('disabled', false)
+                .html(originalHtml);
+        }
+
+        // =====================
+        // AJAX
+        // =====================
+
+        function send(forceOverride = false) {
+
+            logDebug("SENDING BOOKING");
+
+            const formData = new FormData(form);
+
+            if (forceOverride) {
+                formData.append('force_override', '1');
+            }
+
+            lockBtn();
+
+            $.ajax({
+                url: form.action,
+                type: form.method,
+                data: formData,
+                processData: false,
+                contentType: false,
+
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+
+                success: function (res) {
+
+                    logDebug("SUCCESS", res);
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Booking Successful',
+                        text: res.message ?? 'Your booking has been saved',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+
+                    form.reset();
+                    resetSlots();
+
+                },
+
+                error: function (xhr) {
+
+                    const res = xhr.responseJSON || {};
+
+                    logDebug("ERROR", xhr.status);
+
+                    // validation
+                    if (xhr.status === 422) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Validation Error',
+                            text: 'Please check required fields'
+                        });
+                        return;
+                    }
+
+                    // slot taken
+                    if (xhr.status === 409 && res.type === 'slot_taken') {
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Slot Already Taken',
+                            text: res.message
+                        });
+
+                        updateSlots(selectedDate);
+                        return;
+                    }
+
+                    // duplicate booking
+                    if (xhr.status === 409 && res.type === 'unit_already_booked') {
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Already Booked',
+                            text: res.message,
+                            showCancelButton: true,
+                            confirmButtonText: 'Book Anyway'
+                        }).then((result) => {
+
+                            if (result.isConfirmed) {
+                                send(true);
+                            } else {
+                                unlockBtn();
+                            }
+
+                        });
+
+                        return;
+                    }
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Something went wrong'
+                    });
+
+                },
+
+                complete: function () {
+                    unlockBtn();
+                }
+            });
+        }
+
+        send();
+
+    });
 });

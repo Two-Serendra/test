@@ -5,6 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\AusiBooking;
 use App\Models\ResidentDetails;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\UserAusiBookingConfirmation;
+use App\Mail\ConciergeAusiBookingConfirmation;
+use App\Events\AusiBookingCreated;
+// use App\Notifications\UserAusiBookingBellNotification;
 
 class MobileAppController extends Controller
 {
@@ -114,5 +122,139 @@ class MobileAppController extends Controller
             'blocked_for_user' => $blockedForUser,
             'raw_status' => $slotStatus
         ]);
+    }
+
+    public function storeAusiBookingMobile(Request $request)
+    {
+        $maxRetries = 3;
+        $attempt = 0;
+
+        $towerGroups = [
+            'A' => 'lowrise',
+            'B' => 'lowrise',
+            'C' => 'lowrise',
+            'D' => 'lowrise',
+            'E' => 'lowrise',
+            'F' => 'highrise',
+            'G' => 'highrise',
+            'H' => 'highrise',
+            'I' => 'highrise',
+        ];
+
+        while ($attempt < $maxRetries) {
+            try {
+                DB::beginTransaction();
+                $userId = $request->user_id;
+                $email = $request->email;
+
+                if (!$userId || !$email) {
+                    return response()->json([
+                        'message' => 'Missing mobile user context'
+                    ], 401);
+                }
+
+                $resident = ResidentDetails::where('id', $request->resident_id_ausi)
+                    ->where('email', $email)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$resident) {
+                    DB::rollBack();
+                    return response()->json([
+                        'message' => 'Unauthorized unit selection.'
+                    ], 403);
+                }
+
+                $bookingDate = Carbon::parse($request->booking_date)->toDateString();
+
+                $areaLetter = preg_replace('/[^A-Z]/', '', $resident->unit_no);
+                $towerGroup = $towerGroups[$areaLetter] ?? null;
+
+                if (!$towerGroup) {
+                    DB::rollBack();
+                    return response()->json(['message' => 'Unknown area for your unit.'], 422);
+                }
+
+                $towerAreas = $towerGroup === 'lowrise'
+                    ? ['A', 'B', 'C', 'D', 'E']
+                    : ['F', 'G', 'H', 'I'];
+
+                $existingBookings = AusiBooking::whereDate('booking_date', $bookingDate)
+                    ->whereIn('unit_area', $towerAreas)
+                    ->where('booking_status', 1)
+                    ->lockForUpdate()
+                    ->get();
+
+                $slotTaken = $existingBookings->contains(
+                    'booking_time_slot',
+                    $request->booking_time_slot
+                );
+
+                if ($slotTaken) {
+                    DB::rollBack();
+                    return response()->json([
+                        'message' => 'Slot already taken just now.',
+                        'type' => 'slot_taken'
+                    ], 409);
+                }
+
+                $existingUnitBooking = AusiBooking::where('unit_no', strtoupper($resident->unit_no))
+                    ->where('booking_status', 1)
+                    ->whereYear('booking_date', $bookingDate)
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($existingUnitBooking && !$request->boolean('force_override')) {
+                    DB::rollBack();
+                    return response()->json([
+                        'message' => 'Unit already has a booking this year.',
+                        'type' => 'unit_already_booked'
+                    ], 409);
+                }
+
+                $booking = AusiBooking::create([
+                    'user_id' => $userId,
+                    'created_by' => $userId,
+                    'transaction_no' => '',
+                    'unit_no' => strtoupper($resident->unit_no),
+                    'resident_type' => $resident->resident_type,
+                    'name' => strtoupper($request->name ?? 'MOBILE USER'),
+                    'booking_date' => $bookingDate,
+                    'booking_time_slot' => $request->booking_time_slot,
+                    'unit_area' => $areaLetter,
+                ]);
+
+                $booking->transaction_no = '2AUSI-' . str_pad($booking->id, 5, '0', STR_PAD_LEFT);
+                $booking->save();
+
+                DB::afterCommit(function () use ($booking, $email, $userId) {
+
+                    // 👇 same emails as web
+                    Mail::to($email)
+                        ->queue(new UserAusiBookingConfirmation($booking));
+
+                    Mail::to('concierge@twoserendra.com')
+                        ->queue(new ConciergeAusiBookingConfirmation($booking));
+
+                    // 👇 keep event system
+                    event(new AusiBookingCreated($booking));
+
+                    // // 👇 notification (if user relation exists)
+                    // if ($booking->user) {
+                    //     $booking->user->notify(new UserAusiBookingBellNotification($booking));
+                    // }
+                });
+
+            } catch (\Throwable $e) {
+                DB::rollBack();
+                Log::error('Mobile AUSI Booking Error', [
+                    'error' => $e->getMessage()
+                ]);
+
+                return response()->json([
+                    'message' => 'Server error'
+                ], 500);
+            }
+        }
     }
 }

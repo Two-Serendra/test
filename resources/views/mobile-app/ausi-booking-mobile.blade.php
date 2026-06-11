@@ -81,7 +81,8 @@
                                 @foreach ($slots as $slot)
                                     <div class="col-lg-3 col-md-4 col-6">
                                         <input type="radio" class="btn-check ausi-booking-slot" name="booking_time_slot"
-                                            id="slot{{ $loop->index }}" value="{{ $slot }}" data-slot="{{ $slot }}"  disabled required>
+                                            id="slot{{ $loop->index }}" value="{{ $slot }}" data-slot="{{ $slot }}" disabled
+                                            required>
 
                                         <label class="btn btn-outline-primary disabled w-100 py-2" for="slot{{ $loop->index }}">
                                             {{ $slot }}
@@ -105,18 +106,19 @@
         </div>
 
         <div id="debugPanel" style="
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 200px;
-            overflow: auto;
-            background: black;
-            color: #00ff00;
-            font-size: 11px;
-            z-index: 99999;
-            padding: 10px;
-        "></div>
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 140px;
+        overflow: auto;
+        background: black;
+        color: #00ff00;
+        font-size: 11px;
+        z-index: 99999;
+        padding: 10px;
+    ">
+        </div>
 
     </div>
 
@@ -125,7 +127,7 @@
             alert("JS IS RUNNING");
         });
         document.addEventListener('alpine:init', () => {
-            
+
             Alpine.data('ausiBookingPage', () => ({
                 residences: [],
                 selectedResidence: null,

@@ -144,15 +144,16 @@ class MobileAppController extends Controller
         while ($attempt < $maxRetries) {
             try {
                 DB::beginTransaction();
-                $userId = $request->user_id;
+                $userId = ResidentDetails::where('email', $email)->value('user_id');
                 $email = $request->email;
 
-                if (!$userId || !$email) {
+                $email = $request->email;
+
+                if (!$email) {
                     return response()->json([
-                        'message' => 'Missing mobile user context'
+                        'message' => 'Missing user email context'
                     ], 401);
                 }
-
                 $resident = ResidentDetails::where('id', $request->resident_id_ausi)
                     ->where('email', $email)
                     ->lockForUpdate()

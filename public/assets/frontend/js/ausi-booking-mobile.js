@@ -92,7 +92,9 @@ $(function () {
         const date = $('#AusiBookingDate').val();
         const slot = $('input[name="booking_time_slot"]:checked').val();
 
-        $('#saveUserAusiBtn').prop('disabled', !(unit && date && slot));
+        const isReady = !!(unit && date && slot);
+
+        $('#saveUserAusiBtn').prop('disabled', !isReady);
     }
 
     $(document).on('change', '#resident_id_ausi, #AusiBookingDate, input[name="booking_time_slot"]', checkFormReady);
@@ -138,6 +140,7 @@ $(function () {
                 )
                 .addClass("btn-outline-primary")
                 .css("cursor", "pointer");
+            checkFormReady();
 
         });
 
@@ -244,10 +247,10 @@ $(function () {
         const selectedDate = $('#AusiBookingDate').val();
         const selectedUnit = $('#resident_id_ausi').val();
         const selectedSlot = $('input[name="booking_time_slot"]:checked').val();
+        const store = Alpine.store('superapp');
 
-        // =====================
-        // VALIDATION
-        // =====================
+        formData.append('user_id', store?.user?.id || '');
+        formData.append('email', store?.user?.email || '');
 
         if (!selectedUnit) {
             logDebug("NO UNIT SELECTED");
@@ -271,17 +274,12 @@ $(function () {
             return;
         }
 
-        // native validation
         if (!form.checkValidity()) {
             form.classList.add('was-validated');
             return;
         }
 
         form.classList.remove('was-validated');
-
-        // =====================
-        // BUTTON LOCK
-        // =====================
 
         const originalHtml = $submitBtn.html();
 
@@ -296,10 +294,6 @@ $(function () {
                 .prop('disabled', false)
                 .html(originalHtml);
         }
-
-        // =====================
-        // AJAX
-        // =====================
 
         function send(forceOverride = false) {
 
@@ -347,7 +341,6 @@ $(function () {
 
                     logDebug("ERROR", xhr.status);
 
-                    // validation
                     if (xhr.status === 422) {
                         Swal.fire({
                             icon: 'error',
@@ -357,7 +350,6 @@ $(function () {
                         return;
                     }
 
-                    // slot taken
                     if (xhr.status === 409 && res.type === 'slot_taken') {
 
                         Swal.fire({
@@ -370,7 +362,6 @@ $(function () {
                         return;
                     }
 
-                    // duplicate booking
                     if (xhr.status === 409 && res.type === 'unit_already_booked') {
 
                         Swal.fire({
@@ -405,8 +396,6 @@ $(function () {
                 }
             });
         }
-
         send();
-
     });
 });

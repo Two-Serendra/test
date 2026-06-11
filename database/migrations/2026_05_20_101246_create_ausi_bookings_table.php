@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->id();
             $table->string('transaction_no')->unique();
             $table->unsignedBigInteger('user_id');
+            $table->string('email');
             $table->string('unit_no');
             $table->string('resident_type');
             $table->string('name');

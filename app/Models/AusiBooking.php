@@ -12,6 +12,7 @@ class AusiBooking extends Model
     protected $fillable = [
         'transaction_no',
         'user_id',
+        'email',
         'unit_no',
         'resident_type',
         'name',

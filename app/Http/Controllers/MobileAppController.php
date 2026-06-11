@@ -283,6 +283,7 @@ class MobileAppController extends Controller
                 $booking = AusiBooking::create([
                     'user_id' => $userId,
                     'created_by' => $userId,
+                    'email' => $email,
                     'transaction_no' => '',
                     'unit_no' => strtoupper($resident->unit_no),
                     'resident_type' => $resident->resident_type,

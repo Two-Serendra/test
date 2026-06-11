@@ -392,7 +392,7 @@ $(function () {
                             if (result.isConfirmed) {
                                 send(true);
                             } else {
-                                unlockBtn();
+                                unlockSubmitBtn();
                             }
 
                         });
@@ -409,7 +409,7 @@ $(function () {
                 },
 
                 complete: function () {
-                    unlockBtn();
+                    unlockSubmitBtn();
                 }
             });
         }

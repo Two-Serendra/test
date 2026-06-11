@@ -236,18 +236,19 @@ $(function () {
     });
 
     $(document).on('submit', '#userAusiNewBooking', function (event) {
-
         event.preventDefault();
         logDebug("SUBMIT FIRED");
-        const form = this;
+        const formData = new FormData(form);
+        const store = Alpine.store('superapp');
+        formData.append('user_id', store?.user?.id || '');
+        formData.append('email', store?.user?.email || '');
+        formData.append('unit_name', $('#resident_id_ausi').val());
         const $submitBtn = $('#saveUserAusiBtn');
         const selectedDate = $('#AusiBookingDate').val();
         const selectedUnit = $('#resident_id_ausi').val();
         const selectedSlot = $('input[name="booking_time_slot"]:checked').val();
-        const store = Alpine.store('superapp');
 
-        formData.append('user_id', store?.user?.id || '');
-        formData.append('email', store?.user?.email || '');
+
 
         if (!selectedUnit) {
             logDebug("NO UNIT SELECTED");
@@ -345,6 +346,7 @@ $(function () {
                     const res = xhr.responseJSON || {};
 
                     logDebug("ERROR", xhr.status);
+                    logDebug("RESPONSE", res);
 
                     if (xhr.status === 422) {
                         Swal.fire({

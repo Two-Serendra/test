@@ -131,11 +131,11 @@ class MobileAppController extends Controller
         $attempt = 0;
         $debug = [];
 
-        $unitName = trim($request->unit_name);
+        $unitName = trim($request->mobile_unit_name);
 
         if (!$unitName) {
             return response()->json([
-                'message' => 'unit_name is required'
+                'message' => 'mobile_unit_name is required'
             ], 422);
         }
 

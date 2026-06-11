@@ -251,15 +251,13 @@ $(function () {
     $(document).on('submit', '#userAusiNewBookingMobile', function (event) {
         event.preventDefault();
         logDebug("SUBMIT FIRED");
+        const form = this;
         const formData = new FormData(form);
         const selected = $('#resident_id_ausi').find(':selected');
-
-        formData.set('email', $('#mobile_email').val());
-        formData.set('unit_name', $('#resident_id_ausi').val());
-
-        formData.set('mobile_unit_name', selected.data('name') || '');
-        formData.set('mobile_unit_role', selected.data('role') || '');
-
+        const selectedDate = $('#AusiBookingDate').val();
+        const selectedUnit = $('#resident_id_ausi').val();
+        const selectedSlot = $('input[name="booking_time_slot"]:checked').val();
+        const $submitBtn = $('#saveUserAusiBtn');
 
         if (!selectedUnit) {
             logDebug("NO UNIT SELECTED");
@@ -307,9 +305,6 @@ $(function () {
         function send(forceOverride = false) {
 
             logDebug("SENDING BOOKING");
-
-            const formData = new FormData(form);
-
             if (forceOverride) {
                 formData.append('force_override', '1');
             }

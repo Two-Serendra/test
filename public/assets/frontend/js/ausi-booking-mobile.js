@@ -252,8 +252,6 @@ $(function () {
         event.preventDefault();
         const form = this;
         logDebug("SUBMIT FIRED");
-        const formData = new FormData(form);
-        const selected = $('#resident_id_ausi').find(':selected');
         const selectedDate = $('#AusiBookingDate').val();
         const selectedUnit = $('#resident_id_ausi').val();
         const selectedSlot = $('input[name="booking_time_slot"]:checked').val();
@@ -288,50 +286,50 @@ $(function () {
 
         form.classList.remove('was-validated');
 
-        const originalHtml = $submitBtn.html();
+        const originalWidth = $submitBtn.outerWidth();
 
-        function lockBtn() {
+        const lockSubmitBtn = () => {
             $submitBtn
-                .prop('disabled', true)
-                .html(`<div class="spinner-border spinner-border-sm text-light"></div>`);
-        }
+                .attr('disabled', true)
+                .html(`<div class="spinner-border spinner-border-sm text-light"></div>`)
+                .css('width', originalWidth + 'px');
+        };
 
-        function unlockBtn() {
+        const unlockSubmitBtn = () => {
             $submitBtn
-                .prop('disabled', false)
-                .html(originalHtml);
-        }
+                .attr('disabled', false)
+                .html(`<span class="btn-text">Submit</span>`)
+                .css('width', '');
+        };
 
-        function send(forceOverride = false) {
-
-            logDebug("SENDING BOOKING");
+        const sendBooking = (forceOverride = false) => {
+            alert("sending ajax");
             const formData = new FormData(form);
             if (forceOverride) {
-                formData.append('force_override', '1');
+                formData.append('force_override', true);
             }
 
-            lockBtn();
+            lockSubmitBtn();
 
+            alert($(form).attr('action'));
+            alert($(form).attr('method'));
             for (const pair of formData.entries()) {
-                logToPanel(pair[0] + " = " + pair[1]);
+                alert(pair[0] + " = " + pair[1]);
             }
 
             $.ajax({
-                url: form.action,
-                type: form.method,
+                url: $(form).attr('action'),
+                type: $(form).attr('method'),
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
                 data: formData,
                 processData: false,
                 contentType: false,
 
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-
                 beforeSend: function () {
                     logToPanel("🚀 REQUEST SENT TO: " + form.action);
                 },
-
-
                 success: function (res) {
 
                     logToPanel("SUCCESS");
@@ -415,6 +413,6 @@ $(function () {
                 }
             });
         }
-        send();
+        sendBooking();
     });
 });

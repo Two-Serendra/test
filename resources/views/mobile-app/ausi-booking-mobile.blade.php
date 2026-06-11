@@ -71,31 +71,24 @@
                             ]; 
                         @endphp
                         <div id="slotWrapper" class="position-relative">
-
                             <div id="slotLoading" class="slot-loading d-none">
                                 <div class="spinner-border text-primary" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
                             </div>
 
-                            <div class="slot-grid">
-
+                            <div class="row g-2">
                                 @foreach ($slots as $slot)
-                                    <div class="slot-item">
+                                    <div class="col-lg-3 col-md-4 col-6">
                                         <input type="radio" class="btn-check ausi-booking-slot" name="booking_time_slot"
-                                            id="slot{{ $loop->index }}" value="{{ $slot }}" data-slot="{{ $slot }}" disabled
-                                            required>
+                                            id="slot{{ $loop->index }}" value="{{ $slot }}" data-slot="{{ $slot }}"  disabled required>
 
-                                        <label class="slot-card" for="slot{{ $loop->index }}">
-                                            <span class="slot-text">
-                                                {{ $slot }}
-                                            </span>
+                                        <label class="btn btn-outline-primary disabled w-100 py-2" for="slot{{ $loop->index }}">
+                                            {{ $slot }}
                                         </label>
                                     </div>
                                 @endforeach
-
                             </div>
-
                         </div>
                     </div>
 
@@ -112,18 +105,18 @@
         </div>
 
         <div id="debugPanel" style="
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 200px;
-                overflow: auto;
-                background: black;
-                color: #00ff00;
-                font-size: 11px;
-                z-index: 99999;
-                padding: 10px;
-            "></div>
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            overflow: auto;
+            background: black;
+            color: #00ff00;
+            font-size: 11px;
+            z-index: 99999;
+            padding: 10px;
+        "></div>
 
     </div>
 
@@ -132,7 +125,7 @@
             alert("JS IS RUNNING");
         });
         document.addEventListener('alpine:init', () => {
-
+            
             Alpine.data('ausiBookingPage', () => ({
                 residences: [],
                 selectedResidence: null,

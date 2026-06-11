@@ -126,6 +126,7 @@ class MobileAppController extends Controller
 
     public function storeAusiBookingMobile(Request $request)
     {
+        \Log::info('AUSI MOBILE HIT', $request->all());
         $maxRetries = 3;
         $attempt = 0;
         $debug = [];

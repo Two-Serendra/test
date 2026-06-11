@@ -250,8 +250,9 @@ $(function () {
 
     $(document).on('submit', '#userAusiNewBookingMobile', function (event) {
         event.preventDefault();
-        logDebug("SUBMIT FIRED");
         const form = this;
+        logDebug("SUBMIT FIRED");
+
         const formData = new FormData(form);
         const selected = $('#resident_id_ausi').find(':selected');
         const selectedDate = $('#AusiBookingDate').val();
@@ -325,6 +326,11 @@ $(function () {
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
+
+                beforeSend: function () {
+                    logToPanel("🚀 REQUEST SENT TO: " + form.action);
+                },
+
 
                 success: function (res) {
 

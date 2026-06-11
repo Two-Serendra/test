@@ -41,6 +41,7 @@
     <link href="{{ asset('assets/frontend/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/frontend/css/style.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/frontend/css/custom.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/mobile-app/ausi-booking-mobile.css') }}" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <!-- <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet"> -->
@@ -100,4 +101,4 @@
     <script src="{{ asset('assets/frontend/js/ausi-booking-mobile.js') }}"></script>
 </body>
 
-</html> 
+</html>

@@ -130,6 +130,49 @@ class MobileAppController extends Controller
         $attempt = 0;
         $debug = [];
 
+        $unitName = trim($request->unit_name);
+
+        if (!$unitName) {
+            return response()->json([
+                'message' => 'unit_name is required'
+            ], 422);
+        }
+
+        $map = [
+            "Almond" => "A",
+            "Belize" => "B",
+            "Callery" => "C",
+            "Dolce" => "D",
+            "Encino" => "E",
+            "Aston" => "F",
+            "ReadOak" => "G",
+            "Meranti" => "H",
+            "Sequoia" => "I",
+        ];
+
+        $parts = explode(' ', $unitName);
+
+        if (count($parts) !== 2) {
+            return response()->json([
+                'message' => 'Invalid unit format',
+                'unit' => $unitName
+            ], 422);
+        }
+
+        [$tower, $number] = $parts;
+
+        $towerLetter = $map[$tower] ?? null;
+
+        if (!$towerLetter) {
+            return response()->json([
+                'message' => 'Unknown tower',
+                'tower' => $tower
+            ], 422);
+        }
+
+        $unitNo = strtoupper($number . $towerLetter);
+
+
         $towerGroups = [
             'A' => 'lowrise',
             'B' => 'lowrise',
@@ -148,21 +191,19 @@ class MobileAppController extends Controller
 
                 $email = $request->email;
 
-                if (empty($email)) {
-                    return response()->json([
-                        'message' => 'Missing user email context',
-                        'debug' => 'email is empty from request'
-                    ], 401);
-                }
-
-                $debug[] = "Email received: " . ($email ?? 'NULL');
-
-                $userId = ResidentDetails::where('email', $email)->value('user_id');
-
-                $resident = ResidentDetails::where('id', $request->resident_id_ausi)
-                    ->where('email', $email)
+                $resident = ResidentDetails::where('email', $email)
                     ->lockForUpdate()
                     ->first();
+
+                $userId = $resident->user_id;
+                $unitNo = $resident->unit_no; // OR mapped if needed
+                
+                if (!$resident) {
+                    return response()->json([
+                        'message' => 'Resident not found for email',
+                        'debug' => ['email' => $email]
+                    ], 404);
+                }
 
                 if (!$resident) {
                     DB::rollBack();
@@ -171,6 +212,9 @@ class MobileAppController extends Controller
                     ], 403);
                 }
 
+                $debug[] = "Resident found: YES";
+                $debug[] = "Unit No: " . $resident->unit_no;
+
                 $bookingDate = Carbon::parse($request->booking_date)->toDateString();
 
                 $areaLetter = preg_replace('/[^A-Z]/', '', $resident->unit_no);
@@ -178,23 +222,21 @@ class MobileAppController extends Controller
 
                 if (!$towerGroup) {
                     DB::rollBack();
-                    return response()->json(['message' => 'Unknown area for your unit.'], 422);
+                    return response()->json([
+                        'message' => 'Unknown area for your unit.'
+                    ], 422);
                 }
 
                 $towerAreas = $towerGroup === 'lowrise'
                     ? ['A', 'B', 'C', 'D', 'E']
                     : ['F', 'G', 'H', 'I'];
 
-                $existingBookings = AusiBooking::whereDate('booking_date', $bookingDate)
+                $slotTaken = AusiBooking::whereDate('booking_date', $bookingDate)
                     ->whereIn('unit_area', $towerAreas)
                     ->where('booking_status', 1)
+                    ->where('booking_time_slot', $request->booking_time_slot)
                     ->lockForUpdate()
-                    ->get();
-
-                $slotTaken = $existingBookings->contains(
-                    'booking_time_slot',
-                    $request->booking_time_slot
-                );
+                    ->exists();
 
                 if ($slotTaken) {
                     DB::rollBack();
@@ -218,6 +260,9 @@ class MobileAppController extends Controller
                     ], 409);
                 }
 
+                $userId = $resident->user_id;
+
+
                 $booking = AusiBooking::create([
                     'user_id' => $userId,
                     'created_by' => $userId,
@@ -233,32 +278,35 @@ class MobileAppController extends Controller
                 $booking->transaction_no = '2AUSI-' . str_pad($booking->id, 5, '0', STR_PAD_LEFT);
                 $booking->save();
 
-                DB::afterCommit(function () use ($booking, $email, $userId) {
+                DB::commit();
 
-                    // 👇 same emails as web
+                DB::afterCommit(function () use ($booking, $email) {
+
                     Mail::to($email)
                         ->queue(new UserAusiBookingConfirmation($booking));
 
                     Mail::to('concierge@twoserendra.com')
                         ->queue(new ConciergeAusiBookingConfirmation($booking));
 
-                    // 👇 keep event system
                     event(new AusiBookingCreated($booking));
-
-                    // // 👇 notification (if user relation exists)
-                    // if ($booking->user) {
-                    //     $booking->user->notify(new UserAusiBookingBellNotification($booking));
-                    // }
                 });
+
+                return response()->json([
+                    'message' => 'Booking submitted successfully.',
+                    'debug' => $debug,
+                    'data' => $booking
+                ]);
 
             } catch (\Throwable $e) {
                 DB::rollBack();
+
                 Log::error('Mobile AUSI Booking Error', [
                     'error' => $e->getMessage()
                 ]);
 
                 return response()->json([
-                    'message' => 'Server error'
+                    'message' => 'Server error',
+                    'error' => $e->getMessage()
                 ], 500);
             }
         }

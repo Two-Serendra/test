@@ -147,7 +147,6 @@ $(function () {
                 .removeClass("btn-outline-primary")
                 .addClass("btn-secondary disabled")
                 .css("cursor", "not-allowed");
-
         });
 
     }
@@ -166,17 +165,14 @@ $(function () {
     function hideLoading() {
 
         $("#slotLoading").addClass("d-none");
-
     }
 
     function disablePastSlots(selectedDate) {
 
         if (!selectedDate) return;
-
         const now = new Date();
 
         $(".ausi-booking-slot").each(function () {
-
             const slot =
                 $(this).data("slot");
 
@@ -202,20 +198,26 @@ $(function () {
                     .css("cursor", "not-allowed");
 
             }
-
         });
 
     }
 
+
+    logDebug(
+        "SLOTS COUNT",
+        document.querySelectorAll(".ausi-booking-slot").length
+    );
+
     $(document).ready(function () {
+
+        logDebug("READY");
+
+        logDebug(
+            "SLOTS",
+            document.querySelectorAll(".ausi-booking-slot").length
+        );
+
         $(".ausi-booking-slot").prop("disabled", true);
 
-        $(".ausi-booking-slot").each(function () {
-            $('label[for="' + this.id + '"]')
-                .removeClass("btn-outline-primary")
-                .addClass("btn-secondary disabled")
-                .css("cursor", "not-allowed");
-        });
     });
-
 });

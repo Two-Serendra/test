@@ -237,14 +237,11 @@ $(function () {
     $(document).on('change', '#resident_id_ausi', function () {
 
         const selected = $(this).find(':selected');
-
         const name = selected.data('name');
         const role = selected.data('role');
         const email = selected.data('email');
-
         $('#mobile_unit_name').val(name || '');
         $('#mobile_unit_role').val(role || '');
-        $('#mobile_unit_email').val(email || '');
         const store = Alpine.store('superapp');
     });
 
@@ -285,6 +282,9 @@ $(function () {
         }
 
         form.classList.remove('was-validated');
+        const store = Alpine.store('superapp');
+        const email = store?.user?.email || '';
+
 
         const originalWidth = $submitBtn.outerWidth();
 
@@ -305,7 +305,9 @@ $(function () {
         const sendBooking = (forceOverride = false) => {
             alert("sending ajax");
             const store = Alpine.store('superapp');
+
             $('#mobile_email').val(store?.user?.email || '');
+
 
             const formData = new FormData(form);
             if (forceOverride) {

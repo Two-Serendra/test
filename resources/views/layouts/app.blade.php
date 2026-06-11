@@ -62,7 +62,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body x-data>
+<body x-data style="padding-bottom: 160px;">
     @yield('content')
 
     <script>

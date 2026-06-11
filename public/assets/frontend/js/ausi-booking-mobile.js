@@ -235,9 +235,23 @@ $(function () {
 
     });
 
+    $(document).on('change', '#resident_id_ausi', function () {
+
+        const store = Alpine.store('superapp');
+
+        const selected = store?.units?.find(u => u.name === $(this).val());
+
+        if (!selected) return;
+
+        $('#mobile_unit_name').val(selected.name);
+        $('#mobile_unit_role').val(selected.role ?? '');
+        $('#mobile_email').val(store?.user?.email ?? '');
+    });
+
     $(document).on('submit', '#userAusiNewBooking', function (event) {
         event.preventDefault();
         logDebug("SUBMIT FIRED");
+        const form = this;
         const formData = new FormData(form);
         const store = Alpine.store('superapp');
         formData.append('user_id', store?.user?.id || '');

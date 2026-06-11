@@ -260,6 +260,22 @@ class MobileAppController extends Controller
                     ], 409);
                 }
 
+                $email = $request->email;
+
+                if (!$email) {
+                    return response()->json([
+                        'message' => 'Missing email from request'
+                    ], 401);
+                }
+
+                $resident = ResidentDetails::where('email', $email)->first();
+
+                if (!$resident) {
+                    return response()->json([
+                        'message' => 'Resident not found for email'
+                    ], 404);
+                }
+
                 $userId = $resident->user_id;
 
 

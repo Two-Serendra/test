@@ -236,14 +236,18 @@ $(function () {
     });
     $(document).on('change', '#resident_id_ausi', function () {
 
-        const data = JSON.parse($(this).val());
+        const selected = $(this).find(':selected');
 
-        $('#mobile_unit_name').val(data.name);
-        $('#mobile_unit_role').val(data.role);
+        const name = selected.data('name');
+        const role = selected.data('role');
+
+        $('#mobile_unit_name').val(name || '');
+        $('#mobile_unit_role').val(role || '');
 
         const store = Alpine.store('superapp');
         $('#mobile_email').val(store?.user?.email || '');
     });
+    
     $(document).on('submit', '#userAusiNewBooking', function (event) {
         event.preventDefault();
         logDebug("SUBMIT FIRED");

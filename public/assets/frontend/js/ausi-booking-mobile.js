@@ -43,7 +43,12 @@ $(function () {
 
         logDebug("unitName", unitName);
 
-        if (!date || !unitName) return;
+        if (!date || !unitName) {
+
+            $(".ausi-booking-slot").prop("disabled", true);
+
+            return;
+        }
 
         logDebug("STORE TEST", Alpine.store('superapp'));
         logDebug("SELECTED UNIT", Alpine.store('superapp')?.selectedUnit);
@@ -201,5 +206,16 @@ $(function () {
         });
 
     }
+
+    $(document).ready(function () {
+        $(".ausi-booking-slot").prop("disabled", true);
+
+        $(".ausi-booking-slot").each(function () {
+            $('label[for="' + this.id + '"]')
+                .removeClass("btn-outline-primary")
+                .addClass("btn-secondary disabled")
+                .css("cursor", "not-allowed");
+        });
+    });
 
 });

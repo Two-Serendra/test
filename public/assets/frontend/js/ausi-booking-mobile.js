@@ -240,12 +240,12 @@ $(function () {
 
         const name = selected.data('name');
         const role = selected.data('role');
+        const email = selected.data('email');
 
         $('#mobile_unit_name').val(name || '');
         $('#mobile_unit_role').val(role || '');
-
+        $('#mobile_unit_email').val(email || '');
         const store = Alpine.store('superapp');
-        $('#mobile_email').val(store?.user?.email || '');
     });
 
     $(document).on('submit', '#userAusiNewBookingMobile', function (event) {

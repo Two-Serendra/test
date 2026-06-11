@@ -31,7 +31,7 @@
                                         <option value="" disabled>-- Select Residence --</option>
 
                                         <template x-for="(unit, index) in $store.superapp.units" :key="index">
-                                            <option :value="unit.name" :data-name="unit.name" :data-role="unit.role" :data-email="unit.email"
+                                            <option :value="unit.name" :data-name="unit.name" :data-role="unit.role" :data-email="user.email"
                                                 x-text="`${unit.role ?? ''} ${unit.name}`">
                                             </option>
                                         </template>

@@ -86,6 +86,17 @@ $(function () {
         });
     }
 
+    function checkFormReady() {
+
+        const unit = $('#resident_id_ausi').val();
+        const date = $('#AusiBookingDate').val();
+        const slot = $('input[name="booking_time_slot"]:checked').val();
+
+        $('#saveUserAusiBtn').prop('disabled', !(unit && date && slot));
+    }
+
+    $(document).on('change', '#resident_id_ausi, #AusiBookingDate, input[name="booking_time_slot"]', checkFormReady);
+
     $(document).on(
         "change",
         "#AusiBookingDate",

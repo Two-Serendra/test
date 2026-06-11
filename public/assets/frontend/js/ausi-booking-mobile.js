@@ -248,13 +248,10 @@ $(function () {
         $('#mobile_email').val(store?.user?.email || '');
     });
 
-    $(document).on('submit', '#userAusiNewBooking', function (event) {
+    $(document).on('submit', '#userAusiNewBookingMobile', function (event) {
         event.preventDefault();
         logDebug("SUBMIT FIRED");
-
         const formData = new FormData(form);
-
-        // FORCE READ CURRENT SELECT VALUE DIRECTLY
         const selected = $('#resident_id_ausi').find(':selected');
 
         formData.set('email', $('#mobile_email').val());

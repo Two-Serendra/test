@@ -15,7 +15,7 @@
         <div class="card shadow-sm mb-4">
             <div class="card-body">
                 <form method="POST" action="{{ route('ausi.booking.mobile.store') }}" enctype="multipart/form-data"
-                    id="userAusiNewBooking" class="needs-validation" novalidate>
+                    id="userAusiNewBookingMobile" class="needs-validation" novalidate>
                     @csrf
 
                     <div class="row mb-3">
@@ -98,7 +98,7 @@
                     </div>
 
                     <div class="d-grid">
-                        <button type="submit" form="userAusiNewBooking" id="saveUserAusiBtn"
+                        <button type="submit" form="userAusiNewBookingMobile" id="saveUserAusiBtn"
                             class="btn btn-primary d-flex align-items-center justify-content-center customBtn"
                             style="min-width: 100px; height: 38px;">
                             <span class="btn-text" disabled>SUBMIT</span>

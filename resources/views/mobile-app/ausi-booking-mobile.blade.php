@@ -21,6 +21,8 @@
                     <div class="row mb-3">
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label">Select Residence <span class="required">*</span></label>
+                            <input type="hidden" name="email" id="mobile_email">
+                            <input type="hidden" name="user_id" id="mobile_user_id">
                             <dl>
                                 <dd>
                                     <select id="resident_id_ausi" name="resident_id_ausi" class="form-select"
@@ -97,7 +99,7 @@
                         <button type="submit" form="userAusiNewBooking" id="saveUserAusiBtn"
                             class="btn btn-primary d-flex align-items-center justify-content-center customBtn"
                             style="min-width: 100px; height: 38px;">
-                            <span class="btn-text" disabled >SUBMIT</span>
+                            <span class="btn-text" disabled>SUBMIT</span>
                         </button>
 
                     </div>
@@ -106,18 +108,18 @@
         </div>
 
         <div id="debugPanel" style="
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 140px;
-        overflow: auto;
-        background: black;
-        color: #00ff00;
-        font-size: 11px;
-        z-index: 99999;
-        padding: 10px;
-    ">
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 140px;
+                overflow: auto;
+                background: black;
+                color: #00ff00;
+                font-size: 11px;
+                z-index: 99999;
+                padding: 10px;
+            ">
         </div>
 
     </div>
@@ -142,6 +144,11 @@
                     this.log("🚀 INIT STARTED");
 
                     this.setHeader();
+                    const store = Alpine.store('superapp');
+
+                    $('#mobile_email').val(store?.user?.email || '');
+                    $('#mobile_user_id').val(store?.user?.id || '');
+
                 },
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({

@@ -238,12 +238,9 @@ $(function () {
     $(document).on('submit', '#userAusiNewBooking', function (event) {
 
         event.preventDefault();
-
         logDebug("SUBMIT FIRED");
-
         const form = this;
         const $submitBtn = $('#saveUserAusiBtn');
-
         const selectedDate = $('#AusiBookingDate').val();
         const selectedUnit = $('#resident_id_ausi').val();
         const selectedSlot = $('input[name="booking_time_slot"]:checked').val();
@@ -306,6 +303,10 @@ $(function () {
             }
 
             lockBtn();
+
+            for (const pair of formData.entries()) {
+                logToPanel(pair[0] + " = " + pair[1]);
+            }
 
             $.ajax({
                 url: form.action,

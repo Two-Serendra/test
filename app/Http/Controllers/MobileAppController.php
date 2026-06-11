@@ -145,12 +145,13 @@ class MobileAppController extends Controller
         while ($attempt < $maxRetries) {
             try {
                 DB::beginTransaction();
-           
+
                 $email = $request->email;
 
-                if (!$email) {
+                if (empty($email)) {
                     return response()->json([
-                        'message' => 'Missing user email context'
+                        'message' => 'Missing user email context',
+                        'debug' => 'email is empty from request'
                     ], 401);
                 }
 

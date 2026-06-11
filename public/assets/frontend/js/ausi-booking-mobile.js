@@ -234,20 +234,16 @@ $(function () {
         $(".ausi-booking-slot").prop("disabled", true);
 
     });
-
     $(document).on('change', '#resident_id_ausi', function () {
 
+        const data = JSON.parse($(this).val());
+
+        $('#mobile_unit_name').val(data.name);
+        $('#mobile_unit_role').val(data.role);
+
         const store = Alpine.store('superapp');
-
-        const selected = store?.units?.find(u => u.name === $(this).val());
-
-        if (!selected) return;
-
-        $('#mobile_unit_name').val(selected.name);
-        $('#mobile_unit_role').val(selected.role ?? '');
-        $('#mobile_email').val(store?.user?.email ?? '');
+        $('#mobile_email').val(store?.user?.email || '');
     });
-
     $(document).on('submit', '#userAusiNewBooking', function (event) {
         event.preventDefault();
         logDebug("SUBMIT FIRED");

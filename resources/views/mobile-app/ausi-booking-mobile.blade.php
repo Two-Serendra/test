@@ -21,8 +21,8 @@
                     <div class="row mb-3">
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label">Select Residence <span class="required">*</span></label>
-                            <input type="hidden" name="email" id="mobile_email">
-                            <input type="hidden" name="user_id" id="mobile_user_id">
+                            <input type="text" name="email" id="mobile_email">
+                            <input type="text" name="user_id" id="mobile_user_id">
                             <dl>
                                 <dd>
                                     <select id="resident_id_ausi" name="resident_id_ausi" class="form-select"

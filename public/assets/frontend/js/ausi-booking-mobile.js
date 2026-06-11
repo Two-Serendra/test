@@ -247,21 +247,21 @@ $(function () {
         const store = Alpine.store('superapp');
         $('#mobile_email').val(store?.user?.email || '');
     });
-    
+
     $(document).on('submit', '#userAusiNewBooking', function (event) {
         event.preventDefault();
         logDebug("SUBMIT FIRED");
-        const form = this;
-        const formData = new FormData(form);
-        const store = Alpine.store('superapp');
-        formData.append('user_id', store?.user?.id || '');
-        formData.append('email', store?.user?.email || '');
-        formData.append('unit_name', $('#resident_id_ausi').val());
-        const $submitBtn = $('#saveUserAusiBtn');
-        const selectedDate = $('#AusiBookingDate').val();
-        const selectedUnit = $('#resident_id_ausi').val();
-        const selectedSlot = $('input[name="booking_time_slot"]:checked').val();
 
+        const formData = new FormData(form);
+
+        // FORCE READ CURRENT SELECT VALUE DIRECTLY
+        const selected = $('#resident_id_ausi').find(':selected');
+
+        formData.set('email', $('#mobile_email').val());
+        formData.set('unit_name', $('#resident_id_ausi').val());
+
+        formData.set('mobile_unit_name', selected.data('name') || '');
+        formData.set('mobile_unit_role', selected.data('role') || '');
 
 
         if (!selectedUnit) {

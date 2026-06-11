@@ -252,7 +252,6 @@ $(function () {
         event.preventDefault();
         const form = this;
         logDebug("SUBMIT FIRED");
-
         const formData = new FormData(form);
         const selected = $('#resident_id_ausi').find(':selected');
         const selectedDate = $('#AusiBookingDate').val();
@@ -306,6 +305,7 @@ $(function () {
         function send(forceOverride = false) {
 
             logDebug("SENDING BOOKING");
+            const formData = new FormData(form);
             if (forceOverride) {
                 formData.append('force_override', '1');
             }

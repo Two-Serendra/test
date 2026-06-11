@@ -328,15 +328,15 @@ $(function () {
                 contentType: false,
 
                 beforeSend: function () {
-                    logToPanel("🚀 REQUEST SENT TO: " + form.action);
+                    logDebug("🚀 REQUEST SENT TO: " + form.action);
                 },
                 success: function (res) {
 
-                    logToPanel("SUCCESS");
-                    logToPanel(JSON.stringify(res, null, 2));
+                    logDebug("SUCCESS");
+                    logDebug(JSON.stringify(res, null, 2));
 
                     if (res.debug) {
-                        res.debug.forEach(d => logToPanel("🧠 " + d));
+                        res.debug.forEach(d => logDebug("🧠 " + d));
                     }
                     Swal.fire({
                         icon: 'success',

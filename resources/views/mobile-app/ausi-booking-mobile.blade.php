@@ -19,25 +19,29 @@
                     @csrf
 
                     <div class="row mb-3">
+
+                        <div class="">
+                            <dt>Email</dt>
+                            <dd x-text="$store.superapp.user?.email ?? '—'"></dd>
+                        </div>
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label">Select Residence <span class="required">*</span></label>
-                            <input type="text" name="mobile_unit_email" id="mobile_unit_email">
-                            <input type="text" name="mobile_unit_name" id="mobile_unit_name">
-                            <input type="text" name="mobile_unit_role" id="mobile_unit_role">
+                            <input type="hidden" name="mobile_unit_email" id="mobile_unit_email">
+                            <input type="hidden" name="mobile_unit_name" id="mobile_unit_name">
+                            <input type="hidden" name="mobile_unit_role" id="mobile_unit_role">
                             <dl>
                                 <dd>
-                                <dt>Email</dt>
-                                <dd x-text="$store.superapp.user?.email ?? '—'"></dd>
-                                <select id="resident_id_ausi" name="resident_id_ausi" class="form-select"
-                                    x-model="$store.superapp.selectedUnit" required>
-                                    <option value="" disabled>-- Select Residence --</option>
 
-                                    <template x-for="(unit, index) in $store.superapp.units" :key="index">
-                                        <option :value="unit.name" :data-name="unit.name" :data-role="unit.role"
-                                            :data-email="user.email" x-text="`${unit.role ?? ''} ${unit.name}`">
-                                        </option>
-                                    </template>
-                                </select>
+                                    <select id="resident_id_ausi" name="resident_id_ausi" class="form-select"
+                                        x-model="$store.superapp.selectedUnit" required>
+                                        <option value="" disabled>-- Select Residence --</option>
+
+                                        <template x-for="(unit, index) in $store.superapp.units" :key="index">
+                                            <option :value="unit.name" :data-name="unit.name" :data-role="unit.role"
+                                                :data-email="user.email" x-text="`${unit.role ?? ''} ${unit.name}`">
+                                            </option>
+                                        </template>
+                                    </select>
                                 </dd>
                             </dl>
                         </div>
@@ -112,18 +116,18 @@
         </div>
 
         <div id="debugPanel" style="
-                            position: fixed;
-                            bottom: 0;
-                            left: 0;
-                            right: 0;
-                            height: 140px;
-                            overflow: auto;
-                            background: black;
-                            color: #00ff00;
-                            font-size: 11px;
-                            z-index: 99999;
-                            padding: 10px;
-                        ">
+                                    position: fixed;
+                                    bottom: 0;
+                                    left: 0;
+                                    right: 0;
+                                    height: 140px;
+                                    overflow: auto;
+                                    background: black;
+                                    color: #00ff00;
+                                    font-size: 11px;
+                                    z-index: 99999;
+                                    padding: 10px;
+                                ">
         </div>
 
     </div>

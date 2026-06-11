@@ -297,13 +297,16 @@ $(function () {
 
         const unlockSubmitBtn = () => {
             $submitBtn
-                .attr('disabled', false)
+                .attr('disabled', false)``
                 .html(`<span class="btn-text">Submit</span>`)
                 .css('width', '');
         };
 
         const sendBooking = (forceOverride = false) => {
             alert("sending ajax");
+            const store = Alpine.store('superapp');
+            $('#mobile_email').val(store?.user?.email || '');
+
             const formData = new FormData(form);
             if (forceOverride) {
                 formData.append('force_override', true);

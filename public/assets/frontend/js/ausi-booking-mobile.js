@@ -320,8 +320,12 @@ $(function () {
 
                 success: function (res) {
 
-                    logDebug("SUCCESS", res);
+                    logToPanel("SUCCESS");
+                    logToPanel(JSON.stringify(res, null, 2));
 
+                    if (res.debug) {
+                        res.debug.forEach(d => logToPanel("🧠 " + d));
+                    }
                     Swal.fire({
                         icon: 'success',
                         title: 'Booking Successful',

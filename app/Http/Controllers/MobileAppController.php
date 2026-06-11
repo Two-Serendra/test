@@ -128,6 +128,7 @@ class MobileAppController extends Controller
     {
         $maxRetries = 3;
         $attempt = 0;
+        $debug = [];
 
         $towerGroups = [
             'A' => 'lowrise',
@@ -144,9 +145,7 @@ class MobileAppController extends Controller
         while ($attempt < $maxRetries) {
             try {
                 DB::beginTransaction();
-                $userId = ResidentDetails::where('email', $email)->value('user_id');
-                $email = $request->email;
-
+           
                 $email = $request->email;
 
                 if (!$email) {
@@ -154,6 +153,11 @@ class MobileAppController extends Controller
                         'message' => 'Missing user email context'
                     ], 401);
                 }
+
+                $debug[] = "Email received: " . ($email ?? 'NULL');
+
+                $userId = ResidentDetails::where('email', $email)->value('user_id');
+
                 $resident = ResidentDetails::where('id', $request->resident_id_ausi)
                     ->where('email', $email)
                     ->lockForUpdate()

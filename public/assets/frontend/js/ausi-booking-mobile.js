@@ -82,7 +82,11 @@ $(function () {
         });
     }
 
+    let isResetting = false;
+
     function checkFormReady() {
+        if (isResetting) return;
+
         const unit = $('#resident_id_ausi').val();
         const date = $('#AusiBookingDate').val();
         const slot = $('input[name="booking_time_slot"]:checked').val();
@@ -215,6 +219,7 @@ $(function () {
 
     function resetAusiBookingUI() {
         const form = document.getElementById('userAusiNewBookingMobile');
+        form.classList.remove('was-validated');
         form.reset();
         const store = Alpine.store('superapp');
         store.selectedUnit = null;
@@ -224,7 +229,6 @@ $(function () {
         $('#mobile_unit_role').val('');
         const fp = document.querySelector("#AusiBookingDate")?._flatpickr;
         if (fp) fp.clear();
-
         $(".ausi-booking-slot").each(function () {
             $(this)
                 .prop("disabled", true)
@@ -237,8 +241,8 @@ $(function () {
         });
 
         $("#slotLoading").addClass("d-none");
-        const $btn = $("#saveUserAusiBtn");
-        $btn
+
+        $("#saveUserAusiBtn")
             .prop("disabled", true)
             .html('<span class="btn-text">SUBMIT</span>');
     }
@@ -312,12 +316,8 @@ $(function () {
         };
 
         const sendBooking = (forceOverride = false) => {
-            alert("sending ajax");
             const store = Alpine.store('superapp');
-
             $('#mobile_email').val(store?.user?.email || '');
-
-
             const formData = new FormData(form);
             if (forceOverride) {
                 formData.append('force_override', true);
@@ -356,9 +356,7 @@ $(function () {
                         timer: 2000,
                         showConfirmButton: false
                     });
-
                     resetAusiBookingUI();
-                    unlockSubmitBtn();
                 },
 
                 error: function (xhr) {

@@ -385,22 +385,19 @@ $(function () {
                     if (xhr.status === 409 && res.type === 'unit_already_booked') {
 
                         Swal.fire({
-                            title: 'Book Anyway?',
-                            text: res.message,
                             icon: 'warning',
+                            title: 'Already Booked',
+                            text: res.message,
                             showCancelButton: true,
-                            confirmButtonText: 'Continue',
-                            cancelButtonText: 'Cancel',
-                            position: 'bottom',
-                            width: '100%',
-                            backdrop: false,
-                            grow: 'row'
+                            confirmButtonText: 'Book Anyway'
                         }).then((result) => {
+
                             if (result.isConfirmed) {
                                 sendBooking(true);
                             } else {
                                 unlockSubmitBtn();
                             }
+
                         });
 
                         return;

@@ -28,12 +28,12 @@ $(function () {
         }
     });
 
-    document.addEventListener('change', (e) => {
-        if (e.target.id === 'resident_id_ausi') {
-            Alpine.store('superapp').selectedUnit = e.target.value;
-            logDebug("SYNC STORE", e.target.value);
-        }
-    });
+    // document.addEventListener('change', (e) => {
+    //     if (e.target.id === 'resident_id_ausi') {
+    //         Alpine.store('superapp').selectedUnit = e.target.value;
+    //         logDebug("SYNC STORE", e.target.value);
+    //     }
+    // });
 
     function updateSlots(date) {
 
@@ -234,8 +234,45 @@ $(function () {
         $(".ausi-booking-slot").prop("disabled", true);
 
     });
-    $(document).on('change', '#resident_id_ausi', function () {
 
+    function resetAusiBookingUI() {
+        const form = document.getElementById('userAusiNewBookingMobile');
+
+        // 1. Reset form
+        form.reset();
+
+        // 2. Reset Alpine state
+        const store = Alpine.store('superapp');
+        store.selectedUnit = null;
+
+        // 3. Reset flatpickr
+        const fp = document.querySelector("#AusiBookingDate")?._flatpickr;
+        if (fp) {
+            fp.clear();
+        }
+
+        // 4. Reset slots to DEFAULT (disabled state, not enabled)
+        $(".ausi-booking-slot").each(function () {
+            $(this)
+                .prop("disabled", true)
+                .prop("checked", false);
+
+            $('label[for="' + this.id + '"]')
+                .removeClass("btn-secondary disabled")
+                .addClass("btn-outline-primary")
+                .css("cursor", "pointer");
+        });
+
+        // 5. Hide loading just in case
+        $("#slotLoading").addClass("d-none");
+
+        // 6. Reset submit button
+        $("#saveUserAusiBtn")
+            .prop("disabled", true)
+            .html('<span class="btn-text">SUBMIT</span>');
+    }
+
+    $(document).on('change', '#resident_id_ausi', function () {
         const selected = $(this).find(':selected');
         const name = selected.data('name');
         const role = selected.data('role');
@@ -284,8 +321,6 @@ $(function () {
         form.classList.remove('was-validated');
         const store = Alpine.store('superapp');
         const email = store?.user?.email || '';
-
-
         const originalWidth = $submitBtn.outerWidth();
 
         const lockSubmitBtn = () => {
@@ -351,8 +386,7 @@ $(function () {
                         showConfirmButton: false
                     });
 
-                    form.reset();
-                    resetSlots();
+                    resetAusiBookingUI();
 
                 },
 

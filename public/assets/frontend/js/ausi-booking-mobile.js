@@ -98,7 +98,6 @@ $(function () {
         "change",
         "#AusiBookingDate",
         function () {
-
             updateSlots($(this).val());
         }
     );
@@ -206,42 +205,27 @@ $(function () {
 
     $(document).ready(function () {
         logDebug("READY");
-
         logDebug(
             "SLOTS",
             document.querySelectorAll(".ausi-booking-slot").length
         );
 
         $(".ausi-booking-slot").prop("disabled", true);
-
     });
 
     function resetAusiBookingUI() {
-
         const form = document.getElementById('userAusiNewBookingMobile');
-
-        // 1. Reset native form
         form.reset();
-
-        // 2. Reset Alpine
         const store = Alpine.store('superapp');
         store.selectedUnit = null;
-
-        // 3. Reset dropdown explicitly (IMPORTANT FIX)
         $('#resident_id_ausi').val('').trigger('change');
-
-        // 4. Reset hidden inputs
         $('#mobile_email').val('');
         $('#mobile_unit_name').val('');
         $('#mobile_unit_role').val('');
-
-        // 5. Reset flatpickr
         const fp = document.querySelector("#AusiBookingDate")?._flatpickr;
         if (fp) fp.clear();
 
-        // 6. Reset slots (default state = disabled)
         $(".ausi-booking-slot").each(function () {
-
             $(this)
                 .prop("disabled", true)
                 .prop("checked", false);
@@ -252,11 +236,9 @@ $(function () {
                 .css("cursor", "pointer");
         });
 
-        // 7. Reset loading UI
         $("#slotLoading").addClass("d-none");
-
-        // 8. Reset submit button (FIX SPINNER BUG HERE)
-        $("#saveUserAusiBtn")
+        const $btn = $("#saveUserAusiBtn");
+        $btn
             .prop("disabled", true)
             .html('<span class="btn-text">SUBMIT</span>');
     }
@@ -342,9 +324,6 @@ $(function () {
             }
 
             lockSubmitBtn();
-
-            alert($(form).attr('action'));
-            alert($(form).attr('method'));
             for (const pair of formData.entries()) {
                 alert(pair[0] + " = " + pair[1]);
             }
@@ -379,7 +358,7 @@ $(function () {
                     });
 
                     resetAusiBookingUI();
-                    unlockSubmitBtn(); // safe here
+                    unlockSubmitBtn();
                 },
 
                 error: function (xhr) {

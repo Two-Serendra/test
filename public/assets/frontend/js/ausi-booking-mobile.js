@@ -357,9 +357,7 @@ $(function () {
                 },
 
                 error: function (xhr) {
-
                     const res = xhr.responseJSON || {};
-
                     logDebug("ERROR", xhr.status);
                     logDebug("RESPONSE", res);
 
@@ -387,19 +385,22 @@ $(function () {
                     if (xhr.status === 409 && res.type === 'unit_already_booked') {
 
                         Swal.fire({
-                            icon: 'warning',
-                            title: 'Already Booked',
+                            title: 'Book Anyway?',
                             text: res.message,
+                            icon: 'warning',
                             showCancelButton: true,
-                            confirmButtonText: 'Book Anyway'
+                            confirmButtonText: 'Continue',
+                            cancelButtonText: 'Cancel',
+                            position: 'bottom',
+                            width: '100%',
+                            backdrop: false,
+                            grow: 'row'
                         }).then((result) => {
-
                             if (result.isConfirmed) {
-                                send(true);
+                                sendBooking(true);
                             } else {
                                 unlockSubmitBtn();
                             }
-
                         });
 
                         return;

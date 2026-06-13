@@ -219,11 +219,13 @@ $(function () {
 
     function resetAusiBookingUI() {
         const form = document.getElementById('userAusiNewBookingMobile');
-        form.classList.remove('was-validated');
+        isResetting = true;
+
         form.reset();
+        form.classList.remove('was-validated');
         const store = Alpine.store('superapp');
         store.selectedUnit = null;
-        $('#resident_id_ausi').val('').trigger('change');
+        $('#resident_id_ausi').val(null).trigger('change');
         $('#mobile_email').val('');
         $('#mobile_unit_name').val('');
         $('#mobile_unit_role').val('');
@@ -239,14 +241,15 @@ $(function () {
                 .addClass("btn-outline-primary")
                 .css("cursor", "pointer");
         });
-
         $("#slotLoading").addClass("d-none");
-
         $("#saveUserAusiBtn")
             .prop("disabled", true)
             .html('<span class="btn-text">SUBMIT</span>');
+
+        isResetting = false;
     }
 
+    Alpine.store('superapp').selectedUnit = null;
     $(document).on('change', '#resident_id_ausi', function () {
         const selected = $(this).find(':selected');
         const name = selected.data('name');
@@ -413,6 +416,12 @@ $(function () {
                     });
 
                 },
+
+                complete: function () {
+                    logDebug("COMPLETE");
+                    hideLoading();
+                    unlockSubmitBtn();
+                }
             });
         }
         sendBooking();

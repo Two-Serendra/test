@@ -106,22 +106,6 @@ $(function () {
         }
     );
 
-    // $(document).on(
-    //     "change",
-    //     "select[name='resident_id_ausi']",
-    //     function () {
-
-    //         const date =
-    //             $("#AusiBookingDate").val();
-
-    //         if (date) {
-
-    //             updateSlots(date);
-
-    //         }
-    //     }
-    // );
-
     function resetSlots() {
         $(".ausi-booking-slot").each(function () {
 
@@ -219,7 +203,7 @@ $(function () {
 
     function resetAusiBookingUI() {
         const form = document.getElementById('userAusiNewBookingMobile');
-        isResetting = true; 
+        isResetting = true;
 
         form.reset();
         form.classList.remove('was-validated');
@@ -359,6 +343,7 @@ $(function () {
                         showConfirmButton: false
                     });
                     resetAusiBookingUI();
+                    resetSlots()
                 },
 
                 error: function (xhr) {

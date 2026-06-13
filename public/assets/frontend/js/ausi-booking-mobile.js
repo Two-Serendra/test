@@ -219,7 +219,7 @@ $(function () {
 
     function resetAusiBookingUI() {
         const form = document.getElementById('userAusiNewBookingMobile');
-        isResetting = true;
+        isResetting = true; 
 
         form.reset();
         form.classList.remove('was-validated');
@@ -249,7 +249,6 @@ $(function () {
         isResetting = false;
     }
 
-    Alpine.store('superapp').selectedUnit = null;
     $(document).on('change', '#resident_id_ausi', function () {
         const selected = $(this).find(':selected');
         const name = selected.data('name');
@@ -416,12 +415,6 @@ $(function () {
                     });
 
                 },
-
-                complete: function () {
-                    logDebug("COMPLETE");
-                    hideLoading();
-                    unlockSubmitBtn();
-                }
             });
         }
         sendBooking();

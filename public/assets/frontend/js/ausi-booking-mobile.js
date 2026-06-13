@@ -36,11 +36,8 @@ $(function () {
     // });
 
     function updateSlots(date) {
-
         logDebug("updateSlots", date);
-
         const unitName = document.querySelector('#resident_id_ausi')?.value || '';
-
         logDebug("unitName", unitName);
 
         if (!date || !unitName) {
@@ -52,7 +49,6 @@ $(function () {
 
         logDebug("STORE TEST", Alpine.store('superapp'));
         logDebug("SELECTED UNIT", Alpine.store('superapp')?.selectedUnit);
-
         showLoading();
         resetSlots();
 
@@ -87,7 +83,6 @@ $(function () {
     }
 
     function checkFormReady() {
-
         const unit = $('#resident_id_ausi').val();
         const date = $('#AusiBookingDate').val();
         const slot = $('input[name="booking_time_slot"]:checked').val();
@@ -105,29 +100,26 @@ $(function () {
         function () {
 
             updateSlots($(this).val());
-
         }
     );
 
-    $(document).on(
-        "change",
-        "select[name='resident_id_ausi']",
-        function () {
+    // $(document).on(
+    //     "change",
+    //     "select[name='resident_id_ausi']",
+    //     function () {
 
-            const date =
-                $("#AusiBookingDate").val();
+    //         const date =
+    //             $("#AusiBookingDate").val();
 
-            if (date) {
+    //         if (date) {
 
-                updateSlots(date);
+    //             updateSlots(date);
 
-            }
-
-        }
-    );
+    //         }
+    //     }
+    // );
 
     function resetSlots() {
-
         $(".ausi-booking-slot").each(function () {
 
             $(this)
@@ -143,11 +135,9 @@ $(function () {
             checkFormReady();
 
         });
-
     }
 
     function disableBookedSlots(bookedSlots) {
-
         bookedSlots.forEach(function (slot) {
 
             const radio =
@@ -162,30 +152,24 @@ $(function () {
                 .addClass("btn-secondary disabled")
                 .css("cursor", "not-allowed");
         });
-
     }
 
     function showLoading() {
-
         $("#slotLoading").removeClass("d-none");
 
         $(".ausi-booking-slot").prop(
             "disabled",
             true
         );
-
     }
 
     function hideLoading() {
-
         $("#slotLoading").addClass("d-none");
     }
 
     function disablePastSlots(selectedDate) {
-
         if (!selectedDate) return;
         const now = new Date();
-
         $(".ausi-booking-slot").each(function () {
             const slot =
                 $(this).data("slot");
@@ -210,12 +194,10 @@ $(function () {
                     .removeClass("btn-outline-primary")
                     .addClass("btn-secondary disabled")
                     .css("cursor", "not-allowed");
-
             }
         });
 
     }
-
 
     logDebug(
         "SLOTS COUNT",
@@ -223,7 +205,6 @@ $(function () {
     );
 
     $(document).ready(function () {
-
         logDebug("READY");
 
         logDebug(
@@ -236,23 +217,31 @@ $(function () {
     });
 
     function resetAusiBookingUI() {
+
         const form = document.getElementById('userAusiNewBookingMobile');
 
-        // 1. Reset form
+        // 1. Reset native form
         form.reset();
 
-        // 2. Reset Alpine state
+        // 2. Reset Alpine
         const store = Alpine.store('superapp');
         store.selectedUnit = null;
 
-        // 3. Reset flatpickr
-        const fp = document.querySelector("#AusiBookingDate")?._flatpickr;
-        if (fp) {
-            fp.clear();
-        }
+        // 3. Reset dropdown explicitly (IMPORTANT FIX)
+        $('#resident_id_ausi').val('').trigger('change');
 
-        // 4. Reset slots to DEFAULT (disabled state, not enabled)
+        // 4. Reset hidden inputs
+        $('#mobile_email').val('');
+        $('#mobile_unit_name').val('');
+        $('#mobile_unit_role').val('');
+
+        // 5. Reset flatpickr
+        const fp = document.querySelector("#AusiBookingDate")?._flatpickr;
+        if (fp) fp.clear();
+
+        // 6. Reset slots (default state = disabled)
         $(".ausi-booking-slot").each(function () {
+
             $(this)
                 .prop("disabled", true)
                 .prop("checked", false);
@@ -263,10 +252,10 @@ $(function () {
                 .css("cursor", "pointer");
         });
 
-        // 5. Hide loading just in case
+        // 7. Reset loading UI
         $("#slotLoading").addClass("d-none");
 
-        // 6. Reset submit button
+        // 8. Reset submit button (FIX SPINNER BUG HERE)
         $("#saveUserAusiBtn")
             .prop("disabled", true)
             .html('<span class="btn-text">SUBMIT</span>');
@@ -324,16 +313,19 @@ $(function () {
         const originalWidth = $submitBtn.outerWidth();
 
         const lockSubmitBtn = () => {
+            isSubmitting = true;
+
             $submitBtn
-                .attr('disabled', true)
-                .html(`<div class="spinner-border spinner-border-sm text-light"></div>`)
-                .css('width', originalWidth + 'px');
+                .prop('disabled', true)
+                .html(`<div class="spinner-border spinner-border-sm text-light"></div>`);
         };
 
         const unlockSubmitBtn = () => {
+            isSubmitting = false;
+
             $submitBtn
-                .attr('disabled', false)``
-                .html(`<span class="btn-text">Submit</span>`)
+                .prop('disabled', false)
+                .html(`<span class="btn-text">SUBMIT</span>`)
                 .css('width', '');
         };
 
@@ -387,7 +379,7 @@ $(function () {
                     });
 
                     resetAusiBookingUI();
-
+                    unlockSubmitBtn(); // safe here
                 },
 
                 error: function (xhr) {
@@ -444,10 +436,6 @@ $(function () {
                     });
 
                 },
-
-                complete: function () {
-                    unlockSubmitBtn();
-                }
             });
         }
         sendBooking();

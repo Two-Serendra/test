@@ -181,22 +181,7 @@ window.addEventListener('DOMContentLoaded', function () {
         });
 
     }
-
-    logDebug(
-        "SLOTS COUNT",
-        document.querySelectorAll(".ausi-booking-slot").length
-    );
-
-    $(document).ready(function () {
-        logDebug("READY");
-        logDebug(
-            "SLOTS",
-            document.querySelectorAll(".ausi-booking-slot").length
-        );
-
-        $(".ausi-booking-slot").prop("disabled", true);
-    });
-
+    
     function resetAusiBookingUI() {
         const form = document.getElementById('userAusiNewBookingMobile');
         isResetting = true;

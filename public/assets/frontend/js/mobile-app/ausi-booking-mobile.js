@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-008");
+    alert("🔥 JS VERSION 2026-06-15-009");
     const el = document.getElementById('resident_id_ausi');
 
     alert("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -121,15 +121,10 @@ $(function () {
                     logDebug("API RESPONSE:", res);
 
                     resetSlots();
-
-                    // 1. Disable booked slots from backend
                     if (res.blocked_for_user && Array.isArray(res.blocked_for_user)) {
                         disableBookedSlots(res.blocked_for_user);
                     }
-
-                    // 2. Disable past slots (you already have this function)
                     disablePastSlots(date);
-
                     logDebug("BLOCKED SLOTS:", res.blocked_for_user);
                 },
 
@@ -166,6 +161,16 @@ $(function () {
                 .css("cursor", "pointer");
         });
         checkFormReady();
+    }
+
+    function checkFormReady() {
+
+        const date = window.ausiState.date;
+        const unit = window.ausiState.unit;
+
+        const ready = !!(date && unit);
+
+        $("#saveUserAusiBtn").prop("disabled", !ready);
     }
 
     function disableBookedSlots(bookedSlots) {

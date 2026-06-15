@@ -50,6 +50,15 @@ $(function () {
         triggerUpdateSlots();
     });
 
+    $(document).on('change input', '#resident_id_ausi', function () {
+
+        const unitName = $(this).val();
+
+        logDebug("RESIDENCE CHANGED", unitName);
+
+        triggerUpdateSlots();
+    });
+
     function triggerUpdateSlots() {
 
         clearTimeout(slotTimer);
@@ -66,7 +75,7 @@ $(function () {
     function updateSlots() {
 
         const date = $('#AusiBookingDate').val();
-        const unitName = Alpine.store('superapp')?.selectedUnit || '';
+        const unitName = $('#resident_id_ausi').val();
 
         logDebug({ date, unitName });
 
@@ -88,6 +97,7 @@ $(function () {
 
             success(res) {
                 logDebug("SUCCESS", res);
+
                 resetSlots();
                 disableBookedSlots(res.blocked_for_user || []);
                 disablePastSlots(date);
@@ -99,7 +109,6 @@ $(function () {
 
             complete() {
                 hideLoading();
-                logDebug("SLOTS UPDATED");
             }
         });
     }

@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-006");
+    alert("🔥 JS VERSION 2026-06-15-007");
     function logDebug(...args) {
 
         const msg = args.map(a =>
@@ -36,7 +36,7 @@ $(function () {
     };
 
     const $bookingSlots = $('.ausi-booking-slot');
-    
+
     $(document).on('change', '#resident_id_ausi', function (e) {
         const value = e.target.value;
 

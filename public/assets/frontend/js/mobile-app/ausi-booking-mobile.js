@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-0065");
+    alert("🔥 JS VERSION 2026-06-15-005");
     const el = document.getElementById('resident_id_ausi');
 
     alert("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -255,10 +255,33 @@ $(function () {
         $(".ausi-booking-slot").prop("disabled", true);
     });
 
-    $('#resident_id_ausi').val('').trigger('change');
+    function resetAusiBookingUI() {
+        const form = document.getElementById('userAusiNewBookingMobile');
+        isResetting = true;
 
-    Alpine.store('superapp').selectedUnit = '';
-    window.ausiState.unit = null;
+        form.reset();
+        form.classList.remove('was-validated');
+        const store = Alpine.store('superapp');
+        store.selectedUnit = null;
+        $('#resident_id_ausi').val(null).trigger('change');
+        $('#mobile_email').val('');
+        $('#mobile_unit_name').val('');
+        $('#mobile_unit_role').val('');
+        const fp = document.querySelector("#AusiBookingDate")?._flatpickr;
+        if (fp) fp.clear();
+        $(".ausi-booking-slot").each(function () {
+            $(this)
+                .prop("disabled", true)
+                .prop("checked", false);
+
+            $('label[for="' + this.id + '"]')
+                .removeClass("btn-outline-primary btn-secondary")
+                .addClass("btn-secondary disabled")
+                .css("cursor", "not-allowed");
+        });
+        $("#slotLoading").addClass("d-none");
+        isResetting = false;
+    }
 
     let isSubmitting = false;
 
@@ -370,7 +393,6 @@ $(function () {
                         showConfirmButton: false
                     });
                     resetAusiBookingUI();
-                    disableAllSlots();
                 },
 
                 error: function (xhr) {
@@ -451,18 +473,4 @@ $(function () {
         }
         sendBooking();
     });
-
-    function disableAllSlots() {
-        $(".ausi-booking-slot").each(function () {
-
-            $(this)
-                .prop("disabled", true)
-                .prop("checked", false);
-
-            $('label[for="' + this.id + '"]')
-                .removeClass("btn-outline-primary btn-secondary")
-                .addClass("btn-secondary disabled")
-                .css("cursor", "not-allowed");
-        });
-    }
 });

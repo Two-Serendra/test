@@ -164,10 +164,6 @@
 
 
             }));
-
-            Alpine.nextTick(() => {
-                store.selectedUnit = null;
-            });
         });
     </script>
 

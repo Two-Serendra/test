@@ -1,122 +1,251 @@
-$(document).ready(function () {
+$(function () {
+    alert("🔥 JS VERSION 2026-06-15-003");
+    function logDebug(...args) {
+
+        const msg = args.map(a =>
+            typeof a === 'object'
+                ? JSON.stringify(a)
+                : a
+        ).join(' ');
+
+        console.log(msg);
+
+        const el = document.getElementById('debugPanel');
+
+        if (el) {
+            el.innerHTML += msg + "<br>";
+            el.scrollTop = el.scrollHeight;
+        }
+    }
+
+    logDebug("🚀 Mobile Booking JS Loaded");
+
     flatpickr("#AusiBookingDate", {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(1),
+        onChange: function (selectedDates, dateStr) {
+            window.ausiState.date = dateStr;
+            console.log("DATE:", dateStr);
+            triggerUpdate();
+            alert("DATE CHANGED: " + dateStr);
+        }
+    });
+    window.ausiState = {
+        date: null,
+        unit: null
+    };
+
+    const $bookingSlots = $('.ausi-booking-slot');
+    window.addEventListener('change', function (e) {
+        if (e.target && e.target.id === 'resident_id_ausi') {
+
+            const value = e.target.value;
+
+            window.ausiState.unit = value;
+            Alpine.store('superapp').selectedUnit = value;
+
+            console.log("UNIT:", value);
+            alert("UNIT CHANGED: " + value);
+
+            triggerUpdate();
+        }
     });
 
 
-    const $bookingDate = $('#AusiBookingDate');
-    const $bookingSlots = $('.ausi-booking-slot');
-    const $submitBtn = $('#saveUserAusiBtn');
+    function triggerUpdate() {
+        const date = window.ausiState.date;
+        const unit = window.ausiState.unit;
 
-    function updateSlots(date) {
-        if (!date) return;
+        console.log("TRIGGER:", { date, unit });
 
-        const residentId = $('select[name="resident_id_ausi"]').val();
+        if (!date || !unit) {
+            $(".ausi-booking-slot").prop("disabled", true);
+            hideLoading();
+            return;
+        }
+
+        updateSlots(date, unit);
+    }
+
+    function updateSlots(date, unitName) {
+
+        console.log("updateSlots:", { date, unitName });
 
         showLoading();
+        resetSlots();
 
         $.ajax({
-            url: '/ausi-booked-slots',
-            type: 'GET',
-            data: {
-                date: date,
-                resident_id: residentId
-            },
+            url: "/ausi-booked-slots-mobile",
+            type: "GET",
+            data: { date, unit_name: unitName },
+
             success: function (res) {
+                console.log("SUCCESS", res);
+
                 resetSlots();
-                disableBookedSlots(res.blocked_for_user);
+                disableBookedSlots(res.blocked_for_user || []);
                 disablePastSlots(date);
             },
-            error: function () {
-                console.log('Failed to load slots');
+
+            error: function (xhr) {
+                console.error("ERROR", xhr.responseText);
             },
+
             complete: function () {
                 hideLoading();
             }
         });
     }
 
-
     function resetSlots() {
-        $bookingSlots.each(function () {
-            $(this).prop('disabled', false).prop('checked', false);
+        $(".ausi-booking-slot").each(function () {
+
+            $(this)
+                .prop("disabled", false)
+                .prop("checked", false);
+
             $('label[for="' + this.id + '"]')
-                .removeClass('disabled btn-secondary')
-                .addClass('btn-outline-primary')
-                .css('cursor', 'pointer');
+                .removeClass(
+                    "disabled btn-secondary"
+                )
+                .addClass("btn-outline-primary")
+                .css("cursor", "pointer");
         });
+        checkFormReady();
     }
 
     function disableBookedSlots(bookedSlots) {
-        bookedSlots.forEach(slot => {
-            const $radio = $('.ausi-booking-slot[data-slot="' + slot + '"]');
+        bookedSlots.forEach(function (slot) {
 
+            const radio =
+                $('.ausi-booking-slot[data-slot="' + slot + '"]');
 
-            if ($radio.length) {
-                $radio.prop('disabled', true);
-                $('label[for="' + $radio.attr('id') + '"]')
-                    .removeClass('btn-outline-primary')
-                    .addClass('btn-secondary disabled')
-                    .css('cursor', 'not-allowed');
-            }
+            if (!radio.length) return;
+
+            radio.prop("disabled", true);
+
+            $('label[for="' + radio.attr("id") + '"]')
+                .removeClass("btn-outline-primary")
+                .addClass("btn-secondary disabled")
+                .css("cursor", "not-allowed");
         });
     }
 
-    $bookingSlots.prop('disabled', true);
-
-    $bookingDate.on('change', function () {
-        const selectedDate = $(this).val();
-        updateSlots(selectedDate);
-    });
-
-    $('select[name="resident_id_ausi"]').on('change', function () {
-        updateSlots($bookingDate.val());
-    });
-
     function showLoading() {
-        $('#slotLoading').removeClass('d-none');
-        $bookingSlots.prop('disabled', true);
+        $("#slotLoading").removeClass("d-none");
+
+        $(".ausi-booking-slot").prop(
+            "disabled",
+            true
+        );
     }
 
     function hideLoading() {
-        $('#slotLoading').addClass('d-none');
+        $("#slotLoading").addClass("d-none");
     }
 
     function disablePastSlots(selectedDate) {
         if (!selectedDate) return;
-
         const now = new Date();
+        $(".ausi-booking-slot").each(function () {
+            const slot =
+                $(this).data("slot");
 
-        $bookingSlots.each(function () {
-            const slot = $(this).data('slot');
-            const startTime = slot.split(' - ')[0];
-            const normalizedStartTime = startTime.replace('NN', 'PM');
-            const slotDateTime = new Date(`${selectedDate} ${normalizedStartTime}`);
-            if (slotDateTime <= now) {
-                $(this).prop('disabled', true);
+            const start =
+                slot.split(" - ")[0]
+                    .replace("NN", "PM");
 
-                $('label[for="' + $(this).attr('id') + '"]')
-                    .removeClass('btn-outline-primary')
-                    .addClass('btn-secondary disabled')
-                    .css('cursor', 'not-allowed');
+            const slotDate =
+                new Date(
+                    `${selectedDate} ${start}`
+                );
+
+            if (slotDate <= now) {
+
+                $(this).prop(
+                    "disabled",
+                    true
+                );
+
+                $('label[for="' + $(this).attr("id") + '"]')
+                    .removeClass("btn-outline-primary")
+                    .addClass("btn-secondary disabled")
+                    .css("cursor", "not-allowed");
             }
         });
+
+    }
+
+    logDebug(
+        "SLOTS COUNT",
+        document.querySelectorAll(".ausi-booking-slot").length
+    );
+
+    $(document).ready(function () {
+        logDebug("READY");
+        logDebug(
+            "SLOTS",
+            document.querySelectorAll(".ausi-booking-slot").length
+        );
+
+        $(".ausi-booking-slot").prop("disabled", true);
+    });
+
+    function resetAusiBookingUI() {
+        const form = document.getElementById('userAusiNewBookingMobile');
+        isResetting = true;
+
+        form.reset();
+        form.classList.remove('was-validated');
+        const store = Alpine.store('superapp');
+        store.selectedUnit = null;
+        Alpine.store('superapp').selectedUnit = '';
+        $('#mobile_email').val('');
+        $('#mobile_unit_name').val('');
+        $('#mobile_unit_role').val('');
+        const fp = document.querySelector("#AusiBookingDate")?._flatpickr;
+        if (fp) fp.clear();
+        $(".ausi-booking-slot").each(function () {
+            $(this)
+                .prop("disabled", true)
+                .prop("checked", false);
+
+            $('label[for="' + this.id + '"]')
+                .removeClass("btn-secondary disabled")
+                .addClass("btn-outline-primary")
+                .css("cursor", "pointer");
+        });
+        $("#slotLoading").addClass("d-none");
+        $("#saveUserAusiBtn")
+            .prop("disabled", true)
+            .html('<span class="btn-text">SUBMIT</span>');
+
+        isResetting = false;
     }
 
 
-    $('#userAusiNewBooking').on('submit', function (event) {
+
+    $(document).on('submit', '#userAusiNewBookingMobile', function (event) {
         event.preventDefault();
-
         const form = this;
-        const $submitBtn = $('#saveUserAusiBtn');
-        const $bookingDate = $('#AusiBookingDate');
-        const selectedDate = $bookingDate.val();
-
+        logDebug("SUBMIT FIRED");
+        const selectedDate = $('#AusiBookingDate').val();
+        const selectedUnit = $('#resident_id_ausi').val();
         const selectedSlot = $('input[name="booking_time_slot"]:checked').val();
+        const $submitBtn = $('#saveUserAusiBtn');
+
+        if (!selectedUnit) {
+            logDebug("NO UNIT SELECTED");
+            return;
+        }
+
+        if (!selectedDate) {
+            logDebug("NO DATE SELECTED");
+            return;
+        }
 
         if (!selectedSlot) {
-            $('.slot-error').show();
+            logDebug("NO SLOT SELECTED");
 
             Swal.fire({
                 icon: 'warning',
@@ -125,39 +254,47 @@ $(document).ready(function () {
             });
 
             return;
-        } else {
-            $('.slot-error').hide();
         }
 
         if (!form.checkValidity()) {
             form.classList.add('was-validated');
             return;
         }
-        form.classList.remove('was-validated');
 
+        form.classList.remove('was-validated');
+        const store = Alpine.store('superapp');
+        const email = store?.user?.email || '';
         const originalWidth = $submitBtn.outerWidth();
 
         const lockSubmitBtn = () => {
+            isSubmitting = true;
+
             $submitBtn
-                .attr('disabled', true)
-                .html(`<div class="spinner-border spinner-border-sm text-light"></div>`)
-                .css('width', originalWidth + 'px');
+                .prop('disabled', true)
+                .html(`<div class="spinner-border spinner-border-sm text-light"></div>`);
         };
 
         const unlockSubmitBtn = () => {
+            isSubmitting = false;
+
             $submitBtn
-                .attr('disabled', false)
-                .html(`<span class="btn-text">Submit</span>`)
+                .prop('disabled', false)
+                .html(`<span class="btn-text">SUBMIT</span>`)
                 .css('width', '');
         };
 
         const sendBooking = (forceOverride = false) => {
+            const store = Alpine.store('superapp');
+            $('#mobile_email').val(store?.user?.email || '');
             const formData = new FormData(form);
             if (forceOverride) {
                 formData.append('force_override', true);
             }
 
             lockSubmitBtn();
+            for (const pair of formData.entries()) {
+                alert(pair[0] + " = " + pair[1]);
+            }
 
             $.ajax({
                 url: $(form).attr('action'),
@@ -168,149 +305,85 @@ $(document).ready(function () {
                 data: formData,
                 processData: false,
                 contentType: false,
+                success: function (res) {
 
-                success(response) {
+                    logDebug("SUCCESS");
+                    logDebug(JSON.stringify(res, null, 2));
 
+                    if (res.debug) {
+                        res.debug.forEach(d => logDebug("🧠 " + d));
+                    }
                     Swal.fire({
                         icon: 'success',
-                        title: 'Booking Submitted!',
-                        text: response.message || 'Your booking has been successfully submitted.',
+                        title: 'Booking Successful',
+                        text: res.message ?? 'Your booking has been saved',
                         timer: 2000,
                         showConfirmButton: false
                     });
-
-
-                    form.reset();
-                    $(form).removeClass('was-validated');
-
-                    resetSlots();
+                    resetAusiBookingUI();
                     $bookingSlots.prop('disabled', true);
-
-                    flatpickr('#AusiBookingDate', {
-                        dateFormat: 'Y-m-d',
-                        minDate: new Date().fp_incr(1)
-                    });
+                    resetSlots()
                 },
 
-
-                error(xhr) {
+                error: function (xhr) {
                     const res = xhr.responseJSON || {};
-
+                    logDebug("ERROR", xhr.status);
+                    logDebug("RESPONSE", res);
 
                     if (xhr.status === 422) {
-                        let msg = 'Please check the form fields.';
-                        if (res.errors) {
-                            msg = Object.values(res.errors).map(e => e[0]).join('\n');
-                        }
                         Swal.fire({
                             icon: 'error',
                             title: 'Validation Error',
-                            text: msg,
-                            confirmButtonText: 'OK',
-                            confirmButtonColor: '#d33'
+                            text: 'Please check required fields'
                         });
                         return;
                     }
 
-                    if (xhr.status === 409) {
+                    if (xhr.status === 409 && res.type === 'slot_taken') {
 
-                        if (res.type === 'slot_taken') {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Time Slot Taken',
-                                text: res.message || 'This time slot is already booked just now.',
-                                confirmButtonText: 'OK',
-                                confirmButtonColor: '#d33'
-                            });
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Slot Already Taken',
+                            text: res.message
+                        });
 
-                            updateSlots(selectedDate);
-                            return;
-                        }
-
-                        if (res.type === 'unit_already_booked') {
-
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Booking Already Exists',
-                                text: res.message,
-                                showCancelButton: true,
-                                confirmButtonText: 'Yes, book anyway',
-                                cancelButtonText: 'Cancel',
-                                confirmButtonColor: '#3085d6',
-                                cancelButtonColor: '#d33'
-                            }).then((result) => {
-
-                                if (result.isConfirmed) {
-                                    sendBooking(true);
-                                } else {
-                                    unlockSubmitBtn();
-                                }
-                            });
-
-                            return;
-                        }
+                        updateSlots(selectedDate);
+                        return;
                     }
+
+                    if (xhr.status === 409 && res.type === 'unit_already_booked') {
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Already Booked',
+                            text: res.message,
+                            showCancelButton: true,
+                            confirmButtonText: 'Book Anyway'
+                        }).then((result) => {
+
+                            if (result.isConfirmed) {
+                                sendBooking(true);
+                            } else {
+                                unlockSubmitBtn();
+                            }
+
+                        });
+
+                        return;
+                    }
+
                     Swal.fire({
-                        toast: true,
-                        position: 'top-end',
                         icon: 'error',
-                        title: 'Something went wrong. Please try again later.',
-                        timer: 3000,
-                        showConfirmButton: false
+                        title: 'Error',
+                        text: 'Something went wrong'
                     });
+
                 },
-
-
                 complete() {
                     unlockSubmitBtn();
                 }
             });
-        };
+        }
         sendBooking();
     });
-
-    $(document).on('click', '.ausi-booking-cancel', function () {
-
-        const bookingId = $(this).data('id');
-        // console.log("Cancel clicked", bookingId);
-
-        Swal.fire({
-            title: 'Cancel Booking',
-            text: 'Are you sure you want to cancel this booking?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Yes, cancel it',
-            cancelButtonText: 'No, keep it'
-        }).then((result) => {
-            if (result.isConfirmed) {
-
-                $.ajax({
-                    url: '/ausi-booking/cancel/' + bookingId,
-                    type: 'POST',
-                    data: {
-                        _token: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function (res) {
-
-                        Swal.fire('Cancelled!', res.message, 'success')
-                            .then(() => {
-                                let page = $('.pagination .active span').text() || 1;
-                                loadBookings(page);
-                            });
-
-                    },
-                    error: function (xhr) {
-                        Swal.fire('Error',
-                            xhr.responseJSON?.message || 'Something went wrong while cancelling.',
-                            'error'
-                        );
-                    }
-                });
-
-            }
-        });
-    });
-
-}); 
+});

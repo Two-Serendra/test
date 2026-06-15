@@ -94,7 +94,7 @@
             })
         });
     </script>
-    <script src="{{ asset('assets/frontend/js/ausi-booking-mobile.js') }}"></script>
+    <script src="{{ asset('assets/frontend/js/mobile-app/ausi-booking-mobile.js') }}"></script>
     <script>
         window.APP_VERSION = "{{ $cache_bust }}";
     </script>

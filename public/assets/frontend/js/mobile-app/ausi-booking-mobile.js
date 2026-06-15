@@ -23,32 +23,20 @@ $(function () {
 
     logDebug("🚀 Mobile Booking JS Loaded");
 
-    window.onAusiDateChange = function (selectedDates, dateStr) {
-        window.ausiState = window.ausiState || {};
-        window.ausiState.date = dateStr;
-
-        console.log("DATE:", dateStr);
-
-        if (window.triggerUpdate) {
-            window.triggerUpdate();
-        }
-
-        alert("DATE CHANGED: " + dateStr);
-    };
-
-    window.initAusiDatePicker = function () {
-        flatpickr("#AusiBookingDate", {
-            dateFormat: "Y-m-d",
-            minDate: new Date().fp_incr(1),
-            onChange: window.onAusiDateChange
-        });
-    };
-
-    document.addEventListener("DOMContentLoaded", function () {
-        if (window.initAusiDatePicker) {
-            window.initAusiDatePicker();
+    flatpickr("#AusiBookingDate", {
+        dateFormat: "Y-m-d",
+        minDate: new Date().fp_incr(1),
+        onChange: function (selectedDates, dateStr) {
+            window.ausiState.date = dateStr;
+            console.log("DATE:", dateStr);
+            triggerUpdate();
+            alert("DATE CHANGED: " + dateStr);
         }
     });
+    window.ausiState = {
+        date: null,
+        unit: null
+    };
 
     const $bookingSlots = $('.ausi-booking-slot');
 

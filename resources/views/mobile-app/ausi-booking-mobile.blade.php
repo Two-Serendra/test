@@ -164,6 +164,6 @@
             }));
         });
     </script>
-    <script src="{{ asset('assets/frontend/js/ausi-booking-mobile-v1.js') }}"></script>
+
 
 @endsection

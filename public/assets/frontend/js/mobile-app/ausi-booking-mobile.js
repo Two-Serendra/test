@@ -22,6 +22,7 @@ $(function () {
     }
 
     logDebug("🚀 Mobile Booking JS Loaded");
+
     window.ausiState = {
         date: null,
         unit: null
@@ -86,8 +87,9 @@ $(function () {
 
     function updateSlots(date, unitName) {
 
-        console.log("updateSlots:", { date, unitName });
+        alert("ENTERED updateSlots");
 
+        logDebug("updateSlots:", { date, unitName });
         showLoading();
         resetSlots();
 
@@ -100,9 +102,9 @@ $(function () {
             },
 
             beforeSend: function () {
-                console.log("===== AJAX START =====");
-                console.log("URL:", "/ausi-booked-slots-mobile");
-                console.log("DATA:", {
+                logDebug("===== AJAX START =====");
+                logDebug("URL:", "/ausi-booked-slots-mobile");
+                logDebug("DATA:", {
                     date: date,
                     unit_name: unitName
                 });

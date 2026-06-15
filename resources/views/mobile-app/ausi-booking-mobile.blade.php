@@ -117,18 +117,18 @@
         </div>
 
         <div id="debugPanel" style="
-                                                        position: fixed;
-                                                        bottom: 0;
-                                                        left: 0;
-                                                        right: 0;
-                                                        height: 140px;
-                                                        overflow: auto;
-                                                        background: black;
-                                                        color: #00ff00;
-                                                        font-size: 11px;
-                                                        z-index: 99999;
-                                                        padding: 10px;
-                                                    ">
+                                                            position: fixed;
+                                                            bottom: 0;
+                                                            left: 0;
+                                                            right: 0;
+                                                            height: 140px;
+                                                            overflow: auto;
+                                                            background: black;
+                                                            color: #00ff00;
+                                                            font-size: 11px;
+                                                            z-index: 99999;
+                                                            padding: 10px;
+                                                        ">
         </div>
 
     </div>
@@ -161,6 +161,17 @@
                         showHome: false,
                     });
                 },
+                
+                onUnitChange(e) {
+                    const value = e.target.value;
+
+                    window.ausiState.unit = value;
+
+                    console.log("UNIT:", value);
+                    alert("UNIT CHANGED: " + value);
+
+                    triggerUpdate();
+                }
             }));
         });
     </script>

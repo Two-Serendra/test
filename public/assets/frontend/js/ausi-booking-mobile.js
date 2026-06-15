@@ -241,6 +241,7 @@ $(function () {
         const store = Alpine.store('superapp');
         logDebug("SELECTED UNIT CHANGED", { name, role, email, storeUser: store?.user });
         alert(`Selected Unit Changed:\nName: ${name}\nRole: ${role}\nEmail: ${email}`);
+        updateSlots($('#AusiBookingDate').val());
     });
 
     $(document).on('submit', '#userAusiNewBookingMobile', function (event) {

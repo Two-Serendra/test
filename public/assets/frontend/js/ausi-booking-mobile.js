@@ -51,6 +51,7 @@ $(function () {
         "#AusiBookingDate",
         function () {
             updateSlots($(this).val());
+            logDebug("Date Changed", $(this).val());
         }
     );
 
@@ -237,6 +238,7 @@ $(function () {
         $('#mobile_unit_name').val(name || '');
         $('#mobile_unit_role').val(role || '');
         const store = Alpine.store('superapp');
+        logDebug("SELECTED UNIT CHANGED", { name, role, email, storeUser: store?.user });
     });
 
     $(document).on('submit', '#userAusiNewBookingMobile', function (event) {
@@ -319,10 +321,6 @@ $(function () {
                 data: formData,
                 processData: false,
                 contentType: false,
-
-                beforeSend: function () {
-                    logDebug("🚀 REQUEST SENT TO: " + form.action);
-                },
                 success: function (res) {
 
                     logDebug("SUCCESS");

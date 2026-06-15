@@ -48,11 +48,13 @@ $(function () {
 
     $(document).on('change', '#AusiBookingDate', function () {
          updateSlots();
+         alert("Date Changed: " + $(this).val());
     });
 
     $(document).on('change', '#resident_id_ausi', function () {
         const selected = $(this).find(':selected');
         logDebug("SELECTED UNIT CHANGED", { name, role, email, storeUser: store?.user });
+        alert("Unit Changed: " + selected.text());
         updateSlots();
     });
 

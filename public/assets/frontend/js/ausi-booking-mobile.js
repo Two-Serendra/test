@@ -44,23 +44,28 @@ $(function () {
 
     // $(document).on('change', '#resident_id_ausi, #AusiBookingDate, input[name="booking_time_slot"]', checkFormReady);
 
+    let slotTimer = null;
+
     $(document).on('change', '#AusiBookingDate', function () {
-        updateSlots();
-        alert("Date Changed: " + $(this).val());
+        triggerUpdateSlots();
     });
 
     $(document).on('change', '#resident_id_ausi', function () {
-        const selected = $(this).find(':selected');
-        logDebug("SELECTED UNIT CHANGED", { name, role, email, storeUser: store?.user });
-        alert("Unit Changed: " + selected.text());
-        updateSlots();
+        triggerUpdateSlots();
     });
+
+
+    function triggerUpdateSlots() {
+        clearTimeout(slotTimer);
+
+        slotTimer = setTimeout(() => {
+            updateSlots();
+        }, 50);
+    }
 
     function updateSlots() {
         const date = $('#AusiBookingDate').val();
         const unitName = Alpine.store('superapp')?.selectedUnit || '';
-
-
         if (!date || !unitName) {
             $(".ausi-booking-slot").prop("disabled", true);
             return;

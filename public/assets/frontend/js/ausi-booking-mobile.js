@@ -30,6 +30,7 @@ $(function () {
             console.log("DATE:", dateStr);
 
             triggerUpdate();
+            alert("DATE CHANGED: " + dateStr);
         }
     });
     window.ausiState = {
@@ -47,23 +48,12 @@ $(function () {
             Alpine.store('superapp').selectedUnit = value;
 
             console.log("UNIT:", value);
+            alert("UNIT CHANGED: " + value);
 
             triggerUpdate();
         }
     });
 
-    flatpickr("#AusiBookingDate", {
-        dateFormat: "Y-m-d",
-        minDate: new Date().fp_incr(1),
-        onChange: function (selectedDates, dateStr) {
-
-            window.ausiState.date = dateStr;
-
-            console.log("DATE:", dateStr);
-
-            triggerUpdate();
-        }
-    });
 
     function triggerUpdate() {
         const date = window.ausiState.date;

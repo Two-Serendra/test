@@ -67,20 +67,12 @@
     @yield('content')
 
     <script>
-        const CURRENT_VERSION = "{{ $cache_bust }}";
-
-        if (window.__LAST_VERSION__ && window.__LAST_VERSION__ !== CURRENT_VERSION) {
-            location.reload(true);
-        }
-
-        window.__LAST_VERSION__ = CURRENT_VERSION;
         function isMobile() {
             return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
         }
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
     <script src="{{ asset('assets/frontend/lib/wow/wow.min.js') }}"></script>
     <script src="{{ asset('assets/frontend/lib/easing/easing.min.js') }}"></script>
     <script src="{{ asset('assets/frontend/lib/waypoints/waypoints.min.js') }}"></script>
@@ -102,7 +94,7 @@
             })
         });
     </script>
-    <script src="{{ asset('assets/frontend/js/ausi-booking-mobile-v2.js') }}"></script>
+    <script src="{{ asset('assets/frontend/js/ausi-booking-mobile.js') }}"></script>
     <script>
         window.APP_VERSION = "{{ $cache_bust }}";
     </script>

@@ -64,21 +64,18 @@ $(function () {
         updateSlots($('#AusiBookingDate').val());
     });
 
-    function updateSlots(date) {
-        logDebug("updateSlots", date);
+    function updateSlots() {
+
         const date = $('#AusiBookingDate').val();
-        const unitName =
-            Alpine.store('superapp')?.selectedUnit || '';
-        logDebug("unitName", unitName);
+        const unitName = Alpine.store('superapp')?.selectedUnit || '';
+
+        logDebug({ date, unitName });
 
         if (!date || !unitName) {
-
             $(".ausi-booking-slot").prop("disabled", true);
-
             return;
         }
-        logDebug("STORE TEST", Alpine.store('superapp'));
-        logDebug("SELECTED UNIT", Alpine.store('superapp')?.selectedUnit);
+
         showLoading();
         resetSlots();
 
@@ -101,7 +98,7 @@ $(function () {
             error: function (xhr) {
                 logDebug("ERROR", {
                     status: xhr.status,
-                    response: xhr.responseTextz
+                    response: xhr.responseText   // FIXED
                 });
             },
 

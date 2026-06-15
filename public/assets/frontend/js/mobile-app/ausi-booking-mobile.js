@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-003");
+    alert("🔥 JS VERSION 2026-06-15-004");
     const el = document.getElementById('resident_id_ausi');
 
     alert("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -27,20 +27,24 @@ $(function () {
         unit: null
     };
 
+    const $bookingSlots = $('.ausi-booking-slot');
+
     flatpickr("#AusiBookingDate", {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(1),
         onChange: function (selectedDates, dateStr) {
-            window.updateSlots(dateStr);
+
+            // Save the selected date
+            window.ausiState.date = dateStr;
+
+            console.log("DATE:", dateStr);
+            alert("DATE CHANGED: " + dateStr);
+
+            // Try updating if both date and unit are available
+            triggerUpdate();
         }
     });
 
-    const $bookingSlots = $('.ausi-booking-slot');
-
-    windows.on('change', '#AusiBookingDate', function () {
-        const date = $(this).val();
-        window.updateSlots(date);
-    });
 
     document.addEventListener('change', function (e) {
         if (e.target && e.target.id === 'resident_id_ausi') {

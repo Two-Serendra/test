@@ -1,4 +1,6 @@
 window.addEventListener('DOMContentLoaded', function () {
+
+   alert("AUSI JS LOADED - NEW VERSION 2026-06-15-01");
     function logDebug(...args) {
 
         const msg = args.map(a =>
@@ -181,7 +183,7 @@ window.addEventListener('DOMContentLoaded', function () {
         });
 
     }
-    
+
     function resetAusiBookingUI() {
         const form = document.getElementById('userAusiNewBookingMobile');
         isResetting = true;

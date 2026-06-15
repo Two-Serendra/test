@@ -18,7 +18,15 @@ class MobileAppController extends Controller
 {
     public function ausiBookingUserMobile(Request $request)
     {
-        return view('mobile-app.ausi-booking-mobile');
+        return response()
+            ->view('mobile-app.ausi-booking-mobile', [
+                'cache_bust' => microtime(true),
+            ])
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0, private, no-transform')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0')
+            ->header('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT')
+            ->header('ETag', '"' . uniqid() . '"');
     }
 
     public function getBookedSlotsAusiMobile(Request $request)

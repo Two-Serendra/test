@@ -127,6 +127,9 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+
+    'miniapp_origin' => env('MINIAPP_ORIGIN'),
+    
     /*
     |--------------------------------------------------------------------------
     | Maintenance Mode Driver

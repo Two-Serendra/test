@@ -207,7 +207,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware(['miniapp.webview'])->group(function () {
-    Route::get('/ausi-booking-mobile?t=TIMESTAMP', [MobileAppController::class, 'ausiBookingUserMobile'])->middleware('no-cache');
+    Route::get('/ausi-booking-mobile', [MobileAppController::class, 'ausiBookingUserMobile'])->middleware('no-cache');
     Route::get('/ausi-booked-slots-mobile', [MobileAppController::class, 'getBookedSlotsAusiMobile']);
     Route::post('/ausi-booking-mobile/store', [MobileAppController::class, 'storeAusiBookingMobile'])->name('ausi.booking.mobile.store')->middleware('throttle:5,1');
     Route::post('/ausi-booking-mobile/cancel/{booking}', [MobileAppController::class, 'CancelAusiBooking'])

@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-001");
+    alert("🔥 JS VERSION 2026-06-15-003");
     function logDebug(...args) {
 
         const msg = args.map(a =>
@@ -24,11 +24,8 @@ $(function () {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(1),
         onChange: function (selectedDates, dateStr) {
-
             window.ausiState.date = dateStr;
-
             console.log("DATE:", dateStr);
-
             triggerUpdate();
             alert("DATE CHANGED: " + dateStr);
         }

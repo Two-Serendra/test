@@ -1,6 +1,5 @@
-window.addEventListener('DOMContentLoaded', function () {
-
-   alert("AUSI JS LOADED - NEW VERSION 2026-06-15-01");
+$(function () {
+    alert("AUSI JS LOADED - NEW VERSION 2026-06-15-01");
     function logDebug(...args) {
 
         const msg = args.map(a =>
@@ -29,27 +28,44 @@ window.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    window.triggerUpdateSlots = function () {
-        if (window.slotTimer) clearTimeout(window.slotTimer);
+    let isResetting = false;
+    const $bookingSlots = $('.ausi-booking-slot');
 
-        window.slotTimer = setTimeout(() => {
-            updateSlots();
-        }, 100);
-    };
+    // function checkFormReady() {
+    //     if (isResetting) return;
 
+    //     const unit = $('#resident_id_ausi').val();
+    //     const date = $('#AusiBookingDate').val();
+    //     const slot = $('input[name="booking_time_slot"]:checked').val();
 
-    window.updateSlots = function () {
+    //     const isReady = !!(unit && date && slot);
 
-        const date = document.getElementById('AusiBookingDate')?.value;
-        const unitName = document.getElementById('resident_id_ausi')?.value;
+    //     $('#saveUserAusiBtn').prop('disabled', !isReady);
+    // }
 
-        logDebug({ date, unitName });
+    // $(document).on('change', '#resident_id_ausi, #AusiBookingDate, input[name="booking_time_slot"]', checkFormReady);
 
+    $(document).on('change', '#AusiBookingDate', function () {
+        updateSlots();
+        alert("Date Changed: " + $(this).val());
+    });
+
+    $(document).on('change', '#resident_id_ausi', function () {
+        const selected = $(this).find(':selected');
+        logDebug("SELECTED UNIT CHANGED", { name, role, email, storeUser: store?.user });
+        alert("Unit Changed: " + selected.text());
+        updateSlots();
+    });
+
+    function updateSlots() {
+        const date = $('#AusiBookingDate').val();
+        const unitName = Alpine.store('superapp')?.selectedUnit || '';
         if (!date || !unitName) {
             $(".ausi-booking-slot").prop("disabled", true);
             return;
         }
-
+        logDebug("STORE TEST", Alpine.store('superapp'));
+        logDebug("SELECTED UNIT", Alpine.store('superapp')?.selectedUnit);
         showLoading();
         resetSlots();
 
@@ -63,46 +79,25 @@ window.addEventListener('DOMContentLoaded', function () {
 
             success: function (res) {
                 logDebug("SUCCESS", res);
+
                 resetSlots();
                 disableBookedSlots(res.blocked_for_user || []);
                 disablePastSlots(date);
             },
 
             error: function (xhr) {
-                logDebug("ERROR", xhr.responseText);
+                logDebug("ERROR", {
+                    status: xhr.status,
+                    response: xhr.responseText
+                });
             },
 
             complete: function () {
+                logDebug("COMPLETE");
                 hideLoading();
             }
         });
-    };
-
-
-    // ✅ RESIDENCE CHANGE (WINDOW EVENT STYLE)
-    window.document.addEventListener('change', function (e) {
-        if (e.target && e.target.id === 'resident_id_ausi') {
-
-            const unitName = e.target.value;
-
-            logDebug("RESIDENCE CHANGED", unitName);
-            alert("Residence changed: " + unitName);
-
-            window.triggerUpdateSlots();
-        }
-    });
-
-
-    // ✅ DATE CHANGE (WINDOW EVENT STYLE)
-    window.document.addEventListener('change', function (e) {
-        if (e.target && e.target.id === 'AusiBookingDate') {
-
-            logDebug("DATE CHANGED", e.target.value);
-            alert("Date changed: " + e.target.value);
-
-            window.triggerUpdateSlots();
-        }
-    });
+    }
 
 
     function resetSlots() {
@@ -184,6 +179,21 @@ window.addEventListener('DOMContentLoaded', function () {
 
     }
 
+    logDebug(
+        "SLOTS COUNT",
+        document.querySelectorAll(".ausi-booking-slot").length
+    );
+
+    $(document).ready(function () {
+        logDebug("READY");
+        logDebug(
+            "SLOTS",
+            document.querySelectorAll(".ausi-booking-slot").length
+        );
+
+        $(".ausi-booking-slot").prop("disabled", true);
+    });
+
     function resetAusiBookingUI() {
         const form = document.getElementById('userAusiNewBookingMobile');
         isResetting = true;
@@ -261,6 +271,7 @@ window.addEventListener('DOMContentLoaded', function () {
 
         const lockSubmitBtn = () => {
             isSubmitting = true;
+
             $submitBtn
                 .prop('disabled', true)
                 .html(`<div class="spinner-border spinner-border-sm text-light"></div>`);
@@ -284,6 +295,10 @@ window.addEventListener('DOMContentLoaded', function () {
             }
 
             lockSubmitBtn();
+            for (const pair of formData.entries()) {
+                alert(pair[0] + " = " + pair[1]);
+            }
+
             $.ajax({
                 url: $(form).attr('action'),
                 type: $(form).attr('method'),

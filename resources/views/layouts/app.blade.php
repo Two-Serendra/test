@@ -98,8 +98,7 @@
             })
         });
     </script>
-    <script
-        src="{{ asset('assets/frontend/js/ausi-booking-mobile.js') }}?v={{ time() }}&r={{ rand(1000, 9999) }}"></script>
+    <script src="{{ asset('assets/frontend/js/ausi-booking-mobile-v1.js') }}"></script>
 </body>
 
 </html>

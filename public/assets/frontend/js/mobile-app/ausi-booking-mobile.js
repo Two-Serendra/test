@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-004");
+    alert("🔥 JS VERSION 2026-06-15-0065");
     const el = document.getElementById('resident_id_ausi');
 
     alert("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -255,40 +255,12 @@ $(function () {
         $(".ausi-booking-slot").prop("disabled", true);
     });
 
-    function resetAusiBookingUI() {
-        const form = document.getElementById('userAusiNewBookingMobile');
-        isResetting = true;
+    $('#resident_id_ausi').val('').trigger('change');
 
-        form.reset();
-        form.classList.remove('was-validated');
-        const store = Alpine.store('superapp');
-        store.selectedUnit = null;
-        // Alpine.store('superapp').selectedUnit = '';
-        $('#resident_id_ausi').val('').trigger('change');
-        $('#mobile_email').val('');
-        $('#mobile_unit_name').val('');
-        $('#mobile_unit_role').val('');
-        const fp = document.querySelector("#AusiBookingDate")?._flatpickr;
-        if (fp) fp.clear();
-        $(".ausi-booking-slot").each(function () {
-            $(this)
-                .prop("disabled", true)
-                .prop("checked", false);
+    Alpine.store('superapp').selectedUnit = '';
+    window.ausiState.unit = null;
 
-            $('label[for="' + this.id + '"]')
-                .removeClass("btn-secondary disabled")
-                .addClass("btn-outline-primary")
-                .css("cursor", "pointer");
-        });
-        $("#slotLoading").addClass("d-none");
-        $("#saveUserAusiBtn")
-            .prop("disabled", true)
-            .html('<span class="btn-text">SUBMIT</span>');
-
-        isResetting = false;
-    }
-
-
+    let isSubmitting = false;
 
     $(document).on('submit', '#userAusiNewBookingMobile', function (event) {
         event.preventDefault();
@@ -350,12 +322,9 @@ $(function () {
 
         const sendBooking = (forceOverride = false) => {
             const store = Alpine.store('superapp');
-
             const email = store?.user?.email || '';
             const unit = $('#resident_id_ausi').val();
             const role = $('#resident_id_ausi option:selected').data('role') || '';
-
-            // 🔥 FORCE SYNC ALL HIDDEN FIELDS
             $('#mobile_email').val(email);
             $('#mobile_unit_name').val(unit);
             $('#mobile_unit_role').val(role);
@@ -401,7 +370,6 @@ $(function () {
                         showConfirmButton: false
                     });
                     resetAusiBookingUI();
-                    $bookingSlots.prop('disabled', true);
                     disableAllSlots();
                 },
 
@@ -474,8 +442,10 @@ $(function () {
                     });
 
                 },
-                complete() {
-                    unlockSubmitBtn();
+                complete: function () {
+                    setTimeout(() => {
+                        unlockSubmitBtn();
+                    }, 50);
                 }
             });
         }

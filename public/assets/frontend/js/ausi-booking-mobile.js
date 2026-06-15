@@ -48,10 +48,11 @@ $(function () {
         updateSlots();
         alert("Date Changed: " + $(this).val());
     });
-
-    $('#resident_id_ausi').on('change', function () {
-        alert("DIRECT BIND WORKS");
-    });
+    document.getElementById('resident_id_ausi')
+        .addEventListener('change', function () {
+            alert("Unit Changed (native)");
+            updateSlots();
+        });
 
     // $(document).on('change', '#resident_id_ausi', function () {
     //     const selected = $(this).find(':selected');

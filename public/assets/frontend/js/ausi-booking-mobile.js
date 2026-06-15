@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 AUSI JS LOADED VERSION A", new Date().toISOString());
+    alert("🔥 JS VERSION 2026-06-15-001");
     function logDebug(...args) {
 
         const msg = args.map(a =>

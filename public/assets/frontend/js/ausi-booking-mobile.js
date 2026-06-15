@@ -1,5 +1,5 @@
 $(function () {
-    alert("AUSI JS LOADED - NEW VERSION 2026-06-15-01");
+
     function logDebug(...args) {
 
         const msg = args.map(a =>
@@ -29,8 +29,9 @@ $(function () {
     });
 
     let isResetting = false;
-    const $bookingSlots = $('.ausi-booking-slot');
 
+
+    const $bookingSlots = $('.ausi-booking-slot');
     // function checkFormReady() {
     //     if (isResetting) return;
 
@@ -46,22 +47,34 @@ $(function () {
     // $(document).on('change', '#resident_id_ausi, #AusiBookingDate, input[name="booking_time_slot"]', checkFormReady);
 
     $(document).on('change', '#AusiBookingDate', function () {
-        updateSlots();
+        updateSlots($(this).val());
+        logDebug("Date Changed", $(this).val());
         alert("Date Changed: " + $(this).val());
     });
 
     $(document).on('change', '#resident_id_ausi', function () {
         const selected = $(this).find(':selected');
+        const name = selected.data('name');
+        const role = selected.data('role');
+        const email = selected.data('email');
+        $('#mobile_unit_name').val(name || '');
+        $('#mobile_unit_role').val(role || '');
+        const store = Alpine.store('superapp');
         logDebug("SELECTED UNIT CHANGED", { name, role, email, storeUser: store?.user });
-        alert("Unit Changed: " + selected.text());
-        updateSlots();
+        updateSlots($('#AusiBookingDate').val());
     });
 
-    function updateSlots() {
+    function updateSlots(date) {
+        logDebug("updateSlots", date);
         const date = $('#AusiBookingDate').val();
-        const unitName = Alpine.store('superapp')?.selectedUnit || '';
+        const unitName =
+            Alpine.store('superapp')?.selectedUnit || '';
+        logDebug("unitName", unitName);
+
         if (!date || !unitName) {
+
             $(".ausi-booking-slot").prop("disabled", true);
+
             return;
         }
         logDebug("STORE TEST", Alpine.store('superapp'));
@@ -88,7 +101,7 @@ $(function () {
             error: function (xhr) {
                 logDebug("ERROR", {
                     status: xhr.status,
-                    response: xhr.responseText
+                    response: xhr.responseTextz
                 });
             },
 

@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-002");
+    alert("🔥 JS VERSION 2026-06-15-003");
     const el = document.getElementById('resident_id_ausi');
 
     alert("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -349,7 +349,22 @@ $(function () {
 
         const sendBooking = (forceOverride = false) => {
             const store = Alpine.store('superapp');
-            $('#mobile_email').val(store?.user?.email || '');
+
+            const email = store?.user?.email || '';
+            const unit = $('#resident_id_ausi').val();
+            const role = $('#resident_id_ausi option:selected').data('role') || '';
+
+            // 🔥 FORCE SYNC ALL HIDDEN FIELDS
+            $('#mobile_email').val(email);
+            $('#mobile_unit_name').val(unit);
+            $('#mobile_unit_role').val(role);
+
+            console.log("SYNC CHECK:", {
+                email,
+                unit,
+                role
+            });
+
             const formData = new FormData(form);
             if (forceOverride) {
                 formData.append('force_override', true);

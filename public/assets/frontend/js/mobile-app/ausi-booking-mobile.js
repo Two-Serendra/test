@@ -36,19 +36,17 @@ $(function () {
     };
 
     const $bookingSlots = $('.ausi-booking-slot');
-    window.addEventListener('change', function (e) {
-        if (e.target && e.target.id === 'resident_id_ausi') {
+    
+    $(document).on('change', '#resident_id_ausi', function (e) {
+        const value = e.target.value;
 
-            const value = e.target.value;
+        window.ausiState.unit = value;
+        Alpine.store('superapp').selectedUnit = value;
 
-            window.ausiState.unit = value;
-            Alpine.store('superapp').selectedUnit = value;
+        console.log("UNIT:", value);
+        alert("UNIT CHANGED: " + value);
 
-            console.log("UNIT:", value);
-            alert("UNIT CHANGED: " + value);
-
-            triggerUpdate();
-        }
+        triggerUpdate();
     });
 
 

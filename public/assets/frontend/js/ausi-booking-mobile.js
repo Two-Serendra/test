@@ -47,32 +47,27 @@ $(function () {
     // $(document).on('change', '#resident_id_ausi, #AusiBookingDate, input[name="booking_time_slot"]', checkFormReady);
 
     $(document).on('change', '#AusiBookingDate', function () {
-        updateSlots($(this).val());
-        logDebug("Date Changed", $(this).val());
-        alert("Date Changed: " + $(this).val());
+         updateSlots();
     });
 
     $(document).on('change', '#resident_id_ausi', function () {
         const selected = $(this).find(':selected');
-        const name = selected.data('name');
-        const role = selected.data('role');
-        const email = selected.data('email');
-        $('#mobile_unit_name').val(name || '');
-        $('#mobile_unit_role').val(role || '');
-        const store = Alpine.store('superapp');
         logDebug("SELECTED UNIT CHANGED", { name, role, email, storeUser: store?.user });
-        updateSlots($('#AusiBookingDate').val());
+        updateSlots();
     });
 
-    function updateSlots(date) {
+    function updateSlots() {
+        const date = $('#AusiBookingDate').val();
         logDebug("updateSlots", date);
-        const unitName = document.querySelector('#resident_id_ausi')?.value || '';
-        logDebug("unitName", unitName);
+        const unitName =
+            Alpine.store('superapp')?.selectedUnit || '';
+        logDebug({
+            date,
+            unitName
+        });
 
         if (!date || !unitName) {
-
             $(".ausi-booking-slot").prop("disabled", true);
-
             return;
         }
         logDebug("STORE TEST", Alpine.store('superapp'));

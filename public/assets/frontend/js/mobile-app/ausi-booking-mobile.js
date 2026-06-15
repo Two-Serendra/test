@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-007");
+    alert("🔥 JS VERSION 2026-06-15-008");
     const el = document.getElementById('resident_id_ausi');
 
     alert("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -89,23 +89,21 @@ $(function () {
 
         alert("ENTERED updateSlots");
 
-       logDebug("STEP 1 OK");
+        logDebug("STEP 1 OK");
 
         try {
 
             if (typeof logDebug === "function") {
                 logDebug("DEBUG OK", { date, unitName });
             } else {
-               logDebug("logDebug missing");
+                logDebug("logDebug missing");
             }
 
-           logDebug("STEP 2 OK");
+            logDebug("STEP 2 OK");
+            showLoading();
+            resetSlots();
 
-            // TEMP DISABLE EVERYTHING THAT CAN BREAK
-            // showLoading();
-            // resetSlots();
-
-           logDebug("STEP 3 OK - BEFORE AJAX");
+            logDebug("STEP 3 OK - BEFORE AJAX");
 
             $.ajax({
                 url: "/ausi-booked-slots-mobile",
@@ -117,8 +115,22 @@ $(function () {
                 },
 
                 success: function (res) {
+
                     alert("SUCCESS");
-                    console.log(res);
+
+                    logDebug("API RESPONSE:", res);
+
+                    resetSlots();
+
+                    // 1. Disable booked slots from backend
+                    if (res.blocked_for_user && Array.isArray(res.blocked_for_user)) {
+                        disableBookedSlots(res.blocked_for_user);
+                    }
+
+                    // 2. Disable past slots (you already have this function)
+                    disablePastSlots(date);
+
+                    logDebug("BLOCKED SLOTS:", res.blocked_for_user);
                 },
 
                 error: function (xhr) {
@@ -157,19 +169,66 @@ $(function () {
     }
 
     function disableBookedSlots(bookedSlots) {
+
+        if (!Array.isArray(bookedSlots)) return;
+
         bookedSlots.forEach(function (slot) {
 
-            const radio =
-                $('.ausi-booking-slot[data-slot="' + slot + '"]');
+            const radio = $('.ausi-booking-slot[data-slot="' + slot + '"]');
 
-            if (!radio.length) return;
+            if (!radio.length) {
+                console.warn("Slot not found:", slot);
+                return;
+            }
 
             radio.prop("disabled", true);
 
-            $('label[for="' + radio.attr("id") + '"]')
+            const label = $('label[for="' + radio.attr("id") + '"]');
+
+            label
                 .removeClass("btn-outline-primary")
                 .addClass("btn-secondary disabled")
                 .css("cursor", "not-allowed");
+        });
+    }
+
+    function disablePastSlots(selectedDate) {
+
+        const now = new Date();
+        const selected = new Date(selectedDate);
+
+        if (now.toDateString() !== selected.toDateString()) return;
+
+        const currentTime = now.getHours() * 60 + now.getMinutes();
+
+        $('.ausi-booking-slot').each(function () {
+
+            const slotText = $(this).data('slot');
+
+            if (!slotText) return;
+
+            const match = slotText.match(/(\d+):(\d+)\s*(AM|PM)/i);
+
+            if (!match) return;
+
+            let hour = parseInt(match[1]);
+            let minute = parseInt(match[2]);
+            let period = match[3].toUpperCase();
+
+            if (period === "PM" && hour !== 12) hour += 12;
+            if (period === "AM" && hour === 12) hour = 0;
+
+            const slotMinutes = hour * 60 + minute;
+
+            if (slotMinutes < currentTime) {
+
+                $(this).prop("disabled", true);
+
+                $('label[for="' + this.id + '"]')
+                    .addClass("btn-secondary disabled")
+                    .removeClass("btn-outline-primary")
+                    .css("cursor", "not-allowed");
+            }
         });
     }
 
@@ -186,37 +245,6 @@ $(function () {
         $("#slotLoading").addClass("d-none");
     }
 
-    function disablePastSlots(selectedDate) {
-        if (!selectedDate) return;
-        const now = new Date();
-        $(".ausi-booking-slot").each(function () {
-            const slot =
-                $(this).data("slot");
-
-            const start =
-                slot.split(" - ")[0]
-                    .replace("NN", "PM");
-
-            const slotDate =
-                new Date(
-                    `${selectedDate} ${start}`
-                );
-
-            if (slotDate <= now) {
-
-                $(this).prop(
-                    "disabled",
-                    true
-                );
-
-                $('label[for="' + $(this).attr("id") + '"]')
-                    .removeClass("btn-outline-primary")
-                    .addClass("btn-secondary disabled")
-                    .css("cursor", "not-allowed");
-            }
-        });
-
-    }
 
     logDebug(
         "SLOTS COUNT",

@@ -1,6 +1,8 @@
 $(function () {
     alert("🔥 JS VERSION 2026-06-15-009");
-    alert("SELECT EXISTS:", document.getElementById('resident_id_ausi'));
+    const el = document.getElementById('resident_id_ausi');
+
+    alert("SELECT EXISTS: " + (el ? "YES" : "NO"));
     function logDebug(...args) {
 
         const msg = args.map(a =>

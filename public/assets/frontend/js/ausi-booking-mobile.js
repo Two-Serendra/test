@@ -24,9 +24,18 @@ $(function () {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(1),
         onChange: function (selectedDates, dateStr) {
-            updateSlots(dateStr);
+
+            window.ausiState.date = dateStr;
+
+            console.log("DATE:", dateStr);
+
+            triggerUpdate();
         }
     });
+    window.ausiState = {
+        date: null,
+        unit: null
+    };
 
     const $bookingSlots = $('.ausi-booking-slot');
     window.addEventListener('change', function (e) {
@@ -34,41 +43,46 @@ $(function () {
 
             const value = e.target.value;
 
+            window.ausiState.unit = value;
             Alpine.store('superapp').selectedUnit = value;
 
-            const date = document.getElementById('AusiBookingDate')?.value;
+            console.log("UNIT:", value);
 
-            console.log("UNIT CHANGE:", value);
-
-            requestAnimationFrame(() => {
-                updateSlots(date, value);
-            });
+            triggerUpdate();
         }
     });
 
-    window.addEventListener('change', function (e) {
-        if (e.target && e.target.id === 'AusiBookingDate') {
+    flatpickr("#AusiBookingDate", {
+        dateFormat: "Y-m-d",
+        minDate: new Date().fp_incr(1),
+        onChange: function (selectedDates, dateStr) {
 
-            const date = e.target.value;
-            const unit = Alpine.store('superapp')?.selectedUnit;
+            window.ausiState.date = dateStr;
 
-            console.log("DATE CHANGE:", date);
+            console.log("DATE:", dateStr);
 
-            requestAnimationFrame(() => {
-                updateSlots(date, unit);
-            });
+            triggerUpdate();
         }
     });
 
-    function updateSlots(date, unitName) {
+    function triggerUpdate() {
+        const date = window.ausiState.date;
+        const unit = window.ausiState.unit;
 
-        console.log("updateSlots:", { date, unitName });
+        console.log("TRIGGER:", { date, unit });
 
-        if (!date || !unitName) {
+        if (!date || !unit) {
             $(".ausi-booking-slot").prop("disabled", true);
             hideLoading();
             return;
         }
+
+        updateSlots(date, unit);
+    }
+
+    function updateSlots(date, unitName) {
+
+        console.log("updateSlots:", { date, unitName });
 
         showLoading();
         resetSlots();

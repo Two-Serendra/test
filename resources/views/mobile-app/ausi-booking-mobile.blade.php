@@ -147,20 +147,10 @@
                 },
                 init() {
                     this.log("🚀 INIT STARTED");
-
                     this.setHeader();
                     const store = Alpine.store('superapp');
-
                     $('#mobile_email').val(store?.user?.email || '');
                     $('#mobile_user_id').val(store?.user?.id || '');
-                    this.$watch(() => Alpine.store('superapp').selectedUnit, () => {
-                        updateSlots();
-                    });
-
-                    this.$watch(() => $('#AusiBookingDate').val(), () => {
-                        updateSlots();
-                    });
-
                 },
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({

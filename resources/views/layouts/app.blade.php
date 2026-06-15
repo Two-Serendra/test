@@ -99,7 +99,7 @@
         });
     </script>
     <script
-        src="{{ asset('assets/frontend/js/ausi-booking-mobile.js') }}?v={{ filemtime(public_path('assets/frontend/js/ausi-booking-mobile.js')) }}"></script>
+        src="{{ asset('assets/frontend/js/ausi-booking-mobile.js') }}?v={{ time() }}&r={{ rand(1000, 9999) }}"></script>
 </body>
 
 </html>

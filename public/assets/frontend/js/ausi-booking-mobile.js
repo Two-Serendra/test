@@ -30,24 +30,12 @@ $(function () {
     let isResetting = false;
     const $bookingSlots = $('.ausi-booking-slot');
 
-    // function checkFormReady() {
-    //     if (isResetting) return;
-
-    //     const unit = $('#resident_id_ausi').val();
-    //     const date = $('#AusiBookingDate').val();
-    //     const slot = $('input[name="booking_time_slot"]:checked').val();
-
-    //     const isReady = !!(unit && date && slot);
-
-    //     $('#saveUserAusiBtn').prop('disabled', !isReady);
-    // }
-
-    // $(document).on('change', '#resident_id_ausi, #AusiBookingDate, input[name="booking_time_slot"]', checkFormReady);
-
     let slotTimer = null;
 
     $(document).on('change', '#AusiBookingDate', function () {
         triggerUpdateSlots();
+        logDebug("DATE CHANGED", $(this).val());
+        alert("Date changed: " + $(this).val());
     });
 
     $(document).on('change input', '#resident_id_ausi', function () {
@@ -55,6 +43,7 @@ $(function () {
         const unitName = $(this).val();
 
         logDebug("RESIDENCE CHANGED", unitName);
+        alert("Residence changed: " + unitName);
 
         triggerUpdateSlots();
     });

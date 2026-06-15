@@ -1,4 +1,4 @@
-$(function () {
+window.addEventListener('DOMContentLoaded', function () {
     function logDebug(...args) {
 
         const msg = args.map(a =>
@@ -27,44 +27,19 @@ $(function () {
         }
     });
 
-    let isResetting = false;
-    const $bookingSlots = $('.ausi-booking-slot');
+    window.triggerUpdateSlots = function () {
+        if (window.slotTimer) clearTimeout(window.slotTimer);
 
-    let slotTimer = null;
+        window.slotTimer = setTimeout(() => {
+            updateSlots();
+        }, 100);
+    };
 
-    $(document).on('change', '#AusiBookingDate', function () {
-        triggerUpdateSlots();
-        logDebug("DATE CHANGED", $(this).val());
-        alert("Date changed: " + $(this).val());
-    });
 
-    $(document).on('change input', '#resident_id_ausi', function () {
+    window.updateSlots = function () {
 
-        const unitName = $(this).val();
-
-        logDebug("RESIDENCE CHANGED", unitName);
-        alert("Residence changed: " + unitName);
-
-        triggerUpdateSlots();
-    });
-
-    function triggerUpdateSlots() {
-
-        clearTimeout(slotTimer);
-
-        slotTimer = setTimeout(() => {
-
-            requestAnimationFrame(() => {
-                updateSlots();
-            });
-
-        }, 50);
-    }
-
-    function updateSlots() {
-
-        const date = $('#AusiBookingDate').val();
-        const unitName = $('#resident_id_ausi').val();
+        const date = document.getElementById('AusiBookingDate')?.value;
+        const unitName = document.getElementById('resident_id_ausi')?.value;
 
         logDebug({ date, unitName });
 
@@ -84,23 +59,48 @@ $(function () {
                 unit_name: unitName
             },
 
-            success(res) {
+            success: function (res) {
                 logDebug("SUCCESS", res);
-
                 resetSlots();
                 disableBookedSlots(res.blocked_for_user || []);
                 disablePastSlots(date);
             },
 
-            error(xhr) {
+            error: function (xhr) {
                 logDebug("ERROR", xhr.responseText);
             },
 
-            complete() {
+            complete: function () {
                 hideLoading();
             }
         });
-    }
+    };
+
+
+    // ✅ RESIDENCE CHANGE (WINDOW EVENT STYLE)
+    window.document.addEventListener('change', function (e) {
+        if (e.target && e.target.id === 'resident_id_ausi') {
+
+            const unitName = e.target.value;
+
+            logDebug("RESIDENCE CHANGED", unitName);
+            alert("Residence changed: " + unitName);
+
+            window.triggerUpdateSlots();
+        }
+    });
+
+
+    // ✅ DATE CHANGE (WINDOW EVENT STYLE)
+    window.document.addEventListener('change', function (e) {
+        if (e.target && e.target.id === 'AusiBookingDate') {
+
+            logDebug("DATE CHANGED", e.target.value);
+            alert("Date changed: " + e.target.value);
+
+            window.triggerUpdateSlots();
+        }
+    });
 
 
     function resetSlots() {

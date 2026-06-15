@@ -28,12 +28,32 @@ $(function () {
         }
     });
 
-    // document.addEventListener('change', (e) => {
-    //     if (e.target.id === 'resident_id_ausi') {
-    //         Alpine.store('superapp').selectedUnit = e.target.value;
-    //         logDebug("SYNC STORE", e.target.value);
-    //     }
-    // });
+    let isResetting = false;
+
+
+    const $bookingSlots = $('.ausi-booking-slot');
+    function checkFormReady() {
+        if (isResetting) return;
+
+        const unit = $('#resident_id_ausi').val();
+        const date = $('#AusiBookingDate').val();
+        const slot = $('input[name="booking_time_slot"]:checked').val();
+
+        const isReady = !!(unit && date && slot);
+
+        $('#saveUserAusiBtn').prop('disabled', !isReady);
+    }
+
+    $(document).on('change', '#resident_id_ausi, #AusiBookingDate, input[name="booking_time_slot"]', checkFormReady);
+
+    $(document).on(
+        "change",
+        "#AusiBookingDate",
+        function () {
+            updateSlots($(this).val());
+        }
+    );
+
 
     function updateSlots(date) {
         logDebug("updateSlots", date);
@@ -82,29 +102,6 @@ $(function () {
         });
     }
 
-    let isResetting = false;
-
-    function checkFormReady() {
-        if (isResetting) return;
-
-        const unit = $('#resident_id_ausi').val();
-        const date = $('#AusiBookingDate').val();
-        const slot = $('input[name="booking_time_slot"]:checked').val();
-
-        const isReady = !!(unit && date && slot);
-
-        $('#saveUserAusiBtn').prop('disabled', !isReady);
-    }
-
-    $(document).on('change', '#resident_id_ausi, #AusiBookingDate, input[name="booking_time_slot"]', checkFormReady);
-
-    $(document).on(
-        "change",
-        "#AusiBookingDate",
-        function () {
-            updateSlots($(this).val());
-        }
-    );
 
     function resetSlots() {
         $(".ausi-booking-slot").each(function () {
@@ -119,9 +116,8 @@ $(function () {
                 )
                 .addClass("btn-outline-primary")
                 .css("cursor", "pointer");
-            checkFormReady();
-
         });
+        checkFormReady();
     }
 
     function disableBookedSlots(bookedSlots) {
@@ -209,7 +205,7 @@ $(function () {
         form.classList.remove('was-validated');
         const store = Alpine.store('superapp');
         store.selectedUnit = null;
-        $('#resident_id_ausi').val(null).trigger('change');
+        Alpine.store('superapp').selectedUnit = '';
         $('#mobile_email').val('');
         $('#mobile_unit_name').val('');
         $('#mobile_unit_role').val('');
@@ -343,6 +339,7 @@ $(function () {
                         showConfirmButton: false
                     });
                     resetAusiBookingUI();
+                    $bookingSlots.prop('disabled', true);
                     resetSlots()
                 },
 
@@ -400,6 +397,9 @@ $(function () {
                     });
 
                 },
+                complete() {
+                    unlockSubmitBtn();
+                }
             });
         }
         sendBooking();

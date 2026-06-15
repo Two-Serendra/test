@@ -302,7 +302,6 @@ $(document).ready(function () {
                     });
                 },
 
-
                 complete() {
                     unlockSubmitBtn();
                 }

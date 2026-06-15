@@ -94,22 +94,65 @@ $(function () {
         $.ajax({
             url: "/ausi-booked-slots-mobile",
             type: "GET",
-            data: { date, unit_name: unitName },
+            data: {
+                date: date,
+                unit_name: unitName
+            },
+
+            beforeSend: function () {
+                console.log("===== AJAX START =====");
+                console.log("URL:", "/ausi-booked-slots-mobile");
+                console.log("DATA:", {
+                    date: date,
+                    unit_name: unitName
+                });
+
+                alert(
+                    "AJAX START\n\n" +
+                    "date: " + date +
+                    "\nunit: " + unitName
+                );
+            },
 
             success: function (res) {
-                console.log("SUCCESS", res);
+                console.log("===== AJAX SUCCESS =====");
+                console.log(res);
+
+                alert("SUCCESS");
 
                 resetSlots();
                 disableBookedSlots(res.blocked_for_user || []);
                 disablePastSlots(date);
             },
 
-            error: function (xhr) {
-                console.error("ERROR", xhr.responseText);
-                logDebug("ERROR", xhr.responseText);
+            error: function (xhr, status, error) {
+
+                console.log("===== AJAX ERROR =====");
+                console.log(xhr);
+                console.log(status);
+                console.log(error);
+
+                alert(
+                    "AJAX ERROR\n\n" +
+                    "Status: " + status +
+                    "\nHTTP: " + xhr.status +
+                    "\nError: " + error +
+                    "\nResponse:\n" + xhr.responseText
+                );
+
+                logDebug("STATUS", status);
+                logDebug("HTTP", xhr.status);
+                logDebug("ERROR", error);
+                logDebug("RESPONSE", xhr.responseText);
             },
 
-            complete: function () {
+            complete: function (xhr, status) {
+
+                console.log("===== AJAX COMPLETE =====");
+                console.log(status);
+
+                alert("COMPLETE: " + status);
+
                 hideLoading();
             }
         });

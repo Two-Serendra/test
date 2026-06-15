@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-009");
+    alert("🔥 JS VERSION 2026-06-15-001");
     const el = document.getElementById('resident_id_ausi');
 
     alert("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -34,18 +34,12 @@ $(function () {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(1),
         onChange: function (selectedDates, dateStr) {
-
-            // Save the selected date
             window.ausiState.date = dateStr;
-
             console.log("DATE:", dateStr);
             alert("DATE CHANGED: " + dateStr);
-
-            // Try updating if both date and unit are available
             triggerUpdate();
         }
     });
-
 
     document.addEventListener('change', function (e) {
         if (e.target && e.target.id === 'resident_id_ausi') {
@@ -106,47 +100,48 @@ $(function () {
             logDebug("STEP 3 OK - BEFORE AJAX");
 
             $.ajax({
+
                 url: "/ausi-booked-slots-mobile",
                 type: "GET",
                 data: { date, unit_name: unitName },
 
                 beforeSend: function () {
-                    alert("AJAX STARTED");
+                    showLoading();
                 },
 
                 success: function (res) {
 
-                    alert("SUCCESS");
-
-                    logDebug("API RESPONSE:", res);
-
                     resetSlots();
-                    if (res.blocked_for_user && Array.isArray(res.blocked_for_user)) {
+
+                    if (res.blocked_for_user) {
                         disableBookedSlots(res.blocked_for_user);
                     }
+
                     disablePastSlots(date);
-                    logDebug("BLOCKED SLOTS:", res.blocked_for_user);
+
+                    hideLoading();
                 },
 
                 error: function (xhr) {
-                    alert("ERROR " + xhr.status);
-                    console.log(xhr.responseText);
-                },
 
-                complete: function () {
-                    alert("COMPLETE");
+                    console.log(xhr.responseText);
+                    alert("ERROR " + xhr.status);
+
+                    hideLoading();
                 }
+
             });
 
         } catch (e) {
 
             alert("JS ERROR:\n" + e.message);
 
-            console.error("FULL ERROR:", e);
+            logDebug("FULL ERROR:", e);
         }
     }
 
     function resetSlots() {
+
         $(".ausi-booking-slot").each(function () {
 
             $(this)
@@ -154,12 +149,11 @@ $(function () {
                 .prop("checked", false);
 
             $('label[for="' + this.id + '"]')
-                .removeClass(
-                    "disabled btn-secondary"
-                )
+                .removeClass("btn-secondary disabled")
                 .addClass("btn-outline-primary")
                 .css("cursor", "pointer");
         });
+
         checkFormReady();
     }
 
@@ -239,11 +233,6 @@ $(function () {
 
     function showLoading() {
         $("#slotLoading").removeClass("d-none");
-
-        $(".ausi-booking-slot").prop(
-            "disabled",
-            true
-        );
     }
 
     function hideLoading() {

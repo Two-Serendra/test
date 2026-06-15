@@ -67,8 +67,8 @@ $(function () {
     function updateSlots() {
 
         const date = $('#AusiBookingDate').val();
-        const unitName = $('#resident_id_ausi').val();
-
+        const unitName = Alpine.store('superapp')?.selectedUnit;
+        
         logDebug({ date, unitName });
 
         if (!date || !unitName) {

@@ -29,30 +29,37 @@ $(function () {
     });
 
     const $bookingSlots = $('.ausi-booking-slot');
-    $(document).off('change.booking').on('change.booking', '#resident_id_ausi', function () {
-        const value = this.value;
+    window.addEventListener('change', function (e) {
+        if (e.target && e.target.id === 'resident_id_ausi') {
 
-        Alpine.store('superapp').selectedUnit = value;
+            const value = e.target.value;
 
-        const date = $('#AusiBookingDate').val();
+            Alpine.store('superapp').selectedUnit = value;
 
-        console.log("UNIT CHANGE:", value);
+            const date = document.getElementById('AusiBookingDate')?.value;
 
-        requestAnimationFrame(() => {
-            updateSlots(date, value);
-        });
+            console.log("UNIT CHANGE:", value);
+
+            requestAnimationFrame(() => {
+                updateSlots(date, value);
+            });
+        }
     });
 
-    $(document).off('change.date').on('change.date', '#AusiBookingDate', function () {
-        const date = this.value;
-        const unit = Alpine.store('superapp')?.selectedUnit;
+    window.addEventListener('change', function (e) {
+        if (e.target && e.target.id === 'AusiBookingDate') {
 
-        console.log("DATE CHANGE:", date);
+            const date = e.target.value;
+            const unit = Alpine.store('superapp')?.selectedUnit;
 
-        requestAnimationFrame(() => {
-            updateSlots(date, unit);
-        });
+            console.log("DATE CHANGE:", date);
+
+            requestAnimationFrame(() => {
+                updateSlots(date, unit);
+            });
+        }
     });
+
     function updateSlots(date, unitName) {
 
         console.log("updateSlots:", { date, unitName });

@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-007");
+    alert("🔥 JS VERSION 2026-06-15-008");
     alert("SELECT EXISTS:", document.getElementById('resident_id_ausi'));
     function logDebug(...args) {
 
@@ -39,16 +39,8 @@ $(function () {
     const $bookingSlots = $('.ausi-booking-slot');
 
     $(document).on('change', '#resident_id_ausi', function (e) {
-        const value = e.target.value;
-
-        window.ausiState.unit = value;
-        Alpine.store('superapp').selectedUnit = value;
-
-        console.log("UNIT:", value);
-        alert("UNIT CHANGED: " + value);
+        console.log("🔥 CHANGE FIRED", e.target.value);
         alert("CHANGE FIRED");
-
-        triggerUpdate();
     });
 
 

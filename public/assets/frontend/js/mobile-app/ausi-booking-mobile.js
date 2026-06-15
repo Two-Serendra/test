@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-003");
+    alert("🔥 JS VERSION 2026-06-15-005");
     function logDebug(...args) {
 
         const msg = args.map(a =>

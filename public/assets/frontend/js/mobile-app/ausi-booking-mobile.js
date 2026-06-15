@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-006");
+    alert("🔥 JS VERSION 2026-06-15-007");
     const el = document.getElementById('resident_id_ausi');
 
     alert("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -89,75 +89,54 @@ $(function () {
 
         alert("ENTERED updateSlots");
 
-        logDebug("updateSlots:", { date, unitName });
-        showLoading();
-        resetSlots();
+       logDebug("STEP 1 OK");
 
-        $.ajax({
-            url: "/ausi-booked-slots-mobile",
-            type: "GET",
-            data: {
-                date: date,
-                unit_name: unitName
-            },
+        try {
 
-            beforeSend: function () {
-                logDebug("===== AJAX START =====");
-                logDebug("URL:", "/ausi-booked-slots-mobile");
-                logDebug("DATA:", {
-                    date: date,
-                    unit_name: unitName
-                });
-
-                alert(
-                    "AJAX START\n\n" +
-                    "date: " + date +
-                    "\nunit: " + unitName
-                );
-            },
-
-            success: function (res) {
-                logDebug("===== AJAX SUCCESS =====");
-                logDebug(res);
-
-                alert("SUCCESS");
-
-                resetSlots();
-                disableBookedSlots(res.blocked_for_user || []);
-                disablePastSlots(date);
-            },
-
-            error: function (xhr, status, error) {
-
-                logDebug("===== AJAX ERROR =====");
-                logDebug(xhr);
-                logDebug(status);
-                logDebug(error);
-
-                alert(
-                    "AJAX ERROR\n\n" +
-                    "Status: " + status +
-                    "\nHTTP: " + xhr.status +
-                    "\nError: " + error +
-                    "\nResponse:\n" + xhr.responseText
-                );
-
-                logDebug("STATUS", status);
-                logDebug("HTTP", xhr.status);
-                logDebug("ERROR", error);
-                logDebug("RESPONSE", xhr.responseText);
-            },
-
-            complete: function (xhr, status) {
-
-                logDebug("===== AJAX COMPLETE =====");
-                logDebug(status);
-
-                alert("COMPLETE: " + status);
-
-                hideLoading();
+            if (typeof logDebug === "function") {
+                logDebug("DEBUG OK", { date, unitName });
+            } else {
+               logDebug("logDebug missing");
             }
-        });
+
+           logDebug("STEP 2 OK");
+
+            // TEMP DISABLE EVERYTHING THAT CAN BREAK
+            // showLoading();
+            // resetSlots();
+
+           logDebug("STEP 3 OK - BEFORE AJAX");
+
+            $.ajax({
+                url: "/ausi-booked-slots-mobile",
+                type: "GET",
+                data: { date, unit_name: unitName },
+
+                beforeSend: function () {
+                    alert("AJAX STARTED");
+                },
+
+                success: function (res) {
+                    alert("SUCCESS");
+                    console.log(res);
+                },
+
+                error: function (xhr) {
+                    alert("ERROR " + xhr.status);
+                    console.log(xhr.responseText);
+                },
+
+                complete: function () {
+                    alert("COMPLETE");
+                }
+            });
+
+        } catch (e) {
+
+            alert("JS ERROR:\n" + e.message);
+
+            console.error("FULL ERROR:", e);
+        }
     }
 
     function resetSlots() {

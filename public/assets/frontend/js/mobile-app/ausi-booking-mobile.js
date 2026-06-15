@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-001");
+    alert("🔥 JS VERSION 2026-06-15-002");
     const el = document.getElementById('resident_id_ausi');
 
     alert("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -395,11 +395,26 @@ $(function () {
                     logDebug("RESPONSE", res);
 
                     if (xhr.status === 422) {
+
+                        const res = xhr.responseJSON || {};
+                        const errors = res.errors || {};
+
+                        let messages = [];
+
+                        Object.keys(errors).forEach(field => {
+                            errors[field].forEach(msg => {
+                                messages.push(msg);
+                            });
+                        });
+
                         Swal.fire({
                             icon: 'error',
                             title: 'Validation Error',
-                            text: 'Please check required fields'
+                            html: messages.join('<br>')
                         });
+
+                        logDebug("VALIDATION ERRORS", messages);
+
                         return;
                     }
 

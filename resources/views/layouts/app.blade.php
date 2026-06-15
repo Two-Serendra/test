@@ -67,14 +67,17 @@
     @yield('content')
 
     <script>
+        const CURRENT_VERSION = "{{ $cache_bust }}";
+
+        if (window.__LAST_VERSION__ && window.__LAST_VERSION__ !== CURRENT_VERSION) {
+            location.reload(true);
+        }
+
+        window.__LAST_VERSION__ = CURRENT_VERSION;
         function isMobile() {
             return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
         }
     </script>
-
-
-
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 

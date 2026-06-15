@@ -29,30 +29,33 @@ $(function () {
     });
 
     const $bookingSlots = $('.ausi-booking-slot');
-    $(document).on('change', '#resident_id_ausi', function () {
-        const value = $(this).val();
+    $(document).off('change.booking').on('change.booking', '#resident_id_ausi', function () {
+        const value = this.value;
 
         Alpine.store('superapp').selectedUnit = value;
 
         const date = $('#AusiBookingDate').val();
 
-        alert("Unit Changed: " + value);
+        console.log("UNIT CHANGE:", value);
 
-        updateSlots(date, value);
+        requestAnimationFrame(() => {
+            updateSlots(date, value);
+        });
     });
 
-    $(document).on('change', '#AusiBookingDate', function () {
-        const date = $(this).val();
-        const unitName = Alpine.store('superapp')?.selectedUnit;
+    $(document).off('change.date').on('change.date', '#AusiBookingDate', function () {
+        const date = this.value;
+        const unit = Alpine.store('superapp')?.selectedUnit;
 
-        alert("Date Changed: " + date);
+        console.log("DATE CHANGE:", date);
 
-        updateSlots(date, unitName);
+        requestAnimationFrame(() => {
+            updateSlots(date, unit);
+        });
     });
-
     function updateSlots(date, unitName) {
 
-        logDebug({ date, unitName });
+        console.log("updateSlots:", { date, unitName });
 
         if (!date || !unitName) {
             $(".ausi-booking-slot").prop("disabled", true);
@@ -66,13 +69,10 @@ $(function () {
         $.ajax({
             url: "/ausi-booked-slots-mobile",
             type: "GET",
-            data: {
-                date,
-                unit_name: unitName
-            },
+            data: { date, unit_name: unitName },
 
             success: function (res) {
-                logDebug("SUCCESS", res);
+                console.log("SUCCESS", res);
 
                 resetSlots();
                 disableBookedSlots(res.blocked_for_user || []);
@@ -80,7 +80,7 @@ $(function () {
             },
 
             error: function (xhr) {
-                logDebug("ERROR", xhr.responseText);
+                console.error("ERROR", xhr.responseText);
             },
 
             complete: function () {

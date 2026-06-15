@@ -53,28 +53,28 @@ $(function () {
     });
 
     $(document).on('change', '#resident_id_ausi', function () {
-        const selected = $(this).find(':selected');
-        const name = selected.data('name');
-        const role = selected.data('role');
-        const email = selected.data('email');
-        $('#mobile_unit_name').val(name || '');
-        $('#mobile_unit_role').val(role || '');
-        const store = Alpine.store('superapp');
-        logDebug("SELECTED UNIT CHANGED", { name, role, email, storeUser: store?.user });
-        updateSlots($('#AusiBookingDate').val());
-    });
+        const value = $(this).val();
 
+        Alpine.store('superapp').selectedUnit = value;
+
+        setTimeout(() => {
+            updateSlots();
+        }, 0);
+
+    });
     function updateSlots() {
 
         const date = $('#AusiBookingDate').val();
         const unitName = Alpine.store('superapp')?.selectedUnit;
-        
+
         logDebug({ date, unitName });
 
         if (!date || !unitName) {
             $(".ausi-booking-slot").prop("disabled", true);
+            hideLoading();
             return;
         }
+
 
         showLoading();
         resetSlots();
@@ -96,10 +96,8 @@ $(function () {
             },
 
             error: function (xhr) {
-                logDebug("ERROR", {
-                    status: xhr.status,
-                    response: xhr.responseText
-                });
+                logDebug("ERROR", xhr.responseText);
+                hideLoading(); 
             },
 
             complete: function () {

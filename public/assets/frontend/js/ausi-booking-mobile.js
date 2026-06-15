@@ -277,7 +277,6 @@ $(function () {
 
         const lockSubmitBtn = () => {
             isSubmitting = true;
-
             $submitBtn
                 .prop('disabled', true)
                 .html(`<div class="spinner-border spinner-border-sm text-light"></div>`);
@@ -301,10 +300,6 @@ $(function () {
             }
 
             lockSubmitBtn();
-            for (const pair of formData.entries()) {
-                alert(pair[0] + " = " + pair[1]);
-            }
-
             $.ajax({
                 url: $(form).attr('action'),
                 type: $(form).attr('method'),

@@ -117,8 +117,8 @@ $(function () {
             },
 
             success: function (res) {
-                console.log("===== AJAX SUCCESS =====");
-                console.log(res);
+                logDebug("===== AJAX SUCCESS =====");
+                logDebug(res);
 
                 alert("SUCCESS");
 
@@ -129,10 +129,10 @@ $(function () {
 
             error: function (xhr, status, error) {
 
-                console.log("===== AJAX ERROR =====");
-                console.log(xhr);
-                console.log(status);
-                console.log(error);
+                logDebug("===== AJAX ERROR =====");
+                logDebug(xhr);
+                logDebug(status);
+                logDebug(error);
 
                 alert(
                     "AJAX ERROR\n\n" +
@@ -150,8 +150,8 @@ $(function () {
 
             complete: function (xhr, status) {
 
-                console.log("===== AJAX COMPLETE =====");
-                console.log(status);
+                logDebug("===== AJAX COMPLETE =====");
+                logDebug(status);
 
                 alert("COMPLETE: " + status);
 

@@ -1,5 +1,6 @@
 $(function () {
     alert("🔥 JS VERSION 2026-06-15-007");
+    alert("SELECT EXISTS:", document.getElementById('resident_id_ausi'));
     function logDebug(...args) {
 
         const msg = args.map(a =>
@@ -45,6 +46,7 @@ $(function () {
 
         console.log("UNIT:", value);
         alert("UNIT CHANGED: " + value);
+        alert("CHANGE FIRED");
 
         triggerUpdate();
     });

@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-009");
+    alert("🔥 JS VERSION 2026-06-15-001");
     const el = document.getElementById('resident_id_ausi');
 
     alert("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -45,7 +45,7 @@ $(function () {
             window.onResidentChange(e);
         }
     });
-    
+
     window.onResidentChange = function (e) {
         const value = e.target.value;
 

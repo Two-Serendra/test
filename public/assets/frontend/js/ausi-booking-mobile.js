@@ -52,6 +52,7 @@ $(function () {
         function () {
             updateSlots($(this).val());
             logDebug("Date Changed", $(this).val());
+            alert("Date Changed: " + $(this).val());
         }
     );
 
@@ -239,6 +240,7 @@ $(function () {
         $('#mobile_unit_role').val(role || '');
         const store = Alpine.store('superapp');
         logDebug("SELECTED UNIT CHANGED", { name, role, email, storeUser: store?.user });
+        alert(`Selected Unit Changed:\nName: ${name}\nRole: ${role}\nEmail: ${email}`);
     });
 
     $(document).on('submit', '#userAusiNewBookingMobile', function (event) {

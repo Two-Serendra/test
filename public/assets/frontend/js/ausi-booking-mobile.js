@@ -1,5 +1,4 @@
 $(function () {
-
     function logDebug(...args) {
 
         const msg = args.map(a =>
@@ -29,9 +28,8 @@ $(function () {
     });
 
     let isResetting = false;
-
-
     const $bookingSlots = $('.ausi-booking-slot');
+
     // function checkFormReady() {
     //     if (isResetting) return;
 
@@ -47,16 +45,20 @@ $(function () {
     // $(document).on('change', '#resident_id_ausi, #AusiBookingDate, input[name="booking_time_slot"]', checkFormReady);
 
     $(document).on('change', '#AusiBookingDate', function () {
-         updateSlots();
-         alert("Date Changed: " + $(this).val());
+        updateSlots();
+        alert("Date Changed: " + $(this).val());
     });
 
-    $(document).on('change', '#resident_id_ausi', function () {
-        const selected = $(this).find(':selected');
-        logDebug("SELECTED UNIT CHANGED", { name, role, email, storeUser: store?.user });
-        alert("Unit Changed: " + selected.text());
-        updateSlots();
+    $('#resident_id_ausi').on('change', function () {
+        alert("DIRECT BIND WORKS");
     });
+
+    // $(document).on('change', '#resident_id_ausi', function () {
+    //     const selected = $(this).find(':selected');
+    //     logDebug("SELECTED UNIT CHANGED", { name, role, email, storeUser: store?.user });
+    //     alert("Unit Changed: " + selected.text());
+    //     updateSlots();
+    // });
 
     function updateSlots() {
         const date = $('#AusiBookingDate').val();

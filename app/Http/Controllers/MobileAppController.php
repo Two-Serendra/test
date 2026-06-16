@@ -179,21 +179,6 @@ class MobileAppController extends Controller
             ], 422);
         }
 
-        $unitNo = strtoupper($number . $towerLetter);
-
-
-        $towerGroups = [
-            'A' => 'lowrise',
-            'B' => 'lowrise',
-            'C' => 'lowrise',
-            'D' => 'lowrise',
-            'E' => 'lowrise',
-            'F' => 'highrise',
-            'G' => 'highrise',
-            'H' => 'highrise',
-            'I' => 'highrise',
-        ];
-
         while ($attempt < $maxRetries) {
             try {
                 DB::beginTransaction();
@@ -226,24 +211,23 @@ class MobileAppController extends Controller
 
                 $bookingDate = Carbon::parse($request->booking_date)->toDateString();
 
-                $areaLetter = preg_replace('/[^A-Z]/', '', $resident->unit_no);
-                $towerGroup = $towerGroups[$areaLetter] ?? null;
+             
 
-                if (!$towerGroup) {
-                    DB::rollBack();
-                    return response()->json([
-                        'message' => 'Unknown area for your unit.'
-                    ], 422);
-                }
+                $lowrise = ['A', 'B', 'C', 'D', 'E'];
+                $highrise = ['F', 'G', 'H', 'I'];
 
-                $towerAreas = $towerGroup === 'lowrise'
-                    ? ['A', 'B', 'C', 'D', 'E']
-                    : ['F', 'G', 'H', 'I'];
+                $areaLetter = preg_replace('/[^A-Z]/', '', strtoupper($resident->unit_no));
+
+                $userGroup = in_array($areaLetter, $lowrise) ? 'lowrise' : 'highrise';
+
+                $groupAreas = $userGroup === 'lowrise'
+                    ? $lowrise
+                    : $highrise;
 
                 $slotTaken = AusiBooking::whereDate('booking_date', $bookingDate)
-                    ->whereIn('unit_area', $towerAreas)
-                    ->where('booking_status', 1)
                     ->where('booking_time_slot', $request->booking_time_slot)
+                    ->where('booking_status', 1)
+                    ->whereIn('unit_area', $groupAreas)
                     ->lockForUpdate()
                     ->exists();
 
@@ -276,9 +260,7 @@ class MobileAppController extends Controller
                         'message' => 'Missing email from request'
                     ], 401);
                 }
-
-                $resident = ResidentDetails::where('email', $email)->first();
-
+                
                 if (!$resident) {
                     return response()->json([
                         'message' => 'Resident not found for email'

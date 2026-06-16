@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-008");
+    alert("🔥 JS VERSION 2026-06-15-009");
     const el = document.getElementById('resident_id_ausi');
 
     alert("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -113,10 +113,7 @@ $(function () {
 
                     resetSlots();
 
-                    if (res.blocked_for_user) {
-                        disableBookedSlots(res.blocked_for_user);
-                    }
-
+                    disableBookedSlots(res.blocked_for_user || []);
                     disablePastSlots(date);
 
                     hideLoading();
@@ -168,25 +165,17 @@ $(function () {
 
     function disableBookedSlots(bookedSlots) {
 
-        if (!Array.isArray(bookedSlots)) return;
+        bookedSlots.forEach(slot => {
+            const $radio = $('.ausi-booking-slot[data-slot="' + slot + '"]');
 
-        bookedSlots.forEach(function (slot) {
+            if ($radio.length) {
+                $radio.prop('disabled', true);
 
-            const radio = $('.ausi-booking-slot[data-slot="' + slot + '"]');
-
-            if (!radio.length) {
-                console.warn("Slot not found:", slot);
-                return;
+                $('label[for="' + $radio.attr('id') + '"]')
+                    .removeClass('btn-outline-primary')
+                    .addClass('btn-secondary disabled')
+                    .css('cursor', 'not-allowed');
             }
-
-            radio.prop("disabled", true);
-
-            const label = $('label[for="' + radio.attr("id") + '"]');
-
-            label
-                .removeClass("btn-outline-primary")
-                .addClass("btn-secondary disabled")
-                .css("cursor", "not-allowed");
         });
     }
 

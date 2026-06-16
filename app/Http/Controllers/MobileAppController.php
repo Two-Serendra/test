@@ -135,6 +135,7 @@ class MobileAppController extends Controller
     public function storeAusiBookingMobile(Request $request)
     {
         \Log::info('AUSI MOBILE HIT', $request->all());
+
         $maxRetries = 3;
         $attempt = 0;
         $debug = [];
@@ -179,6 +180,20 @@ class MobileAppController extends Controller
             ], 422);
         }
 
+        // ===============================
+        // FIX: derive group from INPUT
+        // ===============================
+        $areaLetter = strtoupper($towerLetter);
+
+        $lowrise = ['A', 'B', 'C', 'D', 'E'];
+        $highrise = ['F', 'G', 'H', 'I'];
+
+        $userGroup = in_array($areaLetter, $lowrise) ? 'lowrise' : 'highrise';
+
+        $groupAreas = $userGroup === 'lowrise'
+            ? $lowrise
+            : $highrise;
+
         while ($attempt < $maxRetries) {
             try {
                 DB::beginTransaction();
@@ -199,31 +214,15 @@ class MobileAppController extends Controller
                 }
 
                 $userId = $resident->user_id;
-                if (!$resident) {
-                    DB::rollBack();
-                    return response()->json([
-                        'message' => 'Unauthorized unit selection.'
-                    ], 403);
-                }
 
                 $debug[] = "Resident found: YES";
                 $debug[] = "Unit No: " . $resident->unit_no;
 
                 $bookingDate = Carbon::parse($request->booking_date)->toDateString();
 
-             
-
-                $lowrise = ['A', 'B', 'C', 'D', 'E'];
-                $highrise = ['F', 'G', 'H', 'I'];
-
-                $areaLetter = preg_replace('/[^A-Z]/', '', strtoupper($resident->unit_no));
-
-                $userGroup = in_array($areaLetter, $lowrise) ? 'lowrise' : 'highrise';
-
-                $groupAreas = $userGroup === 'lowrise'
-                    ? $lowrise
-                    : $highrise;
-
+                // ===============================
+                // SLOT CHECK (now consistent)
+                // ===============================
                 $slotTaken = AusiBooking::whereDate('booking_date', $bookingDate)
                     ->where('booking_time_slot', $request->booking_time_slot)
                     ->where('booking_status', 1)
@@ -253,22 +252,11 @@ class MobileAppController extends Controller
                     ], 409);
                 }
 
-                $email = $request->email;
-
                 if (!$email) {
                     return response()->json([
                         'message' => 'Missing email from request'
                     ], 401);
                 }
-                
-                if (!$resident) {
-                    return response()->json([
-                        'message' => 'Resident not found for email'
-                    ], 404);
-                }
-
-                $userId = $resident->user_id;
-
 
                 $booking = AusiBooking::create([
                     'user_id' => $userId,
@@ -277,7 +265,7 @@ class MobileAppController extends Controller
                     'transaction_no' => '',
                     'unit_no' => strtoupper($resident->unit_no),
                     'resident_type' => $resident->resident_type,
-                    'name' => strtoupper($request->name ?? 'MOBILE USER'),
+                    'name' => strtoupper($request->name ?? 'Resident'),
                     'booking_date' => $bookingDate,
                     'booking_time_slot' => $request->booking_time_slot,
                     'unit_area' => $areaLetter,

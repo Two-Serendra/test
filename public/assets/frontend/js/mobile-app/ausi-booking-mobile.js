@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-009");
+    alert("🔥 JS VERSION 2026-06-15-029");
     const el = document.getElementById('resident_id_ausi');
 
     alert("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -180,16 +180,11 @@ $(function () {
     }
 
     function disablePastSlots(selectedDate) {
-
         const now = new Date();
         const selected = new Date(selectedDate);
-
         if (now.toDateString() !== selected.toDateString()) return;
-
         const currentTime = now.getHours() * 60 + now.getMinutes();
-
         $('.ausi-booking-slot').each(function () {
-
             const slotText = $(this).data('slot');
 
             if (!slotText) return;
@@ -239,54 +234,38 @@ $(function () {
             "SLOTS",
             document.querySelectorAll(".ausi-booking-slot").length
         );
-
         $(".ausi-booking-slot").prop("disabled", true);
     });
 
     window.resetAusiBookingUI = function () {
-
-        console.log("RESET CALLED");
         alert("RESET CALLED");
-
         const form = document.getElementById('userAusiNewBookingMobile');
 
         if (form) {
             form.reset();
             form.classList.remove('was-validated');
         }
-
-        // Reset global state
         if (window.ausiState) {
             window.ausiState.date = null;
             window.ausiState.unit = null;
         }
-
-        // Reset Alpine
         if (window.Alpine && Alpine.store('superapp')) {
             Alpine.store('superapp').selectedUnit = '';
         }
-
-        // Reset dropdown
         $('#resident_id_ausi')
             .val('')
             .prop('selectedIndex', 0)
             .trigger('change');
-
-        // Reset hidden fields
         $('#mobile_email').val('');
         $('#mobile_unit_name').val('');
         $('#mobile_unit_role').val('');
-
-        // Reset flatpickr
         const fp = document.querySelector('#AusiBookingDate')?._flatpickr;
 
         if (fp) {
             fp.clear();
         }
 
-        // Reset slots
         $('.ausi-booking-slot').each(function () {
-
             $(this)
                 .prop('checked', false)
                 .prop('disabled', true);
@@ -298,16 +277,13 @@ $(function () {
                 .addClass('btn-secondary disabled')
                 .css('cursor', 'not-allowed');
         });
-
-        // Hide loading
         $('#slotLoading').addClass('d-none');
 
-        // Reset submit button
         $('#saveUserAusiBtn')
             .prop('disabled', true)
             .html('<span class="btn-text">Submit</span>');
-
-        console.log("RESET FINISHED");
+        $bookingSlots.prop('disabled', true);
+        alert("RESET FINISHED");
     };
 
     let isSubmitting = false;
@@ -316,35 +292,24 @@ $(function () {
         event.preventDefault();
         const form = this;
         logDebug("SUBMIT FIRED");
+
         const selectedDate = $('#AusiBookingDate').val();
         const selectedUnit = $('#resident_id_ausi').val();
         const selectedSlot = $('input[name="booking_time_slot"]:checked').val();
         const $submitBtn = $('#saveUserAusiBtn');
 
-        if (!selectedUnit) {
-            logDebug("NO UNIT SELECTED");
-            return;
-        }
-
-        if (!selectedDate) {
-            logDebug("NO DATE SELECTED");
-            return;
-        }
-
-        if (!selectedSlot) {
-            logDebug("NO SLOT SELECTED");
-
-            Swal.fire({
-                icon: 'warning',
-                title: 'Time Slot Required',
-                text: 'Please select a booking time slot.'
-            });
-
-            return;
-        }
+        form.classList.add('was-validated');
 
         if (!form.checkValidity()) {
-            form.classList.add('was-validated');
+
+            if (!selectedSlot) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Time Slot Required',
+                    text: 'Please select a booking time slot.'
+                });
+            }
+
             return;
         }
 

@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-007");
+    alert("🔥 JS VERSION 2026-06-15-008");
     const el = document.getElementById('resident_id_ausi');
 
     alert("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -140,16 +140,21 @@ $(function () {
         }
     }
 
-    function resetSlots() {
+    window.resetSlots = function () {
+
         $('.ausi-booking-slot').each(function () {
-            $(this).prop('disabled', false).prop('checked', false);
+
+            $(this)
+                .prop('checked', false)
+                .prop('disabled', false);
 
             $('label[for="' + this.id + '"]')
                 .removeClass('disabled btn-secondary')
                 .addClass('btn-outline-primary')
                 .css('cursor', 'pointer');
         });
-    }
+
+    };
 
     function checkFormReady() {
 
@@ -249,22 +254,72 @@ $(function () {
         $(".ausi-booking-slot").prop("disabled", true);
     });
 
-    function resetAusiBookingUI() {
-        const form = document.getElementById('userAusiNewBookingMobile');
-        isResetting = true;
+    window.resetAusiBookingUI = function () {
 
-        form.reset();
-        form.classList.remove('was-validated');
-        const store = Alpine.store('superapp');
-        store.selectedUnit = null;
-        $('#resident_id_ausi').val(null).trigger('change');
+        console.log("RESET CALLED");
+        alert("RESET CALLED");
+
+        const form = document.getElementById('userAusiNewBookingMobile');
+
+        if (form) {
+            form.reset();
+            form.classList.remove('was-validated');
+        }
+
+        // Reset global state
+        if (window.ausiState) {
+            window.ausiState.date = null;
+            window.ausiState.unit = null;
+        }
+
+        // Reset Alpine
+        if (window.Alpine && Alpine.store('superapp')) {
+            Alpine.store('superapp').selectedUnit = '';
+        }
+
+        // Reset dropdown
+        $('#resident_id_ausi')
+            .val('')
+            .prop('selectedIndex', 0)
+            .trigger('change');
+
+        // Reset hidden fields
         $('#mobile_email').val('');
         $('#mobile_unit_name').val('');
         $('#mobile_unit_role').val('');
-        const fp = document.querySelector("#AusiBookingDate")?._flatpickr;
-        if (fp) fp.clear();
-        isResetting = false;
-    }
+
+        // Reset flatpickr
+        const fp = document.querySelector('#AusiBookingDate')?._flatpickr;
+
+        if (fp) {
+            fp.clear();
+        }
+
+        // Reset slots
+        $('.ausi-booking-slot').each(function () {
+
+            $(this)
+                .prop('checked', false)
+                .prop('disabled', true);
+
+            $('label[for="' + this.id + '"]')
+                .removeClass('btn-outline-primary')
+                .removeClass('btn-secondary')
+                .removeClass('disabled')
+                .addClass('btn-secondary disabled')
+                .css('cursor', 'not-allowed');
+        });
+
+        // Hide loading
+        $('#slotLoading').addClass('d-none');
+
+        // Reset submit button
+        $('#saveUserAusiBtn')
+            .prop('disabled', true)
+            .html('<span class="btn-text">Submit</span>');
+
+        console.log("RESET FINISHED");
+    };
 
     let isSubmitting = false;
 
@@ -372,9 +427,8 @@ $(function () {
                         timer: 2000,
                         showConfirmButton: false
                     });
-                    resetAusiBookingUI();
-                    resetSlots();
-                    $bookingSlots.prop('disabled', true);
+                    window.resetAusiBookingUI();
+                    window.resetSlots();
                 },
 
                 error: function (xhr) {

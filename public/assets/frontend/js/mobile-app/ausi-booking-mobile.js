@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-030");
+    alert("🔥 JS VERSION 2026-06-15-031");
     const el = document.getElementById('resident_id_ausi');
 
     alert("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -378,7 +378,7 @@ $(function () {
                         icon: 'success',
                         title: 'Booking Successful',
                         text: res.message ?? 'Your booking has been saved',
-                        timer: 2000,
+                        timer: 5000,
                         showConfirmButton: false
                     });
                     window.resetAusiBookingUI();

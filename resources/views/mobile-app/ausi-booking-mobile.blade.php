@@ -20,10 +20,10 @@
 
                     <div class="row mb-3">
 
-                        <div class="">
+                        <!-- <div class="">
                             <dt>Email</dt>
                             <dd x-text="$store.superapp.user?.email ?? '—'"></dd>
-                        </div>
+                        </div> -->
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label">Select Residence <span class="required">*</span></label>
                             <input type="hidden" name="email" id="mobile_email">

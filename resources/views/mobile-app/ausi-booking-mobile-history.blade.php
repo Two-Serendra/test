@@ -3,7 +3,7 @@
 @section('title', 'Bridge Demo — Dashboard')
 
 @section('content')
-    <div class="" x-data="ausiBookingPage()">
+    <div class="" x-data="ausiBookingPageHistory()">
         <div class="loading" x-show="$store.superapp.isLoading">
             <p>Waiting for shell context…</p>
         </div>
@@ -71,7 +71,7 @@
 
     <script>
         document.addEventListener('alpine:init', () => {
-            Alpine.data('ausiBookingPage', () => ({
+            Alpine.data('ausiBookingPageHistory', () => ({
                 residences: [],
                 selectedResidence: null,
                 debugLog: '',

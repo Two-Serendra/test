@@ -37,7 +37,7 @@ $(function () {
         try {
             $.ajax({
 
-                url: "/get-ausi-booking-history-mobile",
+                url: "/get-ausi-booking-mobile/history",
                 type: "GET",
                 data: { unit_name: unitName },
 

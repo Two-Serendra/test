@@ -307,4 +307,11 @@ class MobileAppController extends Controller
             }
         }
     }
+
+    public function viewAusiBookingMobileHistory (){
+        
+
+        return view ('mobile-app.ausi-booking-mobile-history');
+
+    }
 }

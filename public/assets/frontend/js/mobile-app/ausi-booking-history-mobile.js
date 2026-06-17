@@ -32,31 +32,30 @@ $(function () {
     });
 
     window.onResidentChangeHistory = function (e) {
-        alert("ENTERED FUNCTION");
+
         const unit = e.target.value;
-        alert("UNIT: " + unit);
 
 
-        const email = Alpine.store('superapp')?.user?.email;
-
-        alert("EMAIL: " + email);
-
-        window.ausiState = window.ausiState || {};
-
-        window.ausiState.unit = unit;
-        window.ausiState.email = email;
+        logDebugHistory("UNIT SELECTED: " + unit);
 
 
-        logDebugHistory("HISTORY FILTER", {
-            email: email,
-            unit: unit
-        });
+        const store = Alpine.store('superapp');
+
+
+        logDebugHistory("STORE:");
+        logDebugHistory(store);
+
+
+        const email = store?.user?.email;
+
+
+        logDebugHistory("EMAIL:");
+        logDebugHistory(email);
 
 
         updateAusiHistoryBookingTable(unit, email);
 
     };
-
 
     function updateAusiHistoryBookingTable(unitName, email) {
 
@@ -69,7 +68,6 @@ $(function () {
 
             data: {
                 unit_name: unitName,
-                email: email
             },
 
 

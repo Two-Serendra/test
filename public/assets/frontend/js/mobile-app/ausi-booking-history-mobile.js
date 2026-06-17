@@ -1,6 +1,6 @@
 $(function () {
 
-    alert("🔥Ausi History JS VERSION 11");
+    alert("🔥Ausi History JS VERSION 12");
 
     const el = document.getElementById('resident_id_ausi_booking_history');
 
@@ -196,7 +196,6 @@ $(function () {
 <button 
     class="btn btn-sm btn-outline-danger rounded-pill px-3 cancel-booking-btn"
     data-id="${item.id}">
-    <i class="bx bx-x-circle"></i>
     Cancel
 </button>
 `;
@@ -207,7 +206,6 @@ $(function () {
 <button 
     class="btn btn-sm btn-outline-secondary rounded-pill px-3"
     disabled>
-    <i class="bx bx-lock"></i>
     Cancel
 </button>
 `;
@@ -217,7 +215,7 @@ $(function () {
 
                 html += `
             <tr>
-                <td>${item.transactio_no}</td>
+                <td>${item.transaction_no}</td>
                 <td>${item.booking_date}</td>
                 <td>${item.booking_time_slot}</td>
 
@@ -232,8 +230,7 @@ $(function () {
    <div class="d-flex gap-2 justify-content-center flex-wrap">
 
     <a href="/ausi-booking-details/${item.id}"
-       class="btn btn-sm btn-outline-primary rounded-pill px-3">
-        <i class="bx bx-show"></i>
+       class="btn btn-sm btn-primary rounded-pill px-3">
         View
     </a>
 

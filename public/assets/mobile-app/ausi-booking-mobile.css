@@ -84,7 +84,7 @@
 
 
     .history-table td:nth-child(5):before {
-        content: "Action";
+        content: "";
     }
 
     .btn {

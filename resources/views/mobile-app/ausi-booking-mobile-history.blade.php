@@ -63,18 +63,18 @@
         </div>
 
         <div id="debugPanelBookingHistory" style="
-                                                                                                                    position: fixed;
-                                                                                                                    bottom: 0;
-                                                                                                                    left: 0;
-                                                                                                                    right: 0;
-                                                                                                                    height: 140px;
-                                                                                                                    overflow: auto;
-                                                                                                                    background: black;
-                                                                                                                    color: #00ff00;
-                                                                                                                    font-size: 11px;
-                                                                                                                    z-index: 99999;
-                                                                                                                    padding: 10px;
-                                                                                                                ">
+                                                                                                                position: fixed;
+                                                                                                                bottom: 0;
+                                                                                                                left: 0;
+                                                                                                                right: 0;
+                                                                                                                height: 140px;
+                                                                                                                overflow: auto;
+                                                                                                                background: black;
+                                                                                                                color: #00ff00;
+                                                                                                                font-size: 11px;
+                                                                                                                z-index: 99999;
+                                                                                                                padding: 10px;
+                                                                                                            ">
         </div>
 
     </div>
@@ -82,73 +82,72 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('ausiBookingPageHistory', () => ({
+                residences: [],
+                selectedResidence: null,
+                debugLog: '',
+                debugEmail: null,
 
+                log(msg) {
+                    console.log(msg);
+                    this.debugLog += msg + "\n";
+                },
                 init() {
+
+                    this.log("🚀 INIT STARTED");
 
                     this.setHeader();
 
                     const store = Alpine.store('superapp');
-                    const units = store?.units || [];
 
-                    $('#history_mobile_email')
-                        .val(store?.user?.email || '');
-
-                    if (!units.length) {
-                        return;
-                    }
+                    $('#history_mobile_email').val(
+                        store?.user?.email || ''
+                    );
 
                     this.$nextTick(() => {
 
+                        const units = store?.units || [];
+
+                        if (!units.length) {
+                            return;
+                        }
+
+                        // Auto select first unit
                         const firstUnit = units[0].name;
 
                         store.selectedUnit = firstUnit;
 
+                        const select = document.getElementById(
+                            'resident_id_ausi_booking_history'
+                        );
+
+                        if (select) {
+                            select.value = firstUnit;
+                        }
+
                         const email = store?.user?.email || '';
 
-                        logDebugHistory("AUTO LOAD", {
-                            unit: firstUnit,
-                            email: email
-                        });
+                        $("#historyWrapper").removeClass("d-none");
 
                         updateAusiHistoryBookingTable(
                             firstUnit,
                             email
                         );
 
-                        $("#historyWrapper").removeClass("d-none");
-
                     });
-                }
 
-
-                        $('#history_mobile_email')
-                            .val(store?.user?.email || '');
-
-            },
-
-
+                },
                 setHeader() {
+                    Alpine.store('superapp')?.bridge?.setHeader({
+                        mode: 'sticky-no-back',
+                        title: 'Bridge Demo',
+                        backgroundColor: '#1e3a5f',
+                        textStyle: 'white',
+                        showHome: false,
+                    });
+                },
 
-                Alpine.store('superapp')?.bridge?.setHeader({
-
-                    mode: 'sticky-no-back',
-
-                    title: 'Booking History',
-
-                    backgroundColor: '#1e3a5f',
-
-                    textStyle: 'white',
-
-                    showHome: false,
-
-                });
-
-            },
-
-
-                }));
-
-            });
+            }));
+        });
     </script>
 
 

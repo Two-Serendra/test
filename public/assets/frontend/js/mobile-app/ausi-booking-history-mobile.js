@@ -44,11 +44,11 @@ $(function () {
         });
 
 
-        updateAusiHistoryBookingTable(unit);
+        updateAusiHistoryBookingTable(unit, email);
 
     };
 
-    function updateAusiHistoryBookingTable(unitName) {
+    function updateAusiHistoryBookingTable(unitName, email) {
 
         $.ajax({
 
@@ -57,7 +57,9 @@ $(function () {
             type: "GET",
 
             data: {
-                unit_name: unitName
+                unit_name: unitName,
+                email: email
+
             },
 
 

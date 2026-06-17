@@ -308,10 +308,30 @@ class MobileAppController extends Controller
         }
     }
 
-    public function viewAusiBookingMobileHistory (){
-        
+    public function viewAusiBookingMobileHistory()
+    {
 
-        return view ('mobile-app.ausi-booking-mobile-history');
+
+        return view('mobile-app.ausi-booking-mobile-history');
+
+    }
+
+    public function getAusiBookingMobileHistory(Request $request)
+    {
+
+        $email = $request->email;
+        $unit = $request->unit_name;
+
+
+        $bookings = AusiBooking::where('email', $email)
+            ->where('unit_name', $unit)
+            ->orderBy('booking_date', 'desc')
+            ->get();
+
+
+        return response()->json([
+            'bookings' => $bookings
+        ]);
 
     }
 }

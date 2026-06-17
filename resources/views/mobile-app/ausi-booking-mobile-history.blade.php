@@ -26,8 +26,8 @@
                         <dl>
                             <dd>
 
-                                <select id="resident_id_ausi_booking_history" name="resident_id_ausi_booking_history" class="form-select"
-                                    x-model="$store.superapp.selectedUnit" required>
+                                <select id="resident_id_ausi_booking_history" name="resident_id_ausi_booking_history"
+                                    class="form-select" x-model="$store.superapp.selectedUnit" required>
                                     <option value="" disabled>-- Select Residence --</option>
 
                                     <template x-for="(unit, index) in $store.superapp.units" :key="index">
@@ -39,32 +39,44 @@
                             </dd>
                         </dl>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Date <span class="required">*</span></label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-white"><i class='bx bx-calendar'></i></span>
-                            <input type="text" class="form-control bg-white text-dark" id="AusiBookingDate"
-                                name="booking_date" required>
-                        </div>
+                </div>
+
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="ausiHistoryTable">
+
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
             </div>
         </div>
 
-    <div id="debugPanelBookingHistory" style="
-                                                                            position: fixed;
-                                                                            bottom: 0;
-                                                                            left: 0;
-                                                                            right: 0;
-                                                                            height: 140px;
-                                                                            overflow: auto;
-                                                                            background: black;
-                                                                            color: #00ff00;
-                                                                            font-size: 11px;
-                                                                            z-index: 99999;
-                                                                            padding: 10px;
-                                                                        ">
+        <div id="debugPanelBookingHistory" style="
+                                                                                    position: fixed;
+                                                                                    bottom: 0;
+                                                                                    left: 0;
+                                                                                    right: 0;
+                                                                                    height: 140px;
+                                                                                    overflow: auto;
+                                                                                    background: black;
+                                                                                    color: #00ff00;
+                                                                                    font-size: 11px;
+                                                                                    z-index: 99999;
+                                                                                    padding: 10px;
+                                                                                ">
         </div>
 
     </div>

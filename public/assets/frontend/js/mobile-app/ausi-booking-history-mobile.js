@@ -8,59 +8,97 @@ $(function () {
     });
 
     window.onResidentChange = function (e) {
-        const value = e.target.value;
+        const unit = e.target.value;
 
-        window.ausiState.unit = value;
+        const email = Alpine.store('superapp').user?.email;
 
-        if (window.Alpine && Alpine.store('superapp')) {
-            Alpine.store('superapp').selectedUnit = value;
-        }
+        window.ausiState.unit = unit;
+        window.ausiState.email = email;
 
-        console.log("UNIT:", value);
-        alert("UNIT CHANGED HISTORY: " + value);
-        alert("CHANGE FIRED HISTORY");
 
-        triggerUpdate();
+        alert("HISTORY FILTER:", {
+            email: email,
+            unit: unit
+        });
+
+
+        updateAusiHistoryBookingTable(unit, email);
     };
 
 
-    function triggerUpdate() {
-        const unit = window.ausiState.unit;
+    function updateAusiHistoryBookingTable(unitName, email) {
 
-        console.log("TRIGGER:", { unit });
-        updateAusiHistoryBookingTable(unit);
+        alert("ENTERED HISTORY TABLE");
+
+        $.ajax({
+
+            url: "/get-ausi-booking-mobile/history",
+            type: "GET",
+
+            data: {
+                unit_name: unitName,
+                email: email
+            },
+
+
+            success: function (res) {
+
+                console.log("HISTORY RESPONSE:", res);
+
+                renderHistoryTable(res.bookings);
+
+            },
+
+
+            error: function (xhr) {
+
+                console.log(xhr.responseText);
+
+                alert("ERROR " + xhr.status);
+            }
+
+        });
+
     }
 
-    function updateAusiHistoryBookingTable(unitName) {
+    function renderHistoryTable(bookings) {
 
-        alert("ENTERED History Booking Table");
-        try {
-            $.ajax({
-
-                url: "/get-ausi-booking-mobile/history",
-                type: "GET",
-                data: { unit_name: unitName },
+        let html = "";
 
 
-                success: function (res) {
+        if (!bookings.length) {
 
-                },
+            html = `
+            <tr>
+                <td colspan="3" class="text-center">
+                    No booking history found
+                </td>
+            </tr>
+        `;
 
-                error: function (xhr) {
+        }
+        else {
 
-                    console.log(xhr.responseText);
-                    alert("ERROR " + xhr.status);
+            bookings.forEach(item => {
 
-                    hideLoading();
-                }
+                html += `
+                <tr>
+                    <td>${item.booking_date}</td>
+                    <td>${item.booking_time_slot}</td>
+                    <td>
+                        <span class="badge bg-primary">
+                            ${item.status}
+                        </span>
+                    </td>
+                </tr>
+            `;
 
             });
 
-        } catch (e) {
-
-            alert("JS ERROR:\n" + e.message);
-
-            logDebug("FULL ERROR:", e);
         }
+
+
+        $("#ausiHistoryTable").html(html);
+
     }
 });

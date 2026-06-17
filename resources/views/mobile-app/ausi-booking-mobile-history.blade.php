@@ -20,9 +20,9 @@
                     <div class="col-md-6 mb-3 mb-md-0">
                         <label class="form-label">Select Residence <span class="required">*</span></label>
                         <!-- <input type="text" name="email" id="mobile_email"> -->
-                        <input type="text" name="mobile_unit_name" id="mobile_unit_name">
-                        <input type="text" name="mobile_unit_role" id="mobile_unit_role">
-                        <input type="text" id="history_mobile_email" name="email"
+                        <input type="hidden" name="mobile_unit_name" id="mobile_unit_name">
+                        <input type="hidden" name="mobile_unit_role" id="mobile_unit_role">
+                        <input type="hidden" id="history_mobile_email" name="email"
                             :value="$store.superapp.user?.email || ''">
                         <dl>
                             <dd>

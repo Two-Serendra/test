@@ -336,6 +336,8 @@ class MobileAppController extends Controller
         }
 
 
+
+
         $bookings = AusiBooking::where('email', $email)
             ->where('unit_no', $unitNo)
             ->orderBy('booking_date', 'desc')
@@ -384,5 +386,64 @@ class MobileAppController extends Controller
 
 
         return $number . $towerLetter;
+    }
+
+
+
+    public function CancelAusiBooking(AusiBooking $booking)
+    {
+
+        // Check if already cancelled
+        if ($booking->booking_status == 2) {
+
+            return response()->json([
+                'message' => 'Booking is already cancelled.'
+            ], 422);
+
+        }
+
+        $userEmail = auth()->user()?->email ?? request('email');
+
+
+        if ($booking->email !== $userEmail) {
+
+            return response()->json([
+                'message' => 'You are not allowed to cancel this booking.'
+            ], 403);
+
+        }
+
+
+        // Build booking datetime
+        $startTime = explode('-', $booking->booking_time_slot)[0];
+
+        $bookingDateTime = Carbon::parse(
+            $booking->booking_date . ' ' . trim($startTime)
+        );
+
+
+        // Check 12 hour cancellation rule
+        $hoursRemaining = now()->diffInHours($bookingDateTime, false);
+
+
+        if ($hoursRemaining < 12) {
+
+            return response()->json([
+                'message' => 'Cancellation is only allowed at least 12 hours before the booking schedule.'
+            ], 422);
+
+        }
+
+
+        // Cancel booking
+        $booking->update([
+            'booking_status' => 2
+        ]);
+
+
+        return response()->json([
+            'message' => 'Booking cancelled successfully.'
+        ]);
+
     }
 }

@@ -1,6 +1,6 @@
 $(function () {
 
-    alert("🔥Ausi History JS VERSION 9");
+    alert("🔥Ausi History JS VERSION 10");
 
     const el = document.getElementById('resident_id_ausi_booking_history');
 
@@ -34,8 +34,9 @@ $(function () {
     window.onResidentChangeHistory = function (e) {
 
         const unit = e.target.value;
-        const store = Alpine.store('superapp');
-        const email = store?.user?.email || '';
+
+        const email = $('#history_mobile_email').val();
+
 
         logDebugHistory("HISTORY FILTER", {
             unit: unit,
@@ -43,7 +44,7 @@ $(function () {
         });
 
 
-        updateAusiHistoryBookingTable(unit, email);
+        updateAusiHistoryBookingTable(unit);
 
     };
 

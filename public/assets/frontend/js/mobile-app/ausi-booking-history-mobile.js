@@ -1,11 +1,24 @@
 $(function () {
 
-    alert("🔥Ausi History JS VERSION 3");
-    document.addEventListener('change', function (e) {
-        if (e.target && e.target.id === 'resident_id_ausi_booking_history') {
-            window.onResidentChange(e);
+    alert("🔥Ausi History JS VERSION 4");
+
+    function logDebugHistory(...args) {
+
+        const msg = args.map(a =>
+            typeof a === 'object'
+                ? JSON.stringify(a)
+                : a
+        ).join(' ');
+
+        console.log(msg);
+
+        const el = document.getElementById('debugPanelBookingHistory');
+
+        if (el) {
+            el.innerHTML += msg + "<br>";
+            el.scrollTop = el.scrollHeight;
         }
-    });
+    }
 
     window.onResidentChange = function (e) {
         const unit = e.target.value;
@@ -16,7 +29,7 @@ $(function () {
         window.ausiState.email = email;
 
 
-        alert("HISTORY FILTER:", {
+        logDebugHistory("HISTORY FILTER:", {
             email: email,
             unit: unit
         });
@@ -28,7 +41,7 @@ $(function () {
 
     function updateAusiHistoryBookingTable(unitName, email) {
 
-        alert("ENTERED HISTORY TABLE");
+        logDebugHistory("ENTERED HISTORY TABLE");
 
         $.ajax({
 
@@ -43,7 +56,7 @@ $(function () {
 
             success: function (res) {
 
-                console.log("HISTORY RESPONSE:", res);
+                logDebugHistory("HISTORY RESPONSE:", res);
 
                 renderHistoryTable(res.bookings);
 
@@ -52,7 +65,7 @@ $(function () {
 
             error: function (xhr) {
 
-                console.log(xhr.responseText);
+                logDebugHistory(xhr.responseText);
 
                 alert("ERROR " + xhr.status);
             }
@@ -62,7 +75,7 @@ $(function () {
     }
 
     function renderHistoryTable(bookings) {
-
+        logDebugHistory("renderHistoryTable")
         let html = "";
 
 

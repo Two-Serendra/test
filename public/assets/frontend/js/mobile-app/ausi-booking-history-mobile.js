@@ -1,6 +1,6 @@
 $(function () {
 
-    alert("🔥Ausi History JS VERSION 5");
+    alert("🔥Ausi History JS VERSION 6");
 
     const el = document.getElementById('resident_id_ausi_booking_history');
 
@@ -25,6 +25,7 @@ $(function () {
     }
 
     document.addEventListener('change', function (e) {
+        alert("CHANGE EVENT:", e.target.id);
         if (e.target && e.target.id === 'resident_id_ausi_booking_history') {
             window.onResidentChangeHistory(e);
         }

@@ -20,7 +20,13 @@ $(function () {
         }
     }
 
-    window.onResidentChange = function (e) {
+    document.addEventListener('change', function (e) {
+        if (e.target && e.target.id === 'resident_id_ausi_booking_history') {
+            window.onResidentChangeHistory(e);
+        }
+    });
+
+    window.onResidentChangeHistory = function (e) {
         const unit = e.target.value;
 
         const email = Alpine.store('superapp').user?.email;

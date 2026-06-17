@@ -1,0 +1,89 @@
+.history-loading {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    min-height: 150px;
+}
+
+
+.history-table td,
+.history-table th {
+    white-space: nowrap;
+}
+
+
+@media(max-width:768px) {
+
+
+    .history-table thead {
+        display: none;
+    }
+
+
+    .history-table,
+    .history-table tbody,
+    .history-table tr,
+    .history-table td {
+        display: block;
+        width: 100%;
+    }
+
+
+    .history-table tr {
+
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        margin-bottom: 12px;
+        padding: 10px;
+        background: white;
+
+    }
+
+
+    .history-table td {
+
+        border: none;
+        text-align: left !important;
+        padding: 8px 12px;
+
+    }
+
+
+    .history-table td:before {
+
+        font-weight: 600;
+        display: inline-block;
+        width: 100px;
+
+    }
+
+
+    .history-table td:nth-child(1):before {
+        content: "Booking ID";
+    }
+
+
+    .history-table td:nth-child(2):before {
+        content: "Date";
+    }
+
+
+    .history-table td:nth-child(3):before {
+        content: "Time";
+    }
+
+
+    .history-table td:nth-child(4):before {
+        content: "Status";
+    }
+
+
+    .history-table td:nth-child(5):before {
+        content: "Action";
+    }
+
+}

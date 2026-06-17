@@ -1,6 +1,6 @@
 $(function () {
 
-    alert("🔥Ausi History JS VERSION 1");
+    alert("🔥Ausi History JS VERSION 2");
     document.addEventListener('change', function (e) {
         if (e.target && e.target.id === 'resident_id_ausi_booking_history') {
             window.onResidentChange(e);

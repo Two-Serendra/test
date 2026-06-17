@@ -25,28 +25,36 @@ $(function () {
     }
 
     document.addEventListener('change', function (e) {
-        alert("CHANGE EVENT:", e.target.id);
+        alert("CHANGE EVENT: " + e.target.id);
         if (e.target && e.target.id === 'resident_id_ausi_booking_history') {
             window.onResidentChangeHistory(e);
         }
     });
 
     window.onResidentChangeHistory = function (e) {
+        alert("ENTERED FUNCTION");
         const unit = e.target.value;
+        alert("UNIT: " + unit);
 
-        const email = Alpine.store('superapp').user?.email;
+
+        const email = Alpine.store('superapp')?.user?.email;
+
+        alert("EMAIL: " + email);
+
+        window.ausiState = window.ausiState || {};
 
         window.ausiState.unit = unit;
         window.ausiState.email = email;
 
 
-        logDebugHistory("HISTORY FILTER:", {
+        logDebugHistory("HISTORY FILTER", {
             email: email,
             unit: unit
         });
 
 
         updateAusiHistoryBookingTable(unit, email);
+
     };
 
 

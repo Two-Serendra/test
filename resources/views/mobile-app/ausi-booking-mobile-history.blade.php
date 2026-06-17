@@ -27,7 +27,8 @@
                             <dd>
 
                                 <select id="resident_id_ausi_booking_history" name="resident_id_ausi_booking_history"
-                                    class="form-select" x-model="$store.superapp.selectedUnit" required>
+                                    class="form-select" x-model="$store.superapp.selectedUnit"
+                                    @change="onResidentChange($event)" required>
                                     <option value="" disabled>-- Select Residence --</option>
 
                                     <template x-for="(unit, index) in $store.superapp.units" :key="index">
@@ -65,18 +66,18 @@
         </div>
 
         <div id="debugPanelBookingHistory" style="
-                                                                                    position: fixed;
-                                                                                    bottom: 0;
-                                                                                    left: 0;
-                                                                                    right: 0;
-                                                                                    height: 140px;
-                                                                                    overflow: auto;
-                                                                                    background: black;
-                                                                                    color: #00ff00;
-                                                                                    font-size: 11px;
-                                                                                    z-index: 99999;
-                                                                                    padding: 10px;
-                                                                                ">
+                                                                                        position: fixed;
+                                                                                        bottom: 0;
+                                                                                        left: 0;
+                                                                                        right: 0;
+                                                                                        height: 140px;
+                                                                                        overflow: auto;
+                                                                                        background: black;
+                                                                                        color: #00ff00;
+                                                                                        font-size: 11px;
+                                                                                        z-index: 99999;
+                                                                                        padding: 10px;
+                                                                                    ">
         </div>
 
     </div>

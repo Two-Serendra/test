@@ -13,6 +13,11 @@
         </div>
 
         <div class="card shadow-sm mb-4">
+
+            <a href="{{ route('ausi.booking.mobile.history') }}" class="btn btn-sm btn-outline-primary">
+                <i class="bx bx-history"></i> History
+            </a>
+
             <div class="card-body">
                 <form method="POST" action="{{ route('ausi.booking.mobile.store') }}" enctype="multipart/form-data"
                     id="userAusiNewBookingMobile" class="needs-validation" novalidate>
@@ -21,9 +26,9 @@
                     <div class="row mb-3">
 
                         <!-- <div class="">
-                            <dt>Email</dt>
-                            <dd x-text="$store.superapp.user?.email ?? '—'"></dd>
-                        </div> -->
+                                <dt>Email</dt>
+                                <dd x-text="$store.superapp.user?.email ?? '—'"></dd>
+                            </div> -->
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label">Select Residence <span class="required">*</span></label>
                             <input type="hidden" name="email" id="mobile_email">
@@ -55,54 +60,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">
-                            Select Time Slot <span class="required">*</span>
-                        </label>
-
-                        @php
-                            $slots = [
-                                '8:00 AM - 8:30 AM',
-                                '8:30 AM - 9:00 AM',
-                                '9:00 AM - 9:30 AM',
-                                '9:30 AM - 10:00 AM',
-                                '10:00 AM - 10:30 AM',
-                                '10:30 AM - 11:00 AM',
-                                '11:00 AM - 11:30 AM',
-                                '11:30 AM - 12:00 NN',
-
-                                '1:00 PM - 1:30 PM',
-                                '1:30 PM - 2:00 PM',
-                                '2:00 PM - 2:30 PM',
-                                '2:30 PM - 3:00 PM',
-                                '3:00 PM - 3:30 PM',
-                                '3:30 PM - 4:00 PM',
-                                '4:00 PM - 4:30 PM',
-                                '4:30 PM - 5:00 PM',
-                            ]; 
-                        @endphp
-                        <div id="slotWrapper" class="position-relative">
-                            <div id="slotLoading" class="slot-loading d-none">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
-
-                            <div class="row g-2">
-                                @foreach ($slots as $slot)
-                                    <div class="col-lg-3 col-md-4 col-6">
-                                        <input type="radio" class="btn-check ausi-booking-slot" name="booking_time_slot"
-                                            id="slot{{ $loop->index }}" value="{{ $slot }}" data-slot="{{ $slot }}" disabled
-                                            required>
-
-                                        <label class="btn btn-outline-primary disabled w-100 py-2" for="slot{{ $loop->index }}">
-                                            {{ $slot }}
-                                        </label>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
 
                     <div class="d-grid">
                         <button type="submit" form="userAusiNewBookingMobile" id="saveUserAusiBtn"
@@ -117,18 +74,18 @@
         </div>
 
         <div id="debugPanel" style="
-                                                            position: fixed;
-                                                            bottom: 0;
-                                                            left: 0;
-                                                            right: 0;
-                                                            height: 140px;
-                                                            overflow: auto;
-                                                            background: black;
-                                                            color: #00ff00;
-                                                            font-size: 11px;
-                                                            z-index: 99999;
-                                                            padding: 10px;
-                                                        ">
+                                                                position: fixed;
+                                                                bottom: 0;
+                                                                left: 0;
+                                                                right: 0;
+                                                                height: 140px;
+                                                                overflow: auto;
+                                                                background: black;
+                                                                color: #00ff00;
+                                                                font-size: 11px;
+                                                                z-index: 99999;
+                                                                padding: 10px;
+                                                            ">
         </div>
 
     </div>

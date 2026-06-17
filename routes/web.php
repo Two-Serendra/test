@@ -210,6 +210,9 @@ Route::middleware(['miniapp.webview'])->group(function () {
     Route::get('/ausi-booking-mobile', [MobileAppController::class, 'ausiBookingUserMobile'])->middleware('no-cache');
     Route::get('/ausi-booked-slots-mobile', [MobileAppController::class, 'getBookedSlotsAusiMobile']);
     Route::post('/ausi-booking-mobile/store', [MobileAppController::class, 'storeAusiBookingMobile'])->name('ausi.booking.mobile.store')->middleware('throttle:5,1');
+    Route::post('/ausi-booking-mobile/history', [MobileAppController::class, 'viewAusiBookingMobileHistory'])->name('ausi.booking.mobile.history');
+    Route::post('/get-ausi-booking-mobile/history', [MobileAppController::class, 'getAusiBookingMobileHistory'])->name('get.ausi.booking.mobile.history');
+
     Route::post('/ausi-booking-mobile/cancel/{booking}', [MobileAppController::class, 'CancelAusiBooking'])
         ->name('ausi.booking.mobile.cancel')->middleware('throttle:5,1');
     Route::get('/ausi-booking-details/{id}', [MobileAppController::class, 'showAusiBookingDetails']);
@@ -219,4 +222,3 @@ Route::middleware('web')
     ->group(base_path('routes/admin.php'));
 
 require __DIR__ . '/auth.php';
-   

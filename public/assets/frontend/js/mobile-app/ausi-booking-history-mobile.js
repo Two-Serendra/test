@@ -35,45 +35,39 @@ $(function () {
 
         const unit = e.target.value;
 
-
-        logDebugHistory("UNIT SELECTED: " + unit);
-
-
         const store = Alpine.store('superapp');
 
+        const email = store?.user?.email || '';
 
-        logDebugHistory("STORE:");
-        logDebugHistory(store);
-
-
-        const email = store?.user?.email;
-
-
-        logDebugHistory("EMAIL:");
-        logDebugHistory(email);
+        logDebugHistory("HISTORY FILTER", {
+            unit: unit,
+            email: email
+        });
 
 
         updateAusiHistoryBookingTable(unit, email);
 
     };
 
-    function updateAusiHistoryBookingTable(unitName, email) {
-
-        logDebugHistory("ENTERED HISTORY TABLE");
+    function updateAusiHistoryBookingTable(unitName) {
 
         $.ajax({
 
-            url: "/get-ausi-booking-mobile/history",
+            url: "{{ route('get.ausi.booking.mobile.history') }}",
+
             type: "GET",
 
             data: {
-                unit_name: unitName,
+                unit_name: unitName
             },
 
 
             success: function (res) {
 
-                logDebugHistory("HISTORY RESPONSE:", res);
+                logDebugHistory(
+                    "HISTORY RESPONSE",
+                    res
+                );
 
                 renderHistoryTable(res.bookings);
 
@@ -82,9 +76,11 @@ $(function () {
 
             error: function (xhr) {
 
-                logDebugHistory(xhr.responseText);
+                logDebugHistory(
+                    "ERROR",
+                    xhr.responseText
+                );
 
-                alert("ERROR " + xhr.status);
             }
 
         });

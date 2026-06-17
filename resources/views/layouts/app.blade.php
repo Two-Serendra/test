@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0,">
-    <meta name="cache-bust" content="{{ $cache_bust }}">
     <title>@yield('title', 'ITY Miniapp')</title>
     <link rel="stylesheet" href="/css/app.css">
     <script type="module" src="/js/app.js"></script>
@@ -96,10 +95,6 @@
     </script>
     <script src="{{ asset('assets/frontend/js/mobile-app/ausi-booking-mobile.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/mobile-app/ausi-booking-history-mobile.js') }}"></script>
-    <script>
-        window.APP_VERSION = "{{ $cache_bust }}";
-    </script>
-
 </body>
 
 </html>

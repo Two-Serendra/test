@@ -1,6 +1,6 @@
 $(function () {
 
-    alert("🔥Ausi History JS VERSION 7");
+    alert("🔥Ausi History JS VERSION 8");
 
     const el = document.getElementById('resident_id_ausi_booking_history');
 
@@ -51,7 +51,7 @@ $(function () {
 
         $.ajax({
 
-            url: "/ausi-booking-mobile/history",
+            url: "/get-ausi-booking-mobile/history",
 
             type: "GET",
 

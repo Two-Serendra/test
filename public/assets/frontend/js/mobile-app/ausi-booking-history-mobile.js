@@ -1,6 +1,10 @@
 $(function () {
 
-    alert("🔥Ausi History JS VERSION 4");
+    alert("🔥Ausi History JS VERSION 5");
+
+    const el = document.getElementById('resident_id_ausi_booking_history');
+
+    alert("SELECT EXISTS: " + (el ? "YES" : "NO"));
 
     function logDebugHistory(...args) {
 

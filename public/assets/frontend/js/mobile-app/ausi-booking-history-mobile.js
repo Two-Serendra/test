@@ -1,6 +1,6 @@
 $(function () {
 
-    alert("🔥Ausi History JS VERSION 8");
+    alert("🔥Ausi History JS VERSION 9");
 
     const el = document.getElementById('resident_id_ausi_booking_history');
 

@@ -320,18 +320,69 @@ class MobileAppController extends Controller
     {
 
         $email = $request->email;
-        $unit = $request->unit_name;
+        $mobileUnit = $request->unit_name;
+
+
+        $unitNo = $this->convertMobileUnitToUnitNo($mobileUnit);
+
+
+        if (!$unitNo) {
+
+            return response()->json([
+                'message' => 'Invalid unit format',
+                'unit' => $mobileUnit
+            ], 422);
+
+        }
 
 
         $bookings = AusiBooking::where('email', $email)
-            ->where('unit_name', $unit)
+            ->where('unit_no', $unitNo)
             ->orderBy('booking_date', 'desc')
             ->get();
 
 
         return response()->json([
+            'unit_no' => $unitNo,
             'bookings' => $bookings
         ]);
 
+    }
+
+    private function convertMobileUnitToUnitNo($unitName)
+    {
+        $map = [
+            "Almond" => "A",
+            "Belize" => "B",
+            "Callery" => "C",
+            "Dolce" => "D",
+            "Encino" => "E",
+            "Aston" => "F",
+            "ReadOak" => "G",
+            "Meranti" => "H",
+            "Sequoia" => "I",
+        ];
+
+
+        $parts = explode(' ', trim($unitName));
+
+
+        if (count($parts) !== 2) {
+            return null;
+        }
+
+
+        [$tower, $number] = $parts;
+
+
+        $towerLetter = $map[$tower] ?? null;
+
+
+        if (!$towerLetter) {
+            return null;
+        }
+
+
+        return $number . $towerLetter;
     }
 }

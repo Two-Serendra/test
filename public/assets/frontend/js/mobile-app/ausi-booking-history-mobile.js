@@ -116,12 +116,22 @@ $(function () {
         if (!bookings || bookings.length === 0) {
 
             html = `
-            <tr>
-                <td colspan="3" class="text-center">
-                    No booking history found
-                </td>
-            </tr>
-        `;
+<tr>
+    <td colspan="5">
+
+        <div class="py-4 text-center">
+
+            <i class="bx bx-calendar-x fs-1 text-muted"></i>
+
+            <p class="text-muted mt-2 mb-0">
+                No booking history found
+            </p>
+
+        </div>
+
+    </td>
+</tr>
+`;
 
         }
         else {
@@ -182,24 +192,25 @@ $(function () {
 
 
                     if (hoursDiff >= 12) {
-
                         cancelButton = `
-            <button 
-                class="btn btn-sm btn-outline-danger cancel-booking-btn"
-                data-id="${item.id}">
-                Cancel
-            </button>
-        `;
+<button 
+    class="btn btn-sm btn-outline-danger rounded-pill px-3 cancel-booking-btn"
+    data-id="${item.id}">
+    <i class="bx bx-x-circle"></i>
+    Cancel
+</button>
+`;
 
                     } else {
 
                         cancelButton = `
-            <button 
-                class="btn btn-sm btn-outline-secondary"
-                disabled>
-                Cancel
-            </button>
-        `;
+<button 
+    class="btn btn-sm btn-outline-secondary rounded-pill px-3"
+    disabled>
+    <i class="bx bx-lock"></i>
+    Cancel
+</button>
+`;
                     }
 
                 }
@@ -211,21 +222,24 @@ $(function () {
                 <td>${item.booking_time_slot}</td>
 
                 <td>
-                    <span class="badge ${badgeClass}">
-                        ${statusText}
-                    </span>
+                    <span class="badge ${badgeClass} rounded-pill px-3 py-2">
+    ${statusText}
+</span>
                 </td>
 
                <td>
 
+   <div class="d-flex gap-2 justify-content-center flex-wrap">
+
     <a href="/ausi-booking-details/${item.id}"
-       class="btn btn-sm btn-outline-primary mb-1">
-       View
+       class="btn btn-sm btn-outline-primary rounded-pill px-3">
+        <i class="bx bx-show"></i>
+        View
     </a>
 
     ${cancelButton}
 
-</td>
+</div>
             </tr>
         `;
 

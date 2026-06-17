@@ -15,7 +15,7 @@
         <div class="card shadow-sm mb-4">
 
             <a href="{{ route('ausi.booking.mobile.history') }}" class="btn btn-sm btn-outline-primary">
-                <i class="bx bx-history"></i> History
+                <i class="bx bx-history"></i> My Bookings
             </a>
             
             <div class="card-body">

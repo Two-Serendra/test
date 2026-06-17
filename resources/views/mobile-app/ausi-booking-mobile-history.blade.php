@@ -41,8 +41,7 @@
                         </dl>
                     </div>
 
-                    <div class="table-responsive position-relative history-container">
-
+                    <div id="historyWrapper" class="table-responsive position-relative history-container d-none">
                         <!-- Loading Overlay -->
                         <div id="historyLoading" class="history-loading d-none">
                             <div class="spinner-border text-primary" role="status">
@@ -64,18 +63,18 @@
         </div>
 
         <div id="debugPanelBookingHistory" style="
-                                                                                                        position: fixed;
-                                                                                                        bottom: 0;
-                                                                                                        left: 0;
-                                                                                                        right: 0;
-                                                                                                        height: 140px;
-                                                                                                        overflow: auto;
-                                                                                                        background: black;
-                                                                                                        color: #00ff00;
-                                                                                                        font-size: 11px;
-                                                                                                        z-index: 99999;
-                                                                                                        padding: 10px;
-                                                                                                    ">
+                                                                                                                    position: fixed;
+                                                                                                                    bottom: 0;
+                                                                                                                    left: 0;
+                                                                                                                    right: 0;
+                                                                                                                    height: 140px;
+                                                                                                                    overflow: auto;
+                                                                                                                    background: black;
+                                                                                                                    color: #00ff00;
+                                                                                                                    font-size: 11px;
+                                                                                                                    z-index: 99999;
+                                                                                                                    padding: 10px;
+                                                                                                                ">
         </div>
 
     </div>
@@ -83,35 +82,73 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('ausiBookingPageHistory', () => ({
-                residences: [],
-                selectedResidence: null,
-                debugLog: '',
-                debugEmail: null,
 
-                log(msg) {
-                    console.log(msg);
-                    this.debugLog += msg + "\n";
-                },
                 init() {
-                    this.log("🚀 INIT STARTED");
+
                     this.setHeader();
+
                     const store = Alpine.store('superapp');
-                    $('#mobile_email').val(store?.user?.email || '');
-                    $('#mobile_user_id').val(store?.user?.id || '');
-                },
-                setHeader() {
-                    Alpine.store('superapp')?.bridge?.setHeader({
-                        mode: 'sticky-no-back',
-                        title: 'Bridge Demo',
-                        backgroundColor: '#1e3a5f',
-                        textStyle: 'white',
-                        showHome: false,
+                    const units = store?.units || [];
+
+                    $('#history_mobile_email')
+                        .val(store?.user?.email || '');
+
+                    if (!units.length) {
+                        return;
+                    }
+
+                    this.$nextTick(() => {
+
+                        const firstUnit = units[0].name;
+
+                        store.selectedUnit = firstUnit;
+
+                        const email = store?.user?.email || '';
+
+                        logDebugHistory("AUTO LOAD", {
+                            unit: firstUnit,
+                            email: email
+                        });
+
+                        updateAusiHistoryBookingTable(
+                            firstUnit,
+                            email
+                        );
+
+                        $("#historyWrapper").removeClass("d-none");
+
                     });
-                },
+                }
 
 
-            }));
-        });
+                        $('#history_mobile_email')
+                            .val(store?.user?.email || '');
+
+            },
+
+
+                setHeader() {
+
+                Alpine.store('superapp')?.bridge?.setHeader({
+
+                    mode: 'sticky-no-back',
+
+                    title: 'Booking History',
+
+                    backgroundColor: '#1e3a5f',
+
+                    textStyle: 'white',
+
+                    showHome: false,
+
+                });
+
+            },
+
+
+                }));
+
+            });
     </script>
 
 

@@ -1,6 +1,6 @@
 $(function () {
 
-    alert("🔥Ausi History JS VERSION 12");
+    alert("🔥Ausi History JS VERSION 13");
 
     const el = document.getElementById('resident_id_ausi_booking_history');
 
@@ -34,18 +34,14 @@ $(function () {
     window.onResidentChangeHistory = function (e) {
 
         const unit = e.target.value;
-
         const email = $('#history_mobile_email').val();
 
+        $("#historyWrapper").removeClass("d-none");
 
-        logDebugHistory("HISTORY FILTER", {
-            unit: unit,
-            email: email
-        });
-
-
-        updateAusiHistoryBookingTable(unit, email);
-
+        updateAusiHistoryBookingTable(
+            unit,
+            email
+        );
     };
 
     function updateAusiHistoryBookingTable(unitName, email) {
@@ -69,6 +65,7 @@ $(function () {
                     "HISTORY RESPONSE",
                     res
                 );
+                $("#historyWrapper").removeClass('d-none');
 
                 renderHistoryTable(res.bookings);
 
@@ -94,6 +91,8 @@ $(function () {
     }
 
     function showHistoryLoading() {
+
+        $("#historyWrapper").removeClass('d-none');
 
         $("#historyLoading")
             .removeClass("d-none");

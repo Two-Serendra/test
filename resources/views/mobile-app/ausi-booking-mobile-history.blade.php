@@ -64,18 +64,18 @@
         </div>
 
         <div id="debugPanelBookingHistory" style="
-                                                                                                                            position: fixed;
-                                                                                                                            bottom: 0;
-                                                                                                                            left: 0;
-                                                                                                                            right: 0;
-                                                                                                                            height: 140px;
-                                                                                                                            overflow: auto;
-                                                                                                                            background: black;
-                                                                                                                            color: #00ff00;
-                                                                                                                            font-size: 11px;
-                                                                                                                            z-index: 99999;
-                                                                                                                            padding: 10px;
-                                                                                                                        ">
+                                                                                                                        position: fixed;
+                                                                                                                        bottom: 0;
+                                                                                                                        left: 0;
+                                                                                                                        right: 0;
+                                                                                                                        height: 140px;
+                                                                                                                        overflow: auto;
+                                                                                                                        background: black;
+                                                                                                                        color: #00ff00;
+                                                                                                                        font-size: 11px;
+                                                                                                                        z-index: 99999;
+                                                                                                                        padding: 10px;
+                                                                                                                    ">
         </div>
 
     </div>
@@ -112,13 +112,22 @@
                             return;
                         }
 
-
+                        // Auto select first unit
                         const firstUnit = units[0].name;
 
                         store.selectedUnit = firstUnit;
 
+                        const select = document.getElementById(
+                            'resident_id_ausi_booking_history'
+                        );
+
+                        if (select) {
+                            select.value = firstUnit;
+                        }
 
                         const email = store?.user?.email || '';
+
+                        $("#historyWrapper").removeClass("d-none");
 
                         updateAusiHistoryBookingTable(
                             firstUnit,

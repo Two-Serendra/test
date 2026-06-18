@@ -13,7 +13,6 @@
         </div>
 
         <div class="card shadow-sm mb-4">
-
             <H3>Booking History</H3>
             <div class="card-body">
                 <div class="row mb-3">
@@ -86,41 +85,35 @@
                     );
 
                     this.$nextTick(() => {
+                        const checkUnits = setInterval(() => {
 
-                        const units = store?.units || [];
+                            const units = store?.units || [];
+                            logDebugHistory("CHECK UNITS:", units);
+                            if (!units.length) {
+                                return;
+                            }
 
-                        if (!units.length) {
-                            return;
-                        }
-
-
-                        // Auto select first residence
-                        const firstUnit = units[0].name;
-
-
-                        // Update Alpine dropdown value
-                        store.selectedUnit = firstUnit;
-
-
-                        const select = document.getElementById(
-                            'resident_id_ausi_booking_history'
-                        );
+                            clearInterval(checkUnits);
+                            const firstUnit = units[0].name;
+                            logDebugHistory("AUTO SELECT:", firstUnit);
+                            store.selectedUnit = firstUnit;
+                            const select = document.getElementById(
+                                'resident_id_ausi_booking_history'
+                            );
 
 
-                        if (select) {
+                            if (select) {
 
-                            select.value = firstUnit;
+                                select.value = firstUnit;
 
-                            // trigger change event so existing jquery code still works
-                            select.dispatchEvent(new Event('change', {
-                                bubbles: true
-                            }));
+                                select.dispatchEvent(new Event('change', {
+                                    bubbles: true
+                                }));
 
-                        }
-
+                            }
+                        }, 300);
 
                     });
-
                 },
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({
@@ -135,6 +128,5 @@
             }));
         });
     </script>
-
 
 @endsection

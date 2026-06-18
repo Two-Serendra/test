@@ -83,59 +83,6 @@
                     $('#history_mobile_email').val(
                         store?.user?.email || ''
                     );
-
-                    this.$watch(
-                        () => Alpine.store('superapp').units,
-                        (units) => {
-
-                            console.log("UNITS WATCH:", units);
-
-
-                            if (!units || !units.length) {
-                                return;
-                            }
-
-
-                            const firstUnit = units[0].name;
-
-
-                            console.log("AUTO SELECT:", firstUnit);
-
-
-                            // set Alpine model
-                            Alpine.store('superapp').selectedUnit = firstUnit;
-
-
-                            this.$nextTick(() => {
-
-                                const select = document.getElementById(
-                                    'resident_id_ausi_booking_history'
-                                );
-
-
-                                if (select) {
-
-                                    console.log("SELECT FOUND");
-
-
-                                    select.value = firstUnit;
-
-
-                                    // manually load history
-                                    updateAusiHistoryBookingTable(
-                                        firstUnit,
-                                        Alpine.store('superapp').user?.email || ''
-                                    );
-
-                                }
-
-                            });
-
-                        },
-                        {
-                            immediate: true
-                        }
-                    );
                 },
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({

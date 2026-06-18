@@ -1,6 +1,58 @@
 $(function () {
 
-    logDebugHistory("🔥Ausi History JS VERSION 23");
+    autoSelectHistoryResidence();
+    logDebugHistory("🔥Ausi History JS VERSION 26");
+    function autoSelectHistoryResidence() {
+
+        const select = $('#resident_id_ausi_booking_history');
+
+        if (!select.length) {
+            console.log("HISTORY SELECT NOT FOUND");
+            return;
+        }
+
+
+        const options = select.find('option');
+
+        console.log(
+            "HISTORY OPTIONS:",
+            options.length
+        );
+
+
+        // Alpine has not rendered yet
+        if (options.length <= 1) {
+            setTimeout(autoSelectHistoryResidence, 300);
+            return;
+        }
+
+
+        const firstUnit = options.eq(1).val();
+
+
+        if (!firstUnit) {
+            console.log("NO FIRST UNIT");
+            return;
+        }
+
+
+        console.log(
+            "AUTO SELECT UNIT:",
+            firstUnit
+        );
+
+        select.val(firstUnit);
+
+        select.trigger('input');
+
+        const email = $('#history_mobile_email').val();
+
+        updateAusiHistoryBookingTable(
+            firstUnit,
+            email
+        );
+
+    }
 
     const el = document.getElementById('resident_id_ausi_booking_history');
 

@@ -17,7 +17,7 @@
             <H3>Booking History</H3>
             <div class="card-body">
                 <div class="row mb-3">
-                    <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="mb-3 mb-md-0">
                         <label class="form-label">Select Residence <span class="required">*</span></label>
                         <!-- <input type="text" name="email" id="mobile_email"> -->
                         <input type="hidden" name="mobile_unit_name" id="mobile_unit_name">
@@ -56,19 +56,7 @@
             </div>
         </div>
 
-        <div id="debugPanelBookingHistory" style="
-                                                                                                                    position: fixed;
-                                                                                                                    bottom: 0;
-                                                                                                                    left: 0;
-                                                                                                                    right: 0;
-                                                                                                                    height: 140px;
-                                                                                                                    overflow: auto;
-                                                                                                                    background: black;
-                                                                                                                    color: #00ff00;
-                                                                                                                    font-size: 11px;
-                                                                                                                    z-index: 99999;
-                                                                                                                    padding: 10px;
-                                                                                                                ">
+        <div id="debugPanelBookingHistory">
         </div>
 
     </div>
@@ -105,27 +93,31 @@
                             return;
                         }
 
-                        // Auto select first unit
+
+                        // Auto select first residence
                         const firstUnit = units[0].name;
 
+
+                        // Update Alpine dropdown value
                         store.selectedUnit = firstUnit;
+
 
                         const select = document.getElementById(
                             'resident_id_ausi_booking_history'
                         );
 
+
                         if (select) {
+
                             select.value = firstUnit;
+
+                            // trigger change event so existing jquery code still works
+                            select.dispatchEvent(new Event('change', {
+                                bubbles: true
+                            }));
+
                         }
 
-                        const email = store?.user?.email || '';
-
-                        $("#historyWrapper").removeClass("d-none");
-
-                        updateAusiHistoryBookingTable(
-                            firstUnit,
-                            email
-                        );
 
                     });
 

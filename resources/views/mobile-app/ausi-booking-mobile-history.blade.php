@@ -84,36 +84,58 @@
                         store?.user?.email || ''
                     );
 
-                    this.$nextTick(() => {
-                        const checkUnits = setInterval(() => {
+                    this.$watch(
+                        () => Alpine.store('superapp').units,
+                        (units) => {
 
-                            const units = store?.units || [];
-                          logDebugHistory("CHECK UNITS:", units);
-                            if (!units.length) {
+                            console.log("UNITS WATCH:", units);
+
+
+                            if (!units || !units.length) {
                                 return;
                             }
 
-                            clearInterval(checkUnits);
+
                             const firstUnit = units[0].name;
-                          logDebugHistory("AUTO SELECT:", firstUnit);
-                            store.selectedUnit = firstUnit;
-                            const select = document.getElementById(
-                                'resident_id_ausi_booking_history'
-                            );
 
 
-                            if (select) {
+                            console.log("AUTO SELECT:", firstUnit);
 
-                                select.value = firstUnit;
 
-                                select.dispatchEvent(new Event('change', {
-                                    bubbles: true
-                                }));
+                            // set Alpine model
+                            Alpine.store('superapp').selectedUnit = firstUnit;
 
-                            }
-                        }, 300);
 
-                    });
+                            this.$nextTick(() => {
+
+                                const select = document.getElementById(
+                                    'resident_id_ausi_booking_history'
+                                );
+
+
+                                if (select) {
+
+                                    console.log("SELECT FOUND");
+
+
+                                    select.value = firstUnit;
+
+
+                                    // manually load history
+                                    updateAusiHistoryBookingTable(
+                                        firstUnit,
+                                        Alpine.store('superapp').user?.email || ''
+                                    );
+
+                                }
+
+                            });
+
+                        },
+                        {
+                            immediate: true
+                        }
+                    );
                 },
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({

@@ -88,14 +88,14 @@
                         const checkUnits = setInterval(() => {
 
                             const units = store?.units || [];
-                            alert("CHECK UNITS:", units);
+                          logDebugHistory("CHECK UNITS:", units);
                             if (!units.length) {
                                 return;
                             }
 
                             clearInterval(checkUnits);
                             const firstUnit = units[0].name;
-                            alert("AUTO SELECT:", firstUnit);
+                          logDebugHistory("AUTO SELECT:", firstUnit);
                             store.selectedUnit = firstUnit;
                             const select = document.getElementById(
                                 'resident_id_ausi_booking_history'

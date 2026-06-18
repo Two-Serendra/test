@@ -1,8 +1,8 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-031");
+   logDebug("🔥 JS VERSION 2026-06-15-031");
     const el = document.getElementById('resident_id_ausi');
 
-    alert("SELECT EXISTS: " + (el ? "YES" : "NO"));
+   logDebug("SELECT EXISTS: " + (el ? "YES" : "NO"));
     function logDebug(...args) {
 
         const msg = args.map(a =>
@@ -36,7 +36,7 @@ $(function () {
         onChange: function (selectedDates, dateStr) {
             window.ausiState.date = dateStr;
             console.log("DATE:", dateStr);
-            alert("DATE CHANGED: " + dateStr);
+           logDebug("DATE CHANGED: " + dateStr);
             triggerUpdate();
         }
     });
@@ -57,8 +57,8 @@ $(function () {
         }
 
         console.log("UNIT:", value);
-        alert("UNIT CHANGED: " + value);
-        alert("CHANGE FIRED");
+       logDebug("UNIT CHANGED: " + value);
+       logDebug("CHANGE FIRED");
 
         triggerUpdate();
     };
@@ -81,7 +81,7 @@ $(function () {
 
     function updateSlots(date, unitName) {
 
-        alert("ENTERED updateSlots");
+       logDebug("ENTERED updateSlots");
 
         logDebug("STEP 1 OK");
 
@@ -122,7 +122,7 @@ $(function () {
                 error: function (xhr) {
 
                     console.log(xhr.responseText);
-                    alert("ERROR " + xhr.status);
+                   logDebug("ERROR " + xhr.status);
 
                     hideLoading();
                 }
@@ -131,7 +131,7 @@ $(function () {
 
         } catch (e) {
 
-            alert("JS ERROR:\n" + e.message);
+           logDebug("JS ERROR:\n" + e.message);
 
             logDebug("FULL ERROR:", e);
         }
@@ -238,7 +238,7 @@ $(function () {
     });
 
     window.resetAusiBookingUI = function () {
-        alert("RESET CALLED");
+       logDebug("RESET CALLED");
         const form = document.getElementById('userAusiNewBookingMobile');
 
         if (form) {
@@ -283,7 +283,7 @@ $(function () {
             .prop('disabled', true)
             .html('<span class="btn-text">Submit</span>');
         $bookingSlots.prop('disabled', true);
-        alert("RESET FINISHED");
+       logDebug("RESET FINISHED");
     };
 
     let isSubmitting = false;
@@ -354,7 +354,7 @@ $(function () {
 
             lockSubmitBtn();
             // for (const pair of formData.entries()) {
-            //     alert(pair[0] + " = " + pair[1]);
+            //    logDebug(pair[0] + " = " + pair[1]);
             // }
 
             $.ajax({

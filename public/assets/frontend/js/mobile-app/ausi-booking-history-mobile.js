@@ -1,10 +1,10 @@
 $(function () {
 
-    alert("🔥Ausi History JS VERSION 23");
+    logDebugHistory("🔥Ausi History JS VERSION 23");
 
     const el = document.getElementById('resident_id_ausi_booking_history');
 
-    alert("SELECT EXISTS: " + (el ? "YES" : "NO"));
+    logDebugHistory("SELECT EXISTS: " + (el ? "YES" : "NO"));
 
     function logDebugHistory(...args) {
 
@@ -25,7 +25,7 @@ $(function () {
     }
 
     document.addEventListener('change', function (e) {
-        alert("CHANGE EVENT: " + e.target.id);
+        logDebugHistory("CHANGE EVENT: " + e.target.id);
         if (e.target && e.target.id === 'resident_id_ausi_booking_history') {
             window.onResidentChangeHistory(e);
         }

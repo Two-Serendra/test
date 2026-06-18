@@ -41,7 +41,7 @@
                         </dl>
                     </div>
 
-                    <div id="historyWrapper" class="table-responsive position-relative history-container d-none">
+                    <div id="historyWrapper" class="">
                         <!-- Loading Overlay -->
                         <div id="historyLoading" class="history-loading d-none">
                             <div class="spinner-border text-primary" role="status">
@@ -50,31 +50,25 @@
                             <span class="ms-2">Loading history...</span>
                         </div>
 
-                        <table class="table table-bordered text-center align-middle history-table">
-                            <tbody id="ausiHistoryTable">
-
-                            </tbody>
-
-                        </table>
-
+                        <div id="ausiHistoryTable" class="booking-history-list"></div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div id="debugPanelBookingHistory" style="
-                                                                                                                position: fixed;
-                                                                                                                bottom: 0;
-                                                                                                                left: 0;
-                                                                                                                right: 0;
-                                                                                                                height: 140px;
-                                                                                                                overflow: auto;
-                                                                                                                background: black;
-                                                                                                                color: #00ff00;
-                                                                                                                font-size: 11px;
-                                                                                                                z-index: 99999;
-                                                                                                                padding: 10px;
-                                                                                                            ">
+                                                                                                                    position: fixed;
+                                                                                                                    bottom: 0;
+                                                                                                                    left: 0;
+                                                                                                                    right: 0;
+                                                                                                                    height: 140px;
+                                                                                                                    overflow: auto;
+                                                                                                                    background: black;
+                                                                                                                    color: #00ff00;
+                                                                                                                    font-size: 11px;
+                                                                                                                    z-index: 99999;
+                                                                                                                    padding: 10px;
+                                                                                                                ">
         </div>
 
     </div>

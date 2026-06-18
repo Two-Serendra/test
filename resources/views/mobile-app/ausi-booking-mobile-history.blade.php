@@ -3,6 +3,17 @@
 @section('title', 'Bridge Demo — Dashboard')
 
 @section('content')
+
+    <div id="historyPageLoading" class="history-page-loading">
+        <div class="text-center">
+            <div class="spinner-border text-primary"></div>
+
+            <div class="mt-2 text-muted">
+                Loading bookings...
+            </div>
+        </div>
+    </div>
+    
     <div class="" x-data="ausiBookingPageHistory">
         <div class="loading" x-show="$store.superapp.isLoading">
             <p>Waiting for shell context…</p>
@@ -11,6 +22,8 @@
             Running outside the shell — bridge data is unavailable.
             In production this page runs inside the shell iframe.
         </div>
+
+
 
         <div class="card shadow-sm mb-4">
             <H3>Booking History</H3>

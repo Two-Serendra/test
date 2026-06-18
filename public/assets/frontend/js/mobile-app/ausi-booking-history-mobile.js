@@ -24,40 +24,25 @@ $(function () {
         }
     }
 
-    // document.addEventListener('change', function (e) {
-    //     alert("CHANGE EVENT: " + e.target.id);
-    //     if (e.target && e.target.id === 'resident_id_ausi_booking_history') {
-    //         window.onResidentChangeHistory(e);
-    //     }
-    // });
-
-    // window.onResidentChangeHistory = function (e) {
-
-    //     const unit = e.target.value;
-    //     const email = $('#history_mobile_email').val();
-
-    //     $("#historyWrapper").removeClass("d-none");
-
-    //     updateAusiHistoryBookingTable(
-    //         unit,
-    //         email
-    //     );
-    // };
     document.addEventListener('change', function (e) {
-
-        if (e.target.id === 'resident_id_ausi_booking_history') {
-
-            const unit = e.target.value;
-            const email = $('#history_mobile_email').val();
-
-            updateAusiHistoryBookingTable(
-                unit,
-                email
-            );
+        alert("CHANGE EVENT: " + e.target.id);
+        if (e.target && e.target.id === 'resident_id_ausi_booking_history') {
+            window.onResidentChangeHistory(e);
         }
-
     });
 
+    window.onResidentChangeHistory = function (e) {
+
+        const unit = e.target.value;
+        const email = $('#history_mobile_email').val();
+
+        $("#historyWrapper").removeClass("d-none");
+
+        updateAusiHistoryBookingTable(
+            unit,
+            email
+        );
+    };
 
     function updateAusiHistoryBookingTable(unitName, email) {
         showHistoryLoading();

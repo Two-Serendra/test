@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidence();
-    logDebugHistory("🔥Ausi History JS VERSION 26");
+    logDebugHistory("🔥Ausi History JS VERSION 27");
     function autoSelectHistoryResidence() {
 
         const select = $('#resident_id_ausi_booking_history');
@@ -98,6 +98,7 @@ $(function () {
 
     function updateAusiHistoryBookingTable(unitName, email) {
         showHistoryLoading();
+        $("#ausiHistoryTable").html("");
         $.ajax({
 
             url: "/get-ausi-booking-mobile/history",

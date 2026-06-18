@@ -40,17 +40,18 @@
                         </dl>
                     </div>
 
-                    <div id="historyWrapper" class="">
+                    <div id="historyWrapper" class="position-relative">
                         <!-- Loading Overlay -->
                         <div id="historyLoading" class="history-loading d-none">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
+                            <div class="text-center">
+                                <div class="spinner-border text-primary mb-2"></div>
+                                <div class="text-muted">
+                                    Loading bookings...
+                                </div>
                             </div>
-                            <span class="ms-2">Loading history...</span>
                         </div>
-
-                        <div id="ausiHistoryTable" class="booking-history-list"></div>
                     </div>
+                    <div id="ausiHistoryTable" class="booking-history-list"></div>
                 </div>
             </div>
         </div>

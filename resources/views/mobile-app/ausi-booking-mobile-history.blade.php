@@ -3,7 +3,7 @@
 @section('title', 'Bridge Demo — Dashboard')
 
 @section('content')
-    <div class="" x-data="ausiBookingPageHistory()">
+    <div class="" x-data="ausiBookingPageHistory">
         <div class="loading" x-show="$store.superapp.isLoading">
             <p>Waiting for shell context…</p>
         </div>
@@ -88,14 +88,14 @@
                         const checkUnits = setInterval(() => {
 
                             const units = store?.units || [];
-                            logDebugHistory("CHECK UNITS:", units);
+                            alert("CHECK UNITS:", units);
                             if (!units.length) {
                                 return;
                             }
 
                             clearInterval(checkUnits);
                             const firstUnit = units[0].name;
-                            logDebugHistory("AUTO SELECT:", firstUnit);
+                            alert("AUTO SELECT:", firstUnit);
                             store.selectedUnit = firstUnit;
                             const select = document.getElementById(
                                 'resident_id_ausi_booking_history'

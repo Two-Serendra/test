@@ -1,6 +1,6 @@
 $(function () {
 
-    alert("🔥Ausi History JS VERSION 15");
+    alert("🔥Ausi History JS VERSION 16");
 
     const el = document.getElementById('resident_id_ausi_booking_history');
 
@@ -175,27 +175,19 @@ $(function () {
                     const hoursDiff =
                         (bookingStart - now) / (1000 * 60 * 60);
 
-                    if (hoursDiff >= 12) {
+                    const canCancel =
+                        statusText === "Confirmed" && hoursDiff >= 12;
 
-                        cancelButton = `
-                        <button
-                            class="btn btn-outline-danger btn-sm rounded-pill px-3 cancel-booking-btn"
-                            data-id="${item.id}">
-                            <i class="bx bx-x-circle me-1"></i>
-                            Cancel Booking
-                        </button>
-                    `;
-
-                    } else if (statusText === "Confirmed") {
-
-                        cancelButton = `
-                        <button
-                            class="btn btn-outline-secondary btn-sm rounded-pill px-3"
-                            disabled>
-                            Cancellation Closed
-                        </button>
-                    `;
-                    }
+                    cancelButton = `
+        <button
+            class="btn btn-sm rounded-pill px-3 cancel-booking-btn
+                   ${canCancel ? 'btn-outline-danger' : 'btn-outline-secondary'}"
+            ${canCancel ? '' : 'disabled'}
+            data-id="${item.id}">
+            <i class="bx bx-x-circle me-1"></i>
+            Cancel Booking
+        </button>
+    `;
                 }
 
                 html += `
@@ -235,7 +227,7 @@ $(function () {
 
                     ${cancelButton
                         ? `
-                        <div class="mt-3 pt-3 border-top">
+                        <div class="mt-3">
                             ${cancelButton}
                         </div>
                     `

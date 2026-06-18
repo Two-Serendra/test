@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidence();
-    logDebugHistory("🔥Ausi History JS VERSION 28");
+    logDebugHistory("🔥Ausi History JS VERSION 29");
     function autoSelectHistoryResidence() {
 
         const select = $('#resident_id_ausi_booking_history');
@@ -245,7 +245,7 @@ $(function () {
             ${canCancel ? '' : 'disabled'}
             data-id="${item.id}">
             <i class="bx bx-x-circle me-1"></i>
-            Cancel Booking
+            Cancel
         </button>
     `;
                 }
@@ -312,9 +312,8 @@ $(function () {
     }
 
     $(document).on('click', '.cancel-booking-btn', function () {
-
+        const button = $(this);
         const bookingId = $(this).data('id');
-
 
         Swal.fire({
 
@@ -332,7 +331,7 @@ $(function () {
 
 
             if (result.isConfirmed) {
-
+                button.prop('disabled', true);
                 cancelAusiBooking(bookingId);
 
             }
@@ -359,24 +358,35 @@ $(function () {
             success: function (res) {
 
                 Swal.fire({
-
                     icon: "success",
-
                     title: "Cancelled",
-
                     text: "Your booking has been cancelled"
-
                 });
 
 
-                // reload current selected unit history
-                const unit = $('#resident_id_ausi_booking_history').val();
-                const email = $('#history_mobile_email').val();
+                // keep current selected residence
+                const unit =
+                    Alpine.store('superapp')?.selectedUnit ||
+                    $('#resident_id_ausi_booking_history').val();
 
-                updateAusiHistoryBookingTable(unit, email);
+
+                const email =
+                    $('#history_mobile_email').val();
+
+
+                console.log(
+                    "RELOAD HISTORY AFTER CANCEL:",
+                    unit,
+                    email
+                );
+
+
+                updateAusiHistoryBookingTable(
+                    unit,
+                    email
+                );
 
             },
-
 
             error: function (xhr) {
 

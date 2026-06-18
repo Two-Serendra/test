@@ -390,10 +390,9 @@ class MobileAppController extends Controller
 
 
 
-    public function CancelAusiBooking(AusiBooking $booking)
+    public function CancelAusiBookingMobile(AusiBooking $booking)
     {
 
-        // Check if already cancelled
         if ($booking->booking_status == 2) {
 
             return response()->json([
@@ -401,9 +400,7 @@ class MobileAppController extends Controller
             ], 422);
 
         }
-
         $userEmail = auth()->user()?->email ?? request('email');
-
 
         if ($booking->email !== $userEmail) {
 
@@ -413,8 +410,6 @@ class MobileAppController extends Controller
 
         }
 
-
-        // Build booking datetime
         $startTime = explode('-', $booking->booking_time_slot)[0];
 
         $bookingDateTime = Carbon::parse(
@@ -422,7 +417,6 @@ class MobileAppController extends Controller
         );
 
 
-        // Check 12 hour cancellation rule
         $hoursRemaining = now()->diffInHours($bookingDateTime, false);
 
 
@@ -434,12 +428,9 @@ class MobileAppController extends Controller
 
         }
 
-
-        // Cancel booking
         $booking->update([
             'booking_status' => 2
         ]);
-
 
         return response()->json([
             'message' => 'Booking cancelled successfully.'

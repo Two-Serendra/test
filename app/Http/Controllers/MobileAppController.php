@@ -400,7 +400,7 @@ class MobileAppController extends Controller
             ], 422);
 
         }
-        $userEmail = auth()->user()?->email ?? request('email');
+        $userEmail = request('email');
 
         if ($booking->email !== $userEmail) {
 

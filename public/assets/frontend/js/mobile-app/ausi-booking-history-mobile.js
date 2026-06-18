@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidence();
-    logDebugHistory("🔥Ausi History JS VERSION 29");
+    logDebugHistory("🔥Ausi History JS VERSION 30");
     function autoSelectHistoryResidence() {
 
         const select = $('#resident_id_ausi_booking_history');
@@ -343,12 +343,17 @@ $(function () {
     });
 
     function cancelAusiBooking(id) {
+        const email = $('#history_mobile_email').val();
 
         $.ajax({
 
             url: `/ausi-booking-mobile/cancel/${id}`,
 
             type: "POST",
+
+            data: {
+                email: email
+            },
 
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

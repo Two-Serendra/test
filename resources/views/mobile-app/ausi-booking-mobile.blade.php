@@ -13,12 +13,32 @@
         </div>
 
         <div class="card shadow-sm mb-4">
-
-            <a href="{{ route('ausi.booking.mobile.history') }}" class="btn btn-sm btn-outline-primary">
-                <i class="bx bx-history"></i> My Bookings
-            </a>
-
             <div class="card-body">
+
+                <div class="mb-3">
+
+                    <a href="{{ route('ausi.booking.mobile.history') }}" class="history-shortcut">
+
+                        <div class="history-shortcut-icon">
+                            <i class="bx bx-history"></i>
+                        </div>
+
+                        <div>
+                            <div class="fw-semibold">
+                                My Bookings
+                            </div>
+
+                            <small class="text-muted">
+                                View upcoming and past bookings
+                            </small>
+                        </div>
+
+                        <i class="bx bx-chevron-right ms-auto"></i>
+
+                    </a>
+
+                </div>
+                
                 <form method="POST" action="{{ route('ausi.booking.mobile.store') }}" enctype="multipart/form-data"
                     id="userAusiNewBookingMobile" class="needs-validation" novalidate>
                     @csrf
@@ -26,9 +46,9 @@
                     <div class="row mb-3">
 
                         <!-- <div class="">
-                                    <dt>Email</dt>
-                                    <dd x-text="$store.superapp.user?.email ?? '—'"></dd>
-                                </div> -->
+                                        <dt>Email</dt>
+                                        <dd x-text="$store.superapp.user?.email ?? '—'"></dd>
+                                    </div> -->
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label">Select Residence <span class="required">*</span></label>
                             <input type="hidden" name="email" id="mobile_email">
@@ -123,18 +143,18 @@
         </div>
 
         <div id="debugPanel" style="
-                                                                    position: fixed;
-                                                                    bottom: 0;
-                                                                    left: 0;
-                                                                    right: 0;
-                                                                    height: 140px;
-                                                                    overflow: auto;
-                                                                    background: black;
-                                                                    color: #00ff00;
-                                                                    font-size: 11px;
-                                                                    z-index: 99999;
-                                                                    padding: 10px;
-                                                                ">
+                                                                        position: fixed;
+                                                                        bottom: 0;
+                                                                        left: 0;
+                                                                        right: 0;
+                                                                        height: 140px;
+                                                                        overflow: auto;
+                                                                        background: black;
+                                                                        color: #00ff00;
+                                                                        font-size: 11px;
+                                                                        z-index: 99999;
+                                                                        padding: 10px;
+                                                                    ">
         </div>
 
     </div>

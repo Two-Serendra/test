@@ -17,58 +17,65 @@
             <H3>Booking History</H3>
             <div class="card-body">
                 <div class="row mb-3">
-                    <div class="col-md-6 mb-3 mb-md-0">
-                        <label class="form-label">Select Residence <span class="required">*</span></label>
-                        <!-- <input type="text" name="email" id="mobile_email"> -->
-                        <input type="hidden" name="mobile_unit_name" id="mobile_unit_name">
-                        <input type="hidden" name="mobile_unit_role" id="mobile_unit_role">
-                        <input type="hidden" id="history_mobile_email" name="email"
-                            :value="$store.superapp.user?.email || ''">
-                        <dl>
-                            <dd>
 
-                                <select id="resident_id_ausi_booking_history" name="resident_id_ausi_booking_history"
-                                    class="form-select" x-model="$store.superapp.selectedUnit" required>
-                                    <option value="" disabled>-- Select Residence --</option>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            Select Residence <span class="required">*</span>
+                        </label>
 
-                                    <template x-for="(unit, index) in $store.superapp.units" :key="index">
-                                        <option :value="unit.name" :data-name="unit.name" :data-role="unit.role"
-                                            x-text="`${unit.role ?? ''} ${unit.name}`">
-                                        </option>
-                                    </template>
-                                </select>
-                            </dd>
-                        </dl>
+                        <select id="resident_id_ausi_booking_history" name="resident_id_ausi_booking_history"
+                            class="form-select" x-model="$store.superapp.selectedUnit" required>
+
+                            <option value="" disabled>
+                                -- Select Residence --
+                            </option>
+
+                            <template x-for="(unit,index) in $store.superapp.units" :key="index">
+
+                                <option :value="unit.name" :data-name="unit.name" :data-role="unit.role"
+                                    x-text="`${unit.role ?? ''} ${unit.name}`">
+                                </option>
+
+                            </template>
+
+                        </select>
+
                     </div>
 
-                    <div id="historyWrapper" class="">
-                        <!-- Loading Overlay -->
-                        <div id="historyLoading" class="history-loading d-none">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <span class="ms-2">Loading history...</span>
-                        </div>
 
-                        <div id="ausiHistoryTable" class="booking-history-list"></div>
+                </div>
+
+
+                <div id="historyWrapper">
+
+                    <div id="historyLoading" class="history-loading d-none">
+                        <div class="spinner-border text-primary"></div>
+                        <span class="ms-2">
+                            Loading history...
+                        </span>
                     </div>
+
+
+                    <div id="ausiHistoryTable" class="booking-history-list">
+                    </div>
+
                 </div>
             </div>
         </div>
 
         <div id="debugPanelBookingHistory" style="
-                                                                                                                    position: fixed;
-                                                                                                                    bottom: 0;
-                                                                                                                    left: 0;
-                                                                                                                    right: 0;
-                                                                                                                    height: 140px;
-                                                                                                                    overflow: auto;
-                                                                                                                    background: black;
-                                                                                                                    color: #00ff00;
-                                                                                                                    font-size: 11px;
-                                                                                                                    z-index: 99999;
-                                                                                                                    padding: 10px;
-                                                                                                                ">
+                                                                                                                            position: fixed;
+                                                                                                                            bottom: 0;
+                                                                                                                            left: 0;
+                                                                                                                            right: 0;
+                                                                                                                            height: 140px;
+                                                                                                                            overflow: auto;
+                                                                                                                            background: black;
+                                                                                                                            color: #00ff00;
+                                                                                                                            font-size: 11px;
+                                                                                                                            z-index: 99999;
+                                                                                                                            padding: 10px;
+                                                                                                                        ">
         </div>
 
     </div>
@@ -105,22 +112,13 @@
                             return;
                         }
 
-                        // Auto select first unit
+
                         const firstUnit = units[0].name;
 
                         store.selectedUnit = firstUnit;
 
-                        const select = document.getElementById(
-                            'resident_id_ausi_booking_history'
-                        );
-
-                        if (select) {
-                            select.value = firstUnit;
-                        }
 
                         const email = store?.user?.email || '';
-
-                        $("#historyWrapper").removeClass("d-none");
 
                         updateAusiHistoryBookingTable(
                             firstUnit,

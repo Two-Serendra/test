@@ -45,6 +45,46 @@
     cursor: not-allowed;
 }
 
+.history-shortcut {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 14px;
+
+    border: 1px solid #e9ecef;
+    border-radius: 14px;
+
+    background: #fff;
+
+    text-decoration: none;
+    color: inherit;
+
+    transition: .2s;
+}
+
+.history-shortcut:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .08);
+}
+
+.history-shortcut-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: rgba(var(--bs-primary-rgb), .1);
+
+    color: var(--bs-primary);
+
+    font-size: 1.25rem;
+}
+
 @media(max-width:768px) {
 
 

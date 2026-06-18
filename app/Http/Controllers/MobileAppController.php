@@ -13,6 +13,8 @@ use App\Mail\UserAusiBookingConfirmation;
 use App\Mail\ConciergeAusiBookingConfirmation;
 use App\Events\AusiBookingCreated;
 // use App\Notifications\UserAusiBookingBellNotification;
+use App\Mail\UserAusiBookingCancellation;
+use App\Mail\ConciergeAusiBookingCancellation;
 
 class MobileAppController extends Controller
 {
@@ -392,49 +394,87 @@ class MobileAppController extends Controller
 
     public function CancelAusiBookingMobile(AusiBooking $booking)
     {
+        try {
 
-        if ($booking->booking_status == 2) {
+            return DB::transaction(function () use ($booking) {
+
+                $userEmail = request('email');
+                $booking = AusiBooking::where('id', $booking->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+
+                if ($booking->booking_status == 2) {
+
+                    return response()->json([
+                        'message' => 'Booking is already cancelled.'
+                    ], 422);
+
+                }
+
+
+                if ($booking->email !== $userEmail) {
+
+                    return response()->json([
+                        'message' => 'You are not allowed to cancel this booking.'
+                    ], 403);
+
+                }
+
+
+                $startTime = explode('-', $booking->booking_time_slot)[0];
+
+                $bookingDateTime = Carbon::parse(
+                    $booking->booking_date . ' ' . trim($startTime)
+                );
+
+
+                $hoursRemaining = now()->diffInHours($bookingDateTime, false);
+
+
+                if ($hoursRemaining < 12) {
+
+                    return response()->json([
+                        'message' => 'Cancellation is only allowed at least 12 hours before the booking schedule.'
+                    ], 422);
+
+                }
+
+                $booking->load('user');
+                $booking->booking_status = 2;
+                $booking->cancelled_at = now();
+                $booking->save();
+
+                DB::afterCommit(function () use ($booking) {
+
+            
+                    if ($booking->email) {
+
+                        Mail::to($booking->email)
+                            ->queue(
+                                new UserAusiBookingCancellation($booking)
+                            );
+
+                    }
+                    Mail::to('concierge@twoserendra.com')
+                        ->queue(
+                            new ConciergeAusiBookingCancellation($booking)
+                        );
+                });
+
+                return response()->json([
+                    'message' => 'Booking cancelled successfully.'
+                ]);
+
+            });
+
+        } catch (\Exception $e) {
 
             return response()->json([
-                'message' => 'Booking is already cancelled.'
-            ], 422);
+                'message' => 'Failed to cancel booking.',
+                'error' => $e->getMessage()
+            ], 500);
 
         }
-        $userEmail = request('email');
-
-        if ($booking->email !== $userEmail) {
-
-            return response()->json([
-                'message' => 'You are not allowed to cancel this booking.'
-            ], 403);
-
-        }
-
-        $startTime = explode('-', $booking->booking_time_slot)[0];
-
-        $bookingDateTime = Carbon::parse(
-            $booking->booking_date . ' ' . trim($startTime)
-        );
-
-
-        $hoursRemaining = now()->diffInHours($bookingDateTime, false);
-
-
-        if ($hoursRemaining < 12) {
-
-            return response()->json([
-                'message' => 'Cancellation is only allowed at least 12 hours before the booking schedule.'
-            ], 422);
-
-        }
-
-        $booking->update([
-            'booking_status' => 2
-        ]);
-
-        return response()->json([
-            'message' => 'Booking cancelled successfully.'
-        ]);
-
     }
 }

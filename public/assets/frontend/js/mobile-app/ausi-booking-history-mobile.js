@@ -1,6 +1,6 @@
 $(function () {
 
-    alert("🔥Ausi History JS VERSION 14");
+    alert("🔥Ausi History JS VERSION 15");
 
     const el = document.getElementById('resident_id_ausi_booking_history');
 
@@ -108,32 +108,23 @@ $(function () {
     }
 
     function renderHistoryTable(bookings) {
-        logDebugHistory("renderHistoryTable")
-        let html = "";
+        logDebugHistory("renderHistoryTable");
 
+        let html = "";
 
         if (!bookings || bookings.length === 0) {
 
             html = `
-<tr>
-    <td colspan="5">
+            <div class="text-center py-5">
+                <i class="bx bx-calendar-x fs-1 text-muted"></i>
 
-        <div class="py-4 text-center">
+                <p class="text-muted mt-2 mb-0">
+                    No booking history found
+                </p>
+            </div>
+        `;
 
-            <i class="bx bx-calendar-x fs-1 text-muted"></i>
-
-            <p class="text-muted mt-2 mb-0">
-                No booking history found
-            </p>
-
-        </div>
-
-    </td>
-</tr>
-`;
-
-        }
-        else {
+        } else {
 
             const now = new Date();
 
@@ -153,30 +144,24 @@ $(function () {
                         `${item.booking_date} ${convertTime(item.booking_time_slot)}`
                     );
 
-
                     const bookingEnd = new Date(bookingStart);
                     bookingEnd.setMinutes(bookingEnd.getMinutes() + 30);
-
 
                     if (now >= bookingStart && now <= bookingEnd) {
 
                         statusText = "Ongoing";
-                        badgeClass = "bg-warning";
+                        badgeClass = "bg-warning text-dark";
 
-                    }
-                    else if (now > bookingEnd) {
+                    } else if (now > bookingEnd) {
 
                         statusText = "Completed";
                         badgeClass = "bg-success";
 
-                    }
-                    else {
+                    } else {
 
                         statusText = "Confirmed";
                         badgeClass = "bg-primary";
-
                     }
-
                 }
 
                 let cancelButton = "";
@@ -187,65 +172,82 @@ $(function () {
                         `${item.booking_date} ${convertTime(item.booking_time_slot)}`
                     );
 
-                    const hoursDiff = (bookingStart - now) / (1000 * 60 * 60);
-
+                    const hoursDiff =
+                        (bookingStart - now) / (1000 * 60 * 60);
 
                     if (hoursDiff >= 12) {
-                        cancelButton = `
-<button 
-    class="btn btn-sm btn-outline-danger rounded-pill px-3 cancel-booking-btn"
-    data-id="${item.id}">
-    Cancel
-</button>
-`;
-
-                    } else {
 
                         cancelButton = `
-<button 
-    class="btn btn-sm btn-outline-secondary rounded-pill px-3"
-    disabled>
-    Cancel
-</button>
-`;
+                        <button
+                            class="btn btn-outline-danger btn-sm rounded-pill px-3 cancel-booking-btn"
+                            data-id="${item.id}">
+                            <i class="bx bx-x-circle me-1"></i>
+                            Cancel Booking
+                        </button>
+                    `;
+
+                    } else if (statusText === "Confirmed") {
+
+                        cancelButton = `
+                        <button
+                            class="btn btn-outline-secondary btn-sm rounded-pill px-3"
+                            disabled>
+                            Cancellation Closed
+                        </button>
+                    `;
                     }
-
                 }
 
                 html += `
-            <tr>
-                <td>${item.transaction_no}</td>
-                <td>${item.booking_date}</td>
-                <td>${item.booking_time_slot}</td>
+                <div class="booking-card shadow-sm">
 
-                <td>
-                    <span class="badge ${badgeClass} rounded-pill px-3 py-2">
-    ${statusText}
-</span>
-                </td>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
 
-               <td>
+                        <div>
+                            <div class="fw-bold">
+                                ${item.transaction_no}
+                            </div>
 
-   <div class="d-flex gap-2 justify-content-center flex-wrap">
+                            <small class="text-muted">
+                                Transaction No.
+                            </small>
+                        </div>
 
-    <a href="/ausi-booking-details/${item.id}"
-       class="btn btn-sm btn-primary rounded-pill px-3">
-        View
-    </a>
+                        <span class="badge ${badgeClass} rounded-pill px-3 py-2">
+                            ${statusText}
+                        </span>
 
-    ${cancelButton}
+                    </div>
 
-</div>
-            </tr>
-        `;
+                    <div class="booking-details">
 
+                        <div class="booking-detail-row">
+                            <i class="bx bx-calendar"></i>
+                            <span>${item.booking_date}</span>
+                        </div>
+
+                        <div class="booking-detail-row">
+                            <i class="bx bx-time-five"></i>
+                            <span>${item.booking_time_slot}</span>
+                        </div>
+
+                    </div>
+
+                    ${cancelButton
+                        ? `
+                        <div class="mt-3 pt-3 border-top">
+                            ${cancelButton}
+                        </div>
+                    `
+                        : ""
+                    }
+
+                </div>
+            `;
             });
-
         }
 
-
         $("#ausiHistoryTable").html(html);
-
     }
 
     function convertTime(slot) {

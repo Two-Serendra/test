@@ -69,8 +69,8 @@
             </div>
         </div>
 
-        <div id="debugPanelBookingHistory">
-        </div>
+        <!-- <div id="debugPanelBookingHistory">
+        </div> -->
 
     </div>
 

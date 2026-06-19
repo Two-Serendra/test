@@ -1,8 +1,8 @@
 $(function () {
-   logDebug("🔥 JS VERSION 2026-06-15-031");
+    logDebug("🔥 JS VERSION 2026-06-15-032");
     const el = document.getElementById('resident_id_ausi');
 
-   logDebug("SELECT EXISTS: " + (el ? "YES" : "NO"));
+    logDebug("SELECT EXISTS: " + (el ? "YES" : "NO"));
     function logDebug(...args) {
 
         const msg = args.map(a =>
@@ -33,12 +33,14 @@ $(function () {
     flatpickr("#AusiBookingDate", {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(1),
+        disableMobile: true,
         onChange: function (selectedDates, dateStr) {
             window.ausiState.date = dateStr;
             console.log("DATE:", dateStr);
-           logDebug("DATE CHANGED: " + dateStr);
+            logDebug("DATE CHANGED: " + dateStr);
             triggerUpdate();
         }
+
     });
 
     document.addEventListener('change', function (e) {
@@ -57,8 +59,8 @@ $(function () {
         }
 
         console.log("UNIT:", value);
-       logDebug("UNIT CHANGED: " + value);
-       logDebug("CHANGE FIRED");
+        logDebug("UNIT CHANGED: " + value);
+        logDebug("CHANGE FIRED");
 
         triggerUpdate();
     };
@@ -81,7 +83,7 @@ $(function () {
 
     function updateSlots(date, unitName) {
 
-       logDebug("ENTERED updateSlots");
+        logDebug("ENTERED updateSlots");
 
         logDebug("STEP 1 OK");
 
@@ -122,7 +124,7 @@ $(function () {
                 error: function (xhr) {
 
                     console.log(xhr.responseText);
-                   logDebug("ERROR " + xhr.status);
+                    logDebug("ERROR " + xhr.status);
 
                     hideLoading();
                 }
@@ -131,7 +133,7 @@ $(function () {
 
         } catch (e) {
 
-           logDebug("JS ERROR:\n" + e.message);
+            logDebug("JS ERROR:\n" + e.message);
 
             logDebug("FULL ERROR:", e);
         }
@@ -238,7 +240,7 @@ $(function () {
     });
 
     window.resetAusiBookingUI = function () {
-       logDebug("RESET CALLED");
+        logDebug("RESET CALLED");
         const form = document.getElementById('userAusiNewBookingMobile');
 
         if (form) {
@@ -283,7 +285,7 @@ $(function () {
             .prop('disabled', true)
             .html('<span class="btn-text">Submit</span>');
         $bookingSlots.prop('disabled', true);
-       logDebug("RESET FINISHED");
+        logDebug("RESET FINISHED");
     };
 
     let isSubmitting = false;

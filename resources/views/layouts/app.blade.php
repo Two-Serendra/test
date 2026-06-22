@@ -63,6 +63,13 @@
 </head>
 
 <body x-data>
+    <div id="pageLoader" class="page-loader d-none">
+        <div class="text-center">
+            <div class="spinner-border text-primary mb-3" role="status"></div>
+            <div>Loading...</div>
+        </div>
+    </div>
+    
     @yield('content')
 
     <script>

@@ -1,5 +1,5 @@
 $(function () {
-    logDebug("🔥 JS VERSION 2026-06-15-032");
+    alert("🔥 JS VERSION 2026-06-15-033");
     const el = document.getElementById('resident_id_ausi');
 
     logDebug("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -462,5 +462,18 @@ $(function () {
             });
         };
         sendBooking();
+    });
+
+    $(document).on('click', '.service-link', function () {
+
+        $('#pageLoader').removeClass('d-none');
+
+        const url = $(this).attr('href');
+
+        setTimeout(function () {
+            window.location.href = url;
+        }, 100);
+
+        return false;
     });
 });

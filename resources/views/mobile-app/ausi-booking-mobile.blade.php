@@ -4,13 +4,13 @@
 
 @section('content')
     <div class="" x-data="ausiBookingPage()">
-        <div class="loading" x-show="$store.superapp.isLoading">
+        <!-- <div class="loading" x-show="$store.superapp.isLoading">
             <p>Waiting for shell context…</p>
         </div>
         <div class="warning-banner" x-show="!inShell && !$store.superapp.isLoading">
             Running outside the shell — bridge data is unavailable.
             In production this page runs inside the shell iframe.
-        </div>
+        </div> -->
 
         <div class="card shadow-sm mb-4">
             <div class="card-body">

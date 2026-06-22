@@ -18,6 +18,10 @@ use App\Mail\ConciergeAusiBookingCancellation;
 
 class MobileAppController extends Controller
 {
+    public function MobileServices()
+    {
+        return view('mobile-app.mobile-services');
+    }
     public function ausiBookingUserMobile(Request $request)
     {
         return response()
@@ -447,7 +451,7 @@ class MobileAppController extends Controller
 
                 DB::afterCommit(function () use ($booking) {
 
-            
+
                     if ($booking->email) {
 
                         Mail::to($booking->email)

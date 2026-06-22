@@ -4,7 +4,6 @@
 
         <div class="text-center mb-4">
             <h3 class="fw-bold">Service Requests</h3>
-            <p class="text-muted mb-0">Select a service to continue</p>
         </div>
 
         <div class="row g-3">

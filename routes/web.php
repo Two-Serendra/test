@@ -207,7 +207,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware(['miniapp.webview'])->group(function () {
-    Route::get('/mobile/services', [MobileAppController::class, 'MobileServices'])->middleware('no-cache');
+    Route::get('/mobile-services-booking', [MobileAppController::class, 'MobileServices'])->middleware('no-cache');
 
     //AUSI
     Route::get('/ausi-booking-mobile', [MobileAppController::class, 'ausiBookingUserMobile'])->name('ausi.booking.mobile')->middleware('no-cache');

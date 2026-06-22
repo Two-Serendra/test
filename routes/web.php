@@ -207,16 +207,25 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware(['miniapp.webview'])->group(function () {
-    Route::get('/mobile/services',[MobileAppController::class, 'MobileServices'])->middleware('no-cache');
-    Route::get('/ausi-booking-mobile', [MobileAppController::class, 'ausiBookingUserMobile'])->middleware('no-cache');
+    Route::get('/mobile/services', [MobileAppController::class, 'MobileServices'])->middleware('no-cache');
+
+    //AUSI
+    Route::get('/ausi-booking-mobile', [MobileAppController::class, 'ausiBookingUserMobile'])->name('ausi.booking.mobile')->middleware('no-cache');
     Route::get('/ausi-booked-slots-mobile', [MobileAppController::class, 'getBookedSlotsAusiMobile']);
     Route::post('/ausi-booking-mobile/store', [MobileAppController::class, 'storeAusiBookingMobile'])->name('ausi.booking.mobile.store')->middleware('throttle:5,1');
     Route::get('/ausi-booking-mobile/history', [MobileAppController::class, 'viewAusiBookingMobileHistory'])->name('ausi.booking.mobile.history');
     Route::get('/get-ausi-booking-mobile/history', [MobileAppController::class, 'getAusiBookingMobileHistory'])->name('get.ausi.booking.mobile.history');
-
     Route::post('/ausi-booking-mobile/cancel/{booking}', [MobileAppController::class, 'CancelAusiBookingMobile'])
         ->name('ausi.cancel.booking.mobile')->middleware('throttle:5,1');
     Route::get('/ausi-booking-details/{id}', [MobileAppController::class, 'showAusiBookingDetails']);
+
+    //Pest Control
+    Route::get('/pest-control-booking-mobile', [MobileAppController::class, 'pestControlBookingUserMobile'])->name('pest.control.booking.mobile')->middleware('no-cache');
+
+    //Greasetrap
+    Route::get('/grease-trap-booking-mobile', [MobileAppController::class, 'greastrapBookingUserMobile'])->name('greasetrap.booking.mobile')->middleware('no-cache');
+
+
 });
 Route::middleware('web')
     ->prefix('admin')

@@ -11,7 +11,7 @@
 
             <!-- AUSI -->
             <div class="col-12 col-lg-4">
-                <a href="{{ route('ausi.booking') }}" class="text-decoration-none">
+                <a href="{{ route('ausi.booking.mobile') }}" class="text-decoration-none">
                     <div class="card service-card border-0 shadow-sm">
                         <div class="card-body d-flex align-items-center">
                             <div class="service-icon bg-primary-subtle text-primary">
@@ -35,7 +35,7 @@
 
             <!-- Grease Trap Cleaning -->
             <div class="col-12 col-lg-4">
-                <a href="{{ route('grease-trap.booking') }}" class="text-decoration-none">
+                <a href="{{ route('grease-trap.booking.mobile') }}" class="text-decoration-none">
                     <div class="card service-card border-0 shadow-sm">
                         <div class="card-body d-flex align-items-center">
                             <div class="service-icon bg-success-subtle text-success">
@@ -59,7 +59,7 @@
 
             <!-- Pest Control -->
             <div class="col-12 col-lg-4">
-                <a href="{{ route('pest-control.booking') }}" class="text-decoration-none">
+                <a href="{{ route('pest-control.booking.mobile') }}" class="text-decoration-none">
                     <div class="card service-card border-0 shadow-sm">
                         <div class="card-body d-flex align-items-center">
                             <div class="service-icon bg-warning-subtle text-warning">

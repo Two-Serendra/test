@@ -220,7 +220,7 @@ Route::middleware(['miniapp.webview'])->group(function () {
     Route::get('/ausi-booking-details/{id}', [MobileAppController::class, 'showAusiBookingDetails']);
 
     //Pest Control
-    Route::get('/pest-control-booking-mobile', [MobileAppController::class, 'pestControlBookingUserMobile'])->name('pest.control.booking.mobile')->middleware('no-cache');
+    Route::get('/pest-control-booking-mobile', [MobileAppController::class, 'pestControlBookingUserMobile'])->name('pest-control.booking.mobile')->middleware('no-cache');
 
     //Greasetrap
     Route::get('/grease-trap-booking-mobile', [MobileAppController::class, 'greastrapBookingUserMobile'])->name('grease-trap.booking.mobile')->middleware('no-cache');

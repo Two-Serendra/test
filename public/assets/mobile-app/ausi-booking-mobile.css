@@ -169,3 +169,30 @@
 
 
 }
+
+.service-card {
+    border-radius: 18px;
+    transition: all .25s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-2px);
+}
+
+.service-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 991px) {
+    .service-card .card-body {
+        padding: 1.25rem;
+        min-height: 100px;
+    }
+}

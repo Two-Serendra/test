@@ -1,0 +1,87 @@
+@extends('layouts.app')
+@section('content')
+    <div class="container py-4">
+
+        <div class="text-center mb-4">
+            <h3 class="fw-bold">Service Requests</h3>
+            <p class="text-muted mb-0">Select a service to continue</p>
+        </div>
+
+        <div class="row g-3">
+
+            <!-- AUSI -->
+            <div class="col-12 col-lg-4">
+                <a href="{{ route('ausi.booking') }}" class="text-decoration-none">
+                    <div class="card service-card border-0 shadow-sm">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="service-icon bg-primary-subtle text-primary">
+                                <i class='bx bx-building-house'></i>
+                            </div>
+
+                            <div class="ms-3 flex-grow-1">
+                                <h5 class="mb-1 text-dark fw-semibold">
+                                    AUSI
+                                </h5>
+                                <small class="text-muted">
+                                    Schedule maintenance and inspection services.
+                                </small>
+                            </div>
+
+                            <i class='bx bx-chevron-right text-muted fs-4'></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Grease Trap Cleaning -->
+            <div class="col-12 col-lg-4">
+                <a href="{{ route('grease-trap.booking') }}" class="text-decoration-none">
+                    <div class="card service-card border-0 shadow-sm">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="service-icon bg-success-subtle text-success">
+                                <i class='bx bx-water'></i>
+                            </div>
+
+                            <div class="ms-3 flex-grow-1">
+                                <h5 class="mb-1 text-dark fw-semibold">
+                                    Grease Trap Cleaning
+                                </h5>
+                                <small class="text-muted">
+                                    Request grease trap cleaning service.
+                                </small>
+                            </div>
+
+                            <i class='bx bx-chevron-right text-muted fs-4'></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Pest Control -->
+            <div class="col-12 col-lg-4">
+                <a href="{{ route('pest-control.booking') }}" class="text-decoration-none">
+                    <div class="card service-card border-0 shadow-sm">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="service-icon bg-warning-subtle text-warning">
+                                <i class='bx bx-bug'></i>
+                            </div>
+
+                            <div class="ms-3 flex-grow-1">
+                                <h5 class="mb-1 text-dark fw-semibold">
+                                    Pest Control
+                                </h5>
+                                <small class="text-muted">
+                                    Book pest treatment and inspection.
+                                </small>
+                            </div>
+
+                            <i class='bx bx-chevron-right text-muted fs-4'></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+@endsection

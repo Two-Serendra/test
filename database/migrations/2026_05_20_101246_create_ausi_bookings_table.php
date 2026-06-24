@@ -26,7 +26,7 @@ return new class extends Migration {
             $table->text('remarks')->nullable();
             $table->tinyInteger('emergency')->default('0');
             $table->integer('booking_status')
-                ->default(1)
+            ->default(1)
              ->comment('0 Cancelled, 1 Scheduled, 2 Completed');
             $table->timestamp('cancelled_at')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();

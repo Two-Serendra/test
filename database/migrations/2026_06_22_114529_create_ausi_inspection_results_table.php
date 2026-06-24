@@ -14,7 +14,6 @@ return new class extends Migration {
             $table->foreignId('ausi_booking_id')
                 ->constrained('ausi_bookings')
                 ->cascadeOnDelete();
-
             $table->foreignId('inspection_item_id')
                 ->constrained('ausi_inspection_items')
                 ->cascadeOnDelete();

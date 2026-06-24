@@ -363,7 +363,7 @@ $(document).ready(function () {
 
                 complete() {
                     unlockSubmitBtn();
-                    refreshAusiTableBookings()
+                    refreshAusiTableBookings();
                     $('#ausiAddBookingAdminModal').modal('hide');
                 }
             });
@@ -424,31 +424,42 @@ $(document).ready(function () {
 
                 bookings.forEach(function (booking) {
 
-                    var isCancelled = booking.display_status === 'Cancelled';
+                    var disableActions = [0, 2].includes(Number(booking.booking_status));
 
                     var actionButtons = `
-        <div class="d-flex gap-1 justify-content-center">
-            <button type="button"
-                class="btn btn-primary edit_ausi_booking btn-sm btn-equal"
-                data-bs-toggle="tooltip"
-                data-bs-placement="left"
-                title="View"
-                data-id="${booking.id}">
-                <i class="fa-solid fa-eye"></i>
-            </button>
+    <div class="d-flex gap-1 justify-content-center">
 
-            <button type="button"
-                class="btn btn-sm btn-equal ${isCancelled ? 'btn-secondary cancel-booking' : 'btn-danger admin-ausi-booking-cancel'}"
-                data-bs-toggle="tooltip"
-                data-bs-placement="right"
-                title="${isCancelled ? 'Cancelled' : 'Cancel'}"
-                data-id="${booking.id}"
-                ${isCancelled ? 'disabled' : ''}>
+        <button type="button"
+            class="btn btn-primary edit_ausi_booking btn-sm btn-equal"
+            data-bs-toggle="tooltip"
+            data-bs-placement="left"
+            title="View"
+            data-id="${booking.id}">
+            <i class="fa-solid fa-eye"></i>
+        </button>
 
-                <i class="fa-solid fa-ban"></i>
-            </button>
-        </div>
-    `;
+        <button type="button"
+            class="btn ${disableActions ? 'btn-secondary' : 'btn-success'} inspection_ausi_booking btn-sm"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            title="${disableActions ? booking.display_status : 'Inspect'}"
+            data-id="${booking.id}"
+            ${disableActions ? 'disabled' : ''}>
+            <i class="fa-solid fa-clipboard-check"></i>
+        </button>
+
+        <button type="button"
+            class="btn btn-sm btn-equal ${disableActions ? 'btn-secondary cancel-booking' : 'btn-danger admin-ausi-booking-cancel'}"
+            data-bs-toggle="tooltip"
+            data-bs-placement="right"
+            title="${disableActions ? booking.display_status : 'Cancel'}"
+            data-id="${booking.id}"
+            ${disableActions ? 'disabled' : ''}>
+            <i class="fa-solid fa-ban"></i>
+        </button>
+
+    </div>
+`;
 
                     // Resident type
                     var resType = booking.resident_type
@@ -487,9 +498,9 @@ $(document).ready(function () {
         </span>
     `;
 
-                    var emergency = booking.emergency == 1
-                        ? `<span class="badge bg-danger">Yes</span>`
-                        : `<span class="badge bg-secondary">No</span>`;
+                    // var emergency = booking.emergency == 1
+                    //     ? `<span class="badge bg-danger">Yes</span>`
+                    //     : `<span class="badge bg-secondary">No</span>`;
 
                     var createdBy = booking.createdBy?.name
                         ? booking.createdBy.name.toUpperCase()
@@ -501,18 +512,20 @@ $(document).ready(function () {
 
                     var cancelledAt = booking.cancelled_at ?? 'N/A';
 
+                    var completedBy = booking.completedBy?.name
+                        ? booking.completedBy.name.toUpperCase()
+                        : 'N/A';
+
+                    var completedAt = booking.cancelled_at ?? 'N/A';
+
                     var row = `
         <tr>
             <td>${booking.transaction_no ?? 'N/A'}</td>
-            <td>${booking.srf_no ?? 'N/A'}</td> 
             <td>${booking.name ?? 'N/A'}</td>
-
             <td>${residentTypeHtml}</td>
             <td>${booking.unit_no ?? 'N/A'}</td>
             <td>${booking.booking_date ?? 'N/A'}</td>
             <td>${booking.booking_time_slot ?? 'N/A'}</td>
-            <td>${emergency}</td>
-
             <td
                 style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
                 data-bs-toggle="tooltip"
@@ -527,7 +540,9 @@ $(document).ready(function () {
 
             <td>${cancelledBy}</td>
             <td>${cancelledAt}</td>
-
+                
+             <td>${completedBy}</td>
+            <td>${completedAt}</td>
             <td class="sticky-col sticky-col-color">
                 ${actionButtons}
             </td>
@@ -552,6 +567,11 @@ $(document).ready(function () {
 
         $.get('/admin/admin-fetch-ausi-booking/' + info_id, function (data) {
 
+            let bookingStatusBadge = `
+    <span class="badge bg-${data.status_badge} text-white">
+        ${data.display_status.toUpperCase()}
+    </span>
+`;
 
 
             $('#display_name').text(data.name);
@@ -561,8 +581,8 @@ $(document).ready(function () {
             let residentType = data.resident_type?.toUpperCase() ?? 'N/A';
             let residentBadge = `<span class="badge bg-secondary">${residentType}</span>`;
 
-            if (residentType === 'TENANT') residentBadge = `<span class="badge bg-danger">TENANT</span>`;
-            if (residentType === 'OWNER') residentBadge = `<span class="badge bg-primary">OWNER</span>`;
+            if (residentType === 'TENANT') residentBadge = `<span class="badge bg-danger text-white">TENANT</span>`;
+            if (residentType === 'OWNER') residentBadge = `<span class="badge bg-primary text-white">OWNER</span>`;
 
             $('#display_resident_type').html(residentBadge);
 
@@ -575,27 +595,452 @@ $(document).ready(function () {
 
             // Editable fields
             $('#srf_no').val(data.srf_no);
-            $('#remarks_ausi').val(data.remarks);
+            $('#remarks_ausi').text(data.remarks ?? 'No remarks provided.');
             $('#info_id').val(info_id);
+            let inspectionHtml = '';
+
+            if (
+                !data.inspection_results ||
+                data.inspection_results.length === 0
+            ) {
+
+                inspectionHtml = `
+            <div class="alert alert-warning mb-0">
+                <i class="fa-solid fa-circle-exclamation me-2"></i>
+                Unit has not been inspected yet.
+            </div>
+        `;
+
+            } else {
+
+                inspectionHtml += `
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered align-middle">
+                <thead>
+                    <tr>
+                        <th>Inspection Item</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+             `;
+
+                data.inspection_results.forEach(function (result) {
+                    let badgeClass =
+                        result.status == 1
+                            ? 'bg-primary'
+                            : 'bg-danger';
+
+                    let label =
+                        result.status == 1
+                            ? result.inspection_item.option_1
+                            : result.inspection_item.option_2;
+
+                    inspectionHtml += `
+            <tr>
+                <td>
+                    ${result.inspection_item.item_name}
+                </td>
+                <td>
+                 
+                        ${label}
+                  
+                </td>
+            </tr>
+        `;
+                });
+
+                inspectionHtml += `
+                </tbody>
+            </table>
+        </div>
+    `;
+            }
+
+            $('#inspectionResultsContainer').html(inspectionHtml);
+            $('#display_booking_status').html(bookingStatusBadge);
+            hideLoading();
             $('#ausiEdit').modal('show');
 
-            hideLoading();
         })
             .fail(function () {
                 alert("Data not found");
             });
     });
 
-    $('#updateAusiBookingFormAdmin').submit(function (event) {
+    // $('#updateAusiBookingFormAdmin').submit(function (event) {
+    //     event.preventDefault();
+
+    //     if (!this.checkValidity()) {
+    //         this.classList.add('was-validated');
+    //         return;
+    //     }
+    //     this.classList.remove('was-validated');
+
+    //     const $btn = $('#UpdateAusiBookingBtn');
+    //     const originalWidth = $btn.outerWidth();
+    //     $btn
+    //         .attr('disabled', true)
+    //         .html(`<div class="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></div>`)
+    //         .css('width', originalWidth + 'px');
+
+    //     var formData = new FormData(this);
+    //     var form = this;
+
+    //     $.ajax({
+    //         url: $(form).attr('action'),
+    //         type: $(form).attr('method'),
+    //         headers: {
+    //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    //         },
+    //         data: formData,
+    //         processData: false,
+    //         contentType: false,
+    //         success: function (response) {
+    //             $('#ausiEdit').modal('hide');
+    //             form.reset();
+    //             const Toast = Swal.mixin({
+    //                 toast: true,
+    //                 position: "top-end",
+    //                 showConfirmButton: false,
+    //                 timer: 2000,
+    //                 timerProgressBar: true,
+    //                 customClass: {
+    //                     popup: 'colored-toast'
+    //                 },
+    //                 didOpen: (toast) => {
+    //                     toast.onmouseenter = Swal.stopTimer;
+    //                     toast.onmouseleave = Swal.resumeTimer;
+    //                 }
+    //             });
+
+    //             Toast.fire({
+    //                 icon: 'success',
+    //                 title: 'AUSI Booking Updated Successfully'
+    //             });
+
+    //             form.reset();
+    //             $(form).removeClass('was-validated');
+    //             refreshAusiTableBookings()
+    //         },
+    //         error: function (xhr, status, error) {
+    //             const Toast = Swal.mixin({
+    //                 toast: true,
+    //                 position: "top-end",
+    //                 showConfirmButton: false,
+    //                 timer: 2000,
+    //                 timerProgressBar: true,
+    //                 customClass: {
+    //                     popup: 'colored-toast-error'
+    //                 },
+    //                 didOpen: (toast) => {
+    //                     toast.onmouseenter = Swal.stopTimer;
+    //                     toast.onmouseleave = Swal.resumeTimer;
+    //                 }
+    //             });
+    //             Toast.fire({
+    //                 icon: 'error',
+    //                 title: 'Failed to update ausi booking. Please try again.'
+    //             });
+    //         },
+    //         complete: function () {
+    //             $btn
+    //                 .attr('disabled', false)
+    //                 .html(`<span class="btn-text">Update</span>`)
+    //                 .css('width', '');
+    //         }
+    //     });
+    // });
+
+
+    $('.DownloadAusiBookingReports').on('click', function () {
+        $('#DownloadAusiBookingReports').modal('show');
+    });
+
+    $('.AddAusiInspectionItem').on('click', function () {
+        $('#NewInspectionItemModal').modal('show');
+    });
+
+    $('#storeInspectionItem').submit(function (event) {
         event.preventDefault();
 
+
+
+        if (!this.checkValidity()) {
+            this.classList.add('was-validated');
+            return;
+        }
+
+        this.classList.remove('was-validated');
+        const $btn = $('#storeInspectionItemBtn');
+        const originalWidth = $btn.outerWidth();
+        $btn
+            .attr('disabled', true)
+            .html(`<div class="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></div>`)
+            .css('width', originalWidth + 'px');
+
+
+        var formData = new FormData(this);
+        var form = this;
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: $(this).attr('method'),
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                $('#NewInspectionItemModal').modal('hide');
+
+                $('#storeInspectionItem')[0].reset(); // Reset the form
+
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'colored-toast'
+                    },
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Item Added Successfully'
+                });
+
+                form.reset();
+                $(form).removeClass('was-validated');
+                refreshTableInspectionItem();
+            },
+            error: function (xhr, status, error) {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'colored-toast-error'
+                    },
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Failed to add item'
+                });
+            },
+            complete: function () {
+                $btn
+                    .attr('disabled', false)
+                    .html(`<span class="btn-text">Create</span>`)
+                    .css('width', '');
+            }
+        });
+    });
+
+    function refreshTableInspectionItem() {
+
+        $.ajax({
+            url: '/admin/get-updated-inspection-item',
+            type: 'GET',
+            dataType: 'json',
+
+            success: function (response) {
+
+                var inspectionItems = response.data;
+                var tableBody = $('#AusiInspectionItemTable tbody');
+
+                $('[data-bs-toggle="tooltip"]').tooltip('dispose');
+
+                tableBody.empty();
+
+                if (inspectionItems.length === 0) {
+                    tableBody.append(`
+            <tr>
+                <td colspan="4" class="text-center">
+                    No Record Found
+                </td>
+            </tr>
+        `);
+
+                    return;
+                }
+
+                inspectionItems.forEach(function (inspectionItem) {
+
+                    let item_name = inspectionItem.item_name
+                        ? inspectionItem.item_name.toUpperCase()
+                        : 'N/A';
+
+                    let option_1 = inspectionItem.option_1
+                        ? inspectionItem.option_1.toUpperCase()
+                        : 'N/A';
+
+                    let option_2 = inspectionItem.option_2
+                        ? inspectionItem.option_2.toUpperCase()
+                        : 'N/A';
+
+
+                    let actionButtons = `
+            <button type="button"
+                class="btn btn-primary edit_inspection_item btn-sm"
+                data-bs-toggle="tooltip"
+                data-bs-placement="left"
+                title="Edit"
+                data-id="${inspectionItem.id}">
+                <i class="fa-solid fa-pen"></i>
+            </button>
+
+            <button type="button"
+                class="btn btn-danger delete_inspection_item btn-equal btn-responsive btn-sm"
+                data-bs-toggle="tooltip"
+                data-bs-placement="right"
+                title="Delete"
+                data-id="${inspectionItem.id}">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        `;
+
+
+                    let row = `
+            <tr>
+                <td>${item_name}</td>
+                <td>${option_1}</td>
+                <td>${option_2}</td>
+                <td>
+                    ${actionButtons}
+                </td>
+            </tr>
+        `;
+
+                    tableBody.append(row);
+
+                });
+
+                $('[data-bs-toggle="tooltip"]').tooltip();
+
+            },
+
+            error: function (xhr, status, error) {
+                console.error('Error refreshing the table:', error);
+            }
+        });
+
+    }
+
+    $('#AusiInspectionItemTable').on('click', '.delete_inspection_item', function () {
+        var inspectionItemId = $(this).data('id');
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/admin/delete-inspection-item',
+                    type: 'get',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: {
+                        inspectionItemId: inspectionItemId,
+                    },
+                    success: function (response) {
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: "top-end",
+                            showConfirmButton: false,
+                            timer: 2000,
+                            timerProgressBar: true,
+                            customClass: {
+                                popup: 'colored-toast'
+                            },
+                            didOpen: (toast) => {
+                                toast.onmouseenter = Swal.stopTimer;
+                                toast.onmouseleave = Swal.resumeTimer;
+                            }
+                        });
+
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Deleted Successfully'
+                        });
+
+                        refreshTableInspectionItem();
+                    },
+                    error: function (xhr, status, error) {
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: "top-end",
+                            showConfirmButton: false,
+                            timer: 2000,
+                            timerProgressBar: true,
+                            customClass: {
+                                popup: 'colored-toast-error'
+                            },
+                            didOpen: (toast) => {
+                                toast.onmouseenter = Swal.stopTimer;
+                                toast.onmouseleave = Swal.resumeTimer;
+                            }
+                        });
+
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Activity Deletion Failed'
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+    $(document).on('click', '.edit_inspection_item', function () {
+
+        let id = $(this).data('id');
+
+        $.ajax({
+            url: '/admin/admin-fetch-inspection-item/' + id,
+            type: 'GET',
+
+            success: function (response) {
+
+                $('#edit_item_id').val(response.id);
+                $('#edit_item_name').val(response.item_name);
+                $('#edit_option_1').val(response.option_1);
+                $('#edit_option_2').val(response.option_2);
+
+                $('#EditInspectionItemModal').modal('show');
+            }
+        });
+
+    });
+
+
+    $('#updateInspectionItemForm').submit(function (event) {
+        event.preventDefault();
         if (!this.checkValidity()) {
             this.classList.add('was-validated');
             return;
         }
         this.classList.remove('was-validated');
 
-        const $btn = $('#UpdateAusiBookingBtn');
+        const $btn = $('#UpdateInspectionItemBtn');
         const originalWidth = $btn.outerWidth();
         $btn
             .attr('disabled', true)
@@ -615,7 +1060,7 @@ $(document).ready(function () {
             processData: false,
             contentType: false,
             success: function (response) {
-                $('#ausiEdit').modal('hide');
+                $('#EditInspectionItemModal').modal('hide');
                 form.reset();
                 const Toast = Swal.mixin({
                     toast: true,
@@ -634,12 +1079,12 @@ $(document).ready(function () {
 
                 Toast.fire({
                     icon: 'success',
-                    title: 'AUSI Booking Updated Successfully'
+                    title: 'Item Updated Successfully'
                 });
 
                 form.reset();
                 $(form).removeClass('was-validated');
-                refreshAusiTableBookings()
+                refreshTableInspectionItem();
             },
             error: function (xhr, status, error) {
                 const Toast = Swal.mixin({
@@ -658,7 +1103,7 @@ $(document).ready(function () {
                 });
                 Toast.fire({
                     icon: 'error',
-                    title: 'Failed to update ausi booking. Please try again.'
+                    title: 'Failed to update item. Please try again.'
                 });
             },
             complete: function () {
@@ -670,102 +1115,183 @@ $(document).ready(function () {
         });
     });
 
-
-
-    $('#ausiBookingReportTable').on('click', '.view_ausi_booking', function () {
-        let info_id = $(this).data("id");
-
+    $(document).on('click', '.inspection_ausi_booking', function () {
+        let bookingId = $(this).data('id');
         showLoading();
-
+        $('#inspection_booking_id').val(bookingId);
+        $('#inspectionChecklist').empty();
+        $('#inspection_name').text('');
+        $('#inspection_unit').text('');
         $.ajax({
-            url: '/admin/admin-fetch-ausi-booking/' + info_id,
-            method: 'GET',
+            url: '/admin/admin/fetch-ausi-inspection/' + bookingId,
+            type: 'GET',
             success: function (data) {
+                $('#inspection_unit').text(data.unit_no);
 
-                $('#display_name_reports_ausi').text(data.name);
-                $('#display_unit_reports_ausi').text(data.unit_no);
+                let html = '';
 
-                let residentType = data.resident_type?.toUpperCase() ?? 'N/A';
-                let residentBadge = `<span class="badge bg-secondary">${residentType}</span>`;
+                data.inspection_items.forEach(function (item) {
 
-                if (residentType === 'TENANT') residentBadge = `<span class="badge bg-danger">TENANT</span>`;
-                if (residentType === 'OWNER') residentBadge = `<span class="badge bg-primary">OWNER</span>`;
+                    html += `
+    <div class="card mb-3 inspection-row">
+        <div class="card-body">
+            <h6 class="inspection-title">
+               
+                ${item.item_name}
+            </h6>
+            <div class="inspection-options">
 
-                $('#display_resident_type_reports_ausi').html(residentBadge);
+                <label class="me-4">
+                    <input 
+                        type="radio"
+                        class="inspection-radio"
+                        name="inspection_${item.id}"
+                        value="1"
+                        required>
 
-                $('#display_booking_date_reports_ausi').text(data.booking_date);
-                $('#display_time_slot_reports_ausi').text(data.booking_time_slot);
-                $('#display_transaction_no_reports_ausi').text(data.transaction_no);
+                    ${item.option_1}
 
-                $('#srf_no_reports_ausi').text(data.srf_no ?? 'N/A');
-                $('#remarks_ausi_reports_ausi').text(data.remarks ?? 'N/A');
-                $('#info_id').val(info_id);
+                </label>
 
-                $('#viewAusiBooking').modal('show');
+                <label>
+
+                    <input 
+                        type="radio"
+                        class="inspection-radio"
+                        name="inspection_${item.id}"
+                        value="0"
+                        required>
+
+                    ${item.option_2}
+
+                </label>
+            </div>
+
+        </div>
+
+    </div>
+    `;
+
+                });
+
+                $('#inspectionChecklist').html(html);
+
+                $('#UnitAusiInspectionModal').modal('show');
+                hideLoading();
+
             },
             error: function () {
-                alert("Data not found");
-            },
-            complete: function () {
-                hideLoading(); // 🔥 ALWAYS runs (success OR error)
+
+                Swal.fire(
+                    'Error',
+                    'Unable to load inspection',
+                    'error'
+                );
             }
+
         });
+
     });
 
-    $('.DownloadAusiBookingReports').on('click', function () {
-        $('#DownloadAusiBookingReports').modal('show');
-    });
+    $('#saveInspectionBtn').click(function () {
 
-    $('#download-ausi-booking-reports').submit(function (e) {
-        e.preventDefault();
+        let bookingId = $('#inspection_booking_id').val();
+        let valid = true;
+        let inspections = [];
+        $('.inspection-row').removeClass('invalid');
+        $('.inspection-row').each(function () {
 
-        const $btn = $('#DownloadAusiBookingReportsBtn');
+            let row = $(this);
+
+            let checked = row.find('input[type="radio"]:checked');
+
+
+            if (checked.length === 0) {
+
+                row.addClass('invalid');
+
+                valid = false;
+
+            } else {
+
+                let name = checked.attr('name');
+
+                let itemId = name.replace('inspection_', '');
+
+
+                inspections.push({
+
+                    inspection_item_id: itemId,
+
+                    status: checked.val()
+
+                });
+            }
+
+        });
+
+        if (!valid) {
+
+            Swal.fire(
+                'Incomplete Inspection',
+                'Please answer all checklist items.',
+                'warning'
+            );
+
+            return;
+
+        }
+        const $btn = $('#saveInspectionBtn');
         const originalWidth = $btn.outerWidth();
-
-        $btn.attr('disabled', true)
-            .html('<div class="spinner-border spinner-border-sm text-light"></div>')
+        $btn
+            .attr('disabled', true)
+            .html(`<div class="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></div>`)
             .css('width', originalWidth + 'px');
-
-        const formData = $(this).serialize();
-
         $.ajax({
-            url: $(this).attr('action'),
+
+            url: '/admin/admin-save-ausi-inspection',
             type: 'POST',
-            data: formData,
-            xhrFields: {
-                responseType: 'blob' // Important to handle file download
-            },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            success: function (response, status, xhr) {
-                const filename = xhr.getResponseHeader('Content-Disposition')
-                    .split('filename=')[1]
-                    .replace(/"/g, '');
 
-                const blob = new Blob([response], { type: 'text/csv' });
-                const link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-
-                $('#DownloadAusiBookingReports').modal('hide');
-                $('#download-ausi-booking-reports')[0].reset();
-
+            data: {
+                ausi_booking_id: bookingId,
+                inspections: inspections
             },
+
+            success: function (response) {
+                $('#UnitAusiInspectionModal').modal('hide');
+                Swal.fire(
+                    'Completed',
+                    'Inspection completed successfully.',
+                    'success'
+                );
+                refreshAusiTableBookings();
+            },
+
             error: function (xhr) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Download Failed',
-                    text: xhr.responseJSON?.message || 'Something went wrong. Please try again.',
-                    confirmButtonColor: '#d33'
-                });
+
+                console.log(xhr.responseText);
+
+
+                Swal.fire(
+                    'Error',
+                    'Failed to save inspection.',
+                    'error'
+                );
+
             },
+
             complete: function () {
-                $btn.attr('disabled', false).html('Download').css('width', '');
+
+                $btn
+                    .attr('disabled', false)
+                    .html(`<span class="btn-text">Complete Inspection</span>`)
+                    .css('width', '');
             }
         });
     });
+
+
 });

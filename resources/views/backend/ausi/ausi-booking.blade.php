@@ -27,8 +27,8 @@
                     </form>
 
                     <!-- <button type="button" class="btn btn-primary badge me-2" id="uploadBookingBtnPC">
-                                                            <i class='bx bx-upload'></i> Upload Bookings
-                                                        </button> -->
+                                                                                                                <i class='bx bx-upload'></i> Upload Bookings
+                                                                                                            </button> -->
 
 
                     <button type="button" class="btn btn-primary badge AddAusiBookingAdmin me-2">
@@ -36,8 +36,8 @@
                     </button>
 
                     <!-- <button type="button" class="btn btn-danger badge AddEmergencyAusiBooking me-2">
-                        <i class='bx bx-plus'></i> Emergency Booking
-                    </button> -->
+                                                                            <i class='bx bx-plus'></i> Emergency Booking
+                                                                        </button> -->
                 </div>
             </div>
             <div class="table-responsive">
@@ -46,34 +46,37 @@
                     <thead>
                         <tr>
                             <th class="text-dark">Transaction No</th>
-                            <th class="text-dark">SRF No</th>
+                            <!-- <th class="text-dark">SRF No</th> -->
                             <th class="text-dark">Name</th>
                             <th class="text-dark">Resident Type</th>
                             <th class="text-dark">Unit</th>
                             <th class="text-dark">Date</th>
                             <th class="text-dark">Time Slot</th>
-                            <th class="text-dark">Emergency</th>
+                            <!-- <th class="text-dark">Emergency</th> -->
                             <th class="text-dark">Remarks</th>
                             <th class="text-dark">Status</th>
                             <th class="text-dark">Created By</th>
                             <th class="text-dark">Created At</th>
                             <th class="text-dark">Cancelled By</th>
                             <th class="text-dark">Cancelled At</th>
+                            <th class="text-dark">Completed At</th>
+                            <th class="text-dark">Completed By</th>
+
                             <th class="text-dark">Action</th>
 
 
                         </tr>
-                    </thead>
+                    </thead> 
                     <tbody>
                         @if($ausiBookings->isEmpty())
                             <tr>
-                                <td colspan="12" class="text-center">No Record Found</td>
+                                <td colspan="16" class="text-center">No Record Found</td>
                             </tr>
                         @else
                             @foreach ($ausiBookings as $ausiBooking)
                                 <tr>
                                     <td>{{ $ausiBooking->transaction_no ?? 'N/A' }}</td>
-                                    <td>{{ $ausiBooking->srf_no ?? 'N/A' }}</td>
+                                    <!-- <td>{{ $ausiBooking->srf_no ?? 'N/A' }}</td> -->
                                     <td>{{ $ausiBooking->name ?? 'N/A' }}</td>
                                     <td>
                                         @php
@@ -93,15 +96,15 @@
 
                                     <td>{{ $ausiBooking->booking_date ?? 'N/A' }}</td>
                                     <td>{{ $ausiBooking->booking_time_slot ?? 'N/A' }}</td>
-                      
 
-                                    <td>
+
+                                    <!-- <td>
                                         @if ($ausiBooking->emergency == 0)
                                             <span class="badge bg-secondary badge-forge ">No</span>
                                         @else
                                             <span class="badge bg-danger badge-forge ">Yes</span>
                                         @endif
-                                    </td>
+                                    </td> -->
 
                                     <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
                                         data-bs-toggle="tooltip" title="{{ $ausiBooking->remarks }}">
@@ -119,12 +122,17 @@
                                     <td>{{ isset($ausiBooking->cancelledBy->name) ? strtoupper($ausiBooking->cancelledBy->name) : 'N/A' }}
                                     </td>
                                     <td>{{ $ausiBooking->cancelled_at ?? 'N/A' }}</td>
+                                    <td>{{ $ausiBooking->completed_at ?? 'N/A' }}</td>
+                                    <td>{{ isset($ausiBooking->completedBy->name) ? strtoupper($ausiBooking->completedBy->name) : 'N/A' }}
                                     <td class="sticky-col sticky-col-color">
                                         <div class="d-flex gap-1 justify-content-center">
 
                                             @php
-                                                $isCancelled = $ausiBooking->display_status === 'Cancelled';
+                                                $disableActions = in_array($ausiBooking->booking_status, [0, 2]);
+                                                $disableInspect = $disableActions;
                                             @endphp
+
+
 
                                             <button type="button" class="btn btn-primary edit_ausi_booking btn-sm btn-equal"
                                                 data-bs-toggle="tooltip" data-bs-placement="left" title="View"
@@ -133,11 +141,19 @@
                                             </button>
 
                                             <button type="button"
-                                                class="btn btn-sm btn-equal {{ $isCancelled ? 'btn-secondary cancel-booking' : 'btn-danger admin-ausi-booking-cancel' }}"
-                                                data-bs-toggle="tooltip" data-bs-placement="right"
-                                                title="{{ $isCancelled ? 'Cancelled' : 'Cancel' }}" data-id="{{ $ausiBooking->id }}"
-                                                {{ $isCancelled ? 'disabled' : '' }}>
+                                                class="btn btn-sm {{ $disableInspect ? 'btn-secondary' : 'btn-success' }} inspection_ausi_booking"
+                                                data-bs-toggle="tooltip" data-bs-placement="top"
+                                                title="{{ $disableInspect ? 'Inspection Unavailable' : 'Inspect' }}"
+                                                data-id="{{ $ausiBooking->id }}" {{ $disableInspect ? 'disabled' : '' }}>
+                                                <i class="fa-solid fa-clipboard-check"></i>
+                                            </button>
 
+
+                                            <button type="button"
+                                                class="btn btn-sm btn-equal {{ $disableActions ? 'btn-secondary cancel-booking' : 'btn-danger admin-ausi-booking-cancel' }}"
+                                                data-bs-toggle="tooltip" data-bs-placement="right"
+                                                title="{{ $disableActions ? $ausiBooking->display_status : 'Cancel' }}"
+                                                data-id="{{ $ausiBooking->id }}" {{ $disableActions ? 'disabled' : '' }}>
                                                 <i class="fa-solid fa-ban"></i>
                                             </button>
 

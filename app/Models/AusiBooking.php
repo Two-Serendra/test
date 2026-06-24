@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use app\Models\AusiInspectionItem;
 class AusiBooking extends Model
 {
     use HasFactory;
@@ -26,6 +27,9 @@ class AusiBooking extends Model
         'created_by',
         'cancelled_at',
         'cancelled_by',
+        'completed_at',
+        'completed_by',
+
     ]; // Optional: automatically include in JSON/array
     protected $appends = ['display_status'];
 
@@ -49,6 +53,13 @@ class AusiBooking extends Model
         return $this->belongsTo(User::class, 'cancelled_by');
     }
 
+    public function completedBy()
+    {
+        return $this->belongsTo(User::class, 'completed_by');
+    }
+
+
+
     public function getBookingDateTime()
     {
         $startTime = explode(' - ', $this->booking_time_slot)[0] ?? '00:00';
@@ -56,57 +67,37 @@ class AusiBooking extends Model
         return Carbon::parse($this->booking_date . ' ' . $startTime);
     }
 
+    public function inspectionItems()
+    {
+        return $this->hasMany(AusiInspectionItem::class);
+    }
+    public function inspectionsResult()
+    {
+        return $this->hasMany(
+            AusiInspection::class,
+            'ausi_booking_id'
+        );
+    }
+
     /**
      * Dynamic booking status
      */
     public function getDisplayStatusAttribute()
     {
-        // Cancelled
-        if ($this->booking_status == 2) {
-            return 'Cancelled';
-        }
-
-        // Active booking logic
-        if ($this->booking_status == 1) {
-
-            $timeParts = explode(' - ', $this->booking_time_slot);
-
-            $startTime = trim($timeParts[0] ?? '00:00');
-            $endTime = trim($timeParts[1] ?? '23:59');
-
-            // Convert NN to PM
-            $startTime = str_replace('NN', 'PM', $startTime);
-            $endTime = str_replace('NN', 'PM', $endTime);
-
-            $startDateTime = Carbon::parse($this->booking_date . ' ' . $startTime);
-            $endDateTime = Carbon::parse($this->booking_date . ' ' . $endTime);
-
-            $now = Carbon::now();
-
-            // Ongoing
-            if ($now->between($startDateTime, $endDateTime)) {
-                return 'On Going';
-            }
-
-            // Completed
-            if ($now->gt($endDateTime)) {
-                return 'Completed';
-            }
-
-            // Upcoming booking
-            return 'Booked';
-        }
-
-        return 'Unknown';
+        return match ($this->booking_status) {
+            0 => 'Cancelled',
+            1 => 'Scheduled',
+            2 => 'Completed',
+            default => 'Unknown',
+        };
     }
 
     public function getStatusBadgeAttribute()
     {
-        return match ($this->display_status) {
-            'Booked' => 'primary',
-            'On Going' => 'warning',
-            'Completed' => 'primary',
-            'Cancelled' => 'danger',
+        return match ($this->booking_status) {
+            0 => 'danger',
+            1 => 'warning',
+            2 => 'primary',
             default => 'secondary',
         };
     }

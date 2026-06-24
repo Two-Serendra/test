@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->id();
             $table->string('transaction_no')->unique();
             $table->unsignedBigInteger('user_id');
-            $table->string('email');
+            $table->string('email')->nullable();
             $table->string('unit_no');
             $table->string('resident_type');
             $table->string('name');
@@ -25,10 +25,14 @@ return new class extends Migration {
             $table->string('unit_area');
             $table->text('remarks')->nullable();
             $table->tinyInteger('emergency')->default('0');
-            $table->tinyInteger('booking_status')->default('1');
+            $table->integer('booking_status')
+                ->default(1)
+                ->comment('0 Cancelled, 1 Scheduled, 2 Completed');
             $table->timestamp('cancelled_at')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('cancelled_by')->nullable();
+            $table->timestamp('completed_at')->nullable();
+            $table->unsignedBigInteger('completed_by')->nullable();
             $table->timestamps();
         });
     }

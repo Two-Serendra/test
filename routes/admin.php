@@ -323,14 +323,35 @@ Route::middleware('auth:admin')->group(function () {
         ->name('admin.ausi.booking.cancel');
     Route::get('/admin-ausi-calendar', [AusiBookingController::class, 'AdminBookingAusiCalendar'])->name('admin.booking.ausi.calendar');
     Route::get('/fetch/ausi-calendar-details/{id}', [AusiBookingController::class, 'fetchAusiCalendarSchedule'])->name("admin.fetch.booking.ausi.calendar");
-    Route::get('/admin-fetch-ausi-booking/{id}', [AusiBookingController::class, 'fetchAusiBooking'])->name('admin.fetch.ausi.control.booking');
+    Route::get('/admin-fetch-ausi-booking/{id}', [AusiBookingController::class, 'fetchAusiBooking'])->name('admin.fetch.ausi.booking');
     Route::post('/admin/ausi/booking/update', [AusiBookingController::class, 'AdminUpdateAusiBooking'])->name('admin.ausi.booking.update');
     Route::get('/search-ausi-report', [AusiBookingController::class, 'searchAusiReport'])->name('admin.search.ausi.report');
     Route::post('/admin-download-ausi-booking-records', [AusiBookingController::class, 'downloadAusiBookingReports'])
         ->name('download.ausi.booking.reports');
 
+    Route::get('/admin-ausi-inspection-items', [AusiBookingController::class, 'AdminAusiInspectionItem'])->name('admin.ausi.inspection.item');
+    Route::get('/admin-search-ausi-inspection-items', [AusiBookingController::class, 'AdminSearchAusiInspectionItem'])->name('admin.search.ausi.inspection.item');
+    Route::post('/admin-store-inspection-item', [AusiBookingController::class, 'storeAusiInspectionItem'])
+        ->name('store.inspection.item');
+    Route::get('/get-updated-inspection-item', [AusiBookingController::class, 'getUpdatedInspectionItemTable'])->name('admin.get.updated.inspection.item.table');
+    Route::get('/delete-inspection-item', [AusiBookingController::class, 'deleteInspectionItem'])->name('delete.inspection.item');
+    Route::get('/admin-fetch-inspection-item/{id}', [AusiBookingController::class, 'fetchInspectionItem'])->name('admin.fetch.inspection.item');
+    Route::post('/admin/update-inspection-item', [AusiBookingController::class, 'updateInspectionItem'])->name('admin.update.inspection.item');
+    Route::get(
+        '/admin/fetch-ausi-inspection/{id}',
+        [AusiBookingController::class, 'fetchAusiInspection']
+    );
 
-
+    Route::post(
+        '/admin-save-ausi-inspection',
+        [AusiBookingController::class, 'saveAusiInspection']
+    )->name('admin.save.ausi.inspection');
+    Route::get('/admin-get-updated-ausi-report-table', [AusiBookingController::class, 'getUpdatedAusiReportTable'])->name('admin.get.updated.ausi.report.table');
+    Route::post('/admin/ausi-report-update', [AusiBookingController::class, 'AdminUpdateAusiBookingReport'])->name('admin.ausi.booking.report.update');
+    Route::post(
+        '/admin-save-ausi-inspection-report',
+        [AusiBookingController::class, 'saveAusiInspectionReport']
+    )->name('admin.save.ausi.inspection.report');
 
     Route::get('/admin-gallery', [GalleryController::class, 'showGallery'])->name('admin.show.gallery');
     Route::post('/admin/gallery/upload', [GalleryController::class, 'uploadGalleryImages'])->name('admin.gallery.upload');

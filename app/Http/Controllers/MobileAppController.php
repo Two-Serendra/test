@@ -15,6 +15,7 @@ use App\Events\AusiBookingCreated;
 // use App\Notifications\UserAusiBookingBellNotification;
 use App\Mail\UserAusiBookingCancellation;
 use App\Mail\ConciergeAusiBookingCancellation;
+use App\Models\AusiInspectionResult;
 
 class MobileAppController extends Controller
 {
@@ -480,5 +481,34 @@ class MobileAppController extends Controller
             ], 500);
 
         }
+    }
+
+    public function fetchAusiBookingMobile($id)
+    {
+        $ausiBooking = AusiBooking::with('user')->find($id);
+
+        if (!$ausiBooking) {
+            return response()->json(['message' => 'Data not found'], 404);
+        }
+
+        $inspectionResults = AusiInspectionResult::with('inspectionItem')
+            ->where('ausi_booking_id', $id)
+            ->get();
+
+
+        return response()->json([
+            'name' => $ausiBooking->user->name ?? 'N/A',
+            'unit_no' => $ausiBooking->unit_no,
+            'resident_type' => $ausiBooking->resident_type,
+            'remarks' => $ausiBooking->remarks,
+            'transaction_no' => $ausiBooking->transaction_no,
+            'booking_date' => Carbon::parse($ausiBooking->booking_date)->format('F d, Y'),
+            'booking_time_slot' => $ausiBooking->booking_time_slot,
+            'srf_no' => $ausiBooking->srf_no,
+            'inspection_results' => $inspectionResults,
+            'booking_status' => $ausiBooking->booking_status,
+            'display_status' => $ausiBooking->display_status,
+            'status_badge' => $ausiBooking->status_badge,
+        ]);
     }
 }

@@ -128,7 +128,6 @@ $(function () {
 
             },
 
-
             error: function (xhr) {
 
                 logDebugHistory(
@@ -224,6 +223,15 @@ $(function () {
                     }
                 }
 
+                let viewButton = `
+                    <button
+                        class="btn btn-sm rounded-pill px-3 btn-outline-primary view-ausi-booking-btn"
+                        data-id="${item.id}">
+                        <i class="bx bx-show me-1"></i>
+                        View
+                    </button>
+                `;
+
                 let cancelButton = "";
 
                 if (item.booking_status == 1) {
@@ -288,6 +296,7 @@ $(function () {
                     ${cancelButton
                         ? `
                         <div class="mt-3">
+                          ${viewButton}
                             ${cancelButton}
                         </div>
                     `
@@ -410,4 +419,158 @@ $(function () {
         });
 
     }
+
+    $('#ausiHistoryTable').on('click', '.view-ausi-booking-btn', function () {
+
+        let info_id = $(this).data('id');
+
+        showLoading();
+
+
+        $.get('/fetch-ausi-booking-mobile/' + info_id, function (data) {
+
+
+            $('#view_transaction_no')
+                .text(data.transaction_no);
+
+
+            $('#view_name')
+                .text(data.name);
+
+
+            $('#view_unit')
+                .text(data.unit_no);
+
+
+
+            let residentType = data.resident_type?.toUpperCase() ?? 'N/A';
+
+            $('#view_resident_type').html(
+                `<span class="badge bg-secondary">
+                ${residentType}
+            </span>`
+            );
+
+
+
+            $('#view_booking_date')
+                .text(data.booking_date);
+
+
+            $('#view_time_slot')
+                .text(data.booking_time_slot);
+
+
+
+            $('#view_remarks')
+                .text(
+                    data.remarks ?? 'No remarks provided.'
+                );
+
+
+
+            // STATUS BADGE
+
+            $('#view_booking_status').html(`
+            <span class="badge bg-${data.status_badge}">
+                ${data.display_status.toUpperCase()}
+            </span>
+        `);
+
+
+
+            // INSPECTION
+
+            let inspectionHtml = "";
+
+
+            if (!data.inspection_results ||
+                data.inspection_results.length === 0) {
+
+
+                inspectionHtml = `
+                <div class="alert alert-warning">
+                    <i class="fa-solid fa-circle-exclamation me-2"></i>
+                    Unit has not been inspected yet.
+                </div>
+            `;
+
+
+            } else {
+
+
+                inspectionHtml = `
+            <div class="table-responsive">
+
+            <table class="table table-sm table-bordered">
+
+            <thead>
+                <tr>
+                    <th>
+                        Item
+                    </th>
+
+                    <th>
+                        Result
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody>
+            `;
+
+
+                data.inspection_results.forEach(result => {
+
+
+                    let label =
+                        result.status == 1
+                            ? result.inspection_item.option_1
+                            : result.inspection_item.option_2;
+
+
+
+                    inspectionHtml += `
+                <tr>
+
+                    <td>
+                        ${result.inspection_item.item_name}
+                    </td>
+
+                    <td>
+                        ${label}
+                    </td>
+
+                </tr>
+                `;
+
+
+                });
+
+
+                inspectionHtml += `
+            </tbody>
+            </table>
+
+            </div>
+            `;
+
+            }
+
+
+            $('#viewInspectionResults')
+                .html(inspectionHtml);
+
+
+
+            $('#ausiViewResultModal')
+                .modal('show');
+
+
+        })
+            .always(function () {
+                hideLoading();
+            });
+
+    });
 });

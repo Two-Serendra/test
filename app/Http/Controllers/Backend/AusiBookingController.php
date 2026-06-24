@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Models\AusiInspectionItem;
 use Illuminate\Http\Request;
 use App\Models\AusiBooking;
+use App\Models\AusiInspectionResult;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +19,8 @@ class AusiBookingController extends Controller
         $ausiBookings = AusiBooking::with([
             'user',
             'createdBy',
-            'cancelledBy'
+            'cancelledBy',
+            'completedBy',
         ])->whereDate('booking_date', '>=', now()->toDateString())
             ->orderBy('created_at', 'DESC')
             ->paginate(10);
@@ -184,7 +187,7 @@ class AusiBookingController extends Controller
 
     public function getUpdatedAusiTable()
     {
-        $bookings = AusiBooking::with('user', 'createdBy', 'cancelledBy')
+        $bookings = AusiBooking::with('user', 'createdBy', 'cancelledBy', 'completedBy')
             ->whereDate('booking_date', '>=', now()->toDateString())
             ->orderBy('created_at', 'DESC')
             ->paginate(10);
@@ -216,6 +219,15 @@ class AusiBookingController extends Controller
                     'name' => $b->createdBy->name
                 ] : null,
 
+                'completed_at' => $b->completed_at
+                    ? Carbon::parse($b->completed_at)->format('Y-m-d H:i:s')
+                    : null,
+
+                'completedBy' => $b->completedBy ? [
+                    'name' => $b->completedBy->name
+                ] : null,
+
+
                 'cancelledBy' => $b->cancelledBy ? [
                     'name' => $b->cancelledBy->name
                 ] : null,
@@ -231,7 +243,7 @@ class AusiBookingController extends Controller
         try {
             $booking->load('user');
 
-            $booking->booking_status = 2;
+            $booking->booking_status = 0;
             $booking->cancelled_by = auth()->id();
             $booking->cancelled_at = now();
             $booking->save();
@@ -349,6 +361,11 @@ class AusiBookingController extends Controller
             return response()->json(['message' => 'Data not found'], 404);
         }
 
+        $inspectionResults = AusiInspectionResult::with('inspectionItem')
+            ->where('ausi_booking_id', $id)
+            ->get();
+
+
         return response()->json([
             'name' => $ausiBooking->user->name ?? 'N/A',
             'unit_no' => $ausiBooking->unit_no,
@@ -358,6 +375,10 @@ class AusiBookingController extends Controller
             'booking_date' => Carbon::parse($ausiBooking->booking_date)->format('F d, Y'),
             'booking_time_slot' => $ausiBooking->booking_time_slot,
             'srf_no' => $ausiBooking->srf_no,
+            'inspection_results' => $inspectionResults,
+            'booking_status' => $ausiBooking->booking_status,
+            'display_status' => $ausiBooking->display_status,
+            'status_badge' => $ausiBooking->status_badge,
         ]);
     }
 
@@ -401,13 +422,26 @@ class AusiBookingController extends Controller
 
         $data = DB::table('ausi_bookings')
             ->leftJoin('users as u', 'ausi_bookings.user_id', '=', 'u.id')
+
+            // completed user
+            ->leftJoin('users as completed_user', 'ausi_bookings.completed_by', '=', 'completed_user.id')
+
+            // cancelled user
+            ->leftJoin('users as cancelled_user', 'ausi_bookings.cancelled_by', '=', 'cancelled_user.id')
+
+            // inspection results
+            ->leftJoin('ausi_inspection_results as air', 'ausi_bookings.id', '=', 'air.ausi_booking_id')
+
+            ->leftJoin('ausi_inspection_items as aii', 'air.inspection_item_id', '=', 'aii.id')
+
             ->select(
+                'ausi_bookings.id',
                 'ausi_bookings.transaction_no',
                 'ausi_bookings.unit_no',
                 'ausi_bookings.resident_type',
-
                 'ausi_bookings.name as resident_name',
-                'u.name as created_by_name', // if you have created_by column, else remove this
+
+                'u.name as created_by_name',
 
                 'ausi_bookings.booking_date',
                 'ausi_bookings.booking_time_slot',
@@ -415,10 +449,32 @@ class AusiBookingController extends Controller
                 'ausi_bookings.remarks',
                 'ausi_bookings.emergency',
                 'ausi_bookings.booking_status',
+
+                'ausi_bookings.cancelled_at',
+                'cancelled_user.name as cancelled_by_name',
+
+                'ausi_bookings.completed_at',
+                'completed_user.name as completed_by_name',
+
                 'ausi_bookings.created_at',
-                'ausi_bookings.updated_at'
+                'ausi_bookings.updated_at',
+
+                DB::raw("
+            GROUP_CONCAT(
+                CONCAT(
+                    aii.item_name,
+                    ': ',
+                    CASE 
+                        WHEN air.status = 1 THEN aii.option_1
+                        ELSE aii.option_2
+                    END
+                )
+                SEPARATOR ' | '
+            ) as inspection_results
+        ")
             )
             ->whereBetween('booking_date', [$fromDate, $toDate])
+            ->groupBy('ausi_bookings.id')
             ->orderBy('booking_date', 'desc')
             ->get();
 
@@ -433,6 +489,7 @@ class AusiBookingController extends Controller
             $handle = fopen('php://output', 'w');
 
             fputcsv($handle, [
+                'Booking ID',
                 'Transaction No',
                 'Resident Name',
                 'Unit No',
@@ -443,6 +500,15 @@ class AusiBookingController extends Controller
                 'Remarks',
                 'Emergency',
                 'Status',
+
+                'Inspection Results',
+
+                'Completed By',
+                'Completed At',
+
+                'Cancelled By',
+                'Cancelled At',
+
                 'Created By',
                 'Created At',
                 'Updated At'
@@ -454,25 +520,60 @@ class AusiBookingController extends Controller
                 $emergency = $row->emergency == 1 ? 'Yes' : 'No';
 
                 $status = match ($row->booking_status) {
-                    1 => 'Completed',
-                    2 => 'Cancelled',
+                    0 => 'Cancelled',
+                    1 => 'Scheduled',
+                    2 => 'Completed',
                     default => 'Booked'
                 };
 
                 fputcsv($handle, [
+
+                    $row->id,
+
                     $row->transaction_no,
+
                     $row->resident_name,
+
                     $row->unit_no,
+
                     $row->resident_type,
+
                     $bookingDate,
+
                     $row->booking_time_slot,
+
                     $row->srf_no,
+
                     $row->remarks,
+
                     $emergency,
+
                     $status,
-                    $row->created_by_name ?? null,
+
+
+                    // inspection
+                    $row->inspection_results ?? 'Not Inspected',
+
+
+                    // completed
+                    $row->completed_by_name,
+
+                    $row->completed_at,
+
+
+                    // cancelled
+                    $row->cancelled_by_name,
+
+                    $row->cancelled_at,
+
+
+                    // created
+                    $row->created_by_name,
+
                     $row->created_at,
+
                     $row->updated_at
+
                 ]);
 
                 ob_flush();
@@ -488,5 +589,316 @@ class AusiBookingController extends Controller
         Log::info("AUSI CSV Export Completed", ['filename' => $fileName]);
 
         return $response;
+    }
+
+    public function AdminAusiInspectionItem()
+    {
+
+        $AusiInspectionItems = AusiInspectionItem::paginate(10);
+        return view('backend.ausi.ausi-inspection-item', compact('AusiInspectionItems'));
+    }
+    public function storeAusiInspectionItem(Request $request)
+    {
+        $request->validate([
+            'item_name' => 'required|string|max:255',
+            'option_1' => 'required|string|max:255',
+            'option_2' => 'required|string|max:255',
+        ]);
+
+        try {
+
+            AusiInspectionItem::create([
+                'item_name' => strtoupper(trim($request->item_name)),
+                'option_1' => strtoupper(trim($request->option_1)),
+                'option_2' => strtoupper(trim($request->option_2)),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Item added successfully'
+            ]);
+
+        } catch (\Exception $e) {
+
+            \Log::error('Failed to create inspection item', [
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to add item'
+            ], 500);
+        }
+    }
+
+    public function getUpdatedInspectionItemTable()
+    {
+        $inspectionItems = AusiInspectionItem::paginate(10);
+
+        $inspectionItems->getCollection()->transform(function ($item) {
+            return [
+                'id' => $item->id,
+                'item_name' => $item->item_name,
+                'option_1' => $item->option_1,
+                'option_2' => $item->option_2,
+            ];
+        });
+
+        return response()->json($inspectionItems);
+    }
+
+    public function deleteInspectionItem(Request $request)
+    {
+        $inspectionItemId = $request->input('inspectionItemId');
+
+        try {
+
+            $inspectionItem = AusiInspectionItem::findOrFail($inspectionItemId);
+
+            $inspectionItem->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Inspection item deleted successfully.'
+            ]);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Inspection item deletion failed.'
+            ], 500);
+        }
+    }
+
+    public function fetchInspectionItem($id)
+    {
+        $inspectionItem = AusiInspectionItem::find($id);
+
+        if (!$inspectionItem) {
+            return response()->json(['message' => 'Data not found'], 404);
+        }
+
+        return response()->json([
+            'id' => $inspectionItem->id,
+            'item_name' => $inspectionItem->item_name ?? 'N/A',
+            'option_1' => $inspectionItem->option_1,
+            'option_2' => $inspectionItem->option_2,
+        ]);
+    }
+    public function updateInspectionItem(Request $request)
+    {
+        $request->validate([
+            'item_name' => 'required',
+            'option_1' => 'required',
+            'option_2' => 'required',
+        ]);
+
+        $item = AusiInspectionItem::findOrFail($request->id);
+
+        $item->update([
+            'item_name' => strtoupper(trim($request->item_name)),
+            'option_1' => strtoupper(trim($request->option_1)),
+            'option_2' => strtoupper(trim($request->option_2)),
+        ]);
+
+        return response()->json([
+            'success' => true
+        ]);
+    }
+
+    public function fetchAusiInspection($id)
+    {
+        $booking = AusiBooking::with('user')
+            ->findOrFail($id);
+
+
+        $inspectionItems = AusiInspectionItem::all();
+
+
+        return response()->json([
+
+            'name' => $booking->user->name ?? 'N/A',
+
+            'unit_no' => $booking->unit_no,
+
+            'inspection_items' => $inspectionItems
+
+        ]);
+    }
+
+    public function saveAusiInspection(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $bookingId = $request->ausi_booking_id;
+            AusiInspectionResult::where(
+                'ausi_booking_id',
+                $bookingId
+            )->delete();
+            foreach ($request->inspections as $inspection) {
+
+                AusiInspectionResult::create([
+
+                    'ausi_booking_id' => $bookingId,
+
+                    'inspection_item_id' => $inspection['inspection_item_id'],
+
+                    'status' => $inspection['status']
+
+                ]);
+            }
+            $booking = AusiBooking::findOrFail($bookingId);
+            $booking->booking_status = 2;
+            $booking->completed_at = now();
+            $booking->completed_by = auth()->id();
+            $booking->save();
+            DB::commit();
+            return response()->json([
+
+                'success' => true,
+
+                'message' => 'Inspection completed successfully.'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+
+                'success' => false,
+
+                'message' => $e->getMessage()
+
+            ], 500);
+        }
+    }
+
+    public function getUpdatedAusiReportTable()
+    {
+        $bookings = AusiBooking::with('user', 'createdBy', 'cancelledBy', 'completedBy')
+            ->whereDate('booking_date', '<', now()->toDateString())
+            ->orderBy('created_at', 'DESC')
+            ->paginate(10);
+        $bookings->getCollection()->transform(function ($b) {
+            return [
+                'id' => $b->id,
+                'transaction_no' => $b->transaction_no,
+                'srf_no' => $b->srf_no,
+                'name' => $b->name,
+                'resident_type' => $b->resident_type,
+                'unit_no' => $b->unit_no,
+                'booking_date' => $b->booking_date,
+                'booking_time_slot' => $b->booking_time_slot,
+                'emergency' => $b->emergency,
+                'remarks' => $b->remarks,
+                'booking_status' => $b->booking_status,
+
+                // ADD THESE
+                'display_status' => $b->display_status,
+                'status_badge' => $b->status_badge,
+
+                'created_at' => optional($b->created_at)->format('Y-m-d H:i:s'),
+
+                'cancelled_at' => $b->cancelled_at
+                    ? Carbon::parse($b->cancelled_at)->format('Y-m-d H:i:s')
+                    : null,
+
+                'createdBy' => $b->createdBy ? [
+                    'name' => $b->createdBy->name
+                ] : null,
+
+                'completed_at' => $b->completed_at
+                    ? Carbon::parse($b->completed_at)->format('Y-m-d H:i:s')
+                    : null,
+
+                'completedBy' => $b->completedBy ? [
+                    'name' => $b->completedBy->name
+                ] : null,
+
+
+                'cancelledBy' => $b->cancelledBy ? [
+                    'name' => $b->cancelledBy->name
+                ] : null,
+            ];
+        });
+
+        return response()->json($bookings);
+    }
+
+    public function AdminUpdateAusiBookingReport(Request $request)
+    {
+
+        try {
+            $booking = AusiBooking::findOrFail($request->id);
+            $booking->srf_no = $request->srf_no;
+            $booking->remarks = $request->remarks;
+            $booking->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'AUSI Booking updated successfully'
+            ]);
+
+        } catch (\Exception $e) {
+
+            Log::error('AUSI Update Failed', [
+                'request' => $request->all(),
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Update failed',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function saveAusiInspectionReport(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $bookingId = $request->ausi_booking_id;
+            AusiInspectionResult::where(
+                'ausi_booking_id',
+                $bookingId
+            )->delete();
+            foreach ($request->inspections as $inspection) {
+
+                AusiInspectionResult::create([
+
+                    'ausi_booking_id' => $bookingId,
+
+                    'inspection_item_id' => $inspection['inspection_item_id'],
+
+                    'status' => $inspection['status']
+
+                ]);
+            }
+            $booking = AusiBooking::findOrFail($bookingId);
+            $booking->booking_status = 2;
+            $booking->completed_at = now();
+            $booking->completed_by = auth()->id();
+            $booking->remarks = strtoupper(trim($request->remarks ?? ''));
+            $booking->save();
+            DB::commit();
+            return response()->json([
+
+                'success' => true,
+
+                'message' => 'Inspection completed successfully.'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+
+                'success' => false,
+
+                'message' => $e->getMessage()
+
+            ], 500);
+        }
     }
 }

@@ -301,7 +301,7 @@
         </li>
 
 
-        <!-- <li class="menu-item">
+        <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-shield-quarter"></i>
                 <div data-i18n="Form Elements">
@@ -326,13 +326,19 @@
                     </a>
                 </li>
 
+                <li class="menu-item {{ request()->routeIs('admin.ausi.inspection.item') ? 'active' : '' }}">
+                    <a href="{{ route('admin.ausi.inspection.item') }}" class="menu-link">
+                        <div data-i18n="Typography">Inspection Items</div>
+                    </a>
+                </li>
+
                 <li class="menu-item {{ request()->routeIs('admin.report.ausi') ? 'active' : '' }}">
                     <a href="{{ route('admin.report.ausi') }}" class="menu-link">
                         <div data-i18n="Typography">Reports</div>
                     </a>
                 </li>
             </ul>
-        </li> -->
+        </li>
         @endroles
 
         <!-- Manage -->

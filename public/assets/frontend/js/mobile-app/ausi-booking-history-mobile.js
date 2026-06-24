@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidence();
-    alert("🔥Ausi History JS VERSION 39");
+    alert("🔥Ausi History JS VERSION 40");
     function autoSelectHistoryResidence() {
 
         const select = $('#resident_id_ausi_booking_history');
@@ -192,35 +192,26 @@ $(function () {
                 let statusText = "";
                 let badgeClass = "";
 
-                if (item.booking_status == 2) {
+                switch (Number(item.booking_status)) {
 
-                    statusText = "Cancelled";
-                    badgeClass = "bg-danger";
+                    case 0:
+                        statusText = "Cancelled";
+                        badgeClass = "bg-danger";
+                        break;
 
-                } else if (item.booking_status == 1) {
-
-                    const bookingStart = new Date(
-                        `${item.booking_date} ${convertTime(item.booking_time_slot)}`
-                    );
-
-                    const bookingEnd = new Date(bookingStart);
-                    bookingEnd.setMinutes(bookingEnd.getMinutes() + 30);
-
-                    if (now >= bookingStart && now <= bookingEnd) {
-
-                        statusText = "Ongoing";
+                    case 1:
+                        statusText = "Scheduled";
                         badgeClass = "bg-warning text-dark";
+                        break;
 
-                    } else if (now > bookingEnd) {
-
+                    case 3:
                         statusText = "Completed";
-                        badgeClass = "bg-success";
-
-                    } else {
-
-                        statusText = "Confirmed";
                         badgeClass = "bg-primary";
-                    }
+                        break;
+
+                    default:
+                        statusText = "Unknown";
+                        badgeClass = "bg-secondary";
                 }
 
                 let viewButton = `
@@ -234,28 +225,24 @@ $(function () {
 
                 let cancelButton = "";
 
-                if (item.booking_status == 1) {
+                if (Number(item.booking_status) === 1) {
 
-                    const bookingStart = new Date(
+                    const bookingDateTime = new Date(
                         `${item.booking_date} ${convertTime(item.booking_time_slot)}`
                     );
 
-                    const hoursDiff =
-                        (bookingStart - now) / (1000 * 60 * 60);
-
-                    const canCancel =
-                        statusText === "Confirmed" && hoursDiff >= 12;
+                    const canCancel = now < bookingDateTime;
 
                     cancelButton = `
-        <button
-            class="btn btn-sm rounded-pill px-3 cancel-booking-btn
-                   ${canCancel ? 'btn-outline-danger' : 'btn-outline-secondary'}"
-            ${canCancel ? '' : 'disabled'}
-            data-id="${item.id}">
-            <i class="bx bx-x-circle me-1"></i>
-            Cancel
-        </button>
-    `;
+                        <button
+                            class="btn btn-sm rounded-pill px-3 cancel-booking-btn
+                                ${canCancel ? 'btn-outline-danger' : 'btn-outline-secondary'}"
+                            ${canCancel ? '' : 'disabled'}
+                            data-id="${item.id}">
+                            <i class="bx bx-x-circle me-1"></i>
+                            Cancel
+                        </button>
+                    `;
                 }
 
                 html += `
@@ -293,17 +280,12 @@ $(function () {
 
                     </div>
 
-                    ${cancelButton
-                        ? `
-                        <div class="mt-3">
-                          ${viewButton}
-                            ${cancelButton}
-                        </div>
-                    `
-                        : ""
-                    }
+                 <div class="mt-3 d-flex gap-2">
+                    ${viewButton}
+                    ${cancelButton}
+                /div>
 
-                </div>
+            </div>
             `;
             });
         }

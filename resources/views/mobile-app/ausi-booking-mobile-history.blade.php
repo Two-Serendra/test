@@ -111,5 +111,5 @@
             }));
         });
     </script>
-@includes('frotnend.modal.ausi-mobile-modal');
+@includes('frontend.modal.ausi-mobile-modal');
 @endsection

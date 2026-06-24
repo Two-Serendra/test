@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidence();
-    alert("🔥Ausi History JS VERSION 41");
+    alert("🔥Ausi History JS VERSION 42");
     function autoSelectHistoryResidence() {
 
         const select = $('#resident_id_ausi_booking_history');
@@ -427,11 +427,19 @@ $(function () {
 
             logDebugHistory("Resident Type: " + residentType);
 
-            $('#view_resident_type').html(
-                `<span class="badge bg-secondary">
-                ${residentType}
-            </span>`
-            );
+            let residentBadgeClass = "bg-secondary";
+
+            if (residentType === "OWNER") {
+                residentBadgeClass = "bg-primary";
+            } else if (residentType === "TENANT") {
+                residentBadgeClass = "bg-danger";
+            }
+
+            $('#view_resident_type').html(`
+    <span class="badge ${residentBadgeClass} rounded-pill px-3 py-2">
+        ${residentType}
+    </span>
+`);
 
 
             $('#view_booking_date')
@@ -454,11 +462,10 @@ $(function () {
 
 
             $('#view_booking_status').html(`
-            <span class="badge bg-${data.status_badge}">
-                ${data.display_status.toUpperCase()}
-            </span>
-        `);
-
+    <span class="badge bg-${data.status_badge} rounded-pill px-4 py-2 shadow-sm">
+        ${data.display_status.toUpperCase()}
+    </span>
+`);
             let inspectionHtml = "";
 
             if (!data.inspection_results ||

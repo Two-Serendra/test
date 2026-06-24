@@ -13,7 +13,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="" x-data="ausiBookingPageHistory">
         <div class="loading" x-show="$store.superapp.isLoading">
             <p>Waiting for shell context…</p>
@@ -73,7 +73,7 @@
         </div>
 
     </div>
-
+    @include('frontend.modal.ausi-mobile-modal')
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('ausiBookingPageHistory', () => ({
@@ -111,5 +111,5 @@
             }));
         });
     </script>
-  @include('frontend.modal.ausi-mobile-modal')
-  @endsection
+
+@endsection

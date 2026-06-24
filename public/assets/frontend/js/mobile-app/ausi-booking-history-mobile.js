@@ -566,6 +566,16 @@ $(function () {
             logDebugHistory(
                 "Opening AUSI view modal"
             );
+
+            logDebugHistory(
+                "Modal Count: " +
+                $('#ausiViewResultModal').length
+            );
+
+            logDebugHistory(
+                "Modal Element: " +
+                (document.getElementById('ausiViewResultModal') ? 'FOUND' : 'NOT FOUND')
+            );
             $('#ausiViewResultModal').modal('show');
         })
             .fail(function (xhr, status, error) {

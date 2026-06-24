@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidence();
-    alert("🔥Ausi History JS VERSION 34");
+    alert("🔥Ausi History JS VERSION 35");
     function autoSelectHistoryResidence() {
 
         const select = $('#resident_id_ausi_booking_history');
@@ -426,11 +426,12 @@ $(function () {
         logDebugHistory("VIEW AUSI BOOKING CLICKED");
         logDebugHistory("Booking ID: " + info_id);
         showLoading();
-        $.get('/fetch-ausi-booking-mobile/' + info_id, function (data) {
+        logDebugHistory("Before AJAX");
 
+        $.get('/fetch-ausi-booking-mobile/' + info_id, function (data) {
             logDebugHistory("AUSI booking data fetched successfully");
             logDebugHistory(JSON.stringify(data));
-
+            logDebugHistory("SUCCESS CALLBACK REACHED");
 
             $('#view_transaction_no')
                 .text(data.transaction_no);
@@ -479,8 +480,6 @@ $(function () {
             </span>
         `);
 
-
-
             let inspectionHtml = "";
 
             if (!data.inspection_results ||
@@ -491,14 +490,12 @@ $(function () {
                     "No inspection results found"
                 );
 
-
                 inspectionHtml = `
                 <div class="alert alert-warning">
                     <i class="fa-solid fa-circle-exclamation me-2"></i>
                     Unit has not been inspected yet.
                 </div>
             `;
-
 
             } else {
 
@@ -529,7 +526,6 @@ $(function () {
             <tbody>
             `;
 
-
                 data.inspection_results.forEach(result => {
 
 
@@ -543,8 +539,6 @@ $(function () {
                         result.status == 1
                             ? result.inspection_item.option_1
                             : result.inspection_item.option_2;
-
-
 
                     inspectionHtml += `
                 <tr>
@@ -562,31 +556,19 @@ $(function () {
 
                 });
 
-
                 inspectionHtml += `
             </tbody>
             </table>
 
             </div>
             `;
-
             }
-
-
             $('#viewInspectionResults')
                 .html(inspectionHtml);
-
-
-
             logDebugHistory(
                 "Opening AUSI view modal"
             );
-
-
-            $('#ausiViewResultModal')
-                .modal('show');
-
-
+            $('#ausiViewResultModal').modal('show');
         })
             .fail(function (xhr, status, error) {
 

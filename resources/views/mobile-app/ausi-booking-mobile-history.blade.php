@@ -69,8 +69,8 @@
             </div>
         </div>
 
-        <!-- <div id="debugPanelBookingHistory">
-        </div> -->
+        <div id="debugPanelBookingHistory">
+        </div>
 
     </div>
 
@@ -111,5 +111,5 @@
             }));
         });
     </script>
-
+@includes('frotnend.modal.ausi-mobile-modal');
 @endsection

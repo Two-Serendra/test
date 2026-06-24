@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidence();
-    logDebugHistory("🔥Ausi History JS VERSION 31");
+    logDebugHistory("🔥Ausi History JS VERSION 32");
     function autoSelectHistoryResidence() {
 
         const select = $('#resident_id_ausi_booking_history');
@@ -424,15 +424,19 @@ $(function () {
 
         let info_id = $(this).data('id');
 
+        logDebugHistory("VIEW AUSI BOOKING CLICKED");
+        logDebugHistory("Booking ID: " + info_id);
+
         showLoading();
 
-
         $.get('/fetch-ausi-booking-mobile/' + info_id, function (data) {
+
+            logDebugHistory("AUSI booking data fetched successfully");
+            logDebugHistory(JSON.stringify(data));
 
 
             $('#view_transaction_no')
                 .text(data.transaction_no);
-
 
             $('#view_name')
                 .text(data.name);
@@ -442,8 +446,9 @@ $(function () {
                 .text(data.unit_no);
 
 
-
             let residentType = data.resident_type?.toUpperCase() ?? 'N/A';
+
+            logDebugHistory("Resident Type: " + residentType);
 
             $('#view_resident_type').html(
                 `<span class="badge bg-secondary">
@@ -452,14 +457,11 @@ $(function () {
             );
 
 
-
             $('#view_booking_date')
                 .text(data.booking_date);
 
-
             $('#view_time_slot')
                 .text(data.booking_time_slot);
-
 
 
             $('#view_remarks')
@@ -468,8 +470,11 @@ $(function () {
                 );
 
 
+            logDebugHistory(
+                "Booking Status: " +
+                data.display_status
+            );
 
-            // STATUS BADGE
 
             $('#view_booking_status').html(`
             <span class="badge bg-${data.status_badge}">
@@ -479,13 +484,15 @@ $(function () {
 
 
 
-            // INSPECTION
-
             let inspectionHtml = "";
-
 
             if (!data.inspection_results ||
                 data.inspection_results.length === 0) {
+
+
+                logDebugHistory(
+                    "No inspection results found"
+                );
 
 
                 inspectionHtml = `
@@ -497,6 +504,12 @@ $(function () {
 
 
             } else {
+
+
+                logDebugHistory(
+                    "Inspection results count: " +
+                    data.inspection_results.length
+                );
 
 
                 inspectionHtml = `
@@ -523,6 +536,12 @@ $(function () {
                 data.inspection_results.forEach(result => {
 
 
+                    logDebugHistory(
+                        "Inspection Item: " +
+                        result.inspection_item.item_name
+                    );
+
+
                     let label =
                         result.status == 1
                             ? result.inspection_item.option_1
@@ -544,7 +563,6 @@ $(function () {
                 </tr>
                 `;
 
-
                 });
 
 
@@ -563,13 +581,36 @@ $(function () {
 
 
 
+            logDebugHistory(
+                "Opening AUSI view modal"
+            );
+
+
             $('#ausiViewResultModal')
                 .modal('show');
 
 
         })
+            .fail(function (xhr, status, error) {
+
+                logDebugHistory("FAILED TO FETCH AUSI BOOKING");
+                logDebugHistory("Status: " + status);
+                logDebugHistory("Error: " + error);
+                logDebugHistory("HTTP Code: " + xhr.status);
+                logDebugHistory("Response: " + xhr.responseText);
+
+
+                alert("Unable to load booking details.");
+
+            })
             .always(function () {
+
+                logDebugHistory(
+                    "AUSI booking request completed"
+                );
+
                 hideLoading();
+
             });
 
     });

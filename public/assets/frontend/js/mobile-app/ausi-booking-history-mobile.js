@@ -420,7 +420,7 @@ $(function () {
 
     }
 
-    $('#ausiHistoryTable').on('click', '.view-ausi-booking-btn', function () {
+    $(document).on('click', '.view-ausi-booking-btn', function () {
 
         let info_id = $(this).data('id');
         logDebugHistory("VIEW AUSI BOOKING CLICKED");

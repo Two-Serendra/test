@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidence();
-    alert("🔥Ausi History JS VERSION 40");
+    alert("🔥Ausi History JS VERSION 41");
     function autoSelectHistoryResidence() {
 
         const select = $('#resident_id_ausi_booking_history');
@@ -204,7 +204,7 @@ $(function () {
                         badgeClass = "bg-warning text-dark";
                         break;
 
-                    case 3:
+                    case 2:
                         statusText = "Completed";
                         badgeClass = "bg-primary";
                         break;
@@ -283,7 +283,7 @@ $(function () {
                  <div class="mt-3 d-flex gap-2">
                     ${viewButton}
                     ${cancelButton}
-                /div>
+                </div>
 
             </div>
             `;

@@ -73,7 +73,7 @@
         </div>
 
     </div>
-    @include('mobile-app.ausi-mobile-modal')
+    @include('mobile-app.ausi.ausi-mobile-modal')
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('ausiBookingPageHistory', () => ({

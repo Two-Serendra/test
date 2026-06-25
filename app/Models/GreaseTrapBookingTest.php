@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 
-class GreaseTrapBooking extends Model
+class GreaseTrapBookingTest extends Model
 {
     use HasFactory;
 
-    protected $table = 'grease_trap_bookings';
+    protected $table = 'grease_trap_booking_test';
 
     protected $fillable = [
         'transaction_no',

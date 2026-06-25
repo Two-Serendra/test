@@ -21,8 +21,8 @@ use App\Http\Controllers\Frontend\GreaseTrapController;
 use App\Http\Controllers\Frontend\PestControlController;
 use App\Http\Controllers\Backend\FitnessHubController;
 use App\Http\Controllers\Frontend\FitnessHubBookingController;
-use App\Http\Controllers\MobileAppController;
-
+use App\Http\Controllers\MobileApp\AusiBookingMobileController;
+use App\Http\Controllers\MobileApp\GreaseTrapBookingMobileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -207,23 +207,24 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware(['miniapp.webview'])->group(function () {
-    Route::get('/mobile-services-booking', [MobileAppController::class, 'MobileServices'])->middleware('no-cache');
+    Route::get('/mobile-services-booking', [AusiBookingMobileController::class, 'MobileServices'])->middleware('no-cache');
     //AUSI
-    Route::get('/ausi-booking-mobile', [MobileAppController::class, 'ausiBookingUserMobile'])->name('ausi.booking.mobile')->middleware('no-cache');
-    Route::get('/ausi-booked-slots-mobile', [MobileAppController::class, 'getBookedSlotsAusiMobile']);
-    Route::post('/ausi-booking-mobile/store', [MobileAppController::class, 'storeAusiBookingMobile'])->name('ausi.booking.mobile.store')->middleware('throttle:5,1');
-    Route::get('/ausi-booking-mobile/history', [MobileAppController::class, 'viewAusiBookingMobileHistory'])->name('ausi.booking.mobile.history');
-    Route::get('/get-ausi-booking-mobile/history', [MobileAppController::class, 'getAusiBookingMobileHistory'])->name('get.ausi.booking.mobile.history');
-    Route::post('/ausi-booking-mobile/cancel/{booking}', [MobileAppController::class, 'CancelAusiBookingMobile'])
+    Route::get('/ausi-booking-mobile', [AusiBookingMobileController::class, 'ausiBookingUserMobile'])->name('ausi.booking.mobile')->middleware('no-cache');
+    Route::get('/ausi-booked-slots-mobile', [AusiBookingMobileController::class, 'getBookedSlotsAusiMobile']);
+    Route::post('/ausi-booking-mobile/store', [AusiBookingMobileController::class, 'storeAusiBookingMobile'])->name('ausi.booking.mobile.store')->middleware('throttle:5,1');
+    Route::get('/ausi-booking-mobile/history', [AusiBookingMobileController::class, 'viewAusiBookingMobileHistory'])->name('ausi.booking.mobile.history');
+    Route::get('/get-ausi-booking-mobile/history', [AusiBookingMobileController::class, 'getAusiBookingMobileHistory'])->name('get.ausi.booking.mobile.history');
+    Route::post('/ausi-booking-mobile/cancel/{booking}', [AusiBookingMobileController::class, 'CancelAusiBookingMobile'])
         ->name('ausi.cancel.booking.mobile')->middleware('throttle:5,1');
-    Route::get('/ausi-booking-details/{id}', [MobileAppController::class, 'showAusiBookingDetails']);
+    Route::get('/ausi-booking-details/{id}', [AusiBookingMobileController::class, 'showAusiBookingDetails']);
+    Route::get('/fetch-ausi-booking-mobile/{id}', [AusiBookingMobileController::class, 'fetchAusiBookingMobile'])->name('fetch.ausi.booking.mobile');
 
     //Pest Control
-    Route::get('/pest-control-booking-mobile', [MobileAppController::class, 'pestControlBookingUserMobile'])->name('pest-control.booking.mobile')->middleware('no-cache');
+    Route::get('/pest-control-booking-mobile', [AusiBookingMobileController::class, 'pestControlBookingUserMobile'])->name('pest-control.booking.mobile')->middleware('no-cache');
 
     //Greasetrap
-    Route::get('/grease-trap-booking-mobile', [MobileAppController::class, 'greastrapBookingUserMobile'])->name('grease-trap.booking.mobile')->middleware('no-cache');
-    Route::get('/fetch-ausi-booking-mobile/{id}', [MobileAppController::class, 'fetchAusiBookingMobile'])->name('fetch.ausi.booking.mobile');
+    Route::get('/grease-trap-booking-mobile', [GreaseTrapBookingMobileController::class, 'greastrapBookingUserMobile'])->name('grease-trap.booking.mobile')->middleware('no-cache');
+    Route::get('/ausi-booking-mobile', [GreaseTrapBookingMobileController::class, 'ausiBookingUserMobile'])->name('ausi.booking.mobile')->middleware('no-cache');
 
 
 });

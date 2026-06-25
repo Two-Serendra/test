@@ -10,7 +10,7 @@ class GreaseTrapBookingTest extends Model
 {
     use HasFactory;
 
-    protected $table = 'grease_trap_bookings';
+    protected $table = 'grease_trap_booking_tests';
 
     protected $fillable = [ 
         'transaction_no',

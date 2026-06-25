@@ -296,116 +296,116 @@ $(function () {
     let isSubmitting = false;
 
     $(document).on('submit', '#userGtNewBookingMobile', function (event) {
+
         event.preventDefault();
+
         const form = this;
-        logDebugGt("SUBMIT FIRED");
+        const $submitBtn = $('#saveUserGtBtn');
 
-        const selectedDate = $('#GtBookingDate').val();
-        const selectedUnit = $('#resident_id_gt').val();
-        const selectedSlot = $('input[name="booking_time_slot"]:checked').val();
-        const $submitBtn = $('#saveUserAusiBtn');
+        const selectedSlot =
+            $('input[name="booking_time_slot"]:checked').val();
 
-        form.classList.add('was-validated');
+        if (!selectedSlot) {
 
-        if (!form.checkValidity()) {
-
-            if (!selectedSlot) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Time Slot Required',
-                    text: 'Please select a booking time slot.'
-                });
-            }
+            Swal.fire({
+                icon: 'warning',
+                title: 'Time Slot Required',
+                text: 'Please select a booking time slot.'
+            });
 
             return;
         }
 
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return;
+        }
+
         form.classList.remove('was-validated');
+
         const store = Alpine.store('superapp');
+
         const email = store?.user?.email || '';
+        const unit = $('#resident_id_gt').val();
+        const role =
+            $('#resident_id_gt option:selected').data('role') || '';
+
+        $('#mobile_email').val(email);
+        $('#mobile_unit_name').val(unit);
+        $('#mobile_unit_role').val(role);
 
         const originalWidth = $submitBtn.outerWidth();
+
         const lockSubmitBtn = () => {
             $submitBtn
-                .attr('disabled', true)
-                .html(`<div class="spinner-border spinner-border-sm text-light"></div>`)
+                .prop('disabled', true)
+                .html('<div class="spinner-border spinner-border-sm text-light"></div>')
                 .css('width', originalWidth + 'px');
         };
 
         const unlockSubmitBtn = () => {
             $submitBtn
-                .attr('disabled', false)
-                .html(`<span class="btn-text">Submit</span>`)
+                .prop('disabled', false)
+                .html('<span class="btn-text">SUBMIT</span>')
                 .css('width', '');
         };
 
-        const sendBooking = (forceOverride = false) => {
-            const store = Alpine.store('superapp');
-            const email = store?.user?.email || '';
-            const unit = $('#resident_id_gt').val();
-            const role = $('#resident_id_gt option:selected').data('role') || '';
-            $('#mobile_email').val(email);
-            $('#mobile_unit_name').val(unit);
-            $('#mobile_unit_role').val(role);
-
-            console.log("SYNC CHECK:", {
-                email,
-                unit,
-                role
-            });
+        const sendBooking = (forcePayment = false) => {
 
             const formData = new FormData(form);
-            if (forceOverride) {
-                formData.append('force_override', true);
+
+            if (forcePayment) {
+                formData.append('force_payment', true);
             }
 
             lockSubmitBtn();
-            // for (const pair of formData.entries()) {
-            //    logDebugGt(pair[0] + " = " + pair[1]);
-            // }
 
             $.ajax({
+
                 url: $(form).attr('action'),
                 type: $(form).attr('method'),
+
                 headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    'X-CSRF-TOKEN':
+                        $('meta[name="csrf-token"]').attr('content')
                 },
+
                 data: formData,
                 processData: false,
                 contentType: false,
+
                 success: function (res) {
 
-                    logDebugGt("SUCCESS");
-                    logDebugGt(JSON.stringify(res, null, 2));
-
-                    if (res.debug) {
-                        res.debug.forEach(d => logDebugGt("🧠 " + d));
-                    }
                     Swal.fire({
                         icon: 'success',
                         title: 'Booking Successful',
-                        text: res.message ?? 'Your booking has been saved',
-                        timer: 5000,
+                        text: res.message,
+                        timer: 3000,
                         showConfirmButton: false
                     });
-                    window.resetGtBookingUI();
-                    window.resetGtSlots();
+
+                    form.reset();
+
+                    resetGtSlots();
+
+                    $('.gt-booking-slot').prop('disabled', true);
+
+                    window.gtState = {
+                        date: null,
+                        unit: null
+                    };
                 },
 
                 error: function (xhr) {
+
                     const res = xhr.responseJSON || {};
-                    logDebugGt("ERROR", xhr.status);
-                    logDebugGt("RESPONSE", res);
 
                     if (xhr.status === 422) {
 
-                        const res = xhr.responseJSON || {};
-                        const errors = res.errors || {};
-
                         let messages = [];
 
-                        Object.keys(errors).forEach(field => {
-                            errors[field].forEach(msg => {
+                        Object.keys(res.errors || {}).forEach(field => {
+                            res.errors[field].forEach(msg => {
                                 messages.push(msg);
                             });
                         });
@@ -416,56 +416,70 @@ $(function () {
                             html: messages.join('<br>')
                         });
 
-                        logDebugGt("VALIDATION ERRORS", messages);
-
                         return;
                     }
 
-                    if (xhr.status === 409 && res.type === 'slot_taken') {
+                    if (xhr.status === 409) {
 
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Slot Already Taken',
-                            text: res.message
-                        });
+                        if (res.requires_payment) {
 
-                        updateGtSlots(selectedDate);
-                        return;
-                    }
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Payment Required',
+                                text: res.message,
+                                showCancelButton: true,
+                                confirmButtonText: 'Continue'
+                            }).then((result) => {
 
-                    if (xhr.status === 409 && res.type === 'unit_already_booked') {
+                                if (result.isConfirmed) {
+                                    sendBooking(true);
+                                }
+                            });
 
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Already Booked',
-                            text: res.message,
-                            showCancelButton: true,
-                            confirmButtonText: 'Book Anyway'
-                        }).then((result) => {
+                            return;
+                        }
 
-                            if (result.isConfirmed) {
-                                sendBooking(true);
-                            } else {
-                                unlockSubmitBtn();
-                            }
+                        if (res.type === 'slot_taken') {
 
-                        });
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Slot Taken',
+                                text: res.message
+                            });
 
-                        return;
+                            updateGtSlots(
+                                $('#GtBookingDate').val(),
+                                $('#resident_id_gt').val()
+                            );
+
+                            return;
+                        }
+
+                        if (res.type === 'unit_already_booked') {
+
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Already Booked',
+                                text: res.message
+                            });
+
+                            return;
+                        }
                     }
 
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Something went wrong'
+                        text: res.message || 'Something went wrong.'
                     });
-
                 },
-                complete() {
+
+                complete: function () {
                     unlockSubmitBtn();
                 }
             });
         };
+
         sendBooking();
     });
 

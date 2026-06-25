@@ -23,7 +23,7 @@ $(function () {
 
     logDebugGt("🚀 Mobile Booking JS Loaded");
 
-    window.ausiState = {
+    window.gtState = {
         date: null,
         unit: null
     };
@@ -35,7 +35,7 @@ $(function () {
         minDate: new Date().fp_incr(1),
         disableMobile: true,
         onChange: function (selectedDates, dateStr) {
-            window.ausiState.date = dateStr;
+            window.gtState.date = dateStr;
             console.log("DATE:", dateStr);
             logDebugGt("DATE CHANGED: " + dateStr);
             triggerUpdateGt();
@@ -52,7 +52,7 @@ $(function () {
     window.onResidentChangeGt = function (e) {
         const value = e.target.value;
 
-        window.ausiState.unit = value;
+        window.gtState.unit = value;
 
         if (window.Alpine && Alpine.store('superapp')) {
             Alpine.store('superapp').selectedUnit = value;
@@ -67,7 +67,7 @@ $(function () {
 
 
     function triggerUpdateGt() {
-        const date = window.ausiState.date;
+        const date = window.gtState.date;
 
         if (!date) {
             $(".gt-booking-slot").prop("disabled", true);
@@ -149,8 +149,8 @@ $(function () {
     };
 
     function checkGtFormReady() {
-        const date = window.ausiState.date;
-        const unit = window.ausiState.unit;
+        const date = window.gtState.date;
+        const unit = window.gtState.unit;
         const ready = !!(date && unit);
         $("#saveUserGtBtn").prop("disabled", !ready);
     }
@@ -236,9 +236,9 @@ $(function () {
             form.reset();
             form.classList.remove('was-validated');
         }
-        if (window.ausiState) {
-            window.ausiState.date = null;
-            window.ausiState.unit = null;
+        if (window.gtState) {
+            window.gtState.date = null;
+            window.gtState.unit = null;
         }
         if (window.Alpine && Alpine.store('superapp')) {
             Alpine.store('superapp').selectedUnit = '';

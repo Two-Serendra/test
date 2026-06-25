@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-007");
+    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-008");
     const el = document.getElementById('resident_id_gt');
 
     logDebugGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -68,20 +68,17 @@ $(function () {
 
     function triggerUpdateGt() {
         const date = window.ausiState.date;
-        const unit = window.ausiState.unit;
 
-        console.log("TRIGGER:", { date, unit });
-
-        if (!date || !unit) {
+        if (!date) {
             $(".gt-booking-slot").prop("disabled", true);
-            hideLoading();
+            hideLoadingGt();
             return;
         }
 
-        updateGtSlots(date, unit);
+        updateGtSlots(date);
     }
 
-    function updateGtSlots(date, unitName) {
+    function updateGtSlots(date) {
 
         logDebugGt("ENTERED updateGtSlots");
 
@@ -105,7 +102,9 @@ $(function () {
 
                 url: "/grease-trap-booked-slots-mobile",
                 type: "GET",
-                data: { date, unit_name: unitName },
+                data: {
+                    date: date
+                },
 
                 beforeSend: function () {
                     showLoadingGt();

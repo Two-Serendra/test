@@ -72,7 +72,7 @@ class GreaseTrapBookingMobileController extends Controller
 
         if (!$towerLetter) {
             return response()->json([
-                'message' => 'Unknown tower',
+                'message' => 'Unknown tower'
             ], 422);
         }
 
@@ -87,9 +87,11 @@ class GreaseTrapBookingMobileController extends Controller
             ], 404);
         }
 
+        // One booking per slot regardless of tower
         $blockedSlots = GreaseTrapBookingTest::whereDate('booking_date', $request->date)
             ->where('booking_status', 1)
             ->pluck('booking_time_slot')
+            ->filter()
             ->unique()
             ->values()
             ->toArray();
@@ -98,6 +100,7 @@ class GreaseTrapBookingMobileController extends Controller
             'unit_name' => $unitName,
             'unit_no' => $unitNo,
             'resident_id' => $resident->id,
+            'date' => $request->date,
             'blocked_slots' => $blockedSlots,
         ]);
 

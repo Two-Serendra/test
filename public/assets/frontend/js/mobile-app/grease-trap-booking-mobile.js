@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-011");
+    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-012");
     const el = document.getElementById('resident_id_gt');
 
     logDebugGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -67,17 +67,32 @@ $(function () {
 
 
     function triggerUpdateGt() {
-        const date = window.gtState.date;
-        const unit = window.gtState.unit;
-        if (!date) {
-            $(".gt-booking-slot").prop("disabled", true);
-            hideLoadingGt();
-            return;
+
+        try {
+
+            logDebugGt("TRIGGER START");
+
+            const date = window.gtState.date;
+            const unit = window.gtState.unit;
+
+            logDebugGt("DATE=" + date);
+            logDebugGt("UNIT=" + unit);
+
+            if (!date) {
+                $(".gt-booking-slot").prop("disabled", true);
+                return;
+            }
+
+            updateGtSlots(date, unit);
+
+        } catch (e) {
+
+            console.error(e);
+
+            logDebugGt("TRIGGER ERROR");
+            logDebugGt(e.message);
         }
-
-        updateGtSlots(date, unit);
     }
-
     function updateGtSlots(date, unitName) {
 
         logDebugGt("ENTERED updateGtSlots");
@@ -116,14 +131,14 @@ $(function () {
                     disableGtPastSlots(date);
                     logDebugGt("SUCCESS", res);
 
-                    hideLoading();
+                    hideLoadingGt();
                 },
                 error: function (xhr) {
 
                     logDebugGt(xhr.responseText);
                     logDebugGt("ERROR " + xhr.status);
 
-                    hideLoading();
+                    hideLoadingGt();
                 }
 
             });

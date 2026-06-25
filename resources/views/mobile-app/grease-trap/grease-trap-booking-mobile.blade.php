@@ -48,7 +48,7 @@
                 </div>
 
                 <form method="POST" action="{{ route('grease.trap.booking.mobile.store') }}" enctype="multipart/form-data"
-                    id="userAusiNewBookingMobile" class="needs-validation" novalidate>
+                    id="userGtNewBookingMobile" class="needs-validation" novalidate>
                     @csrf
 
                     <div class="row mb-3">
@@ -129,7 +129,7 @@
                     </div>
 
                     <div class="d-grid">
-                        <button type="submit" form="userGreaseTrapNewBookingMobile" id="saveUserGreaseTrapBtn"
+                        <button type="submit" form="userGtNewBookingMobile" id="saveUserGtBtn"
                             class="btn btn-primary d-flex align-items-center justify-content-center customBtn"
                             style="min-width: 100px; height: 38px;">
                             <span class="btn-text" disabled>SUBMIT</span>

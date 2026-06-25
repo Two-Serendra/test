@@ -223,11 +223,9 @@ Route::middleware(['miniapp.webview'])->group(function () {
     Route::get('/pest-control-booking-mobile', [AusiBookingMobileController::class, 'pestControlBookingUserMobile'])->name('pest-control.booking.mobile')->middleware('no-cache');
 
     //Greasetrap
-    Route::get('/grease-trap-booking-mobile', [GreaseTrapBookingMobileController::class, 'greastrapBookingUserMobile'])->name('grease-trap.booking.mobile')->middleware('no-cache');
+    Route::get('/grease-trap-booking-mobile', [GreaseTrapBookingMobileController::class, 'greasetrapBookingUserMobile'])->name('grease-trap.booking.mobile')->middleware('no-cache');
     Route::get('/grease-trap-booking-mobile/history', [GreaseTrapBookingMobileController::class, 'viewGreaseTrapBookingMobileHistory'])->name('grease.trap.booking.mobile.history');
     Route::post('/grease-trap-booking-mobile/store', [GreaseTrapBookingMobileController::class, 'storeGreaseTrapBookingMobile'])->name('grease.trap.booking.mobile.store')->middleware('throttle:5,1');
-
-
 });
 Route::middleware('web')
     ->prefix('admin')

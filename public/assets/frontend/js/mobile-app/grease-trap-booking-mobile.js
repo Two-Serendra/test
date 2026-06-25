@@ -107,9 +107,9 @@ $(function () {
                 type: "GET",
                 data: { date, unit_name: unitName },
 
-                // beforeSend: function () {
-                //     showLoadingGt();
-                // },
+                beforeSend: function () {
+                    showLoadingGt();
+                },
                 success: function (res) {
                     resetGtSlots();
                     disableBookedGtSlots(res.blocked_slots || []);

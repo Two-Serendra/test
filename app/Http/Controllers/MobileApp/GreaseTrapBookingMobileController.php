@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class GreaseTrapBookingMobileController extends Controller
 {
-    public function ausiBookingUserMobile(Request $request)
+    public function greasetrapBookingUserMobile(Request $request)
     {
         return response()
             ->view('mobile-app.grease-trap.grease-trap-booking-mobile', [

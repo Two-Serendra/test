@@ -34,6 +34,76 @@ class GreaseTrapBookingMobileController extends Controller
             ->header('ETag', '"' . uniqid() . '"');
     }
 
+    public function getBookedSlotsGreaseTrapMobile(Request $request)
+    {
+        $unitName = trim($request->unit_name);
+
+        if (!$unitName) {
+            return response()->json([
+                'message' => 'unit_name is required'
+            ], 422);
+        }
+
+        $map = [
+            "Almond" => "A",
+            "Belize" => "B",
+            "Callery" => "C",
+            "Dolce" => "D",
+            "Encino" => "E",
+            "Aston" => "F",
+            "ReadOak" => "G",
+            "Meranti" => "H",
+            "Sequoia" => "I",
+        ];
+
+        $parts = explode(' ', $unitName);
+
+        if (count($parts) !== 2) {
+            return response()->json([
+                'message' => 'Invalid unit format',
+                'unit' => $unitName
+            ], 422);
+        }
+
+        [$tower, $number] = $parts;
+
+        $towerLetter = $map[$tower] ?? null;
+
+        if (!$towerLetter) {
+            return response()->json([
+                'message' => 'Unknown tower',
+            ], 422);
+        }
+
+        $unitNo = $number . $towerLetter;
+
+        $resident = ResidentDetails::where('unit_no', $unitNo)->first();
+
+        if (!$resident) {
+            return response()->json([
+                'message' => 'Resident not found',
+                'unit_no' => $unitNo
+            ], 404);
+        }
+
+        $blockedSlots = GreaseTrapBooking::whereDate('booking_date', $request->date)
+            ->where('booking_status', 1)
+            ->pluck('booking_time_slot')
+            ->unique()
+            ->values()
+            ->toArray();
+
+        \Log::info('MOBILE GREASE TRAP SLOT REQUEST', [
+            'unit_name' => $unitName,
+            'unit_no' => $unitNo,
+            'resident_id' => $resident->id,
+            'blocked_slots' => $blockedSlots,
+        ]);
+
+        return response()->json([
+            'blocked_slots' => $blockedSlots
+        ]);
+    }
     public function storeGreaseTrapBooking(Request $request)
     {
         $maxRetries = 3;

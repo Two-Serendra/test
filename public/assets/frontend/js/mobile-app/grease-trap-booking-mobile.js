@@ -103,7 +103,7 @@ $(function () {
 
             $.ajax({
 
-                url: "/gt-booked-slots-mobile",
+                url: "/grease-trap-booked-slots-mobile",
                 type: "GET",
                 data: { date, unit_name: unitName },
 

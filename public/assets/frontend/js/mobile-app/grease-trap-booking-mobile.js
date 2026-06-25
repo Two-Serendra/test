@@ -96,7 +96,7 @@ $(function () {
             }
 
             logDebugGt("STEP 2 OK");
-            showLoading();
+            showLoadingGt();
             resetGtSlots();
 
             logDebugGt("STEP 3 OK - BEFORE AJAX");
@@ -108,16 +108,12 @@ $(function () {
                 data: { date, unit_name: unitName },
 
                 beforeSend: function () {
-                    showLoading();
+                    showLoadingGt();
                 },
-
                 success: function (res) {
-
                     resetGtSlots();
-
                     disableBookedGtSlots(res.blocked_slots || []);
                     disableGtPastSlots(date);
-
                     hideLoading();
                 },
                 error: function (xhr) {
@@ -133,13 +129,11 @@ $(function () {
         } catch (e) {
 
             logDebugGt("JS ERROR:\n" + e.message);
-
             logDebugGt("FULL ERROR:", e);
         }
     }
 
     window.resetGtSlots = function () {
-
         $('.gt-booking-slot').each(function () {
 
             $(this)
@@ -155,17 +149,13 @@ $(function () {
     };
 
     function checkGtFormReady() {
-
         const date = window.ausiState.date;
         const unit = window.ausiState.unit;
-
         const ready = !!(date && unit);
-
         $("#saveUserGtBtn").prop("disabled", !ready);
     }
 
     function disableBookedGtSlots(bookedSlots) {
-
         bookedSlots.forEach(slot => {
             const $radio = $('.gt-booking-slot[data-slot="' + slot + '"]');
 
@@ -215,12 +205,12 @@ $(function () {
         });
     }
 
-    function showLoading() {
-        $("#slotLoading").removeClass("d-none");
+    function showLoadingGt() {
+        $("#slotLoadingGt").removeClass("d-none");
     }
 
     function hideLoading() {
-        $("#slotLoading").addClass("d-none");
+        $("#slotLoadingGt").addClass("d-none");
     }
 
 

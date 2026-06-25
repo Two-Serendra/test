@@ -105,7 +105,7 @@
                             ]; 
                         @endphp
                         <div id="slotWrapper" class="position-relative">
-                            <div id="slotLoading" class="slot-loading d-none">
+                            <div id="slotLoadingGt" class="slot-loading d-none">
                                 <div class="spinner-border text-primary" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>

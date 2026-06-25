@@ -103,6 +103,8 @@
     <script src="{{ asset('assets/frontend/js/mobile-app/ausi-booking-mobile.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/mobile-app/ausi-booking-history-mobile.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/mobile-app/grease-trap-booking-mobile.js') }}"></script>
+    <script src="{{ asset('assets/frontend/js/mobile-app/grease-trap-booking-history-mobile.js') }}"></script>
+
 
 </body>
 

@@ -320,4 +320,12 @@ class GreaseTrapBookingMobileController extends Controller
             'message' => 'Could not complete booking. Please try again.'
         ], 500);
     }
+
+    public function viewGreaseTrapBookingMobileHistory()
+    {
+
+
+        return view('mobile-app.grease-trap.grease-trap-booking-mobile-history');
+
+    }
 }

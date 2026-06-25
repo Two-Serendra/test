@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('grease_trap_bookings_tests', function (Blueprint $table) {
+        Schema::create('grease_trap_booking_tests', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             $table->string('transaction_no')->unique()->nullable();

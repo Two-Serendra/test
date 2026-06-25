@@ -12,7 +12,7 @@ class GreaseTrapBookingTest extends Model
 
     protected $table = 'grease_trap_booking_test';
 
-    protected $fillable = [
+    protected $fillable = [ 
         'transaction_no',
         'user_id',
         'unit_no',

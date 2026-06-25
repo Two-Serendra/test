@@ -225,6 +225,7 @@ Route::middleware(['miniapp.webview'])->group(function () {
     //Greasetrap
     Route::get('/grease-trap-booking-mobile', [GreaseTrapBookingMobileController::class, 'greastrapBookingUserMobile'])->name('grease-trap.booking.mobile')->middleware('no-cache');
     Route::get('/ausi-booking-mobile', [GreaseTrapBookingMobileController::class, 'ausiBookingUserMobile'])->name('ausi.booking.mobile')->middleware('no-cache');
+    Route::get('/grease-trap-booking-mobile/history', [GreaseTrapBookingMobileController::class, 'viewGreaseTrapBookingMobileHistory'])->name('grease.trao.booking.mobile.history');
 
 
 });

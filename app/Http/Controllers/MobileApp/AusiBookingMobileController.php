@@ -16,6 +16,7 @@ use App\Events\AusiBookingCreated;
 use App\Mail\UserAusiBookingCancellation;
 use App\Mail\ConciergeAusiBookingCancellation;
 use App\Models\AusiInspectionResult;
+use App\Http\Controllers\Controller;
 
 class AusiBookingMobileController extends Controller
 {

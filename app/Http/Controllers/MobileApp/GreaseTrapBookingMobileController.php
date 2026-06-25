@@ -8,6 +8,7 @@ use App\Mail\ConciergeGreaseTrapBookingConfirmation;
 use App\Mail\UserGreaseTrapBookingCancellation;
 use App\Mail\ConciergeGreaseTrapBookingCancellation;
 use App\Models\GreaseTrapBooking;
+use App\Models\GreaseTrapBookingTest;
 use App\Models\PestControlBooking;
 use App\Models\ResidentDetails;
 use App\Models\FunctionRoomBooking;
@@ -86,7 +87,7 @@ class GreaseTrapBookingMobileController extends Controller
             ], 404);
         }
 
-        $blockedSlots = GreaseTrapBooking::whereDate('booking_date', $request->date)
+        $blockedSlots = GreaseTrapBookingTest::whereDate('booking_date', $request->date)
             ->where('booking_status', 1)
             ->pluck('booking_time_slot')
             ->unique()

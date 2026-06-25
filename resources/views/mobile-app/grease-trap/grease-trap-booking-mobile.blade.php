@@ -83,7 +83,7 @@
                             <label class="form-label">Date <span class="required">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text bg-white"><i class='bx bx-calendar'></i></span>
-                                <input type="text" class="form-control bg-white text-dark" id="AusiBookingDate"
+                                <input type="text" class="form-control bg-white text-dark" id="GtBookingDate"
                                     name="booking_date" required>
                             </div>
                         </div>

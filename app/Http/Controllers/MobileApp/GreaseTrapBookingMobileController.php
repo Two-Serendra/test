@@ -7,12 +7,8 @@ use App\Mail\UserGreaseTrapBookingConfirmation;
 use App\Mail\ConciergeGreaseTrapBookingConfirmation;
 use App\Mail\UserGreaseTrapBookingCancellation;
 use App\Mail\ConciergeGreaseTrapBookingCancellation;
-use App\Models\GreaseTrapBooking;
-use App\Models\GreaseTrapBookingTest;
-use App\Models\PestControlBooking;
+use App\Models\TestGreaseTrapBooking;
 use App\Models\ResidentDetails;
-use App\Models\FunctionRoomBooking;
-use App\Models\ActivityBooking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -88,7 +84,7 @@ class GreaseTrapBookingMobileController extends Controller
         }
 
         // One booking per slot regardless of tower
-        $blockedSlots = GreaseTrapBookingTest::whereDate('booking_date', $request->date)
+        $blockedSlots = TestGreaseTrapBooking::whereDate('booking_date', $request->date)
             ->where('booking_status', 1)
             ->pluck('booking_time_slot')
             ->filter()

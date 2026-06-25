@@ -323,9 +323,64 @@ class GreaseTrapBookingMobileController extends Controller
 
     public function viewGreaseTrapBookingMobileHistory()
     {
-
-
         return view('mobile-app.grease-trap.grease-trap-booking-mobile-history');
-
     }
+
+    public function getGreaseTrapBookingMobileHistory(Request $request)
+    {
+
+        $email = $request->email;
+        $mobileUnit = $request->unit_name;
+
+
+        $unitNo = $this->convertMobileUnitToUnitNoGt($mobileUnit);
+
+
+        if (!$unitNo) {
+
+            return response()->json([
+                'message' => 'Invalid unit format',
+                'unit' => $mobileUnit
+            ], 422);
+
+        }
+    }
+
+    private function convertMobileUnitToUnitNoGt($unitName)
+    {
+        $map = [
+            "Almond" => "A",
+            "Belize" => "B",
+            "Callery" => "C",
+            "Dolce" => "D",
+            "Encino" => "E",
+            "Aston" => "F",
+            "ReadOak" => "G",
+            "Meranti" => "H",
+            "Sequoia" => "I",
+        ];
+
+
+        $parts = explode(' ', trim($unitName));
+
+
+        if (count($parts) !== 2) {
+            return null;
+        }
+
+
+        [$tower, $number] = $parts;
+
+
+        $towerLetter = $map[$tower] ?? null;
+
+
+        if (!$towerLetter) {
+            return null;
+        }
+
+
+        return $number . $towerLetter;
+    }
+
 }

@@ -45,11 +45,11 @@ $(function () {
 
     document.addEventListener('change', function (e) {
         if (e.target && e.target.id === 'resident_id_gt') {
-            window.onResidentChange(e);
+            window.onResidentChangeGt(e);
         }
     });
 
-    window.onResidentChange = function (e) {
+    window.onResidentChangeGt = function (e) {
         const value = e.target.value;
 
         window.ausiState.unit = value;
@@ -115,12 +115,11 @@ $(function () {
 
                     resetGtSlots();
 
-                    disableBookedGtSlots(res.blocked_for_user || []);
+                    disableBookedGtSlots(res.blocked_slots || []);
                     disableGtPastSlots(date);
 
                     hideLoading();
                 },
-
                 error: function (xhr) {
 
                     console.log(xhr.responseText);

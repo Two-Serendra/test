@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-034");
+    alert("🔥 JS VERSION 2026-06-15-035");
     const el = document.getElementById('resident_id_ausi');
 
     logDebug("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -69,8 +69,9 @@ $(function () {
     function triggerUpdate() {
         const date = window.ausiState.date;
         const unit = window.ausiState.unit;
+        logDebug("DATE=" + date);
+        logDebug("UNIT=" + unit);
 
-        console.log("TRIGGER:", { date, unit });
 
         if (!date || !unit) {
             $(".ausi-booking-slot").prop("disabled", true);

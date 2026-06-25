@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-012");
+    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-013");
     const el = document.getElementById('resident_id_gt');
 
     logDebugGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -69,20 +69,18 @@ $(function () {
     function triggerUpdateGt() {
 
         try {
-
             logDebugGt("TRIGGER START");
-
             const date = window.gtState.date;
             const unit = window.gtState.unit;
 
             logDebugGt("DATE=" + date);
             logDebugGt("UNIT=" + unit);
 
-            if (!date) {
-                $(".gt-booking-slot").prop("disabled", true);
+            if (!date || !unit) {
+                $(".ausi-booking-slot").prop("disabled", true);
+                hideLoadingGt();
                 return;
             }
-
             updateGtSlots(date, unit);
 
         } catch (e) {
@@ -93,7 +91,7 @@ $(function () {
             logDebugGt(e.message);
         }
     }
-    function updateGtSlots(date, unitName) {
+    function updateGtSlots(date, unit) {
 
         logDebugGt("ENTERED updateGtSlots");
 
@@ -102,7 +100,7 @@ $(function () {
         try {
 
             if (typeof logDebugGt === "function") {
-                logDebugGt("DEBUG OK", { date, unitName });
+                logDebugGt("DEBUG OK", { date, unit });
             } else {
                 logDebugGt("logDebugGt missing");
             }
@@ -119,7 +117,7 @@ $(function () {
                 type: "GET",
                 data: {
                     date: date,
-                    unit_name: unitName
+                    unit_name: unit
                 },
 
                 beforeSend: function () {

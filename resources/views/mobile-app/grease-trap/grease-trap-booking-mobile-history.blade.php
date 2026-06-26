@@ -69,11 +69,10 @@
             </div>
         </div>
 
-        <div id="debugPanelBookingHistory">
+        <div id="debugPanelBookingHistoryGt">
         </div>
 
     </div>
-    @include('mobile-app.ausi.ausi-mobile-modal')
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('gtBookingPageHistory', () => ({

@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidenceGt();
-    alert("🔥GT History JS VERSION 24");
+    alert("🔥GT History JS VERSION 25");
     function autoSelectHistoryResidenceGt() {
 
         const select = $('#resident_id_gt_booking_history');
@@ -230,16 +230,6 @@ $(function () {
                     );
 
                     const time = convertTime(item.booking_time_slot);
-
-                    logDebugHistoryGt("Booking Date:", item.booking_date);
-                    logDebugHistoryGt("Converted Time:", time);
-
-                    const bookingDateTime = new Date(`${item.booking_date} ${time}`);
-
-                    logDebugHistoryGt("Booking DateTime:", bookingDateTime);
-                    logDebugHistoryGt("Is Valid:", !isNaN(bookingDateTime.getTime()));
-                    logDebugHistoryGt("Now:", now);
-                    logDebugHistoryGt("Can Cancel:", now < bookingDateTime);
                     const canCancel = now < bookingDateTime;
 
                     cancelButton = `

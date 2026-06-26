@@ -56,14 +56,9 @@ $(document).ready(function () {
                     const formattedDate = flatpickr.formatDate(date, "Y-m-d");
 
                     const isSunday = date.getDay() === 0;
-                    const isFriday = date.getDay() === 5;
                     const isHoliday = philippineHolidays.includes(formattedDate);
 
                     if (category === 'group1') {
-                        return isFriday || isSunday || isHoliday;
-                    }
-
-                    if (category === 'group2') {
                         return isSunday || isHoliday;
                     }
 

@@ -106,7 +106,7 @@
     font-size: 1.25rem;
 }
 
-#debugPanelBookingHistory {
+#debugPanelBookingHistory, #logDebugHistoryGt {
     position: fixed;
     bottom: 0;
     left: 0;

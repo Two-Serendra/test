@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidenceGt();
-    alert("🔥GT History JS VERSION 27");
+    alert("🔥GT History JS VERSION 28");
     function autoSelectHistoryResidenceGt() {
 
         const select = $('#resident_id_gt_booking_history');
@@ -324,9 +324,9 @@ $(function () {
 
     $(document).on('click', '.cancel-mobile-gt-booking-btn', function () {
         const bookingId = $(this).data('id');
-
+        logDebugHistoryGt("Sending confirmed cancel request...");
         $.ajax({
-            url: '/grease-trap-booking-mobile/cancel' + bookingId,
+            url: '/grease-trap-booking-mobile/cancel/' + bookingId,
             type: 'POST',
             data: {
                 _token: $('meta[name="csrf-token"]').attr('content')
@@ -364,10 +364,21 @@ $(function () {
                                         .then(() => {
                                             let page = $('.pagination .active span').text() || 1;
                                             loadBookings(page);
+                                            logDebugHistoryGt("Second response received");
+                                            logDebugHistoryGt(JSON.stringify(res2));
                                         });
                                 },
-                                error: function () {
-                                    Swal.fire('Error', 'Something went wrong while cancelling.', 'error');
+                                error: function (xhr) {
+
+                                    logDebugHistoryGt("AJAX ERROR");
+                                    logDebugHistoryGt("Status: " + xhr.status);
+                                    logDebugHistoryGt("Response: " + xhr.responseText);
+
+                                    Swal.fire(
+                                        'Error',
+                                        'Something went wrong while cancelling.',
+                                        'error'
+                                    );
                                 }
                             });
                         }
@@ -381,8 +392,17 @@ $(function () {
                         });
                 }
             },
-            error: function () {
-                Swal.fire('Error', 'Something went wrong while cancelling.', 'error');
+            error: function (xhr) {
+
+                logDebugHistoryGt("AJAX ERROR");
+                logDebugHistoryGt("Status: " + xhr.status);
+                logDebugHistoryGt("Response: " + xhr.responseText);
+
+                Swal.fire(
+                    'Error',
+                    'Something went wrong while cancelling.',
+                    'error'
+                );
             }
         });
     });

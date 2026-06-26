@@ -229,7 +229,8 @@ Route::middleware(['miniapp.webview'])->group(function () {
     Route::get('/grease-trap-booked-slots-mobile', [GreaseTrapBookingMobileController::class, 'getBookedSlotsGreaseTrapMobile']);
     Route::get('/grease-trap-booking-mobile/history', [GreaseTrapBookingMobileController::class, 'viewGreaseTrapBookingMobileHistory'])->name('grease.trap.booking.mobile.history');
     Route::get('/get-grease-trap-booking-mobile/history', [GreaseTrapBookingMobileController::class, 'getGreaseTrapBookingMobileHistory'])->name('get.grease.trap.booking.mobile.history');
-
+    Route::post('/grease-trap-booking-mobile/cancel/{booking}', [GreaseTrapBookingMobileController::class, 'CancelGreaseTrapBookingMobile'])
+        ->name('grease.trap.cancel.booking.mobile')->middleware('throttle:5,1');
 });
 Route::middleware('web')
     ->prefix('admin')

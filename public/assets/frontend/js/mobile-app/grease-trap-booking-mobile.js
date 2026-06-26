@@ -377,13 +377,14 @@ $(function () {
                 success: function (res) {
 
                     Swal.fire({
+                        toast: true,
+                        position: 'top-end',
                         icon: 'success',
-                        title: 'Booking Successful',
-                        text: res.message,
-                        timer: 3000,
-                        showConfirmButton: false
+                        title: 'Booking submitted successfully',
+                        showConfirmButton: false,
+                        timer: 2500
                     });
-
+                    
                     window.resetGtBookingUI();
 
                     resetGtSlots();

@@ -344,6 +344,17 @@ class GreaseTrapBookingMobileController extends Controller
             ], 422);
 
         }
+
+        $bookings = TestGreaseTrapBooking::where('email', $email)
+            ->where('unit_no', $unitNo)
+            ->orderBy('booking_date', 'desc')
+            ->get();
+
+        return response()->json([
+            'unit_no' => $unitNo,
+            'bookings' => $bookings
+        ]);
+
     }
 
     private function convertMobileUnitToUnitNoGt($unitName)

@@ -1,10 +1,10 @@
 $(function () {
 
-    autoSelectHistoryResidence();
+    autoSelectHistoryResidenceGt();
     alert("🔥Ausi History JS VERSION 42");
-    function autoSelectHistoryResidence() {
+    function autoSelectHistoryResidenceGt() {
 
-        const select = $('#resident_id_ausi_booking_history');
+        const select = $('#resident_id_gt_booking_history');
 
         if (!select.length) {
             console.log("HISTORY SELECT NOT FOUND");
@@ -19,10 +19,13 @@ $(function () {
             options.length
         );
 
+
+        // Alpine has not rendered yet
         if (options.length <= 1) {
-            setTimeout(autoSelectHistoryResidence, 300);
+            setTimeout(autoSelectHistoryResidenceGt, 300);
             return;
         }
+
 
         const firstUnit = options.eq(1).val();
 
@@ -44,18 +47,18 @@ $(function () {
 
         const email = $('#history_mobile_email').val();
 
-        updateAusiHistoryBookingTable(
+        updateGtHistoryBookingTable(
             firstUnit,
             email
         );
 
     }
 
-    const el = document.getElementById('resident_id_ausi_booking_history');
+    const el = document.getElementById('resident_id_gt_booking_history');
 
-    logDebugHistory("SELECT EXISTS: " + (el ? "YES" : "NO"));
+    logDebugHistoryGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
 
-    function logDebugHistory(...args) {
+    function logDebugHistoryGt(...args) {
 
         const msg = args.map(a =>
             typeof a === 'object'
@@ -65,7 +68,7 @@ $(function () {
 
         console.log(msg);
 
-        const el = document.getElementById('debugPanelBookingHistory');
+        const el = document.getElementById('debugPanelBookingHistoryGt');
 
         if (el) {
             el.innerHTML += msg + "<br>";
@@ -74,27 +77,27 @@ $(function () {
     }
 
     document.addEventListener('change', function (e) {
-        logDebugHistory("CHANGE EVENT: " + e.target.id);
-        if (e.target && e.target.id === 'resident_id_ausi_booking_history') {
-            window.onResidentChangeHistory(e);
+        logDebugHistoryGt("CHANGE EVENT: " + e.target.id);
+        if (e.target && e.target.id === 'resident_id_gt_booking_history') {
+            window.onResidentChangeHistoryGt(e);
         }
     });
 
-    window.onResidentChangeHistory = function (e) {
+    window.onResidentChangeHistoryGt = function (e) {
 
         const unit = e.target.value;
         const email = $('#history_mobile_email').val();
 
-        $("#historyWrapper").removeClass("d-none");
+        $("#historyWrapperGt").removeClass("d-none");
 
-        updateAusiHistoryBookingTable(
+        updateGtHistoryBookingTable(
             unit,
             email
         );
     };
 
-    function updateAusiHistoryBookingTable(unitName, email) {
-        showHistoryLoading();
+    function updateGtHistoryBookingTable(unitName, email) {
+        showHistoryLoadingGt();
         $("#ausiHistoryTable").html("");
         $.ajax({
 
@@ -111,13 +114,13 @@ $(function () {
 
             success: function (res) {
 
-                logDebugHistory(
+                logDebugHistoryGt(
                     "HISTORY RESPONSE",
                     res
                 );
-                $("#historyWrapper").removeClass('d-none');
+                $("#historyWrapperGt").removeClass('d-none');
 
-                renderHistoryTable(res.bookings);
+                renderHistoryTableGt(res.bookings);
 
                 $("#historyPageLoading").fadeOut(200, function () {
                     $(this).remove();
@@ -127,7 +130,7 @@ $(function () {
 
             error: function (xhr) {
 
-                logDebugHistory(
+                logDebugHistoryGt(
                     "ERROR",
                     xhr.responseText
                 );
@@ -146,11 +149,11 @@ $(function () {
 
     }
 
-    function showHistoryLoading() {
+    function showHistoryLoadingGt() {
 
-        $("#historyWrapper").removeClass('d-none');
+        $("#historyWrapperGt").removeClass('d-none');
 
-        $("#historyLoading")
+        $("#historyLoadingGt")
             .removeClass("d-none");
 
     }
@@ -158,13 +161,13 @@ $(function () {
 
     function hideHistoryLoading() {
 
-        $("#historyLoading")
+        $("#historyLoadingGt")
             .addClass("d-none");
 
     }
 
-    function renderHistoryTable(bookings) {
-        logDebugHistory("renderHistoryTable");
+    function renderHistoryTableGt(bookings) {
+        logDebugHistoryGt("renderHistoryTableGt");
 
         let html = "";
 
@@ -211,14 +214,21 @@ $(function () {
                         badgeClass = "bg-secondary";
                 }
 
-                let viewButton = `
-                    <button
-                        class="btn btn-sm rounded-pill px-3 btn-outline-primary view-ausi-booking-btn"
-                        data-id="${item.id}">
-                        <i class="bx bx-show me-1"></i>
-                        View
-                    </button>
-                `;
+                switch (Number(item.charged_type)) {
+                    case 1:
+                        statusText = "Completed";
+                        badgeClass = "bg-primary";
+                        break;
+
+                    case 2:
+                        statusText = "Cancelled";
+                        badgeClass = "bg-danger";
+                        break;
+
+                    default:
+                        statusText = "Unknown";
+                        badgeClass = "bg-secondary";
+                }
 
                 let cancelButton = "";
 
@@ -275,10 +285,14 @@ $(function () {
                             <span>${item.booking_time_slot}</span>
                         </div>
 
+                        <div class="booking-detail-row">
+                            <i class="bx bx-time-five"></i>
+                            <span>${item.charged_type}</span>
+                        </div>
+
                     </div>
 
                  <div class="mt-3 d-flex gap-2">
-                    ${viewButton}
                     ${cancelButton}
                 </div>
 
@@ -320,7 +334,7 @@ $(function () {
 
             if (result.isConfirmed) {
                 button.prop('disabled', true);
-                cancelAusiBooking(bookingId);
+                cancelGtBooking(bookingId);
 
             }
 
@@ -330,12 +344,12 @@ $(function () {
 
     });
 
-    function cancelAusiBooking(id) {
+    function cancelGtBooking(id) {
         const email = $('#history_mobile_email').val();
 
         $.ajax({
 
-            url: `/ausi-booking-mobile/cancel/${id}`,
+            url: `/grease-trap-booking-mobile/cancel/${id}`,
 
             type: "POST",
 
@@ -360,7 +374,7 @@ $(function () {
                 // keep current selected residence
                 const unit =
                     Alpine.store('superapp')?.selectedUnit ||
-                    $('#resident_id_ausi_booking_history').val();
+                    $('#resident_id_gt_booking_history').val();
 
 
                 const email =
@@ -374,7 +388,7 @@ $(function () {
                 );
 
 
-                updateAusiHistoryBookingTable(
+                updateGtHistoryBookingTable(
                     unit,
                     email
                 );
@@ -401,13 +415,13 @@ $(function () {
 
     $(document).on('click', '.view-ausi-booking-btn', function () {
         let info_id = $(this).data('id');
-        logDebugHistory("VIEW AUSI BOOKING CLICKED");
-        logDebugHistory("Booking ID: " + info_id);
-        logDebugHistory("Before AJAX");
+        logDebugHistoryGt("VIEW AUSI BOOKING CLICKED");
+        logDebugHistoryGt("Booking ID: " + info_id);
+        logDebugHistoryGt("Before AJAX");
         $.get('/fetch-ausi-booking-mobile/' + info_id, function (data) {
-            logDebugHistory("AUSI booking data fetched successfully");
-            logDebugHistory(JSON.stringify(data));
-            logDebugHistory("SUCCESS CALLBACK REACHED");
+            logDebugHistoryGt("AUSI booking data fetched successfully");
+            logDebugHistoryGt(JSON.stringify(data));
+            logDebugHistoryGt("SUCCESS CALLBACK REACHED");
             alert("view ausi is hitting");
             $('#view_transaction_no')
                 .text(data.transaction_no);
@@ -422,7 +436,7 @@ $(function () {
 
             let residentType = data.resident_type?.toUpperCase() ?? 'N/A';
 
-            logDebugHistory("Resident Type: " + residentType);
+            logDebugHistoryGt("Resident Type: " + residentType);
 
             let residentBadgeClass = "bg-secondary";
 
@@ -452,7 +466,7 @@ $(function () {
                 );
 
 
-            logDebugHistory(
+            logDebugHistoryGt(
                 "Booking Status: " +
                 data.display_status
             );
@@ -469,7 +483,7 @@ $(function () {
                 data.inspection_results.length === 0) {
 
 
-                logDebugHistory(
+                logDebugHistoryGt(
                     "No inspection results found"
                 );
 
@@ -483,7 +497,7 @@ $(function () {
             } else {
 
 
-                logDebugHistory(
+                logDebugHistoryGt(
                     "Inspection results count: " +
                     data.inspection_results.length
                 );
@@ -512,7 +526,7 @@ $(function () {
                 data.inspection_results.forEach(result => {
 
 
-                    logDebugHistory(
+                    logDebugHistoryGt(
                         "Inspection Item: " +
                         result.inspection_item.item_name
                     );
@@ -548,16 +562,16 @@ $(function () {
             }
             $('#viewInspectionResults')
                 .html(inspectionHtml);
-            logDebugHistory(
+            logDebugHistoryGt(
                 "Opening AUSI view modal"
             );
 
-            logDebugHistory(
+            logDebugHistoryGt(
                 "Modal Count: " +
                 $('#ausiViewResultModal').length
             );
 
-            logDebugHistory(
+            logDebugHistoryGt(
                 "Modal Element: " +
                 (document.getElementById('ausiViewResultModal') ? 'FOUND' : 'NOT FOUND')
             );
@@ -565,11 +579,11 @@ $(function () {
         })
             .fail(function (xhr, status, error) {
 
-                logDebugHistory("FAILED TO FETCH AUSI BOOKING");
-                logDebugHistory("Status: " + status);
-                logDebugHistory("Error: " + error);
-                logDebugHistory("HTTP Code: " + xhr.status);
-                logDebugHistory("Response: " + xhr.responseText);
+                logDebugHistoryGt("FAILED TO FETCH AUSI BOOKING");
+                logDebugHistoryGt("Status: " + status);
+                logDebugHistoryGt("Error: " + error);
+                logDebugHistoryGt("HTTP Code: " + xhr.status);
+                logDebugHistoryGt("Response: " + xhr.responseText);
 
 
                 alert("Unable to load booking details.");
@@ -577,7 +591,7 @@ $(function () {
             })
             .always(function () {
 
-                logDebugHistory(
+                logDebugHistoryGt(
                     "AUSI booking request completed"
                 );
 

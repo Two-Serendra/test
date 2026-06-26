@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidenceGt();
-    alert("🔥Ausi History JS VERSION 42");
+    alert("🔥GT History JS VERSION 20");
     function autoSelectHistoryResidenceGt() {
 
         const select = $('#resident_id_gt_booking_history');
@@ -98,10 +98,10 @@ $(function () {
 
     function updateGtHistoryBookingTable(unitName, email) {
         showHistoryLoadingGt();
-        $("#ausiHistoryTable").html("");
+        $("#gtHistoryTable").html("");
         $.ajax({
 
-            url: "/get-ausi-booking-mobile/history",
+            url: "/get-grease-trap-booking-mobile/history",
 
             type: "GET",
 
@@ -141,7 +141,7 @@ $(function () {
             },
             complete: function () {
 
-                hideHistoryLoading();
+                hideHistoryLoadingGt();
 
             }
 
@@ -159,7 +159,7 @@ $(function () {
     }
 
 
-    function hideHistoryLoading() {
+    function hideHistoryLoadingGt() {
 
         $("#historyLoadingGt")
             .addClass("d-none");
@@ -216,18 +216,18 @@ $(function () {
 
                 switch (Number(item.charged_type)) {
                     case 1:
-                        statusText = "Completed";
-                        badgeClass = "bg-primary";
+                        charged_type = "Free";
+                        badgeClassChargedType = "bg-primary";
                         break;
 
                     case 2:
-                        statusText = "Cancelled";
-                        badgeClass = "bg-danger";
+                        charged_type = "Charged";
+                        badgeClassChargedType = "bg-danger";
                         break;
 
                     default:
-                        statusText = "Unknown";
-                        badgeClass = "bg-secondary";
+                        charged_type = "Unknown";
+                        badgeClassChargedType = "bg-secondary";
                 }
 
                 let cancelButton = "";
@@ -286,8 +286,10 @@ $(function () {
                         </div>
 
                         <div class="booking-detail-row">
-                            <i class="bx bx-time-five"></i>
-                            <span>${item.charged_type}</span>
+                              <span class="badge ${badgeClassChargedType} rounded-pill px-3 py-2">
+                            ${charged_type}
+                        </span>
+
                         </div>
 
                     </div>
@@ -301,7 +303,7 @@ $(function () {
             });
         }
 
-        $("#ausiHistoryTable").html(html);
+        $("#gtHistoryTable").html(html);
     }
 
     function convertTime(slot) {

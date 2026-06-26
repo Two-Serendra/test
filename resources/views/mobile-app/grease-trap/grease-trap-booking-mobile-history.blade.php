@@ -27,11 +27,7 @@
             </div>
         </div>
 
-
-
         <div class="card shadow-sm mb-4">
-            <H3>Booking History</H3>
-            <div class="card-body">
                 <div class="row mb-3">
                     <div class="mb-3 mb-md-0">
                         <label class="form-label">Select Residence <span class="required">*</span></label>
@@ -57,7 +53,7 @@
                         </dl>
                     </div>
 
-                    <div id="historyWrapper" class="position-relative">
+                    <div id="historyWrapperGt" class="position-relative">
                         <!-- Loading Overlay -->
                         <div id="historyLoading" class="history-loading d-none">
                             <div class="text-center">
@@ -68,7 +64,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="ausiHistoryTable" class="booking-history-list"></div>
+                    <div id="gtHistoryTable" class="booking-history-list"></div>
                 </div>
             </div>
         </div>

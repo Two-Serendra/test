@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidenceGt();
-    alert("🔥GT History JS VERSION 25");
+    alert("🔥GT History JS VERSION 26");
     function autoSelectHistoryResidenceGt() {
 
         const select = $('#resident_id_gt_booking_history');
@@ -16,7 +16,7 @@ $(function () {
         if (options.length <= 1) {
             setTimeout(autoSelectHistoryResidenceGt, 300);
             return;
-        } 
+        }
 
         const firstUnit = options.eq(1).val();
 
@@ -225,23 +225,37 @@ $(function () {
 
                 if (Number(item.booking_status) === 1) {
 
-                    const bookingDateTime = new Date(
-                        `${item.booking_date} ${convertTime(item.booking_time_slot)}`
-                    );
+                    const startTime = convertTime(item.booking_time_slot); // e.g. "2:00PM"
 
-                    const time = convertTime(item.booking_time_slot);
+                    const [year, month, day] = item.booking_date.split('-').map(Number);
+
+                    const match = startTime.match(/(\d+):(\d+)(AM|PM)/i);
+
+                    let hour = parseInt(match[1], 10);
+                    const minute = parseInt(match[2], 10);
+                    const period = match[3].toUpperCase();
+
+                    if (period === "PM" && hour !== 12) hour += 12;
+                    if (period === "AM" && hour === 12) hour = 0;
+
+                    const bookingDateTime = new Date(year, month - 1, day, hour, minute);
+
                     const canCancel = now < bookingDateTime;
 
+                    console.log("Now:", now);
+                    console.log("Booking:", bookingDateTime);
+                    console.log("Can Cancel:", canCancel);
+
                     cancelButton = `
-                        <button
-                            class="btn btn-sm rounded-pill px-3 cancel-booking-btn
-                                ${canCancel ? 'btn-outline-danger' : 'btn-outline-secondary'}"
-                            ${canCancel ? '' : 'disabled'}
-                            data-id="${item.id}">
-                            <i class="bx bx-x-circle me-1"></i>
-                            Cancel
-                        </button>
-                    `;
+        <button
+            class="btn btn-sm rounded-pill px-3 cancel-booking-btn
+                ${canCancel ? 'btn-outline-danger' : 'btn-outline-secondary'}"
+            ${canCancel ? '' : 'disabled'}
+            data-id="${item.id}">
+            <i class="bx bx-x-circle me-1"></i>
+            Cancel
+        </button>
+    `;
                 }
 
                 html += `

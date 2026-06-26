@@ -108,7 +108,7 @@ class GreaseTrapBookingMobileController extends Controller
     public function storeGreaseTrapBookingMobile(Request $request)
     {
         $maxRetries = 3;
-        $attempt = 0;
+        $attempt = 0; 
 
         while ($attempt < $maxRetries) {
 
@@ -269,6 +269,7 @@ class GreaseTrapBookingMobileController extends Controller
                     'user_id' => $resident->user_id,
                     'unit_no' => strtoupper($resident->unit_no),
                     'resident_type' => $resident->resident_type,
+                    'email' => $email,
                     'name' => strtoupper($resident->name ?? 'RESIDENT'),
                     'booking_date' => $bookingDate,
                     'booking_time_slot' => $request->booking_time_slot,

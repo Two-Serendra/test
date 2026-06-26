@@ -39,7 +39,7 @@
                         <dl>
                             <dd>
 
-                                <select id="resident_id_ausi_booking_history" name="resident_id_ausi_booking_history"
+                                <select id="resident_id_gt_booking_history" name="resident_id_gt_booking_history"
                                     class="form-select" x-model="$store.superapp.selectedUnit" required>
                                     <option value="" disabled>-- Select Residence --</option>
 

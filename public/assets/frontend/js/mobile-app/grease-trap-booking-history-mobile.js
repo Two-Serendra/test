@@ -1,42 +1,31 @@
 $(function () {
 
     autoSelectHistoryResidenceGt();
-    alert("🔥GT History JS VERSION 20");
+    alert("🔥GT History JS VERSION 21");
     function autoSelectHistoryResidenceGt() {
 
         const select = $('#resident_id_gt_booking_history');
 
         if (!select.length) {
-            console.log("HISTORY SELECT NOT FOUND");
+           logDebugHistoryGt("HISTORY SELECT NOT FOUND");
             return;
         }
 
-
         const options = select.find('option');
 
-        console.log(
-            "HISTORY OPTIONS:",
-            options.length
-        );
-
-
-        // Alpine has not rendered yet
         if (options.length <= 1) {
             setTimeout(autoSelectHistoryResidenceGt, 300);
             return;
         }
 
-
         const firstUnit = options.eq(1).val();
 
-
         if (!firstUnit) {
-            console.log("NO FIRST UNIT");
+           logDebugHistoryGt("NO FIRST UNIT");
             return;
         }
 
-
-        console.log(
+       logDebugHistoryGt(
             "AUTO SELECT UNIT:",
             firstUnit
         );
@@ -110,7 +99,6 @@ $(function () {
                 email: email
 
             },
-
 
             success: function (res) {
 

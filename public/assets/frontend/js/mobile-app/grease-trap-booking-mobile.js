@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-016");
+    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-018");
     const el = document.getElementById('resident_id_gt');
 
     logDebugGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -354,6 +354,10 @@ $(function () {
 
             const formData = new FormData(form);
 
+            for (const pair of formData.entries()) {
+                logDebugGt(pair[0] + ":", pair[1]);
+            }
+
             if (forcePayment) {
                 formData.append('force_payment', true);
             }
@@ -384,7 +388,7 @@ $(function () {
                         showConfirmButton: false,
                         timer: 2500
                     });
-                    
+
                     window.resetGtBookingUI();
 
                     resetGtSlots();

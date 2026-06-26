@@ -1,13 +1,13 @@
 $(function () {
 
     autoSelectHistoryResidenceGt();
-    alert("🔥GT History JS VERSION 21");
+    alert("🔥GT History JS VERSION 22");
     function autoSelectHistoryResidenceGt() {
 
         const select = $('#resident_id_gt_booking_history');
 
         if (!select.length) {
-           logDebugHistoryGt("HISTORY SELECT NOT FOUND");
+            logDebugHistoryGt("HISTORY SELECT NOT FOUND");
             return;
         }
 
@@ -21,11 +21,11 @@ $(function () {
         const firstUnit = options.eq(1).val();
 
         if (!firstUnit) {
-           logDebugHistoryGt("NO FIRST UNIT");
+            logDebugHistoryGt("NO FIRST UNIT");
             return;
         }
 
-       logDebugHistoryGt(
+        logDebugHistoryGt(
             "AUTO SELECT UNIT:",
             firstUnit
         );
@@ -180,26 +180,29 @@ $(function () {
                 let statusText = "";
                 let badgeClass = "";
 
-                switch (Number(item.booking_status)) {
+                if (Number(item.booking_status) === 1) {
 
-                    case 0:
-                        statusText = "Cancelled";
-                        badgeClass = "bg-danger";
-                        break;
+                    const bookingDate = new Date(item.booking_date);
 
-                    case 1:
-                        statusText = "Scheduled";
-                        badgeClass = "bg-warning text-dark";
-                        break;
+                    // Ignore the time portion like Carbon::isPast() on booking_date
+                    bookingDate.setHours(0, 0, 0, 0);
 
-                    case 2:
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    if (bookingDate < today) {
                         statusText = "Completed";
                         badgeClass = "bg-primary";
-                        break;
+                    } else {
+                        statusText = "Booked";
+                        badgeClass = "bg-primary";
+                    }
 
-                    default:
-                        statusText = "Unknown";
-                        badgeClass = "bg-secondary";
+                } else {
+
+                    statusText = "Cancelled";
+                    badgeClass = "bg-danger";
+
                 }
 
                 switch (Number(item.charged_type)) {
@@ -209,12 +212,12 @@ $(function () {
                         break;
 
                     case 2:
-                        charged_type = "Charged";
+                        charged_type = "Billable";
                         badgeClassChargedType = "bg-danger";
                         break;
 
                     default:
-                        charged_type = "Unknown";
+                        charged_type = "Unkown";
                         badgeClassChargedType = "bg-secondary";
                 }
 

@@ -410,10 +410,7 @@ class GreaseTrapBookingMobileController extends Controller
                     ->lockForUpdate()
                     ->firstOrFail();
 
-                $booking->load('user');
-
-                // Verify ownership using email instead of auth()
-                if (!$booking->user || $booking->user->email !== $userEmail) {
+                if ($booking->email !== $userEmail) {
 
                     return response()->json([
                         'success' => false,
@@ -520,12 +517,13 @@ class GreaseTrapBookingMobileController extends Controller
 
                 DB::afterCommit(function () use ($booking) {
 
-                    if ($booking->user?->email) {
+                    if ($booking->email) {
 
-                        Mail::to($booking->user->email)
+                        Mail::to($booking->email)
                             ->queue(new UserGreaseTrapBookingCancellation($booking));
 
                     }
+
 
                     // Mail::to('concierge@twoserendra.com')
                     //     ->queue(new ConciergeGreaseTrapBookingCancellation($booking));

@@ -15,12 +15,16 @@
     </div>
 
     <div class="" x-data="gtBookingPageHistory">
-        <div class="loading" x-show="$store.superapp.isLoading">
-            <p>Waiting for shell context…</p>
-        </div>
-        <div class="warning-banner" x-show="!inShell && !$store.superapp.isLoading">
-            Running outside the shell — bridge data is unavailable.
-            In production this page runs inside the shell iframe.
+        <div class="bg-light rounded-3 py-3 px-3 border">
+            <div class="d-flex align-items-center">
+                <i class="bx bx-water text-primary fs-1 me-3"></i>
+
+                <div>
+                    <h5 class="fw-bold mb-0">
+                        Grease Trap Cleaning History
+                    </h5>
+                </div>
+            </div>
         </div>
 
 

@@ -397,10 +397,12 @@ class GreaseTrapBookingMobileController extends Controller
     public function CancelGreaseTrapBookingMobile(TestGreaseTrapBooking $booking, Request $request)
     {
         try {
-            return DB::transaction(function () use ($booking, $request) {
-                $user = auth()->user();
 
-                $units = ResidentDetails::where('email', $user->email)
+            return DB::transaction(function () use ($booking, $request) {
+
+                $userEmail = $request->email;
+
+                $units = ResidentDetails::where('email', $userEmail)
                     ->pluck('unit_no');
 
                 $booking = TestGreaseTrapBooking::where('id', $booking->id)
@@ -410,27 +412,32 @@ class GreaseTrapBookingMobileController extends Controller
 
                 $booking->load('user');
 
+                // Verify ownership using email instead of auth()
+                if (!$booking->user || $booking->user->email !== $userEmail) {
 
-                if ($booking->user_id !== $user->id) {
                     return response()->json([
                         'success' => false,
                         'message' => 'This booking was created by another resident in your unit. Only the creator can cancel it.'
                     ], 403);
+
                 }
 
-
                 if ($booking->booking_status !== TestGreaseTrapBooking::STATUS_CONFIRMED) {
+
                     return response()->json([
                         'success' => false,
                         'message' => 'Only active bookings can be cancelled.'
                     ], 400);
+
                 }
 
                 if ($booking->getBookingDateTime()->lt(now())) {
+
                     return response()->json([
                         'success' => false,
                         'message' => 'Cannot cancel a completed booking.'
                     ], 400);
+
                 }
 
                 $within24Hours = $booking->isWithin24Hours();
@@ -439,21 +446,27 @@ class GreaseTrapBookingMobileController extends Controller
 
                 $freeLimit = 2;
 
+                // First request - confirmation only
                 if (!$request->has('confirm')) {
-
-                    $message = '';
 
                     if ($within24Hours) {
 
                         if ($usedFree >= $freeLimit) {
+
                             $message = 'Cancelling within 24 hours will incur a penalty of ₱448 because the unit has already used its 2 free bookings.';
+
                         } else {
+
                             $remaining = $freeLimit - $usedFree;
+
                             $message = "Cancelling within 24 hours will forfeit one of the remaining {$remaining} free grease trap bookings for this year.";
+
                         }
 
                     } else {
+
                         $message = '<br>No penalty will be applied.';
+
                     }
 
                     return response()->json([
@@ -461,15 +474,20 @@ class GreaseTrapBookingMobileController extends Controller
                         'requires_confirmation' => true,
                         'message' => $message
                     ]);
+
                 }
 
+                // Actual cancellation
                 $booking->booking_status = TestGreaseTrapBooking::STATUS_CANCELLED;
                 $booking->cancelled_at = now();
-                $booking->cancelled_by = auth()->id();
+
+                // Since mobile doesn't use auth(), remove this or set it to null
+                $booking->cancelled_by = null;
 
                 if ($within24Hours) {
 
                     if ($usedFree >= $freeLimit) {
+
                         $booking->applyCancellationPenalty();
 
                         $message = 'Cancelling within 24 hours incurred a penalty of ₱448 because the unit has already used its 2 free bookings.';
@@ -481,9 +499,13 @@ class GreaseTrapBookingMobileController extends Controller
                         $remaining = $freeLimit - $usedFree - 1;
 
                         if ($remaining <= 0) {
+
                             $message = 'Cancelling within 24 hours used up your last free grease trap booking for this year.';
+
                         } else {
+
                             $message = "Cancelling within 24 hours forfeited one free booking. Remaining free bookings after this: {$remaining}.";
+
                         }
 
                     }
@@ -494,25 +516,28 @@ class GreaseTrapBookingMobileController extends Controller
 
                 }
 
-
                 $booking->save();
 
                 DB::afterCommit(function () use ($booking) {
+
                     if ($booking->user?->email) {
+
                         Mail::to($booking->user->email)
                             ->queue(new UserGreaseTrapBookingCancellation($booking));
+
                     }
 
                     // Mail::to('concierge@twoserendra.com')
                     //     ->queue(new ConciergeGreaseTrapBookingCancellation($booking));
+
                 });
 
                 return response()->json([
                     'success' => true,
                     'message' => $message
                 ]);
-            });
 
+            });
 
         } catch (\Exception $e) {
 
@@ -521,6 +546,7 @@ class GreaseTrapBookingMobileController extends Controller
                 'message' => 'Failed to cancel booking.',
                 'error' => $e->getMessage(),
             ], 500);
+
         }
     }
 

@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidenceGt();
-    alert("🔥GT History JS VERSION 28");
+    alert("🔥GT History JS VERSION 29");
     function autoSelectHistoryResidenceGt() {
 
         const select = $('#resident_id_gt_booking_history');
@@ -325,10 +325,12 @@ $(function () {
     $(document).on('click', '.cancel-mobile-gt-booking-btn', function () {
         const bookingId = $(this).data('id');
         logDebugHistoryGt("Sending confirmed cancel request...");
+        const email = $('#history_mobile_email').val();
         $.ajax({
             url: '/grease-trap-booking-mobile/cancel/' + bookingId,
             type: 'POST',
             data: {
+                email: email,
                 _token: $('meta[name="csrf-token"]').attr('content')
             },
             success: function (res) {
@@ -353,9 +355,10 @@ $(function () {
                     }).then((result) => {
                         if (result.isConfirmed) {
                             $.ajax({
-                                url: '/grease-trap-booking-mobile/cancel' + bookingId,
+                                url: '/grease-trap-booking-mobile/cancel/' + bookingId,
                                 type: 'POST',
                                 data: {
+                                    email: email,
                                     _token: $('meta[name="csrf-token"]').attr('content'),
                                     confirm: 1
                                 },
@@ -366,6 +369,10 @@ $(function () {
                                             loadBookings(page);
                                             logDebugHistoryGt("Second response received");
                                             logDebugHistoryGt(JSON.stringify(res2));
+                                            updateGtHistoryBookingTable(
+                                                unit,
+                                                email
+                                            );
                                         });
                                 },
                                 error: function (xhr) {
@@ -388,7 +395,10 @@ $(function () {
                     Swal.fire('Cancelled!', res.message, 'success')
                         .then(() => {
                             let page = $('.pagination .active span').text() || 1;
-                            loadBookings(page);
+                            updateGtHistoryBookingTable(
+                                unit,
+                                email
+                            );
                         });
                 }
             },

@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-019");
+    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-020");
     const el = document.getElementById('resident_id_gt');
 
     logDebugGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -263,7 +263,7 @@ $(function () {
             .val('')
             .prop('selectedIndex', 0)
             .trigger('change');
-        $('#mobile_email').val('');
+        $('#mobile_email_gt').val('');
         $('#mobile_unit_name').val('');
         $('#mobile_unit_role').val('');
         const fp = document.querySelector('#GtBookingDate')?._flatpickr;
@@ -328,7 +328,7 @@ $(function () {
         const role =
             $('#resident_id_gt option:selected').data('role') || '';
 
-        $('#mobile_email').val(email);
+        $('#mobile_email_gt').val(email);
         $('#mobile_unit_name').val(unit);
         $('#mobile_unit_role').val(role);
 

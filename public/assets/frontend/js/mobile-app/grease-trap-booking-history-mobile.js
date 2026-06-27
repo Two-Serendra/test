@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidenceGt();
-    // alert("🔥GT History JS VERSION 31");
+    alert("🔥GT History JS VERSION 32");
     function autoSelectHistoryResidenceGt() {
 
         const select = $('#resident_id_gt_booking_history');
@@ -343,9 +343,7 @@ $(function () {
                 if (res.requires_confirmation) {
                     Swal.fire({
                         title: 'Cancel Booking',
-                        html:
-                            'Are you sure you want to cancel this booking?' +
-                            res.message,
+                        html: res.message,
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#d33',

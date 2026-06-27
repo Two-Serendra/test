@@ -119,21 +119,7 @@
     z-index: 99999;
     padding: 10px;
 }
-
-#debugPanelBookingHistoryGt {
-    position: fixed;
-    bottom: 145px;
-    /* Place above the first panel */
-    left: 0;
-    right: 0;
-    height: 140px;
-    overflow: auto;
-    background: #1b1b1b;
-    color: #00ff00;
-    font-size: 11px;
-    z-index: 99999;
-    padding: 10px;
-}
+ 
 
 @media(max-width:768px) {
 

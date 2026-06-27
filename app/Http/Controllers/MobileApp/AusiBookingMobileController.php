@@ -407,7 +407,7 @@ class AusiBookingMobileController extends Controller
                     ->firstOrFail();
 
 
-                if ($booking->booking_status == 2) {
+                if ($booking->booking_status == 0) {
 
                     return response()->json([
                         'message' => 'Booking is already cancelled.'
@@ -444,7 +444,7 @@ class AusiBookingMobileController extends Controller
                 }
 
                 $booking->load('user');
-                $booking->booking_status = 2;
+                $booking->booking_status = 0;
                 $booking->cancelled_at = now();
                 $booking->save();
 

@@ -173,7 +173,7 @@
                     this.log("🚀 INIT STARTED");
                     this.setHeader();
                     const store = Alpine.store('superapp');
-                    $('#mobile_email').val(store?.user?.email || '');
+                    $('#mobile_email_gt').val(store?.user?.email || '');
                     $('#mobile_user_id').val(store?.user?.id || '');
                 },
                 setHeader() {
@@ -185,8 +185,6 @@
                         showHome: false,
                     });
                 },
-
-
             }));
         });
     </script>

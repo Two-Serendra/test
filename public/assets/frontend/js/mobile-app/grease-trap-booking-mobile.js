@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-021");
+    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-023");
     const el = document.getElementById('resident_id_gt');
 
     logDebugGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -325,17 +325,17 @@ $(function () {
 
         const email = store?.user?.email || '';
         const unit = $('#resident_id_gt').val();
-        const role =
-            $('#resident_id_gt option:selected').data('role') || '';
+        const role = $('#resident_id_gt option:selected').data('role') || '';
 
         $('#mobile_email_gt').val(email);
-        alert($('#mobile_email_gt').val());
         $('#mobile_unit_name').val(unit);
         $('#mobile_unit_role').val(role);
 
-        logDebugGt("Store email:", email);
-        logDebugGt("Alpine input:", $('#alpine_email').val());
-        logDebugGt("Hidden input:", $('#mobile_email_gt').val());
+        logDebugGt("SYNC CHECK:", {
+            email,
+            unit,
+            role
+        });
 
         const originalWidth = $submitBtn.outerWidth();
 
@@ -358,10 +358,10 @@ $(function () {
             const email = store?.user?.email || '';
             const formData = new FormData(form);
 
-           logDebugGt("Store:", email);
+            logDebugGt("Store:", email);
 
             for (const [key, value] of formData.entries()) {
-               logDebugGt(key, value);
+                logDebugGt(key + " => " + value);
             }
             if (forcePayment) {
                 formData.append('force_payment', true);
@@ -370,15 +370,11 @@ $(function () {
             lockSubmitBtn();
 
             $.ajax({
-
                 url: $(form).attr('action'),
                 type: $(form).attr('method'),
-                data: formData,
                 headers: {
-                    'X-CSRF-TOKEN':
-                        $('meta[name="csrf-token"]').attr('content')
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-
                 data: formData,
                 processData: false,
                 contentType: false,

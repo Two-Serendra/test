@@ -43,7 +43,7 @@
                                 View upcoming and past bookings
                             </small>
                         </div>
-
+ 
                         <i class="bx bx-chevron-right ms-auto"></i>
 
                     </a>

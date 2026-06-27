@@ -188,9 +188,6 @@ class AusiBookingMobileController extends Controller
             ], 422);
         }
 
-        // ===============================
-        // FIX: derive group from INPUT
-        // ===============================
         $areaLetter = strtoupper($towerLetter);
 
         $lowrise = ['A', 'B', 'C', 'D', 'E'];
@@ -227,10 +224,6 @@ class AusiBookingMobileController extends Controller
                 $debug[] = "Unit No: " . $resident->unit_no;
 
                 $bookingDate = Carbon::parse($request->booking_date)->toDateString();
-
-                // ===============================
-                // SLOT CHECK (now consistent)
-                // ===============================
                 $slotTaken = AusiBooking::whereDate('booking_date', $bookingDate)
                     ->where('booking_time_slot', $request->booking_time_slot)
                     ->where('booking_status', 1)

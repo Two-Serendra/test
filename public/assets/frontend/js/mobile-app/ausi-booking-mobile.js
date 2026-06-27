@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-035");
+    // alert("🔥 JS VERSION 2026-06-15-035");
     const el = document.getElementById('resident_id_ausi');
 
     logDebug("SELECT EXISTS: " + (el ? "YES" : "NO"));

@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidence();
-    alert("🔥Ausi History JS VERSION 42");
+    // alert("🔥Ausi History JS VERSION 42");
     function autoSelectHistoryResidence() {
 
         const select = $('#resident_id_ausi_booking_history');

@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-020");
+    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-021");
     const el = document.getElementById('resident_id_gt');
 
     logDebugGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -329,8 +329,13 @@ $(function () {
             $('#resident_id_gt option:selected').data('role') || '';
 
         $('#mobile_email_gt').val(email);
+        alert($('#mobile_email_gt').val());
         $('#mobile_unit_name').val(unit);
         $('#mobile_unit_role').val(role);
+
+        logDebugGt("Store email:", email);
+        logDebugGt("Alpine input:", $('#alpine_email').val());
+        logDebugGt("Hidden input:", $('#mobile_email_gt').val());
 
         const originalWidth = $submitBtn.outerWidth();
 
@@ -353,8 +358,10 @@ $(function () {
             const email = store?.user?.email || '';
             const formData = new FormData(form);
 
-            for (const pair of formData.entries()) {
-                logDebugGt(pair[0] + " = " + pair[1]);
+           logDebugGt("Store:", email);
+
+            for (const [key, value] of formData.entries()) {
+               logDebugGt(key, value);
             }
             if (forcePayment) {
                 formData.append('force_payment', true);

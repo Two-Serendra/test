@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-025");
+    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-018");
     const el = document.getElementById('resident_id_gt');
 
     logDebugGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -263,7 +263,7 @@ $(function () {
             .val('')
             .prop('selectedIndex', 0)
             .trigger('change');
-        $('#mobile_email_gt').val('');
+        $('#mobile_email').val('');
         $('#mobile_unit_name').val('');
         $('#mobile_unit_role').val('');
         const fp = document.querySelector('#GtBookingDate')?._flatpickr;
@@ -325,17 +325,12 @@ $(function () {
 
         const email = store?.user?.email || '';
         const unit = $('#resident_id_gt').val();
-        const role = $('#resident_id_gt option:selected').data('role') || '';
+        const role =
+            $('#resident_id_gt option:selected').data('role') || '';
 
-        $('#mobile_email_gt').val(email);
+        $('#mobile_email').val(email);
         $('#mobile_unit_name').val(unit);
         $('#mobile_unit_role').val(role);
-
-        logDebugGt("SYNC CHECK:", {
-            email,
-            unit,
-            role
-        });
 
         const originalWidth = $submitBtn.outerWidth();
 
@@ -354,16 +349,12 @@ $(function () {
         };
 
         const sendBooking = (forcePayment = false) => {
-            const email = Alpine.store('superapp')?.user?.email || '';
-
-            $('#mobile_email_gt').val(email);
-
+            const store = Alpine.store('superapp');
+            const email = store?.user?.email || '';
             const formData = new FormData(form);
 
-            logDebugGt("Store:", email);
-
-            for (const [key, value] of formData.entries()) {
-                logDebugGt(key + " => " + value);
+            for (const pair of formData.entries()) {
+                logDebugGt(pair[0] + " = " + pair[1]);
             }
             if (forcePayment) {
                 formData.append('force_payment', true);
@@ -372,11 +363,15 @@ $(function () {
             lockSubmitBtn();
 
             $.ajax({
+
                 url: $(form).attr('action'),
                 type: $(form).attr('method'),
+                data: formData,
                 headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    'X-CSRF-TOKEN':
+                        $('meta[name="csrf-token"]').attr('content')
                 },
+
                 data: formData,
                 processData: false,
                 contentType: false,

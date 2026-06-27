@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-023");
+    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-025");
     const el = document.getElementById('resident_id_gt');
 
     logDebugGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -354,8 +354,10 @@ $(function () {
         };
 
         const sendBooking = (forcePayment = false) => {
-            const store = Alpine.store('superapp');
-            const email = store?.user?.email || '';
+            const email = Alpine.store('superapp')?.user?.email || '';
+
+            $('#mobile_email_gt').val(email);
+
             const formData = new FormData(form);
 
             logDebugGt("Store:", email);

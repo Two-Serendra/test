@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-018");
+    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-019");
     const el = document.getElementById('resident_id_gt');
 
     logDebugGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -298,10 +298,8 @@ $(function () {
     $(document).on('submit', '#userGtNewBookingMobile', function (event) {
 
         event.preventDefault();
-
         const form = this;
         const $submitBtn = $('#saveUserGtBtn');
-
         const selectedSlot =
             $('input[name="booking_time_slot"]:checked').val();
 
@@ -351,13 +349,13 @@ $(function () {
         };
 
         const sendBooking = (forcePayment = false) => {
-
+            const store = Alpine.store('superapp');
+            const email = store?.user?.email || '';
             const formData = new FormData(form);
 
             for (const pair of formData.entries()) {
-                logDebugGt(pair[0] + ":", pair[1]);
+                logDebugGt(pair[0] + " = " + pair[1]);
             }
-
             if (forcePayment) {
                 formData.append('force_payment', true);
             }
@@ -368,7 +366,7 @@ $(function () {
 
                 url: $(form).attr('action'),
                 type: $(form).attr('method'),
-
+                data: formData,
                 headers: {
                     'X-CSRF-TOKEN':
                         $('meta[name="csrf-token"]').attr('content')

@@ -108,7 +108,7 @@ class GreaseTrapBookingMobileController extends Controller
     public function storeGreaseTrapBookingMobile(Request $request)
     {
         $maxRetries = 3;
-        $attempt = 0; 
+        $attempt = 0;
 
         while ($attempt < $maxRetries) {
 
@@ -308,6 +308,8 @@ class GreaseTrapBookingMobileController extends Controller
                 DB::rollBack();
 
                 Log::error('Mobile Grease Trap Booking Error', [
+                    'request_email' => $request->email,
+                    'all_request' => $request->all(),
                     'error' => $e->getMessage()
                 ]);
 

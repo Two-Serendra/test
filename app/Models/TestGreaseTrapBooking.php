@@ -17,6 +17,7 @@ class TestGreaseTrapBooking extends Model
         'user_id',
         'unit_no',
         'resident_type',
+        'email',
         'name',
         'booking_date',
         'booking_time_slot',

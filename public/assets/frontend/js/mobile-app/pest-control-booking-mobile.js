@@ -1,9 +1,9 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-002");
+    alert("🔥 Pest Control JS VERSION 2026-06-15-002");
     const el = document.getElementById('resident_id_pc');
 
-    logDebug("SELECT EXISTS: " + (el ? "YES" : "NO"));
-    function logDebug(...args) {
+    logDebugPc("SELECT EXISTS: " + (el ? "YES" : "NO"));
+    function logDebugPc(...args) {
 
         const msg = args.map(a =>
             typeof a === 'object'
@@ -21,7 +21,7 @@ $(function () {
         }
     }
 
-    logDebug("🚀 Mobile Booking JS Loaded");
+    logDebugPc("🚀 Mobile Booking JS Loaded");
 
     window.pcState = {
         date: null,
@@ -37,7 +37,7 @@ $(function () {
         onChange: function (selectedDates, dateStr) {
             window.pcState.date = dateStr;
             console.log("DATE:", dateStr);
-            logDebug("DATE CHANGED: " + dateStr);
+            logDebugPc("DATE CHANGED: " + dateStr);
             triggerUpdate();
         }
 
@@ -59,8 +59,8 @@ $(function () {
         }
 
         console.log("UNIT:", value);
-        logDebug("UNIT CHANGED: " + value);
-        logDebug("CHANGE FIRED");
+        logDebugPc("UNIT CHANGED: " + value);
+        logDebugPc("CHANGE FIRED");
 
         triggerUpdate();
     };
@@ -69,8 +69,8 @@ $(function () {
     function triggerUpdate() {
         const date = window.pcState.date;
         const unit = window.pcState.unit;
-        logDebug("DATE=" + date);
-        logDebug("UNIT=" + unit);
+        logDebugPc("DATE=" + date);
+        logDebugPc("UNIT=" + unit);
 
 
         if (!date || !unit) {
@@ -84,23 +84,23 @@ $(function () {
 
     function updateSlots(date, unitName) {
 
-        logDebug("ENTERED updateSlots");
+        logDebugPc("ENTERED updateSlots");
 
-        logDebug("STEP 1 OK");
+        logDebugPc("STEP 1 OK");
 
         try {
 
-            if (typeof logDebug === "function") {
-                logDebug("DEBUG OK", { date, unitName });
+            if (typeof logDebugPc === "function") {
+                logDebugPc("DEBUG OK", { date, unitName });
             } else {
-                logDebug("logDebug missing");
+                logDebugPc("logDebugPc missing");
             }
 
-            logDebug("STEP 2 OK");
+            logDebugPc("STEP 2 OK");
             showLoading();
             resetSlots();
 
-            logDebug("STEP 3 OK - BEFORE AJAX");
+            logDebugPc("STEP 3 OK - BEFORE AJAX");
 
             $.ajax({
 
@@ -125,7 +125,7 @@ $(function () {
                 error: function (xhr) {
 
                     console.log(xhr.responseText);
-                    logDebug("ERROR " + xhr.status);
+                    logDebugPc("ERROR " + xhr.status);
 
                     hideLoading();
                 }
@@ -134,9 +134,9 @@ $(function () {
 
         } catch (e) {
 
-            logDebug("JS ERROR:\n" + e.message);
+            logDebugPc("JS ERROR:\n" + e.message);
 
-            logDebug("FULL ERROR:", e);
+            logDebugPc("FULL ERROR:", e);
         }
     }
 
@@ -226,14 +226,14 @@ $(function () {
     }
 
 
-    logDebug(
+    logDebugPc(
         "SLOTS COUNT",
         document.querySelectorAll(".pc-booking-slot").length
     );
 
     $(document).ready(function () {
-        logDebug("READY");
-        logDebug(
+        logDebugPc("READY");
+        logDebugPc(
             "SLOTS",
             document.querySelectorAll(".pc-booking-slot").length
         );
@@ -241,7 +241,7 @@ $(function () {
     });
 
     window.resetAusiBookingUI = function () {
-        logDebug("RESET CALLED");
+        logDebugPc("RESET CALLED");
         const form = document.getElementById('userPcNewBookingMobile');
 
         if (form) {
@@ -286,7 +286,7 @@ $(function () {
             .prop('disabled', true)
             .html('<span class="btn-text">Submit</span>');
         $bookingSlots.prop('disabled', true);
-        logDebug("RESET FINISHED");
+        logDebugPc("RESET FINISHED");
     };
 
     let isSubmitting = false;
@@ -294,7 +294,7 @@ $(function () {
     $(document).on('submit', '#userPcNewBookingMobile', function (event) {
         event.preventDefault();
         const form = this;
-        logDebug("SUBMIT FIRED");
+        logDebugPc("SUBMIT FIRED");
 
         const selectedDate = $('#PestControlBookingDate').val();
         const selectedUnit = $('#resident_id_pc').val();
@@ -357,7 +357,7 @@ $(function () {
 
             lockSubmitBtn();
             // for (const pair of formData.entries()) {
-            //    logDebug(pair[0] + " = " + pair[1]);
+            //    logDebugPc(pair[0] + " = " + pair[1]);
             // }
 
             $.ajax({
@@ -371,11 +371,11 @@ $(function () {
                 contentType: false,
                 success: function (res) {
 
-                    logDebug("SUCCESS");
-                    logDebug(JSON.stringify(res, null, 2));
+                    logDebugPc("SUCCESS");
+                    logDebugPc(JSON.stringify(res, null, 2));
 
                     if (res.debug) {
-                        res.debug.forEach(d => logDebug("🧠 " + d));
+                        res.debug.forEach(d => logDebugPc("🧠 " + d));
                     }
                     Swal.fire({
                         icon: 'success',
@@ -390,8 +390,8 @@ $(function () {
 
                 error: function (xhr) {
                     const res = xhr.responseJSON || {};
-                    logDebug("ERROR", xhr.status);
-                    logDebug("RESPONSE", res);
+                    logDebugPc("ERROR", xhr.status);
+                    logDebugPc("RESPONSE", res);
 
                     if (xhr.status === 422) {
 
@@ -412,7 +412,7 @@ $(function () {
                             html: messages.join('<br>')
                         });
 
-                        logDebug("VALIDATION ERRORS", messages);
+                        logDebugPc("VALIDATION ERRORS", messages);
 
                         return;
                     }

@@ -34,7 +34,8 @@
                     <!-- <input type="text" name="email" id="mobile_email"> -->
                     <input type="hidden" name="mobile_unit_name" id="mobile_unit_name">
                     <input type="hidden" name="mobile_unit_role" id="mobile_unit_role">
-                    <input type="hidden" id="history_mobile_email_gt" name="email" :value="$store.superapp.user?.email || ''">
+                    <input type="hidden" id="history_mobile_email_gt" name="email"
+                        :value="$store.superapp.user?.email || ''">
                     <dl>
                         <dd>
 
@@ -64,21 +65,22 @@
                     </div>
                 </div>
                 <div id="gtHistoryTable" class="booking-history-list"></div>
+                <div id="gtHistoryPagination" class="mt-3"></div>
             </div>
         </div>
     </div>
 
     <div id="debugPanelBookingHistoryGt" style="position: fixed;
-                                bottom: 0;
-                                left: 0;
-                                right: 0;
-                                height: 140px;
-                                overflow: auto;
-                                background: black;
-                                color: #00ff00;
-                                font-size: 11px;
-                                z-index: 99999;
-                                padding: 10px;"></div>
+                                    bottom: 0;
+                                    left: 0;
+                                    right: 0;
+                                    height: 140px;
+                                    overflow: auto;
+                                    background: black;
+                                    color: #00ff00;
+                                    font-size: 11px;
+                                    z-index: 99999;
+                                    padding: 10px;"></div>
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('gtBookingPageHistory', () => ({

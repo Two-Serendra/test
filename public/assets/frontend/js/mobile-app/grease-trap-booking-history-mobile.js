@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidenceGt();
-    alert("🔥GT History JS VERSION 36");
+    alert("🔥GT History JS VERSION 37");
     function autoSelectHistoryResidenceGt() {
 
         const select = $('#resident_id_gt_booking_history');
@@ -85,7 +85,7 @@ $(function () {
         );
     };
 
-    function updateGtHistoryBookingTable(unitName, email) {
+    function updateGtHistoryBookingTable(unitName, email, page = 1) {
         logDebugHistoryGt(unitName);
         showHistoryLoadingGt();
         $("#gtHistoryTable").html("");
@@ -97,7 +97,8 @@ $(function () {
 
             data: {
                 unit_name: unitName,
-                email: email
+                email: email,
+                page: page
 
             },
 
@@ -108,8 +109,8 @@ $(function () {
                     res
                 );
                 $("#historyWrapperGt").removeClass('d-none');
-
-                renderHistoryTableGt(res.bookings);
+                renderHistoryTableGt(res.bookings.data);
+                renderGtPagination(res.bookings);
 
                 $("#historyPageLoading").fadeOut(200, function () {
                     $(this).remove();
@@ -154,6 +155,48 @@ $(function () {
             .addClass("d-none");
 
     }
+
+    function renderGtPagination(pagination) {
+
+        let html = '';
+
+        if (pagination.last_page > 1) {
+
+            html += '<nav><ul class="pagination justify-content-center">';
+
+            for (let i = 1; i <= pagination.last_page; i++) {
+
+                html += `
+                <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
+                    <a href="#" class="page-link gt-history-page"
+                       data-page="${i}">
+                        ${i}
+                    </a>
+                </li>
+            `;
+            }
+
+            html += '</ul></nav>';
+        }
+
+        $('#gtHistoryPagination').html(html);
+    }
+
+    $(document).on('click', '.gt-history-page', function (e) {
+
+        e.preventDefault();
+
+        const page = $(this).data('page');
+
+        const unit =
+            Alpine.store('superapp')?.selectedUnit ||
+            $('#resident_id_gt_booking_history').val();
+
+        const email = $('#history_mobile_email_gt').val();
+
+        updateGtHistoryBookingTable(unit, email, page);
+
+    });
 
     function renderHistoryTableGt(bookings) {
         logDebugHistoryGt("renderHistoryTableGt");
@@ -375,10 +418,10 @@ $(function () {
                                             const email =
                                                 $('#history_mobile_email_gt').val();
 
-                                            updateGtHistoryBookingTable(
-                                                unit,
-                                                email
-                                            );
+                                            const currentPage =
+                                                $('#gtHistoryPagination .active .page-link').data('page') || 1;
+
+                                            updateGtHistoryBookingTable(unit, email, currentPage);
                                         });
                                 },
                                 error: function (xhr) {

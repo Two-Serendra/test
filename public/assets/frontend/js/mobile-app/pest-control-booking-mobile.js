@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 Pest Control JS VERSION 2026-06-15-003");
+    alert("🔥 Pest Control JS VERSION 2026-06-15-004");
     const el = document.getElementById('resident_id_pc');
 
     logDebugPc("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -242,7 +242,7 @@ $(function () {
 
     window.resetAusiBookingUI = function () {
         logDebugPc("RESET CALLED");
-        const form = document.getElementById('userPcNewBookingMobile');
+        const form = document.getElementById('userPestControlewBookingMobile');
 
         if (form) {
             form.reset();
@@ -291,7 +291,7 @@ $(function () {
 
     let isSubmitting = false;
 
-    $(document).on('submit', '#userPcNewBookingMobile', function (event) {
+    $(document).on('submit', '#userPestControlewBookingMobile', function (event) {
         event.preventDefault();
         const form = this;
         logDebugPc("SUBMIT FIRED");

@@ -13,7 +13,7 @@
                         </div> -->
         <div class="bg-light rounded-3 py-3 px-3 border">
             <div class="d-flex align-items-center">
-                <i class='bx bx-bug'></i>
+                <i class='bx bx-bug text-warning fs-1 me-3'></i> 
                 <div>
                     <h5 class="fw-bold mb-0">
                         Pest Control

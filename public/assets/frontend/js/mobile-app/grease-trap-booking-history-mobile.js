@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidenceGt();
-    alert("🔥GT History JS VERSION 37");
+    alert("🔥GT History JS VERSION 38");
     function autoSelectHistoryResidenceGt() {
 
         const select = $('#resident_id_gt_booking_history');
@@ -141,43 +141,55 @@ $(function () {
 
     function showHistoryLoadingGt() {
 
-        $("#historyWrapperGt").removeClass('d-none');
+        $("#historyLoading").removeClass("d-none");
 
-        $("#historyLoadingGt")
-            .removeClass("d-none");
-
+        $("#gtHistoryPagination .page-link")
+            .addClass("disabled")
+            .css("pointer-events", "none");
     }
-
 
     function hideHistoryLoadingGt() {
 
-        $("#historyLoadingGt")
-            .addClass("d-none");
+        $("#historyLoading").addClass("d-none");
 
+        $("#gtHistoryPagination .page-link")
+            .removeClass("disabled")
+            .css("pointer-events", "");
     }
 
     function renderGtPagination(pagination) {
 
-        let html = '';
+        let html = `
+        <nav>
+            <ul class="pagination mb-0">
+    `;
 
-        if (pagination.last_page > 1) {
+        // Previous
+        html += `
+        <li class="page-item ${pagination.current_page === 1 ? 'disabled' : ''}">
+            <a class="page-link gt-history-page"
+               href="#"
+               data-page="${pagination.current_page - 1}">
+                &lsaquo;
+            </a>
+        </li>
+    `;
 
-            html += '<nav><ul class="pagination justify-content-center">';
+        // Next
+        html += `
+        <li class="page-item ${pagination.current_page === pagination.last_page ? 'disabled' : ''}">
+            <a class="page-link gt-history-page"
+               href="#"
+               data-page="${pagination.current_page + 1}">
+                &rsaquo;
+            </a>
+        </li>
+    `;
 
-            for (let i = 1; i <= pagination.last_page; i++) {
-
-                html += `
-                <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
-                    <a href="#" class="page-link gt-history-page"
-                       data-page="${i}">
-                        ${i}
-                    </a>
-                </li>
-            `;
-            }
-
-            html += '</ul></nav>';
-        }
+        html += `
+            </ul>
+        </nav>
+    `;
 
         $('#gtHistoryPagination').html(html);
     }
@@ -185,6 +197,10 @@ $(function () {
     $(document).on('click', '.gt-history-page', function (e) {
 
         e.preventDefault();
+
+        if ($(this).parent().hasClass('disabled')) {
+            return;
+        }
 
         const page = $(this).data('page');
 

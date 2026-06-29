@@ -352,7 +352,7 @@ class GreaseTrapBookingMobileController extends Controller
         $bookings = TestGreaseTrapBooking::where('email', $email)
             ->where('unit_no', $unitNo)
             ->orderBy('booking_date', 'desc')
-            ->paginate(5);
+            ->paginate(1);
 
         return response()->json([
             'unit_no' => $unitNo,

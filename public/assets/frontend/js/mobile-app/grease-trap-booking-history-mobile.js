@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidenceGt();
-    alert("🔥GT History JS VERSION 39");
+    alert("🔥GT History JS VERSION 40");
     function autoSelectHistoryResidenceGt() {
 
         const select = $('#resident_id_gt_booking_history');
@@ -163,18 +163,18 @@ $(function () {
         <div class="d-flex justify-content-center align-items-center gap-3">
 
             <button
-                class="btn btn-outline-primary btn-sm gt-history-page"
+                class="btn btn-primary btn-sm rounded-circle gt-history-page"
                 data-page="${pagination.current_page - 1}"
                 ${pagination.current_page === 1 ? 'disabled' : ''}>
                 &lsaquo;
             </button>
 
-            <span class="fw-semibold">
+            <span class="fw-bold text-primary fs-5">
                 ${pagination.current_page}
             </span>
 
             <button
-                class="btn btn-outline-primary btn-sm gt-history-page"
+                class="btn btn-primary btn-sm rounded-circle gt-history-page"
                 data-page="${pagination.current_page + 1}"
                 ${pagination.current_page === pagination.last_page ? 'disabled' : ''}>
                 &rsaquo;
@@ -182,7 +182,7 @@ $(function () {
 
         </div>
 
-        <div class="mt-2 text-muted small">
+        <div class="mt-2 text-muted small text-center">
             Showing
             <strong>${pagination.from ?? 0}</strong>
             to

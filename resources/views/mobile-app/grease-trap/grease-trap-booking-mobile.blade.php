@@ -15,7 +15,7 @@
             <div class="d-flex align-items-center">
                 <i class="bx bx-water text-primary fs-1 me-3"></i>
 
-                <div>
+                <div> 
                     <h5 class="fw-bold mb-0">
                         Grease Trap Cleaning
                     </h5>

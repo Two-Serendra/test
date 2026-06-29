@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidenceGt();
-    alert("🔥GT History JS VERSION 38");
+    alert("🔥GT History JS VERSION 39");
     function autoSelectHistoryResidenceGt() {
 
         const select = $('#resident_id_gt_booking_history');
@@ -160,35 +160,37 @@ $(function () {
     function renderGtPagination(pagination) {
 
         let html = `
-        <nav>
-            <ul class="pagination mb-0">
-    `;
+        <div class="d-flex justify-content-center align-items-center gap-3">
 
-        // Previous
-        html += `
-        <li class="page-item ${pagination.current_page === 1 ? 'disabled' : ''}">
-            <a class="page-link gt-history-page"
-               href="#"
-               data-page="${pagination.current_page - 1}">
+            <button
+                class="btn btn-outline-primary btn-sm gt-history-page"
+                data-page="${pagination.current_page - 1}"
+                ${pagination.current_page === 1 ? 'disabled' : ''}>
                 &lsaquo;
-            </a>
-        </li>
-    `;
+            </button>
 
-        // Next
-        html += `
-        <li class="page-item ${pagination.current_page === pagination.last_page ? 'disabled' : ''}">
-            <a class="page-link gt-history-page"
-               href="#"
-               data-page="${pagination.current_page + 1}">
+            <span class="fw-semibold">
+                ${pagination.current_page}
+            </span>
+
+            <button
+                class="btn btn-outline-primary btn-sm gt-history-page"
+                data-page="${pagination.current_page + 1}"
+                ${pagination.current_page === pagination.last_page ? 'disabled' : ''}>
                 &rsaquo;
-            </a>
-        </li>
-    `;
+            </button>
 
-        html += `
-            </ul>
-        </nav>
+        </div>
+
+        <div class="mt-2 text-muted small">
+            Showing
+            <strong>${pagination.from ?? 0}</strong>
+            to
+            <strong>${pagination.to ?? 0}</strong>
+            of
+            <strong>${pagination.total}</strong>
+            results
+        </div>
     `;
 
         $('#gtHistoryPagination').html(html);

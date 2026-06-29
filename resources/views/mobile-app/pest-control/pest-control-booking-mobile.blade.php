@@ -5,19 +5,18 @@
 @section('content')
     <div class="" x-data="pestControlBookingPage()">
         <!-- <div class="loading" x-show="$store.superapp.isLoading">
-                        <p>Waiting for shell context…</p>
-                    </div>
-                    <div class="warning-banner" x-show="!inShell && !$store.superapp.isLoading">
-                        Running outside the shell — bridge data is unavailable.
-                        In production this page runs inside the shell iframe.
-                    </div> -->
+                            <p>Waiting for shell context…</p>
+                        </div>
+                        <div class="warning-banner" x-show="!inShell && !$store.superapp.isLoading">
+                            Running outside the shell — bridge data is unavailable.
+                            In production this page runs inside the shell iframe.
+                        </div> -->
         <div class="bg-light rounded-3 py-3 px-3 border">
             <div class="d-flex align-items-center">
-                <i class="bx bx-building-house text-primary fs-1 me-3"></i>
-
+                <i class='bx bx-bug'></i>
                 <div>
                     <h5 class="fw-bold mb-0">
-                       Pest Control
+                        Pest Control
                     </h5>
                 </div>
             </div>
@@ -57,9 +56,9 @@
                     <div class="row mb-3">
 
                         <!-- <div class="">
-                                                    <dt>Email</dt>
-                                                    <dd x-text="$store.superapp.user?.email ?? '—'"></dd>
-                                                </div> -->
+                                                        <dt>Email</dt>
+                                                        <dd x-text="$store.superapp.user?.email ?? '—'"></dd>
+                                                    </div> -->
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label">Select Residence <span class="required">*</span></label>
                             <!-- <input type="text" name="email" id="mobile_email_pc"> -->
@@ -145,18 +144,18 @@
         </div>
 
         <div id="debugPanelPc" style="
-                                                                                    position: fixed;
-                                                                                    bottom: 0;
-                                                                                    left: 0;
-                                                                                    right: 0;
-                                                                                    height: 140px;
-                                                                                    overflow: auto;
-                                                                                    background: black;
-                                                                                    color: #00ff00;
-                                                                                    font-size: 11px;
-                                                                                    z-index: 99999;
-                                                                                    padding: 10px;
-                                                                                ">
+                                                                                        position: fixed;
+                                                                                        bottom: 0;
+                                                                                        left: 0;
+                                                                                        right: 0;
+                                                                                        height: 140px;
+                                                                                        overflow: auto;
+                                                                                        background: black;
+                                                                                        color: #00ff00;
+                                                                                        font-size: 11px;
+                                                                                        z-index: 99999;
+                                                                                        padding: 10px;
+                                                                                    ">
         </div>
 
     </div>

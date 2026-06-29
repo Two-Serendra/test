@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-001");
+    alert("🔥 JS VERSION 2026-06-15-002");
     const el = document.getElementById('resident_id_pc');
 
     logDebug("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -30,7 +30,7 @@ $(function () {
 
     const $bookingSlots = $('.pc-booking-slot');
 
-    flatpickr("#PcBookingDate", {
+    flatpickr("#PestControlBookingDate", {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(1),
         disableMobile: true,
@@ -262,7 +262,7 @@ $(function () {
         $('#mobile_email_pc').val('');
         $('#mobile_unit_name').val('');
         $('#mobile_unit_role').val('');
-        const fp = document.querySelector('#PcBookingDate')?._flatpickr;
+        const fp = document.querySelector('#PestControlBookingDate')?._flatpickr;
 
         if (fp) {
             fp.clear();
@@ -296,7 +296,7 @@ $(function () {
         const form = this;
         logDebug("SUBMIT FIRED");
 
-        const selectedDate = $('#PcBookingDate').val();
+        const selectedDate = $('#PestControlBookingDate').val();
         const selectedUnit = $('#resident_id_pc').val();
         const selectedSlot = $('input[name="booking_time_slot"]:checked').val();
         const $submitBtn = $('#saveUserPcBtn');

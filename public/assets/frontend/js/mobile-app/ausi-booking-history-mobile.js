@@ -113,7 +113,7 @@ $(function () {
 
                 logDebugHistory(
                     "HISTORY RESPONSE",
-                    res
+                    res 
                 );
                 $("#historyWrapper").removeClass('d-none');
 

@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidenceGt();
-    alert("🔥GT History JS VERSION 34");
+    alert("🔥GT History JS VERSION 35");
     function autoSelectHistoryResidenceGt() {
 
         const select = $('#resident_id_gt_booking_history');
@@ -34,7 +34,7 @@ $(function () {
 
         select.trigger('input');
 
-        const email = $('#history_mobile_email').val();
+        const email = $('#history_mobile_email_gt').val();
 
         updateGtHistoryBookingTable(
             firstUnit,
@@ -75,7 +75,7 @@ $(function () {
     window.onResidentChangeHistoryGt = function (e) {
 
         const unit = e.target.value;
-        const email = $('#history_mobile_email').val();
+        const email = $('#history_mobile_email_gt').val();
 
         $("#historyWrapperGt").removeClass("d-none");
 
@@ -326,7 +326,7 @@ $(function () {
     $(document).on('click', '.cancel-mobile-gt-booking-btn', function () {
         const bookingId = $(this).data('id');
         logDebugHistoryGt("Sending confirmed cancel request...");
-        const email = $('#history_mobile_email').val();
+        const email = $('#history_mobile_email_gt').val();
         $.ajax({
             url: '/grease-trap-booking-mobile/cancel/' + bookingId,
             type: 'POST',
@@ -375,7 +375,7 @@ $(function () {
 
 
                                             const email =
-                                                $('#history_mobile_email').val();
+                                                $('#history_mobile_email_gt').val();
 
                                             updateGtHistoryBookingTable(
                                                 unit,

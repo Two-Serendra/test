@@ -34,7 +34,7 @@
                     <!-- <input type="text" name="email" id="mobile_email"> -->
                     <input type="hidden" name="mobile_unit_name" id="mobile_unit_name">
                     <input type="hidden" name="mobile_unit_role" id="mobile_unit_role">
-                    <input type="hidden" id="history_mobile_email" name="email" :value="$store.superapp.user?.email || ''">
+                    <input type="hidden" id="history_mobile_email_gt" name="email" :value="$store.superapp.user?.email || ''">
                     <dl>
                         <dd>
 
@@ -99,7 +99,7 @@
 
                     const store = Alpine.store('superapp');
 
-                    $('#history_mobile_email').val(
+                    $('#history_mobile_email_gt').val(
                         store?.user?.email || ''
                     );
                 },

@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidenceGt();
-    alert("🔥GT History JS VERSION 35");
+    alert("🔥GT History JS VERSION 36");
     function autoSelectHistoryResidenceGt() {
 
         const select = $('#resident_id_gt_booking_history');
@@ -364,8 +364,6 @@ $(function () {
                                 success: function (res2) {
                                     Swal.fire('Cancelled!', res2.message, 'success')
                                         .then(() => {
-                                            let page = $('.pagination .active span').text() || 1;
-                                            loadBookings(page);
                                             logDebugHistoryGt("Second response received");
                                             logDebugHistoryGt(JSON.stringify(res2));
 
@@ -399,10 +397,16 @@ $(function () {
                         }
                     });
                 } else {
-
                     Swal.fire('Cancelled!', res.message, 'success')
                         .then(() => {
-                            let page = $('.pagination .active span').text() || 1;
+                            const unit =
+                                Alpine.store('superapp')?.selectedUnit ||
+                                $('#resident_id_gt_booking_history').val();
+
+
+                            const email =
+                                $('#history_mobile_email_gt').val();
+
                             updateGtHistoryBookingTable(
                                 unit,
                                 email

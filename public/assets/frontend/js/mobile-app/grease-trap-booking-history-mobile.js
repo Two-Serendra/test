@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidenceGt();
-    alert("🔥GT History JS VERSION 32");
+    alert("🔥GT History JS VERSION 33");
     function autoSelectHistoryResidenceGt() {
 
         const select = $('#resident_id_gt_booking_history');
@@ -86,6 +86,7 @@ $(function () {
     };
 
     function updateGtHistoryBookingTable(unitName, email) {
+       logDebugHistoryGt(unitName);
         showHistoryLoadingGt();
         $("#gtHistoryTable").html("");
         $.ajax({

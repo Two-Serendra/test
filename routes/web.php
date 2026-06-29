@@ -228,7 +228,7 @@ Route::middleware(['miniapp.webview'])->group(function () {
     Route::get('/pest-control-booking-mobile/history', [PestControlBookingMobileController::class, 'viewPestControlBookingMobileHistory'])->name('pest.control.booking.mobile.history');
     Route::get('/get-pest-control-booking-mobile/history', [PestControlBookingMobileController::class, 'getPestControlBookingMobileHistory'])->name('get.pest.control.booking.mobile.history');
     Route::post('/pest-control-booking-mobile/cancel/{booking}', [PestControlBookingMobileController::class, 'CancelPestControlBookingMobile'])
-        ->name('grease.trap.cancel.booking.mobile')->middleware('throttle:5,1');
+        ->name('pest.control.cancel.booking.mobile')->middleware('throttle:5,1');
 
     //Greasetrap
     Route::get('/grease-trap-booking-mobile', [GreaseTrapBookingMobileController::class, 'greasetrapBookingUserMobile'])->name('grease-trap.booking.mobile')->middleware('no-cache');

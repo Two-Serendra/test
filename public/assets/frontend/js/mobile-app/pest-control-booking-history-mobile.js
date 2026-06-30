@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidencePc();
-    alert("🔥PC History JS VERSION 04");
+    alert("🔥PC History JS VERSION 05");
     function autoSelectHistoryResidencePc() {
 
         const select = $('#resident_id_pc_booking_history');
@@ -306,9 +306,9 @@ $(function () {
 
                     const canCancel = now < bookingDateTime;
 
-                    console.log("Now:", now);
-                    console.log("Booking:", bookingDateTime);
-                    console.log("Can Cancel:", canCancel);
+                    logDebugHistoryPc("Now:", now);
+                    logDebugHistoryPc("Booking:", bookingDateTime);
+                    logDebugHistoryPc("Can Cancel:", canCancel);
 
                     cancelButton = `
         <button

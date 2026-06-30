@@ -4,7 +4,7 @@
 
 @section('content')
 
-    <div id="historyPageLoadingPc" class="history-page-loading">
+    <!-- <div id="historyPageLoadingPc" class="history-page-loading">
         <div class="text-center">
             <div class="spinner-border text-primary"></div>
 
@@ -12,7 +12,7 @@
                 Page Loading bookings...
             </div>
         </div>
-    </div>
+    </div> -->
 
     <div class="" x-data="pcBookingPageHistory">
         <div class="bg-light rounded-3 py-3 px-3 border">

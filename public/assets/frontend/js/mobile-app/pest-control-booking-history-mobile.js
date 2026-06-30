@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidencePc();
-    alert("🔥PC History JS VERSION 05");
+    alert("🔥PC History JS VERSION 06");
     function autoSelectHistoryResidencePc() {
 
         const select = $('#resident_id_pc_booking_history');
@@ -86,7 +86,8 @@ $(function () {
     };
 
     function updatePcHistoryBookingTable(unitName, email, page = 1) {
-        logDebugHistoryPc(unitName);
+        logDebugHistoryPc("unit2" + unitName);
+        logDebugHistoryPc("email2" +email);
         showHistoryLoadingPc();
         $("#pcHistoryTable").html("");
         $.ajax({

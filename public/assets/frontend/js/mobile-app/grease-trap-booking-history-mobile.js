@@ -12,7 +12,7 @@ $(function () {
         }
 
         const options = select.find('option');
-
+ 
         if (options.length <= 1) {
             setTimeout(autoSelectHistoryResidenceGt, 300);
             return;
@@ -93,7 +93,7 @@ $(function () {
 
             url: "/get-grease-trap-booking-mobile/history",
 
-            type: "GET",
+            type: "GET", 
 
             data: {
                 unit_name: unitName,

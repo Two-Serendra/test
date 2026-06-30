@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidencePc();
-    alert("🔥PC History JS VERSION 02");
+    alert("🔥PC History JS VERSION 03");
     function autoSelectHistoryResidencePc() {
 
         const select = $('#resident_id_pc_booking_history');
@@ -72,7 +72,7 @@ $(function () {
         }
     });
 
-    window.onResidentChangeHistoryPc = function (e) {
+    window.onResidentChangeHistoryPc = function (e) { 
 
         const unit = e.target.value;
         const email = $('#history_mobile_email_pc').val();
@@ -112,7 +112,7 @@ $(function () {
                 renderHistoryTablePc(res.bookings.data);
                 renderPcPagination(res.bookings);
 
-                $("#historyPageLoading").fadeOut(200, function () {
+                $("#historyPageLoadingPc").fadeOut(200, function () {
                     $(this).remove();
                 });
 
@@ -125,7 +125,7 @@ $(function () {
                     xhr.responseText
                 );
 
-                $("#historyPageLoading").fadeOut(200);
+                $("#historyPageLoadingPc").fadeOut(200);
 
 
             },

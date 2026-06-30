@@ -21,7 +21,7 @@
 
                 <div>
                     <h5 class="fw-bold mb-0">
-                        Grease Trap Booking History
+                        Grease Trap Booking History 
                     </h5>
                 </div>
             </div>

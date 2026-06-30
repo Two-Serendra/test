@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 Pest Control JS VERSION 2026-06-15-006");
+    alert("🔥 Pest Control JS VERSION 2026-06-15-007");
     const el = document.getElementById('resident_id_pc');
 
     logDebugPc("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -319,9 +319,9 @@ $(function () {
         form.classList.remove('was-validated');
         const store = Alpine.store('superapp');
         const email = store?.user?.email || '';
-        const unit = $('#resident_id_gt').val();
+        const unit = $('#resident_id_pc').val();
         const role =
-            $('#resident_id_gt option:selected').data('role') || '';
+            $('#resident_id_pc option:selected').data('role') || '';
         $('#mobile_email').val(email);
         $('#mobile_unit_name').val(unit);
         $('#mobile_unit_role').val(role);

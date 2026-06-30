@@ -336,8 +336,72 @@ class PestControlBookingMobileController extends Controller
     }
 
 
-    public function viewPestControlBookingMobileHistory()
+    public function getPestControlBookingMobileHistory(Request $request)
     {
-        return view('mobile-app.pest-control.pest-control-booking-mobile-history');
+
+        $email = $request->email;
+        $mobileUnit = $request->unit_name;
+
+
+        $unitNo = $this->convertMobileUnitToUnitNoPc($mobileUnit);
+
+
+        if (!$unitNo) {
+
+            return response()->json([
+                'message' => 'Invalid unit format',
+                'unit' => $mobileUnit
+            ], 422);
+
+        }
+
+        $bookings = TestPestControlBooking::where('email', $email)
+            ->where('unit_no', $unitNo)
+            ->orderBy('booking_date', 'desc')
+            ->paginate(1);
+
+        return response()->json([
+            'unit_no' => $unitNo,
+            'bookings' => $bookings
+        ]);
+
     }
+
+    private function convertMobileUnitToUnitNoPc($unitName)
+    {
+        $map = [
+            "Almond" => "A",
+            "Belize" => "B",
+            "Callery" => "C",
+            "Dolce" => "D",
+            "Encino" => "E",
+            "Aston" => "F",
+            "ReadOak" => "G",
+            "Meranti" => "H",
+            "Sequoia" => "I",
+        ];
+
+
+        $parts = explode(' ', trim($unitName));
+
+
+        if (count($parts) !== 2) {
+            return null;
+        }
+
+
+        [$tower, $number] = $parts;
+
+
+        $towerLetter = $map[$tower] ?? null;
+
+
+        if (!$towerLetter) {
+            return null;
+        }
+
+
+        return $number . $towerLetter;
+    }
+
 }

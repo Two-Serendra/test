@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 Pest Control JS VERSION 2026-06-15-007");
+    alert("🔥 Pest Control JS VERSION 2026-06-15-008");
     const el = document.getElementById('resident_id_pc');
 
     logDebugPc("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -367,15 +367,15 @@ $(function () {
                         res.debug.forEach(d => logDebugPc("🧠 " + d));
                     }
 
-
-
                     Swal.fire({
+                        toast: true,
+                        position: 'top-end',
                         icon: 'success',
-                        title: 'Booking Successful',
-                        text: res.message ?? 'Your booking has been saved',
-                        timer: 5000,
-                        showConfirmButton: false
+                        title: 'Booking submitted successfully',
+                        showConfirmButton: false,
+                        timer: 2500
                     });
+
                     window.resetAusiBookingUI();
                     window.resetSlots();
                 },
@@ -471,7 +471,21 @@ $(function () {
                 }
             });
         };
-        sendBooking();
+        Swal.fire({
+            title: 'Submit Booking?',
+            text: 'Are you sure you want to submit this pest control booking?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Proceed',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#0d6efd',   // Primary (blue)
+            cancelButtonColor: '#6c757d',    // Secondary (gray)
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                sendBooking();
+            }
+        });
     });
 
     $(document).on('click', '.service-link', function () {

@@ -335,4 +335,9 @@ class PestControlBookingMobileController extends Controller
         ], 500);
     }
 
+
+    public function viewPestControlBookingMobileHistory()
+    {
+        return view('mobile-app.pest-control.pest-control-booking-mobile-history');
+    }
 }

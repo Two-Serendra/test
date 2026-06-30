@@ -336,6 +336,12 @@ class PestControlBookingMobileController extends Controller
     }
 
 
+    public function viewPestControlBookingMobileHistory()
+    {
+        return view('mobile-app.pest-control.pest-control-booking-mobile-history');
+    }
+
+
     public function getPestControlBookingMobileHistory(Request $request)
     {
 
@@ -403,5 +409,4 @@ class PestControlBookingMobileController extends Controller
 
         return $number . $towerLetter;
     }
-
 }

@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidencePc();
-    alert("🔥PC History JS VERSION 01");
+    alert("🔥PC History JS VERSION 02");
     function autoSelectHistoryResidencePc() {
 
         const select = $('#resident_id_pc_booking_history');

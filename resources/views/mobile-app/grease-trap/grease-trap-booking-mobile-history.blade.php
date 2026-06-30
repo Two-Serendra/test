@@ -9,7 +9,7 @@
             <div class="spinner-border text-primary"></div>
 
             <div class="mt-2 text-muted">
-                Page Loading bookings...
+                Loading bookings...
             </div>
         </div>
     </div>
@@ -59,7 +59,7 @@
                         <div class="text-center">
                             <div class="spinner-border text-primary mb-2"></div>
                             <div class="text-muted">
-                                Table Loading bookings...
+                                Loading bookings...
                             </div>
                         </div>
                     </div>

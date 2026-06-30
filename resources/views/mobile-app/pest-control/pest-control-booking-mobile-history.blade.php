@@ -17,11 +17,10 @@
     <div class="" x-data="pcBookingPageHistory">
         <div class="bg-light rounded-3 py-3 px-3 border">
             <div class="d-flex align-items-center">
-                <i class="bx bx-water text-primary fs-1 me-3"></i>
-
+                <i class='bx bx-bug text-warning fs-1 me-3'></i>
                 <div>
                     <h5 class="fw-bold mb-0">
-                        Grease Trap Cleaning History
+                        Pest Control Booking History
                     </h5>
                 </div>
             </div>
@@ -53,7 +52,7 @@
                     </dl>
                 </div>
 
-                <div id="historyWrapperGt" class="position-relative">
+                <div id="historyWrapperPc" class="position-relative">
                     <!-- Loading Overlay -->
                     <div id="historyLoading" class="history-loading d-none">
                         <div class="text-center">
@@ -71,16 +70,16 @@
     </div>
 
     <div id="debugPanelBookingHistoryPc" style="position: fixed;
-                                            bottom: 0;
-                                            left: 0;
-                                            right: 0;
-                                            height: 140px;
-                                            overflow: auto;
-                                            background: black;
-                                            color: #00ff00;
-                                            font-size: 11px;
-                                            z-index: 99999;
-                                            padding: 10px;"></div>
+                                                bottom: 0;
+                                                left: 0;
+                                                right: 0;
+                                                height: 140px;
+                                                overflow: auto;
+                                                background: black;
+                                                color: #00ff00;
+                                                font-size: 11px;
+                                                z-index: 99999;
+                                                padding: 10px;"></div>
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('pcBookingPageHistory', () => ({

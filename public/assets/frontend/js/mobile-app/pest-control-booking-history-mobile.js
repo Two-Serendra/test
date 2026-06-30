@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidencePc();
-    alert("🔥PC History JS VERSION 06");
+    alert("🔥PC History JS VERSION 07");
     function autoSelectHistoryResidencePc() {
 
         const select = $('#resident_id_pc_booking_history');
@@ -86,8 +86,6 @@ $(function () {
     };
 
     function updatePcHistoryBookingTable(unitName, email, page = 1) {
-        logDebugHistoryPc("unit2" + unitName);
-        logDebugHistoryPc("email2" +email);
         showHistoryLoadingPc();
         $("#pcHistoryTable").html("");
         $.ajax({
@@ -142,7 +140,7 @@ $(function () {
 
     function showHistoryLoadingPc() {
 
-        $("#historyLoading").removeClass("d-none");
+        $("#historyLoadingPc").removeClass("d-none");
 
         $("#pcHistoryPagination .page-link")
             .addClass("disabled")
@@ -151,7 +149,7 @@ $(function () {
 
     function hideHistoryLoadingPc() {
 
-        $("#historyLoading").addClass("d-none");
+        $("#historyLoadingPc").addClass("d-none");
 
         $("#pcHistoryPagination .page-link")
             .removeClass("disabled")

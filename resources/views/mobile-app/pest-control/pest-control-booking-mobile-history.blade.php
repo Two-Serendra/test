@@ -54,7 +54,7 @@
 
                 <div id="historyWrapperPc" class="position-relative">
                     <!-- Loading Overlay -->
-                    <div id="historyLoading" class="history-loading d-none">
+                    <div id="historyLoadingPc" class="history-loading d-none">
                         <div class="text-center">
                             <div class="spinner-border text-primary mb-2"></div>
                             <div class="text-muted">

@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidencePc();
-    alert("🔥PC History JS VERSION 03");
+    alert("🔥PC History JS VERSION 04");
     function autoSelectHistoryResidencePc() {
 
         const select = $('#resident_id_pc_booking_history');
@@ -72,7 +72,7 @@ $(function () {
         }
     });
 
-    window.onResidentChangeHistoryPc = function (e) { 
+    window.onResidentChangeHistoryPc = function (e) {
 
         const unit = e.target.value;
         const email = $('#history_mobile_email_pc').val();
@@ -218,7 +218,9 @@ $(function () {
 
     function renderHistoryTablePc(bookings) {
         logDebugHistoryPc("renderHistoryTablePc");
-
+        logDebugHistoryPc("BOOKINGS:", bookings);
+        logDebugHistoryPc("IS ARRAY:", Array.isArray(bookings));
+        logDebugHistoryPc("LENGTH:", bookings?.length);
         let html = "";
 
         if (!bookings || bookings.length === 0) {
@@ -236,9 +238,9 @@ $(function () {
         } else {
 
             const now = new Date();
-
+            logDebugHistoryPc("Before foreach");
             bookings.forEach(item => {
-
+                logDebugHistoryPc("Inside foreach", item);
                 let statusText = "";
                 let badgeClass = "";
 
@@ -370,7 +372,7 @@ $(function () {
             `;
             });
         }
-
+       logDebugHistoryPc("Finished rendering");
         $("#pcHistoryTable").html(html);
     }
 

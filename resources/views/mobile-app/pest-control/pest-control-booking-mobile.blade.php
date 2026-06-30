@@ -50,7 +50,7 @@
                 </div>
 
                 <form method="POST" action="{{ route('pest.control.booking.mobile.store') }}" enctype="multipart/form-data"
-                    id="userPestControlewBookingMobile" class="needs-validation" novalidate>
+                    id="userPestControlBookingMobile" class="needs-validation" novalidate>
                     @csrf
 
                     <div class="row mb-3">
@@ -132,7 +132,7 @@
                     </div>
 
                     <div class="d-grid">
-                        <button type="submit" form="userPestControlewBookingMobile" id="saveUserPestControlBtn"
+                        <button type="submit" form="userPestControlBookingMobile" id="saveUserPestControlBtn"
                             class="btn btn-primary d-flex align-items-center justify-content-center customBtn"
                             style="min-width: 100px; height: 38px;">
                             <span class="btn-text" disabled>SUBMIT</span>

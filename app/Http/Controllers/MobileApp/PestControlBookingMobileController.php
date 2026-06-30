@@ -161,6 +161,7 @@ class PestControlBookingMobileController extends Controller
 
                 $resident = ResidentDetails::where('email', $email)
                     ->where('unit_no', strtoupper($unitNo))
+                    ->lockForUpdate()
                     ->first();
 
                 if (!$resident) {
@@ -173,61 +174,74 @@ class PestControlBookingMobileController extends Controller
                     $request->booking_date
                 )->toDateString();
 
-                $freeBookingLimit = 2;
+                $towerGroups = [
+                    'A' => 'lowrise',
+                    'B' => 'lowrise',
+                    'C' => 'lowrise',
+                    'D' => 'lowrise',
+                    'E' => 'lowrise',
+                    'F' => 'highrise',
+                    'G' => 'highrise',
+                    'H' => 'highrise',
+                    'I' => 'highrise',
+                ];
 
-                $yearStart = Carbon::now()
-                    ->startOfYear()
-                    ->toDateString();
+                $areaLetter = preg_replace('/[^A-Z]/', '', strtoupper($resident->unit_no));
 
-                $yearEnd = Carbon::now()
-                    ->endOfYear()
-                    ->toDateString();
+                $towerGroup = $towerGroups[$areaLetter] ?? null;
 
-                $unitBookingsCount = TestPestControlBooking::where(
+                if (!$towerGroup) {
+                    DB::rollBack();
+
+                    return response()->json([
+                        'message' => 'Unknown area for your unit.'
+                    ], 422);
+                }
+
+                $towerAreas = $towerGroup == 'lowrise'
+                    ? ['A', 'B', 'C', 'D', 'E']
+                    : ['F', 'G', 'H', 'I'];
+
+                $monthStart = Carbon::parse($bookingDate)->startOfMonth()->toDateString();
+                $monthEnd = Carbon::parse($bookingDate)->endOfMonth()->toDateString();
+
+                $unitBookingsThisMonth = TestPestControlBooking::where(
                     'unit_no',
                     strtoupper($resident->unit_no)
                 )
-                    ->whereBetween('booking_date', [$yearStart, $yearEnd])
-                    ->where(function ($q) {
-                        $q->where('booking_status', 1)
-                            ->orWhere('cancelled_within_24hrs', 1);
-                    })
+                    ->where('booking_status', 1)
+                    ->whereBetween('booking_date', [$monthStart, $monthEnd])
+                    ->lockForUpdate()
                     ->count();
 
-                $remainingFreeBookings = max(
-                    $freeBookingLimit - $unitBookingsCount,
-                    0
-                );
+                $freeBookingLimit = 1;
 
-                $chargedType = $unitBookingsCount < $freeBookingLimit
-                    ? 1
-                    : 2;
+                $chargedType = $unitBookingsThisMonth < $freeBookingLimit ? 1 : 2;
 
-                if (
-                    $chargedType == 2 &&
-                    !$request->boolean('force_payment')
-                ) {
+                if ($chargedType == 2 && !$request->boolean('force_payment')) {
 
                     DB::rollBack();
 
                     return response()->json([
-                        'message' => "You've already used your free grease trap bookings for this year. This booking will cost ₱448.00. Continue?",
+                        'message' => "You’ve used your free pest control booking for this month. This booking will cost ₱350.00. Continue with the booking?",
                         'requires_payment' => true,
-                        'remaining_free_bookings' => $remainingFreeBookings
+                        'remaining_free_bookings' => max($freeBookingLimit - $unitBookingsThisMonth, 0)
                     ], 409);
                 }
 
-                $slotTaken = TestPestControlBooking::whereDate(
+                $existingBookings = TestPestControlBooking::whereDate(
                     'booking_date',
                     $bookingDate
                 )
-                    ->where(
-                        'booking_time_slot',
-                        $request->booking_time_slot
-                    )
+                    ->whereIn('unit_area', $towerAreas)
                     ->where('booking_status', 1)
                     ->lockForUpdate()
-                    ->exists();
+                    ->get();
+
+                $slotTaken = $existingBookings->contains(
+                    'booking_time_slot',
+                    $request->booking_time_slot
+                );
 
                 if ($slotTaken) {
 
@@ -256,7 +270,7 @@ class PestControlBookingMobileController extends Controller
                     DB::rollBack();
 
                     return response()->json([
-                        'message' => 'This unit already has a grease trap booking for the selected date.',
+                        'message' => 'This unit already has a pest control booking for the selected date.',
                         'type' => 'unit_already_booked'
                     ], 409);
                 }
@@ -264,6 +278,7 @@ class PestControlBookingMobileController extends Controller
                 $booking = TestPestControlBooking::create([
                     'user_id' => $resident->user_id,
                     'unit_no' => strtoupper($resident->unit_no),
+                    'unit_area' => $areaLetter,
                     'resident_type' => $resident->resident_type,
                     'email' => $email,
                     'name' => strtoupper($resident->name ?? 'RESIDENT'),
@@ -271,9 +286,8 @@ class PestControlBookingMobileController extends Controller
                     'booking_time_slot' => $request->booking_time_slot,
                     'charged_type' => $chargedType,
                 ]);
-
                 $booking->transaction_no =
-                    '2SGT-' .
+                    '2SPC-' .
                     str_pad($booking->id, 5, '0', STR_PAD_LEFT);
 
                 $booking->save();
@@ -296,14 +310,14 @@ class PestControlBookingMobileController extends Controller
                 });
 
                 return response()->json([
-                    'message' => 'Grease trap booking submitted successfully.'
+                    'message' => 'Pest control booking submitted successfully.'
                 ]);
 
             } catch (\Throwable $e) {
 
                 DB::rollBack();
 
-                Log::error('Mobile Grease Trap Booking Error', [
+                Log::error('Mobile Pest Control Booking Error', [
                     'request_email' => $request->email,
                     'all_request' => $request->all(),
                     'error' => $e->getMessage()

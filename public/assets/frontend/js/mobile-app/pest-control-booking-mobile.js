@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 Pest Control JS VERSION 2026-06-15-004");
+    alert("🔥 Pest Control JS VERSION 2026-06-15-005");
     const el = document.getElementById('resident_id_pc');
 
     logDebugPc("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -242,7 +242,7 @@ $(function () {
 
     window.resetAusiBookingUI = function () {
         logDebugPc("RESET CALLED");
-        const form = document.getElementById('userPestControlewBookingMobile');
+        const form = document.getElementById('userPestControlBookingMobile');
 
         if (form) {
             form.reset();
@@ -291,7 +291,7 @@ $(function () {
 
     let isSubmitting = false;
 
-    $(document).on('submit', '#userPestControlewBookingMobile', function (event) {
+    $(document).on('submit', '#userPestControlBookingMobile', function (event) {
         event.preventDefault();
         const form = this;
         logDebugPc("SUBMIT FIRED");
@@ -351,15 +351,12 @@ $(function () {
             });
 
             const formData = new FormData(form);
+
             if (forceOverride) {
-                formData.append('force_override', true);
+                formData.append('force_payment', true);
             }
 
             lockSubmitBtn();
-            // for (const pair of formData.entries()) {
-            //    logDebugPc(pair[0] + " = " + pair[1]);
-            // }
-
             $.ajax({
                 url: $(form).attr('action'),
                 type: $(form).attr('method'),
@@ -377,6 +374,9 @@ $(function () {
                     if (res.debug) {
                         res.debug.forEach(d => logDebugPc("🧠 " + d));
                     }
+
+
+
                     Swal.fire({
                         icon: 'success',
                         title: 'Booking Successful',
@@ -392,6 +392,30 @@ $(function () {
                     const res = xhr.responseJSON || {};
                     logDebugPc("ERROR", xhr.status);
                     logDebugPc("RESPONSE", res);
+
+                    if (xhr.status === 409 && res.requires_payment) {
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Free Booking Limit Reached',
+                            text: res.message,
+                            showCancelButton: true,
+                            confirmButtonText: 'Yes, continue with payment',
+                            cancelButtonText: 'Cancel',
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33'
+                        }).then((result) => {
+
+                            if (result.isConfirmed) {
+                                sendBooking(true);
+                            } else {
+                                unlockSubmitBtn();
+                            }
+
+                        });
+
+                        return;
+                    }
 
                     if (xhr.status === 422) {
 
@@ -417,6 +441,7 @@ $(function () {
                         return;
                     }
 
+
                     if (xhr.status === 409 && res.type === 'slot_taken') {
 
                         Swal.fire({
@@ -433,18 +458,10 @@ $(function () {
 
                         Swal.fire({
                             icon: 'warning',
-                            title: 'Already Booked',
+                            title: 'Booking already exists',
                             text: res.message,
                             showCancelButton: true,
                             confirmButtonText: 'Book Anyway'
-                        }).then((result) => {
-
-                            if (result.isConfirmed) {
-                                sendBooking(true);
-                            } else {
-                                unlockSubmitBtn();
-                            }
-
                         });
 
                         return;

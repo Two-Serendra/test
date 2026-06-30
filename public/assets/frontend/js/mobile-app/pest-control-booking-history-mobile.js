@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidencePc();
-    alert("🔥PC History JS VERSION 07");
+    alert("🔥PC History JS VERSION 08");
     function autoSelectHistoryResidencePc() {
 
         const select = $('#resident_id_pc_booking_history');
@@ -292,7 +292,12 @@ $(function () {
 
                     const [year, month, day] = item.booking_date.split('-').map(Number);
 
-                    const match = startTime.match(/(\d+):(\d+)(AM|PM)/i);
+                    const match = startTime.match(/(\d+):(\d+)\s*(AM|PM)/i);
+
+                    if (!match) {
+                        logDebugHistoryPc("Invalid booking time:", startTime);
+                        return;
+                    }
 
                     let hour = parseInt(match[1], 10);
                     const minute = parseInt(match[2], 10);
@@ -371,7 +376,7 @@ $(function () {
             `;
             });
         }
-       logDebugHistoryPc("Finished rendering");
+        logDebugHistoryPc("Finished rendering");
         $("#pcHistoryTable").html(html);
     }
 

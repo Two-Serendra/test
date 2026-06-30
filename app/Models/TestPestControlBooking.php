@@ -27,6 +27,7 @@ class TestPestControlBooking extends Model
         'cancelled_by',
         'has_penalty',
         'penalty_amount',
+        'email',
     ];
 
 

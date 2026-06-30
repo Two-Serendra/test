@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 Pest Control JS VERSION 2026-06-15-005");
+    alert("🔥 Pest Control JS VERSION 2026-06-15-006");
     const el = document.getElementById('resident_id_pc');
 
     logDebugPc("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -319,7 +319,12 @@ $(function () {
         form.classList.remove('was-validated');
         const store = Alpine.store('superapp');
         const email = store?.user?.email || '';
-
+        const unit = $('#resident_id_gt').val();
+        const role =
+            $('#resident_id_gt option:selected').data('role') || '';
+        $('#mobile_email').val(email);
+        $('#mobile_unit_name').val(unit);
+        $('#mobile_unit_role').val(role);
         const originalWidth = $submitBtn.outerWidth();
         const lockSubmitBtn = () => {
             $submitBtn
@@ -338,20 +343,7 @@ $(function () {
         const sendBooking = (forceOverride = false) => {
             const store = Alpine.store('superapp');
             const email = store?.user?.email || '';
-            const unit = $('#resident_id_pc').val();
-            const role = $('#resident_id_pc option:selected').data('role') || '';
-            $('#mobile_email_pc').val(email);
-            $('#mobile_unit_name').val(unit);
-            $('#mobile_unit_role').val(role);
-
-            console.log("SYNC CHECK:", {
-                email,
-                unit,
-                role
-            });
-
             const formData = new FormData(form);
-
             if (forceOverride) {
                 formData.append('force_payment', true);
             }

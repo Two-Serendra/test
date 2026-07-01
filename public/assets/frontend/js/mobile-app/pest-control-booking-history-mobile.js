@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidencePc();
-    alert("🔥PC History JS VERSION 11");
+    alert("🔥PC History JS VERSION 12");
     function autoSelectHistoryResidencePc() {
 
         const select = $('#resident_id_pc_booking_history');
@@ -419,55 +419,68 @@ $(function () {
                     email: email,
                     _token: $('meta[name="csrf-token"]').attr('content')
                 },
+
                 success: function (res) {
 
                     if (!res.success) {
-                        Swal.fire(
-                            'Error',
-                            res.message || 'Failed to cancel booking.',
-                            'error'
-                        );
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'error',
+                            title: res.message || 'Failed to cancel booking.',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
                         return;
                     }
-
-                    Swal.fire(
-                        'Cancelled!',
-                        res.message,
-                        'success'
-                    ).then(() => {
-
-                        const unit =
-                            Alpine.store('superapp')?.selectedUnit ||
-                            $('#resident_id_pc_booking_history').val();
-
-                        const email =
-                            $('#history_mobile_email_pc').val();
-
-                        const currentPage =
-                            $('#pcHistoryPagination .active .page-link').data('page') || 1;
-
-                        updatePcHistoryBookingTable(
-                            unit,
-                            email,
-                            currentPage
-                        );
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: res.message,
+                        showConfirmButton: false,
+                        timer: 2500,
+                        customClass: {
+                            popup: 'swal2-success-toast'
+                        }
                     });
+
+                    const unit =
+                        Alpine.store('superapp')?.selectedUnit ||
+                        $('#resident_id_pc_booking_history').val();
+
+                    const email =
+                        $('#history_mobile_email_pc').val();
+
+                    const currentPage =
+                        $('#pcHistoryPagination .active .page-link').data('page') || 1;
+
+                    updatePcHistoryBookingTable(
+                        unit,
+                        email,
+                        currentPage
+                    );
                 },
+
                 error: function (xhr) {
 
                     logDebugHistoryPc("AJAX ERROR");
                     logDebugHistoryPc("Status: " + xhr.status);
                     logDebugHistoryPc("Response: " + xhr.responseText);
 
-                    Swal.fire(
-                        'Error',
-                        'Something went wrong while cancelling.',
-                        'error'
-                    );
+                    const res = xhr.responseJSON || {};
+
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'error',
+                        title: res.message || 'Something went wrong while cancelling.',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
                 }
             });
 
         });
-
     });
 });

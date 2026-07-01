@@ -119,7 +119,7 @@
     z-index: 99999;
     padding: 10px;
 }
- 
+
 
 @media(max-width:768px) {
 
@@ -207,4 +207,25 @@
     justify-content: center;
     opacity: 1;
     transition: opacity .3s ease;
+}
+
+.swal2-success-toast {
+    background: #28a745 !important;
+    color: #fff !important;
+}
+
+.swal2-success-toast .swal2-title {
+    color: #fff !important;
+}
+
+.swal2-success-toast .swal2-icon.swal2-success {
+    border-color: #fff !important;
+    color: #fff !important;
+}
+
+.swal2-success-toast .swal2-success-ring,
+.swal2-success-toast .swal2-success-fix,
+.swal2-success-toast .swal2-success-circular-line-left,
+.swal2-success-toast .swal2-success-circular-line-right {
+    background: transparent !important;
 }

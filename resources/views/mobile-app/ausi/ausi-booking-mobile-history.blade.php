@@ -64,13 +64,13 @@
                             </div>
                         </div>
                     </div>
-                    <!-- <div id="ausiHistoryTable" class="booking-history-list"></div> -->
+                    <div id="ausiHistoryTable" class="booking-history-list"></div>
                 </div>
             </div>
         </div>
 
-        <div id="debugPanelBookingHistory">
-        </div>
+        <!-- <div id="debugPanelBookingHistory">
+        </div> -->
 
     </div>
     @include('mobile-app.ausi.ausi-mobile-modal')

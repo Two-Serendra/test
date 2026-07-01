@@ -414,7 +414,7 @@ $(function () {
             logDebugHistory("AUSI booking data fetched successfully");
             logDebugHistory(JSON.stringify(data));
             logDebugHistory("SUCCESS CALLBACK REACHED");
-            alert("view ausi is hitting");
+            // alert("view ausi is hitting");
             $('#view_transaction_no')
                 .text(data.transaction_no);
 

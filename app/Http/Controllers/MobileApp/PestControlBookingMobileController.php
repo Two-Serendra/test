@@ -409,4 +409,80 @@ class PestControlBookingMobileController extends Controller
 
         return $number . $towerLetter;
     }
+
+    public function CancelPestControlBookingMobile(TestPestControlBooking $booking, Request $request)
+    {
+        try {
+
+            return DB::transaction(function () use ($booking, $request) {
+
+                $userEmail = $request->email;
+
+                $units = ResidentDetails::where('email', $userEmail)
+                    ->pluck('unit_no');
+
+                $booking = TestPestControlBooking::where('id', $booking->id)
+                    ->whereIn('unit_no', $units)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                if ($booking->email !== $userEmail) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'This booking was created by another resident in your unit. Only the creator can cancel it.'
+                    ], 403);
+                }
+
+                if ($booking->booking_status !== TestPestControlBooking::STATUS_CONFIRMED) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Only active bookings can be cancelled.'
+                    ], 400);
+                }
+
+
+                if ($booking->getBookingDateTime()->lt(now())) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Cannot cancel a completed booking.'
+                    ], 400);
+                }
+
+                $booking->booking_status = TestPestControlBooking::STATUS_CANCELLED;
+                $booking->cancelled_at = now();
+                $booking->cancelled_by = null;
+
+                $booking->save();
+
+                DB::afterCommit(function () use ($booking) {
+
+                    if ($booking->email) {
+                        Mail::to($booking->email)
+                            ->queue(new TestUserPestControlBookingCancellation($booking));
+                    }
+
+                    // Optional
+                    // Mail::to('concierge@twoserendra.com')
+                    //     ->queue(new ConciergePestControlBookingCancellation($booking));
+
+                });
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Booking cancelled successfully.'
+                ]);
+
+            });
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to cancel booking.',
+                'error' => $e->getMessage(),
+            ], 500);
+
+        }
+    }
+
 }

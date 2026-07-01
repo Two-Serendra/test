@@ -26,7 +26,7 @@
         <p><strong>Time:</strong> {{ $booking_time_slot }}</p>
 
         <!-- Cancellation Notice -->
-        @if($has_penalty)
+        <!-- @if($has_penalty)
             <div style="margin-top:15px; padding:12px; background:#ffecec; border-left:5px solid #dc3545;">
                 <strong>Cancellation Penalty Applied</strong><br>
                 ₱{{ number_format($penalty_amount, 2) }} will be billed to your account.
@@ -39,7 +39,7 @@
                 <strong>No Cancellation Penalty</strong><br>
                 This booking was cancelled outside the 24-hour window.
             </div>
-        @endif
+        @endif -->
 
         <!-- Closing -->
         <div style="margin-top:15px;">

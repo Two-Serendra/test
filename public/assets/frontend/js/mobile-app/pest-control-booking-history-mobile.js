@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidencePc();
-    alert("🔥PC History JS VERSION 10");
+    alert("🔥PC History JS VERSION 11");
     function autoSelectHistoryResidencePc() {
 
         const select = $('#resident_id_pc_booking_history');
@@ -391,108 +391,83 @@ $(function () {
 
 
     $(document).on('click', '.cancel-mobile-pc-booking-btn', function () {
+
         const bookingId = $(this).data('id');
-        logDebugHistoryPc("Sending confirmed cancel request...");
         const email = $('#history_mobile_email_pc').val();
-        $.ajax({
-            url: '/pest-control-booking-mobile/cancel/' + bookingId,
-            type: 'POST',
-            data: {
-                email: email,
-                _token: $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function (res) {
-                if (!res.success) {
-                    Swal.fire('Error', res.message || 'Failed to cancel booking.', 'error');
-                    return;
-                }
 
+        Swal.fire({
+            title: 'Cancel Booking?',
+            text: 'Are you sure you want to cancel this booking?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, cancel it',
+            cancelButtonText: 'No'
+        }).then((result) => {
 
-                if (res.requires_confirmation) {
-                    Swal.fire({
-                        title: 'Cancel Booking',
-                        html: res.message,
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#6c757d',
-                        confirmButtonText: 'Yes, cancel it',
-                        cancelButtonText: 'No, keep it'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: '/pest-control-booking-mobile/cancel/' + bookingId,
-                                type: 'POST',
-                                data: {
-                                    email: email,
-                                    _token: $('meta[name="csrf-token"]').attr('content'),
-                                    confirm: 1
-                                },
-                                success: function (res2) {
-                                    Swal.fire('Cancelled!', res2.message, 'success')
-                                        .then(() => {
-                                            logDebugHistoryPc("Second response received");
-                                            logDebugHistoryPc(JSON.stringify(res2));
-
-                                            const unit =
-                                                Alpine.store('superapp')?.selectedUnit ||
-                                                $('#resident_id_pc_booking_history').val();
-
-
-                                            const email =
-                                                $('#history_mobile_email_pc').val();
-
-                                            const currentPage =
-                                                $('#pcHistoryPagination .active .page-link').data('page') || 1;
-
-                                            updatePcHistoryBookingTable(unit, email, currentPage);
-                                        });
-                                },
-                                error: function (xhr) {
-
-                                    logDebugHistoryPc("AJAX ERROR");
-                                    logDebugHistoryPc("Status: " + xhr.status);
-                                    logDebugHistoryPc("Response: " + xhr.responseText);
-
-                                    Swal.fire(
-                                        'Error',
-                                        'Something went wrong while cancelling.',
-                                        'error'
-                                    );
-                                }
-                            });
-                        }
-                    });
-                } else {
-                    Swal.fire('Cancelled!', res.message, 'success')
-                        .then(() => {
-                            const unit =
-                                Alpine.store('superapp')?.selectedUnit ||
-                                $('#resident_id_pc_booking_history').val();
-
-
-                            const email =
-                                $('#history_mobile_email_pc').val();
-
-                            updatePcHistoryBookingTable(
-                                unit,
-                                email
-                            );
-                        });
-                }
-            },
-            error: function (xhr) {
-
-                logDebugHistoryPc("AJAX ERROR");
-                logDebugHistoryPc("Status: " + xhr.status);
-                logDebugHistoryPc("Response: " + xhr.responseText);
-
-                Swal.fire(
-                    'Error',
-                    'Something went wrong while cancelling.',
-                    'error'
-                );
+            if (!result.isConfirmed) {
+                return;
             }
+
+            logDebugHistoryPc("Sending cancel request...");
+
+            $.ajax({
+                url: '/pest-control-booking-mobile/cancel/' + bookingId,
+                type: 'POST',
+                data: {
+                    email: email,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (res) {
+
+                    if (!res.success) {
+                        Swal.fire(
+                            'Error',
+                            res.message || 'Failed to cancel booking.',
+                            'error'
+                        );
+                        return;
+                    }
+
+                    Swal.fire(
+                        'Cancelled!',
+                        res.message,
+                        'success'
+                    ).then(() => {
+
+                        const unit =
+                            Alpine.store('superapp')?.selectedUnit ||
+                            $('#resident_id_pc_booking_history').val();
+
+                        const email =
+                            $('#history_mobile_email_pc').val();
+
+                        const currentPage =
+                            $('#pcHistoryPagination .active .page-link').data('page') || 1;
+
+                        updatePcHistoryBookingTable(
+                            unit,
+                            email,
+                            currentPage
+                        );
+                    });
+                },
+                error: function (xhr) {
+
+                    logDebugHistoryPc("AJAX ERROR");
+                    logDebugHistoryPc("Status: " + xhr.status);
+                    logDebugHistoryPc("Response: " + xhr.responseText);
+
+                    Swal.fire(
+                        'Error',
+                        'Something went wrong while cancelling.',
+                        'error'
+                    );
+                }
+            });
+
         });
+
     });
 });

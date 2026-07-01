@@ -29,7 +29,7 @@
 
         <div class="card shadow-sm mb-4">
             <div class="row mb-3">
-                <div class="mb-3 mb-md-0">
+                <div class="col-12 mb-3 mb-md-0">
                     <label class="form-label">Select Residence <span class="required">*</span></label>
                     <!-- <input type="text" name="email" id="mobile_email"> -->
                     <input type="hidden" name="mobile_unit_name" id="mobile_unit_name">
@@ -72,16 +72,16 @@
     </div>
 
     <!-- <div id="debugPanelBookingHistoryGt" style="position: fixed;
-                                            bottom: 0;
-                                            left: 0;
-                                            right: 0;
-                                            height: 140px;
-                                            overflow: auto;
-                                            background: black;
-                                            color: #00ff00;
-                                            font-size: 11px;
-                                            z-index: 99999;
-                                            padding: 10px;"></div> -->
+                                                bottom: 0;
+                                                left: 0;
+                                                right: 0;
+                                                height: 140px;
+                                                overflow: auto;
+                                                background: black;
+                                                color: #00ff00;
+                                                font-size: 11px;
+                                                z-index: 99999;
+                                                padding: 10px;"></div> -->
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('gtBookingPageHistory', () => ({

@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidenceGt();
-    // alert("🔥GT History JS VERSION 40");
+    alert("🔥GT History JS VERSION 41");
     function autoSelectHistoryResidenceGt() {
 
         const select = $('#resident_id_gt_booking_history');
@@ -411,9 +411,10 @@ $(function () {
                 type: 'POST',
                 data: {
                     email: email,
-                    _token: $('meta[name="csrf-token"]').attr('content')
-                },
+                    confirm: true,
+                    _token: $('meta[name="csrf-token"]').attr('content'),
 
+                },
                 success: function (res) {
 
                     if (!res.success) {
@@ -437,7 +438,10 @@ $(function () {
                         icon: 'success',
                         title: res.message,
                         showConfirmButton: false,
-                        timer: 2500
+                        timer: 3000,
+                        customClass: {
+                            popup: 'swal2-success-toast'
+                        }
                     });
 
                     const unit =

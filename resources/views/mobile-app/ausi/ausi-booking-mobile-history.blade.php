@@ -64,7 +64,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="ausiHistoryTable" class="booking-history-list"></div>
+                    <!-- <div id="ausiHistoryTable" class="booking-history-list"></div> -->
                 </div>
             </div>
         </div>

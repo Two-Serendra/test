@@ -69,7 +69,7 @@
         </div>
     </div>
 
-    <div id="debugPanelBookingHistoryPc" style="position: fixed;
+    <!-- <div id="debugPanelBookingHistoryPc" style="position: fixed;
                                                 bottom: 0;
                                                 left: 0;
                                                 right: 0;
@@ -79,7 +79,7 @@
                                                 color: #00ff00;
                                                 font-size: 11px;
                                                 z-index: 99999;
-                                                padding: 10px;"></div>
+                                                padding: 10px;"></div> -->
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('pcBookingPageHistory', () => ({

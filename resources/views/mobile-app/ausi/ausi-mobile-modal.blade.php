@@ -5,7 +5,7 @@
             <!-- Header -->
             <div class="modal-header bg-primary text-white">
                 <div>
-                    <h5 class="mb-1">
+                    <h5 class="mb-1 text-white">
                         <i class="fa-solid fa-clipboard-check me-2"></i>
                         AUSI Booking Details
                     </h5>
@@ -37,10 +37,10 @@
 
                         <div class="row g-3">
 
-                            <div class="col-md-6">
+                            <!-- <div class="col-md-6">
                                 <small class="text-muted d-block">Resident</small>
                                 <div class="fw-semibold fs-6" id="view_name"></div>
-                            </div>
+                            </div> -->
 
                             <div class="col-md-3">
                                 <small class="text-muted d-block">Unit</small>
@@ -48,8 +48,8 @@
                             </div>
 
                             <div class="col-md-3">
-                                <small class="text-muted d-block">Type</small>
-                                <div id="view_resident_type"></div>
+                                <small class="text-muted d-block">Resident Type</small>
+                                <div id="view_resident_type" class="fw-semibold"></div>
                             </div>
 
                         </div>

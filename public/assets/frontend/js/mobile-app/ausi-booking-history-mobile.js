@@ -430,19 +430,16 @@ $(function () {
 
             logDebugHistory("Resident Type: " + residentType);
 
-            let residentBadgeClass = "bg-secondary";
-
-            if (residentType === "OWNER") {
-                residentBadgeClass = "bg-primary";
-            } else if (residentType === "TENANT") {
-                residentBadgeClass = "bg-danger";
-            }
-
-            $('#view_resident_type').html(`
-    <span class="badge ${residentBadgeClass} rounded-pill px-3 py-2">
-        ${residentType}
-    </span>
-`);
+            $('#view_resident_type')
+                .removeClass('text-primary text-danger text-secondary')
+                .addClass(
+                    residentType === 'OWNER'
+                        ? 'text-primary'
+                        : residentType === 'TENANT'
+                            ? 'text-danger'
+                            : 'text-secondary'
+                )
+                .text(residentType);
 
 
             $('#view_booking_date')

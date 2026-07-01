@@ -23,7 +23,7 @@
             </div>
         </div>
 
-        <div class="card shadow-sm mb-4">
+        <div class="card shadow-sm">
             <div class="card-body">
 
                 <div class="mb-3">

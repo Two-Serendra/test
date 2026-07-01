@@ -1,139 +1,128 @@
-<div class="modal fade" id="ausiViewResultModal">
-    <div class="modal-dialog modal-lg modal-fullscreen-sm-down">
-        <div class="modal-content">
+<div class="modal fade" id="ausiViewResultModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow">
 
-
+            <!-- Header -->
             <div class="modal-header bg-primary text-white">
+                <div>
+                    <h5 class="mb-1">
+                        <i class="fa-solid fa-clipboard-check me-2"></i>
+                        AUSI Booking Details
+                    </h5>
 
-                <h5 class="modal-title">
-                    AUSI Booking Details
-                </h5>
+                    <small class="opacity-75">
+                        Transaction #
+                        <span id="view_transaction_no"></span>
+                    </small>
+                </div>
 
-                <button type="button" class="btn-close" data-bs-dismiss="modal">
-                </button>
-
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-
 
             <div class="modal-body">
 
-
+                <!-- Status -->
                 <div class="text-center mb-4">
-
-                    <h5 class="fw-bold">
-                        <span id="view_transaction_no"></span>
-                    </h5>
-
                     <span id="view_booking_status"></span>
-
                 </div>
 
-
-                <div class="card shadow-sm border-0 mb-3">
-
-                    <div class="card-body">
-
-                        <h6 class="text-primary fw-bold">
-                            <i class="fa-solid fa-user me-2"></i>
-                            Resident Information
-                        </h6>
-
-
-                        <div class="info-row">
-                            <span>Name</span>
-                            <strong id="view_name"></strong>
-                        </div>
-
-
-                        <div class="info-row">
-                            <span>Unit</span>
-                            <strong id="view_unit"></strong>
-                        </div>
-
-
-                        <div class="info-row">
-                            <span>Resident Type</span>
-                            <span id="view_resident_type"></span>
-                        </div>
-
-
+                <!-- Resident Card -->
+                <div class="card border-0 shadow-sm mb-3">
+                    <div class="card-header bg-light fw-bold">
+                        <i class="fa-solid fa-user me-2 text-primary"></i>
+                        Resident Information
                     </div>
 
-                </div>
-
-
-
-                <div class="card shadow-sm border-0 mb-3">
-
                     <div class="card-body">
 
+                        <div class="row g-3">
 
-                        <h6 class="text-primary fw-bold">
-                            <i class="fa-solid fa-calendar me-2"></i>
-                            Booking Information
-                        </h6>
+                            <div class="col-md-6">
+                                <small class="text-muted d-block">Resident</small>
+                                <div class="fw-semibold fs-6" id="view_name"></div>
+                            </div>
 
+                            <div class="col-md-3">
+                                <small class="text-muted d-block">Unit</small>
+                                <div class="fw-semibold" id="view_unit"></div>
+                            </div>
 
-                        <div class="info-row">
-                            <span>Date</span>
-                            <strong id="view_booking_date"></strong>
+                            <div class="col-md-3">
+                                <small class="text-muted d-block">Type</small>
+                                <div id="view_resident_type"></div>
+                            </div>
+
                         </div>
-
-
-                        <div class="info-row">
-                            <span>Time</span>
-                            <strong id="view_time_slot"></strong>
-                        </div>
-
 
                     </div>
-
                 </div>
 
-
-
-                <div class="card shadow-sm border-0 mb-3">
+                <!-- Booking -->
+                <div class="card border-0 shadow-sm mb-3">
+                    <div class="card-header bg-light fw-bold">
+                        <i class="fa-solid fa-calendar-days me-2 text-primary"></i>
+                        Booking Schedule
+                    </div>
 
                     <div class="card-body">
 
+                        <div class="row">
 
-                        <h6 class="text-primary fw-bold">
-                            <i class="fa-solid fa-clipboard-check me-2"></i>
-                            Inspection Results
-                        </h6>
+                            <div class="col-md-6">
+                                <small class="text-muted d-block">
+                                    Date
+                                </small>
 
+                                <div class="fw-semibold" id="view_booking_date"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <small class="text-muted d-block">
+                                    Time Slot
+                                </small>
+
+                                <div class="fw-semibold" id="view_time_slot"></div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Inspection -->
+                <div class="card border-0 shadow-sm mb-3">
+
+                    <div class="card-header bg-light fw-bold">
+                        <i class="fa-solid fa-list-check me-2 text-primary"></i>
+                        Inspection Results
+                    </div>
+
+                    <div class="card-body">
 
                         <div id="viewInspectionResults"></div>
 
-
                     </div>
 
                 </div>
 
+                <!-- Remarks -->
+                <div class="card border-0 shadow-sm">
 
-
-                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-light fw-bold">
+                        <i class="fa-solid fa-comment-dots me-2 text-primary"></i>
+                        Remarks
+                    </div>
 
                     <div class="card-body">
 
-                        <h6 class="text-primary fw-bold">
-                            Remarks
-                        </h6>
-
-                        <div class="bg-light rounded p-3">
-
-                            <span id="view_remarks">
-                            </span>
-
+                        <div class="border-start border-4 border-primary bg-light rounded p-3 fst-italic">
+                            <span id="view_remarks"></span>
                         </div>
-
                     </div>
 
                 </div>
 
-
             </div>
-
 
         </div>
     </div>

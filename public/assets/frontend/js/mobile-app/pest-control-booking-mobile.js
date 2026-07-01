@@ -293,7 +293,7 @@ $(function () {
 
     $(document).on('submit', '#userPestControlBookingMobile', function (event) {
         event.preventDefault();
-        const form = this; 
+        const form = this;
         logDebugPc("SUBMIT FIRED");
 
         const selectedDate = $('#PestControlBookingDate').val();
@@ -373,7 +373,10 @@ $(function () {
                         icon: 'success',
                         title: 'Booking submitted successfully',
                         showConfirmButton: false,
-                        timer: 2500
+                        timer: 3000,
+                        customClass: {
+                            popup: 'swal2-success-toast'
+                        }
                     });
 
                     window.resetAusiBookingUI();

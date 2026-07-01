@@ -439,8 +439,8 @@ $(function () {
                         icon: 'success',
                         title: res.message,
                         showConfirmButton: false,
-                        timer: 2500,
-                        customClass: {
+                        timer: 3000,
+                        customClass: { 
                             popup: 'swal2-success-toast'
                         }
                     });

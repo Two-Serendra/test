@@ -12,7 +12,7 @@ $(function () {
         }
 
         const options = select.find('option');
- 
+
         if (options.length <= 1) {
             setTimeout(autoSelectHistoryResidenceGt, 300);
             return;
@@ -93,7 +93,7 @@ $(function () {
 
             url: "/get-grease-trap-booking-mobile/history",
 
-            type: "GET", 
+            type: "GET",
 
             data: {
                 unit_name: unitName,
@@ -385,109 +385,99 @@ $(function () {
 
 
     $(document).on('click', '.cancel-mobile-gt-booking-btn', function () {
+
         const bookingId = $(this).data('id');
-        logDebugHistoryGt("Sending confirmed cancel request...");
         const email = $('#history_mobile_email_gt').val();
-        $.ajax({
-            url: '/grease-trap-booking-mobile/cancel/' + bookingId,
-            type: 'POST',
-            data: {
-                email: email,
-                _token: $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function (res) {
-                if (!res.success) {
-                    Swal.fire('Error', res.message || 'Failed to cancel booking.', 'error');
-                    return;
-                }
 
+        Swal.fire({
+            title: 'Cancel Booking?',
+            text: 'Are you sure you want to cancel this booking?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, cancel it',
+            cancelButtonText: 'No'
+        }).then((result) => {
 
-                if (res.requires_confirmation) {
-                    Swal.fire({
-                        title: 'Cancel Booking',
-                        html: res.message,
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#6c757d',
-                        confirmButtonText: 'Yes, cancel it',
-                        cancelButtonText: 'No, keep it'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: '/grease-trap-booking-mobile/cancel/' + bookingId,
-                                type: 'POST',
-                                data: {
-                                    email: email,
-                                    _token: $('meta[name="csrf-token"]').attr('content'),
-                                    confirm: 1
-                                },
-                                success: function (res2) {
-                                    Swal.fire('Cancelled!', res2.message, 'success')
-                                        .then(() => {
-                                            logDebugHistoryGt("Second response received");
-                                            logDebugHistoryGt(JSON.stringify(res2));
-
-                                            const unit =
-                                                Alpine.store('superapp')?.selectedUnit ||
-                                                $('#resident_id_gt_booking_history').val();
-
-
-                                            const email =
-                                                $('#history_mobile_email_gt').val();
-
-                                            const currentPage =
-                                                $('#gtHistoryPagination .active .page-link').data('page') || 1;
-
-                                            updateGtHistoryBookingTable(unit, email, currentPage);
-                                        });
-                                },
-                                error: function (xhr) {
-
-                                    logDebugHistoryGt("AJAX ERROR");
-                                    logDebugHistoryGt("Status: " + xhr.status);
-                                    logDebugHistoryGt("Response: " + xhr.responseText);
-
-                                    Swal.fire(
-                                        'Error',
-                                        'Something went wrong while cancelling.',
-                                        'error'
-                                    );
-                                }
-                            });
-                        }
-                    });
-                } else {
-                    Swal.fire('Cancelled!', res.message, 'success')
-                        .then(() => {
-                            const unit =
-                                Alpine.store('superapp')?.selectedUnit ||
-                                $('#resident_id_gt_booking_history').val();
-
-
-                            const email =
-                                $('#history_mobile_email_gt').val();
-
-                            updateGtHistoryBookingTable(
-                                unit,
-                                email
-                            );
-                        });
-                }
-            },
-            error: function (xhr) {
-
-                logDebugHistoryGt("AJAX ERROR");
-                logDebugHistoryGt("Status: " + xhr.status);
-                logDebugHistoryGt("Response: " + xhr.responseText);
-
-                Swal.fire(
-                    'Error',
-                    'Something went wrong while cancelling.',
-                    'error'
-                );
+            if (!result.isConfirmed) {
+                return;
             }
+
+            logDebugHistoryGt("Sending cancel request...");
+
+            $.ajax({
+                url: '/grease-trap-booking-mobile/cancel/' + bookingId,
+                type: 'POST',
+                data: {
+                    email: email,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+
+                success: function (res) {
+
+                    if (!res.success) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'error',
+                            title: res.message || 'Failed to cancel booking.',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            customClass: {
+                                popup: 'swal2-success-toast'
+                            }
+                        });
+                        return;
+                    }
+
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: res.message,
+                        showConfirmButton: false,
+                        timer: 2500
+                    });
+
+                    const unit =
+                        Alpine.store('superapp')?.selectedUnit ||
+                        $('#resident_id_gt_booking_history').val();
+
+                    const email =
+                        $('#history_mobile_email_gt').val();
+
+                    const currentPage =
+                        $('#gtHistoryPagination .active .page-link').data('page') || 1;
+
+                    updateGtHistoryBookingTable(
+                        unit,
+                        email,
+                        currentPage
+                    );
+                },
+
+                error: function (xhr) {
+
+                    logDebugHistoryGt("AJAX ERROR");
+                    logDebugHistoryGt("Status: " + xhr.status);
+                    logDebugHistoryGt("Response: " + xhr.responseText);
+
+                    const res = xhr.responseJSON || {};
+
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'error',
+                        title: res.message || 'Something went wrong while cancelling.',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                }
+            });
+
         });
+
     });
 
     $(document).on('click', '.view-ausi-booking-btn', function () {

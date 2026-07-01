@@ -113,7 +113,7 @@ $(function () {
 
                 logDebugHistory(
                     "HISTORY RESPONSE",
-                    res 
+                    res
                 );
                 $("#historyWrapper").removeClass('d-none');
 
@@ -351,9 +351,15 @@ $(function () {
             success: function (res) {
 
                 Swal.fire({
-                    icon: "success",
-                    title: "Cancelled",
-                    text: "Your booking has been cancelled"
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Booking cancelled successfully',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    customClass: {
+                        popup: 'swal2-success-toast'
+                    }
                 });
 
 

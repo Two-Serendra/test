@@ -384,7 +384,10 @@ $(function () {
                         icon: 'success',
                         title: 'Booking submitted successfully',
                         showConfirmButton: false,
-                        timer: 2500
+                        timer: 3000,
+                        customClass: {
+                            popup: 'swal2-success-toast'
+                        }
                     });
 
                     window.resetGtBookingUI();
@@ -483,7 +486,21 @@ $(function () {
             });
         };
 
-        sendBooking();
+        Swal.fire({
+            title: 'Submit Booking?',
+            text: 'Are you sure you want to submit this grease trap booking?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Proceed',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#0d6efd', 
+            cancelButtonColor: '#6c757d',   
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                sendBooking();
+            }
+        });
     });
 
     $(document).on('click', '.service-link', function () {

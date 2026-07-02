@@ -4,15 +4,15 @@
 
 @section('content')
 
-    <!-- <div id="historyPageLoading" class="history-page-loading">
-            <div class="text-center">
-                <div class="spinner-border text-primary"></div>
+    <div id="historyPageLoading" class="history-page-loading">
+        <div class="text-center">
+            <div class="spinner-border text-primary"></div>
 
-                <div class="mt-2 text-muted">
-                    Loading bookings...
-                </div>
+            <div class="mt-2 text-muted">
+                Loading bookings...
             </div>
-        </div> -->
+        </div>
+    </div>
 
     <div class="" x-data="gtBookingPageHistory">
         <div class="bg-light rounded-3 py-3 px-3 border">
@@ -73,16 +73,16 @@
     </div>
 
     <!-- <div id="debugPanelBookingHistoryGt" style="position: fixed;
-                                                    bottom: 0;
-                                                    left: 0;
-                                                    right: 0;
-                                                    height: 140px;
-                                                    overflow: auto;
-                                                    background: black;
-                                                    color: #00ff00;
-                                                    font-size: 11px;
-                                                    z-index: 99999;
-                                                    padding: 10px;"></div> -->
+                                                        bottom: 0;
+                                                        left: 0;
+                                                        right: 0;
+                                                        height: 140px;
+                                                        overflow: auto;
+                                                        background: black;
+                                                        color: #00ff00;
+                                                        font-size: 11px;
+                                                        z-index: 99999;
+                                                        padding: 10px;"></div> -->
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('gtBookingPageHistory', () => ({

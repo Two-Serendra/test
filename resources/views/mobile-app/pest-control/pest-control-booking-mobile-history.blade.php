@@ -14,21 +14,22 @@
         </div>
     </div>
 
-    <div class="" x-data="pcBookingPageHistory">
-        <div class="bg-light rounded-3 py-3 px-3 border">
-            <div class="d-flex align-items-center">
-                <i class='bx bx-bug text-warning fs-1 me-3'></i>
-                <div>
-                    <h5 class="fw-bold mb-0">
-                        Pest Control Booking History
-                    </h5>
-                </div>
+
+    <div class="bg-light rounded-3 py-3 px-3 border">
+        <div class="d-flex align-items-center">
+            <i class='bx bx-bug text-warning fs-1 me-3'></i>
+            <div>
+                <h5 class="fw-bold mb-0">
+                    Pest Control Booking History
+                </h5>
             </div>
         </div>
+    </div>
 
-        <div class="card shadow-sm mb-4">
+    <div class="container-fluid px-3 py-3">
+        <div class="" x-data="pcBookingPageHistory">
             <div class="row mb-3">
-                <div class="mb-3 mb-md-0">
+                <div class="col-12 mb-3 mb-md-0">
                     <label class="form-label">Select Residence <span class="required">*</span></label>
                     <!-- <input type="text" name="email" id="mobile_email"> -->
                     <input type="hidden" name="mobile_unit_name" id="mobile_unit_name">
@@ -51,36 +52,36 @@
                         </dd>
                     </dl>
                 </div>
-
-                <div id="historyWrapperPc" class="position-relative">
-                    <!-- Loading Overlay -->
-                    <div id="historyLoadingPc" class="history-loading d-none">
-                        <div class="text-center">
-                            <div class="spinner-border text-primary mb-2"></div>
-                            <div class="text-muted">
-                                Table Loading bookings...
+                <div class="col-12 mb-3 mb-md-0">
+                    <div id="historyWrapperPc" class="position-relative">
+                        <!-- Loading Overlay -->
+                        <div id="historyLoadingPc" class="history-loading d-none">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary mb-2"></div>
+                                <div class="text-muted">
+                                    Table Loading bookings...
+                                </div>
                             </div>
                         </div>
+                        <div id="pcHistoryTable" class="booking-history-list"></div>
+                        <div id="pcHistoryPagination" class="mt-4 text-center"></div>
                     </div>
-                    <div id="pcHistoryTable" class="booking-history-list"></div>
-                    <div id="pcHistoryPagination" class="mt-4 text-center"></div>
                 </div>
-
             </div>
         </div>
     </div>
 
     <!-- <div id="debugPanelBookingHistoryPc" style="position: fixed;
-                                                    bottom: 0;
-                                                    left: 0;
-                                                    right: 0;
-                                                    height: 140px;
-                                                    overflow: auto;
-                                                    background: black;
-                                                    color: #00ff00;
-                                                    font-size: 11px;
-                                                    z-index: 99999;
-                                                    padding: 10px;"></div> -->
+                                                                            bottom: 0;
+                                                                            left: 0;
+                                                                            right: 0;
+                                                                            height: 140px;
+                                                                            overflow: auto;
+                                                                            background: black;
+                                                                            color: #00ff00;
+                                                                            font-size: 11px;
+                                                                            z-index: 99999;
+                                                                            padding: 10px;"></div> -->
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('pcBookingPageHistory', () => ({

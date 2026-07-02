@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidence();
-    alert("🔥Ausi History JS VERSION 43");
+    alert("🔥Ausi History JS VERSION 44");
     function autoSelectHistoryResidence() {
 
         const select = $('#resident_id_ausi_booking_history');
@@ -407,7 +407,7 @@ $(function () {
 
     $(document).on('click', '.view-ausi-booking-btn', function () {
         let info_id = $(this).data('id');
-        showLoading();
+        showHistoryLoading();
         $.get('/fetch-ausi-booking-mobile/' + info_id, function (data) {
             logDebugHistory("AUSI booking data fetched successfully");
             logDebugHistory(JSON.stringify(data));
@@ -562,6 +562,7 @@ $(function () {
                 "Modal Element: " +
                 (document.getElementById('ausiViewResultModal') ? 'FOUND' : 'NOT FOUND')
             );
+            hideHistoryLoading();
             $('#ausiViewResultModal').modal('show');
         })
             .fail(function (xhr, status, error) {
@@ -582,7 +583,7 @@ $(function () {
                     "AUSI booking request completed"
                 );
 
-                hideLoading();
+               hideHistoryLoading();
 
             });
 

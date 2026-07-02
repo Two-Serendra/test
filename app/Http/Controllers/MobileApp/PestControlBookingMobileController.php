@@ -364,7 +364,7 @@ class PestControlBookingMobileController extends Controller
         $bookings = TestPestControlBooking::where('email', $email)
             ->where('unit_no', $unitNo)
             ->orderBy('booking_date', 'desc')
-            ->paginate(1);
+            ->paginate(5); 
 
         return response()->json([
             'unit_no' => $unitNo,

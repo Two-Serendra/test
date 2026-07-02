@@ -13,21 +13,23 @@
             </div>
         </div>
     </div>
+    
+    <div class="bg-light rounded-3 py-3 px-3 border">
+        <div class="d-flex align-items-center">
+            <i class="bx bx-water text-primary fs-1 me-3"></i>
 
-    <div class="" x-data="gtBookingPageHistory">
-        <div class="bg-light rounded-3 py-3 px-3 border">
-            <div class="d-flex align-items-center">
-                <i class="bx bx-water text-primary fs-1 me-3"></i>
-
-                <div>
-                    <h5 class="fw-bold mb-0">
-                        Grease Trap Booking History
-                    </h5>
-                </div>
+            <div>
+                <h5 class="fw-bold mb-0">
+                    Grease Trap Booking History
+                </h5>
             </div>
         </div>
+    </div>
 
-        <div class="card">
+    <div class="container-fluid px-3 py-3">
+        <div class="" x-data="gtBookingPageHistory">
+
+
             <div class="row">
                 <div class="col-12 mb-3 mb-md-0">
                     <label class="form-label">Select Residence <span class="required">*</span></label>
@@ -69,20 +71,22 @@
                 </div>
 
             </div>
+
         </div>
     </div>
 
+
     <!-- <div id="debugPanelBookingHistoryGt" style="position: fixed;
-                                                        bottom: 0;
-                                                        left: 0;
-                                                        right: 0;
-                                                        height: 140px;
-                                                        overflow: auto;
-                                                        background: black;
-                                                        color: #00ff00;
-                                                        font-size: 11px;
-                                                        z-index: 99999;
-                                                        padding: 10px;"></div> -->
+                                                                            bottom: 0;
+                                                                            left: 0;
+                                                                            right: 0;
+                                                                            height: 140px;
+                                                                            overflow: auto;
+                                                                            background: black;
+                                                                            color: #00ff00;
+                                                                            font-size: 11px;
+                                                                            z-index: 99999;
+                                                                            padding: 10px;"></div> -->
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('gtBookingPageHistory', () => ({

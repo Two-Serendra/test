@@ -27,7 +27,7 @@
             </div>
         </div>
 
-        <div class="card shadow-sm">
+        <div class="card">
             <div class="row">
                 <div class="col-12 mb-3 mb-md-0">
                     <label class="form-label">Select Residence <span class="required">*</span></label>

@@ -36,21 +36,18 @@
                     <input type="hidden" name="mobile_unit_role" id="mobile_unit_role">
                     <input type="hidden" id="history_mobile_email_gt" name="email"
                         :value="$store.superapp.user?.email || ''">
-                    <dl>
-                        <dd>
 
-                            <select id="resident_id_gt_booking_history" name="resident_id_gt_booking_history"
-                                class="form-select" x-model="$store.superapp.selectedUnit" required>
-                                <option value="" disabled>-- Select Residence --</option>
+                    <select id="resident_id_gt_booking_history" name="resident_id_gt_booking_history" class="form-select"
+                        x-model="$store.superapp.selectedUnit" required>
+                        <option value="" disabled>-- Select Residence --</option>
 
-                                <template x-for="(unit, index) in $store.superapp.units" :key="index">
-                                    <option :value="unit.name" :data-name="unit.name" :data-role="unit.role"
-                                        x-text="`${unit.role ?? ''} ${unit.name}`">
-                                    </option>
-                                </template>
-                            </select>
-                        </dd>
-                    </dl>
+                        <template x-for="(unit, index) in $store.superapp.units" :key="index">
+                            <option :value="unit.name" :data-name="unit.name" :data-role="unit.role"
+                                x-text="`${unit.role ?? ''} ${unit.name}`">
+                            </option>
+                        </template>
+                    </select>
+
                 </div>
                 <div class="col-12 mb-3 mb-md-0">
                     <div id="historyWrapperGt" class="position-relative">
@@ -75,16 +72,16 @@
 
 
     <!-- <div id="debugPanelBookingHistoryGt" style="position: fixed;
-                                                                            bottom: 0;
-                                                                            left: 0;
-                                                                            right: 0;
-                                                                            height: 140px;
-                                                                            overflow: auto;
-                                                                            background: black;
-                                                                            color: #00ff00;
-                                                                            font-size: 11px;
-                                                                            z-index: 99999;
-                                                                            padding: 10px;"></div> -->
+                                                                                bottom: 0;
+                                                                                left: 0;
+                                                                                right: 0;
+                                                                                height: 140px;
+                                                                                overflow: auto;
+                                                                                background: black;
+                                                                                color: #00ff00;
+                                                                                font-size: 11px;
+                                                                                z-index: 99999;
+                                                                                padding: 10px;"></div> -->
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('gtBookingPageHistory', () => ({

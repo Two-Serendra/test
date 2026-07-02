@@ -35,21 +35,18 @@
                     <input type="hidden" name="mobile_unit_name" id="mobile_unit_name">
                     <input type="hidden" name="mobile_unit_role" id="mobile_unit_role">
                     <input type="hidden" id="history_mobile_email" name="email" :value="$store.superapp.user?.email || ''">
-                    <dl>
-                        <dd>
 
-                            <select id="resident_id_ausi_booking_history" name="resident_id_ausi_booking_history"
-                                class="form-select" x-model="$store.superapp.selectedUnit" required>
-                                <option value="" disabled>-- Select Residence --</option>
+                    <select id="resident_id_ausi_booking_history" name="resident_id_ausi_booking_history"
+                        class="form-select" x-model="$store.superapp.selectedUnit" required>
+                        <option value="" disabled>-- Select Residence --</option>
 
-                                <template x-for="(unit, index) in $store.superapp.units" :key="index">
-                                    <option :value="unit.name" :data-name="unit.name" :data-role="unit.role"
-                                        x-text="`${unit.role ?? ''} ${unit.name}`">
-                                    </option>
-                                </template>
-                            </select>
-                        </dd>
-                    </dl>
+                        <template x-for="(unit, index) in $store.superapp.units" :key="index">
+                            <option :value="unit.name" :data-name="unit.name" :data-role="unit.role"
+                                x-text="`${unit.role ?? ''} ${unit.name}`">
+                            </option>
+                        </template>
+                    </select>
+
                 </div>
 
                 <div class="col-12 mb-3 mb-md-0">
@@ -71,7 +68,7 @@
     </div>
 
     <!-- <div id="debugPanelBookingHistory">
-                                                            </div> -->
+                                                                </div> -->
 
     </div>
     @include('mobile-app.ausi.ausi-mobile-modal')

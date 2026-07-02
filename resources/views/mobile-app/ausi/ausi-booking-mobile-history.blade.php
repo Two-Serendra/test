@@ -14,45 +14,45 @@
         </div>
     </div>
 
-    <div class="" x-data="ausiBookingPageHistory">
-        <div class="loading" x-show="$store.superapp.isLoading">
-            <p>Waiting for shell context…</p>
+    <div class="bg-light rounded-3 py-3 px-3 border">
+        <div class="d-flex align-items-center">
+            <i class="bx bx-building-house text-primary fs-1 me-3"></i>
+
+            <div>
+                <h5 class="fw-bold mb-0">
+                    AUSI Booking History
+                </h5>
+            </div>
         </div>
-        <div class="warning-banner" x-show="!inShell && !$store.superapp.isLoading">
-            Running outside the shell — bridge data is unavailable.
-            In production this page runs inside the shell iframe.
-        </div>
+    </div>
 
+    <div class="container-fluid px-3 py-3">
+        <div class="" x-data="ausiBookingPageHistory">
+            <div class="row mb-3">
+                <div class="col-12 mb-3 mb-md-0">
+                    <label class="form-label">Select Residence <span class="required">*</span></label>
+                    <!-- <input type="text" name="email" id="mobile_email"> -->
+                    <input type="hidden" name="mobile_unit_name" id="mobile_unit_name">
+                    <input type="hidden" name="mobile_unit_role" id="mobile_unit_role">
+                    <input type="hidden" id="history_mobile_email" name="email" :value="$store.superapp.user?.email || ''">
+                    <dl>
+                        <dd>
 
+                            <select id="resident_id_ausi_booking_history" name="resident_id_ausi_booking_history"
+                                class="form-select" x-model="$store.superapp.selectedUnit" required>
+                                <option value="" disabled>-- Select Residence --</option>
 
-        <div class="card shadow-sm mb-4">
-            <H3>Booking History</H3>
-            <div class="card-body">
-                <div class="row mb-3">
-                    <div class="mb-3 mb-md-0">
-                        <label class="form-label">Select Residence <span class="required">*</span></label>
-                        <!-- <input type="text" name="email" id="mobile_email"> -->
-                        <input type="hidden" name="mobile_unit_name" id="mobile_unit_name">
-                        <input type="hidden" name="mobile_unit_role" id="mobile_unit_role">
-                        <input type="hidden" id="history_mobile_email" name="email"
-                            :value="$store.superapp.user?.email || ''">
-                        <dl>
-                            <dd>
+                                <template x-for="(unit, index) in $store.superapp.units" :key="index">
+                                    <option :value="unit.name" :data-name="unit.name" :data-role="unit.role"
+                                        x-text="`${unit.role ?? ''} ${unit.name}`">
+                                    </option>
+                                </template>
+                            </select>
+                        </dd>
+                    </dl>
+                </div>
 
-                                <select id="resident_id_ausi_booking_history" name="resident_id_ausi_booking_history"
-                                    class="form-select" x-model="$store.superapp.selectedUnit" required>
-                                    <option value="" disabled>-- Select Residence --</option>
-
-                                    <template x-for="(unit, index) in $store.superapp.units" :key="index">
-                                        <option :value="unit.name" :data-name="unit.name" :data-role="unit.role"
-                                            x-text="`${unit.role ?? ''} ${unit.name}`">
-                                        </option>
-                                    </template>
-                                </select>
-                            </dd>
-                        </dl>
-                    </div>
-
+                <div class="col-12 mb-3 mb-md-0">
                     <div id="historyWrapper" class="position-relative">
                         <!-- Loading Overlay -->
                         <div id="historyLoading" class="history-loading d-none">
@@ -68,9 +68,10 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- <div id="debugPanelBookingHistory">
-            </div> -->
+    <!-- <div id="debugPanelBookingHistory">
+                                                            </div> -->
 
     </div>
     @include('mobile-app.ausi.ausi-mobile-modal')

@@ -228,23 +228,3 @@
 .swal2-success-toast .swal2-success-circular-line-right {
     background: transparent !important;
 }
-
-.card {
-    border: 2px solid red !important;
-}
-
-#historyWrapperGt {
-    border: 2px solid blue !important;
-}
-
-#gtHistoryTable {
-    border: 2px solid green !important;
-}
-
-#gtHistoryPagination {
-    border: 2px solid orange !important;
-}
-
-.booking-card {
-    border: 2px solid purple !important;
-}

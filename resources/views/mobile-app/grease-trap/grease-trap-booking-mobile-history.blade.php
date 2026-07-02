@@ -51,38 +51,36 @@
                             </select>
                         </dd>
                     </dl>
-
-                    <div id="historyWrapperGt" class="position-relative">
-                        <!-- Loading Overlay -->
-                        <div id="historyLoading" class="history-loading d-none">
-                            <div class="text-center">
-                                <div class="spinner-border text-primary mb-2"></div>
-                                <div class="text-muted">
-                                    Loading bookings...
-                                </div>
+                </div>
+                
+                <div id="historyWrapperGt" class="position-relative">
+                    <!-- Loading Overlay -->
+                    <div id="historyLoading" class="history-loading d-none">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary mb-2"></div>
+                            <div class="text-muted">
+                                Loading bookings...
                             </div>
                         </div>
-                        <div id="gtHistoryTable" class="booking-history-list"></div>
-                        <div id="gtHistoryPagination" class="mt-4 text-center"></div>
                     </div>
+                    <div id="gtHistoryTable" class="booking-history-list"></div>
+                    <div id="gtHistoryPagination" class="mt-4 text-center"></div>
                 </div>
-
-
             </div>
         </div>
     </div>
 
     <!-- <div id="debugPanelBookingHistoryGt" style="position: fixed;
-                                                    bottom: 0;
-                                                    left: 0;
-                                                    right: 0;
-                                                    height: 140px;
-                                                    overflow: auto;
-                                                    background: black;
-                                                    color: #00ff00;
-                                                    font-size: 11px;
-                                                    z-index: 99999;
-                                                    padding: 10px;"></div> -->
+                                                bottom: 0;
+                                                left: 0;
+                                                right: 0;
+                                                height: 140px;
+                                                overflow: auto;
+                                                background: black;
+                                                color: #00ff00;
+                                                font-size: 11px;
+                                                z-index: 99999;
+                                                padding: 10px;"></div> -->
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('gtBookingPageHistory', () => ({

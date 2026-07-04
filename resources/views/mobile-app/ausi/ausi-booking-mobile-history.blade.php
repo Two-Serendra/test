@@ -3,7 +3,7 @@
 @section('title', 'Bridge Demo — Dashboard')
 
 @section('content')
-
+<!-- 
     <div id="historyPageLoading" class="history-page-loading">
         <div class="text-center">
             <div class="spinner-border text-primary"></div>
@@ -12,7 +12,7 @@
                 Loading bookings...
             </div>
         </div>
-    </div>
+    </div> -->
 
     <div class="bg-light rounded-3 py-3 px-3 border">
         <div class="d-flex align-items-center">

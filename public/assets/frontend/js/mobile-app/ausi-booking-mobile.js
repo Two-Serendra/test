@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-040");
+    alert("🔥 JS VERSION 2026-06-15-041");
     const el = document.getElementById('resident_id_ausi_mobile');
 
     logDebug("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -30,11 +30,11 @@ $(function () {
 
     const $bookingSlots = $('.ausi-booking-slot');
 
-    document.addEventListener('change', function (e) {
-        if (e.target && e.target.id === 'resident_id_ausi_mobile') {
-            window.onResidentChange(e);
-        }
-    });
+    // document.addEventListener('change', function (e) {
+    //     if (e.target && e.target.id === 'resident_id_ausi_mobile') {
+    //         window.onResidentChange(e);
+    //     }
+    // });
 
     window.onResidentChange = function (e) {
         const value = e.target.value;

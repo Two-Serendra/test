@@ -67,8 +67,8 @@
         </div>
     </div>
 
-    <div id="debugPanelBookingHistoryAusi">
-                                                                </div>
+    <!-- <div id="debugPanelBookingHistoryAusi">
+                                                                </div> -->
 
     </div>
     @include('mobile-app.ausi.ausi-mobile-modal')

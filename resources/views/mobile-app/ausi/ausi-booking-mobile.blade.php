@@ -68,7 +68,7 @@
                             <input type="hidden" name="email" :value="$store.superapp.user?.email || ''">
 
 
-                            <select id="resident_id_ausi" name="resident_id_ausi" class="form-select"
+                            <select id="resident_id_ausi_mobile" name="resident_id_ausi_mobile" class="form-select"
                                 x-model="$store.superapp.selectedUnit" required>
                                 <option value="" disabled>-- Select Residence --</option>
 

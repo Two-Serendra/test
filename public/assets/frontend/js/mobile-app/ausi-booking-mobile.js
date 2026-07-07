@@ -1,6 +1,6 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-038");
-    const el = document.getElementById('resident_id_ausi');
+    alert("🔥 JS VERSION 2026-06-15-039");
+    const el = document.getElementById('resident_id_ausi_mobile');
 
     logDebug("SELECT EXISTS: " + (el ? "YES" : "NO"));
     function logDebug(...args) {
@@ -44,7 +44,7 @@ $(function () {
     });
 
     document.addEventListener('change', function (e) {
-        if (e.target && e.target.id === 'resident_id_ausi') {
+        if (e.target && e.target.id === 'resident_id_ausi_mobile') {
             window.onResidentChange(e);
         }
     });
@@ -251,7 +251,7 @@ $(function () {
         if (window.Alpine && Alpine.store('superapp')) {
             Alpine.store('superapp').selectedUnit = '';
         }
-        $('#resident_id_ausi')
+        $('#resident_id_ausi_mobile')
             .val('')
             .prop('selectedIndex', 0)
             .trigger('change');
@@ -293,7 +293,7 @@ $(function () {
         logDebug("SUBMIT FIRED");
 
         const selectedDate = $('#AusiBookingDate').val();
-        const selectedUnit = $('#resident_id_ausi').val();
+        const selectedUnit = $('#resident_id_ausi_mobile').val();
         const selectedSlot = $('input[name="booking_time_slot"]:checked').val();
         const $submitBtn = $('#saveUserAusiBtn');
 
@@ -334,8 +334,8 @@ $(function () {
         const sendBooking = (forceOverride = false) => {
             const store = Alpine.store('superapp');
             const email = store?.user?.email || '';
-            const unit = $('#resident_id_ausi').val();
-            const role = $('#resident_id_ausi option:selected').data('role') || '';
+            const unit = $('#resident_id_ausi_mobile').val();
+            const role = $('#resident_id_ausi_mobile option:selected').data('role') || '';
             $('#mobile_email').val(email);
             $('#mobile_unit_name').val(unit);
             $('#mobile_unit_role').val(role);

@@ -98,7 +98,7 @@ $(function () {
 
             logDebugPc("STEP 2 OK");
             showLoading();
-            resetSlots();
+            resetSlotsPc();
 
             logDebugPc("STEP 3 OK - BEFORE AJAX");
 
@@ -114,7 +114,7 @@ $(function () {
 
                 success: function (res) {
 
-                    resetSlots();
+                    resetSlotsPc();
 
                     disableBookedSlots(res.blocked_for_user || []);
                     disablePastSlots(date);
@@ -140,7 +140,7 @@ $(function () {
         }
     }
 
-    window.resetSlots = function () {
+    window.resetSlotsPc = function () {
 
         $('.pc-booking-slot').each(function () {
 
@@ -380,7 +380,7 @@ $(function () {
                     });
 
                     window.resetAusiBookingUI();
-                    window.resetSlots();
+                    window.resetSlotsPc();
                 },
 
                 error: function (xhr) {

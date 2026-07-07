@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 Pest Control JS VERSION 2026-06-15-0010");
+    alert("🔥 Pest Control JS VERSION 2026-06-15-0011");
     const el = document.getElementById('resident_id_pc');
 
     logDebugPc("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -105,7 +105,7 @@ $(function () {
             $.ajax({
 
                 url: "/pest-control-booked-slots-mobile",
-                type: "GET",
+                type: "GET", 
                 data: { date, unit_name: unitName },
 
                 beforeSend: function () {

@@ -79,25 +79,57 @@ class PestControlBookingMobileController extends Controller
             ], 404);
         }
 
-        // One booking per slot regardless of tower
-        $blockedSlots = TestPestControlBooking::whereDate('booking_date', $request->date)
-            ->where('booking_status', 1)
-            ->pluck('booking_time_slot')
-            ->filter()
-            ->unique()
-            ->values()
-            ->toArray();
+        $areaLetter = preg_replace('/[^A-Z]/', '', $resident->unit_no);
 
-        \Log::info('MOBILE GREASE TRAP SLOT REQUEST', [
+        $lowrise = ['A', 'B', 'C', 'D', 'E'];
+        $highrise = ['F', 'G', 'H', 'I'];
+
+        $userGroup = in_array($areaLetter, $lowrise) ? 'lowrise' : 'highrise';
+
+        $bookings = TestPestControlBooking::whereDate('booking_date', $request->date)
+            ->where('booking_status', 1)
+            ->get(['booking_time_slot', 'unit_area']);
+
+        $slotStatus = [];
+
+        foreach ($bookings as $b) {
+            $slot = $b->booking_time_slot;
+            $area = $b->unit_area;
+
+            if (!isset($slotStatus[$slot])) {
+                $slotStatus[$slot] = [
+                    'lowrise' => false,
+                    'highrise' => false
+                ];
+            }
+
+            if (in_array($area, $lowrise)) {
+                $slotStatus[$slot]['lowrise'] = true;
+            }
+
+            if (in_array($area, $highrise)) {
+                $slotStatus[$slot]['highrise'] = true;
+            }
+        }
+
+        $blockedForUser = [];
+
+        foreach ($slotStatus as $slot => $status) {
+            if ($status[$userGroup]) {
+                $blockedForUser[] = $slot;
+            }
+        }
+
+        \Log::info('MOBILE PEST CONTROL SLOT REQUEST', [
             'unit_name' => $unitName,
             'unit_no' => $unitNo,
-            'resident_id' => $resident->id,
-            'date' => $request->date,
-            'blocked_slots' => $blockedSlots,
+            'resident_id' => $resident->id ?? null,
+            'blocked_for_user' => $blockedForUser,
         ]);
 
         return response()->json([
-            'blocked_slots' => $blockedSlots
+            'blocked_for_user' => $blockedForUser,
+            'raw_status' => $slotStatus
         ]);
     }
 
@@ -364,7 +396,7 @@ class PestControlBookingMobileController extends Controller
         $bookings = TestPestControlBooking::where('email', $email)
             ->where('unit_no', $unitNo)
             ->orderBy('booking_date', 'desc')
-            ->paginate(5); 
+            ->paginate(5);
 
         return response()->json([
             'unit_no' => $unitNo,

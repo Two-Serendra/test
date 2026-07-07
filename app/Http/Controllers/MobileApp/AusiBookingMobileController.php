@@ -94,7 +94,7 @@ class AusiBookingMobileController extends Controller
         $userGroup = in_array($areaLetter, $lowrise) ? 'lowrise' : 'highrise';
 
         $bookings = AusiBooking::whereDate('booking_date', $request->date)
-            ->where('booking_status', 1)
+            ->where('booking_status', '!=', 0)
             ->get(['booking_time_slot', 'unit_area']);
 
         $slotStatus = [];

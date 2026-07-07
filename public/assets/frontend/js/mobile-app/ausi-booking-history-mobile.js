@@ -1,7 +1,7 @@
 $(function () {
 
     autoSelectHistoryResidence();
-    alert("🔥Ausi History JS VERSION 45");
+    alert("🔥Ausi History JS VERSION 46");
     function autoSelectHistoryResidence() {
 
         const select = $('#resident_id_ausi_booking_history');
@@ -53,9 +53,9 @@ $(function () {
 
     const el = document.getElementById('resident_id_ausi_booking_history');
 
-    // logDebugHistory("SELECT EXISTS: " + (el ? "YES" : "NO"));
+    logDebugHistoryAusi("SELECT EXISTS: " + (el ? "YES" : "NO"));
 
-    function logDebugHistory(...args) {
+    function logDebugHistoryAusi(...args) {
 
         const msg = args.map(a =>
             typeof a === 'object'
@@ -65,7 +65,7 @@ $(function () {
 
         console.log(msg);
 
-        const el = document.getElementById('debugPanelBookingHistory');
+        const el = document.getElementById('debugPanelBookingHistoryAusi');
 
         if (el) {
             el.innerHTML += msg + "<br>";
@@ -74,7 +74,7 @@ $(function () {
     }
 
     document.addEventListener('change', function (e) {
-        logDebugHistory("CHANGE EVENT: " + e.target.id);
+        logDebugHistoryAusi("CHANGE EVENT: " + e.target.id);
         if (e.target && e.target.id === 'resident_id_ausi_booking_history') {
             window.onResidentChangeHistory(e);
         }
@@ -88,7 +88,7 @@ $(function () {
         $("#historyWrapperAusi").removeClass("d-none");
 
         updateAusiHistoryBookingTable(
-            unit, 
+            unit,
             email
         );
     };
@@ -111,7 +111,7 @@ $(function () {
 
             success: function (res) {
 
-                logDebugHistory(
+                logDebugHistoryAusi(
                     "HISTORY RESPONSE",
                     res
                 );
@@ -127,7 +127,7 @@ $(function () {
 
             error: function (xhr) {
 
-                logDebugHistory(
+                logDebugHistoryAusi(
                     "ERROR",
                     xhr.responseText
                 );
@@ -164,7 +164,7 @@ $(function () {
     }
 
     function renderHistoryTableAusi(bookings) {
-        logDebugHistory("renderHistoryTableAusi");
+        logDebugHistoryAusi("renderHistoryTableAusi");
 
         let html = "";
 
@@ -286,6 +286,8 @@ $(function () {
             `;
             });
         }
+
+        logDebugHistoryAusi(html);
 
         $("#ausiHistoryTable").html(html);
     }
@@ -409,9 +411,9 @@ $(function () {
         let info_id = $(this).data('id');
         showHistoryLoadingAusi();
         $.get('/fetch-ausi-booking-mobile/' + info_id, function (data) {
-            logDebugHistory("AUSI booking data fetched successfully");
-            logDebugHistory(JSON.stringify(data));
-            logDebugHistory("SUCCESS CALLBACK REACHED");
+            logDebugHistoryAusi("AUSI booking data fetched successfully");
+            logDebugHistoryAusi(JSON.stringify(data));
+            logDebugHistoryAusi("SUCCESS CALLBACK REACHED");
             // alert("view ausi is hitting");
             $('#view_transaction_no')
                 .text(data.transaction_no);
@@ -426,7 +428,7 @@ $(function () {
 
             let residentType = data.resident_type?.toUpperCase() ?? 'N/A';
 
-            logDebugHistory("Resident Type: " + residentType);
+            logDebugHistoryAusi("Resident Type: " + residentType);
 
             $('#view_resident_type')
                 .removeClass('text-primary text-danger text-secondary')
@@ -453,7 +455,7 @@ $(function () {
                 );
 
 
-            logDebugHistory(
+            logDebugHistoryAusi(
                 "Booking Status: " +
                 data.display_status
             );
@@ -470,7 +472,7 @@ $(function () {
                 data.inspection_results.length === 0) {
 
 
-                logDebugHistory(
+                logDebugHistoryAusi(
                     "No inspection results found"
                 );
 
@@ -484,7 +486,7 @@ $(function () {
             } else {
 
 
-                logDebugHistory(
+                logDebugHistoryAusi(
                     "Inspection results count: " +
                     data.inspection_results.length
                 );
@@ -513,7 +515,7 @@ $(function () {
                 data.inspection_results.forEach(result => {
 
 
-                    logDebugHistory(
+                    logDebugHistoryAusi(
                         "Inspection Item: " +
                         result.inspection_item.item_name
                     );
@@ -549,16 +551,16 @@ $(function () {
             }
             $('#viewInspectionResults')
                 .html(inspectionHtml);
-            logDebugHistory(
+            logDebugHistoryAusi(
                 "Opening AUSI view modal"
             );
 
-            logDebugHistory(
+            logDebugHistoryAusi(
                 "Modal Count: " +
                 $('#ausiViewResultModal').length
             );
 
-            logDebugHistory(
+            logDebugHistoryAusi(
                 "Modal Element: " +
                 (document.getElementById('ausiViewResultModal') ? 'FOUND' : 'NOT FOUND')
             );
@@ -567,11 +569,11 @@ $(function () {
         })
             .fail(function (xhr, status, error) {
 
-                logDebugHistory("FAILED TO FETCH AUSI BOOKING");
-                logDebugHistory("Status: " + status);
-                logDebugHistory("Error: " + error);
-                logDebugHistory("HTTP Code: " + xhr.status);
-                logDebugHistory("Response: " + xhr.responseText);
+                logDebugHistoryAusi("FAILED TO FETCH AUSI BOOKING");
+                logDebugHistoryAusi("Status: " + status);
+                logDebugHistoryAusi("Error: " + error);
+                logDebugHistoryAusi("HTTP Code: " + xhr.status);
+                logDebugHistoryAusi("Response: " + xhr.responseText);
 
 
                 alert("Unable to load booking details.");
@@ -579,11 +581,11 @@ $(function () {
             })
             .always(function () {
 
-                logDebugHistory(
+                logDebugHistoryAusi(
                     "AUSI booking request completed"
                 );
 
-               hideHistoryLoadingAusi();
+                hideHistoryLoadingAusi();
 
             });
 

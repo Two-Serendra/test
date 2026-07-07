@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-036");
+    alert("🔥 JS VERSION 2026-06-15-037");
     const el = document.getElementById('resident_id_ausi');
 
     logDebug("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -57,35 +57,28 @@ $(function () {
         if (window.Alpine && Alpine.store('superapp')) {
             Alpine.store('superapp').selectedUnit = value;
         }
-
-        console.log("UNIT:", value);
         logDebug("UNIT CHANGED: " + value);
         logDebug("CHANGE FIRED");
-
         triggerUpdate();
     };
 
 
     function triggerUpdate() {
-
         const date = window.ausiState.date;
-
-        const unit = $('#resident_id_ausi').val(); // <-- always get current value
-
-        window.ausiState.unit = unit;
-
+        const unit = window.ausiState.unit;
         logDebug("DATE=" + date);
         logDebug("UNIT=" + unit);
 
         if (!date || !unit) {
             $(".ausi-booking-slot").prop("disabled", true);
-            hideLoading();
+            hideLoadingAusi();
             return;
         }
 
         updateSlots(date, unit);
     }
-    function updateSlots(date, unitName) {
+
+    function updateSlots(date, unit) {
 
         logDebug("ENTERED updateSlots");
 
@@ -94,13 +87,13 @@ $(function () {
         try {
 
             if (typeof logDebug === "function") {
-                logDebug("DEBUG OK", { date, unitName });
+                logDebug("DEBUG OK", { date, unit });
             } else {
                 logDebug("logDebug missing");
             }
 
             logDebug("STEP 2 OK");
-            showLoading();
+            showLoadingAusi();
             resetSlots();
 
             logDebug("STEP 3 OK - BEFORE AJAX");
@@ -109,10 +102,10 @@ $(function () {
 
                 url: "/ausi-booked-slots-mobile",
                 type: "GET",
-                data: { date, unit_name: unitName },
+                data: { date, unit_name: unit },
 
                 beforeSend: function () {
-                    showLoading();
+                    showLoadingAusi();
                 },
 
                 success: function (res) {
@@ -122,7 +115,7 @@ $(function () {
                     disableBookedSlots(res.blocked_for_user || []);
                     disablePastSlots(date);
 
-                    hideLoading();
+                    hideLoadingAusi();
                 },
 
                 error: function (xhr) {
@@ -130,7 +123,7 @@ $(function () {
                     console.log(xhr.responseText);
                     logDebug("ERROR " + xhr.status);
 
-                    hideLoading();
+                    hideLoadingAusi();
                 }
 
             });
@@ -220,12 +213,12 @@ $(function () {
         });
     }
 
-    function showLoading() {
-        $("#slotLoading").removeClass("d-none");
+    function showLoadingAusi() {
+        $("#slotLoadingAusi").removeClass("d-none");
     }
 
-    function hideLoading() {
-        $("#slotLoading").addClass("d-none");
+    function hideLoadingAusi() {
+        $("#slotLoadingAusi").addClass("d-none");
     }
 
 
@@ -500,5 +493,5 @@ $(function () {
     });
 
 
-
+  
 });

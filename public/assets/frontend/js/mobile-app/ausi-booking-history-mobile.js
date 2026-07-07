@@ -53,7 +53,7 @@ $(function () {
 
     const el = document.getElementById('resident_id_ausi_booking_history');
 
-    logDebugHistory("SELECT EXISTS: " + (el ? "YES" : "NO"));
+    // logDebugHistory("SELECT EXISTS: " + (el ? "YES" : "NO"));
 
     function logDebugHistory(...args) {
 

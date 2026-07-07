@@ -45,7 +45,7 @@ $(function () {
 
     const el = document.getElementById('resident_id_gt_booking_history');
 
-    logDebugHistoryGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
+    // logDebugHistoryGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
 
     function logDebugHistoryGt(...args) {
 

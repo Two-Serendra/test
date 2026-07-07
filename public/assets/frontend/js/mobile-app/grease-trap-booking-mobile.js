@@ -13,7 +13,7 @@ $(function () {
 
         console.log(msg);
 
-        const el = document.getElementById('debugPanel');
+        const el = document.getElementById('debugPanelGt');
 
         if (el) {
             el.innerHTML += msg + "<br>";

@@ -50,9 +50,9 @@
                 </div>
 
                 <div class="col-12 mb-3 mb-md-0">
-                    <div id="historyWrapper" class="position-relative">
+                    <div id="historyWrapperAusi" class="position-relative">
                         <!-- Loading Overlay -->
-                        <div id="historyLoading" class="history-loading d-none">
+                        <div id="historyLoadingAusi" class="history-loading d-none">
                             <div class="text-center">
                                 <div class="spinner-border text-primary mb-2"></div>
                                 <div class="text-muted">

@@ -105,8 +105,8 @@
                                 '4:00 PM - 5:00 PM',
                             ]; 
                         @endphp
-                        <div id="slotWrapper" class="position-relative">
-                            <div id="slotLoading" class="slot-loading d-none">
+                        <div id="slotWrapperPc" class="position-relative">
+                            <div id="slotLoadingPc" class="slot-loading d-none">
                                 <div class="spinner-border text-primary" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>

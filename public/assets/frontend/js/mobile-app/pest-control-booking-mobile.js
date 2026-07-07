@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 Pest Control JS VERSION 2026-06-15-009");
+    alert("🔥 Pest Control JS VERSION 2026-06-15-0010");
     const el = document.getElementById('resident_id_pc');
 
     logDebugPc("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -38,18 +38,18 @@ $(function () {
             window.pcState.date = dateStr;
             console.log("DATE:", dateStr);
             logDebugPc("DATE CHANGED: " + dateStr);
-            triggerUpdate();
+            triggerUpdatePc();
         }
 
     });
 
     document.addEventListener('change', function (e) {
         if (e.target && e.target.id === 'resident_id_pc') {
-            window.onResidentChange(e);
+            window.onResidentChangePc(e);
         }
     });
 
-    window.onResidentChange = function (e) {
+    window.onResidentChangePc = function (e) {
         const value = e.target.value;
 
         window.pcState.unit = value;
@@ -62,11 +62,11 @@ $(function () {
         logDebugPc("UNIT CHANGED: " + value);
         logDebugPc("CHANGE FIRED");
 
-        triggerUpdate();
+        triggerUpdatePc();
     };
 
 
-    function triggerUpdate() {
+    function triggerUpdatePc() {
         const date = window.pcState.date;
         const unit = window.pcState.unit;
         logDebugPc("DATE=" + date);
@@ -75,16 +75,16 @@ $(function () {
 
         if (!date || !unit) {
             $(".pc-booking-slot").prop("disabled", true);
-            hideLoading();
+            hideLoadingPc();
             return;
         }
 
-        updateSlots(date, unit);
+        updateSlotsPc(date, unit);
     }
 
-    function updateSlots(date, unitName) {
+    function updateSlotsPc(date, unitName) {
 
-        logDebugPc("ENTERED updateSlots");
+        logDebugPc("ENTERED updateSlotsPc");
 
         logDebugPc("STEP 1 OK");
 
@@ -97,7 +97,7 @@ $(function () {
             }
 
             logDebugPc("STEP 2 OK");
-            showLoading();
+            showLoadingPc();
             resetSlotsPc();
 
             logDebugPc("STEP 3 OK - BEFORE AJAX");
@@ -109,17 +109,17 @@ $(function () {
                 data: { date, unit_name: unitName },
 
                 beforeSend: function () {
-                    showLoading();
+                    showLoadingPc();
                 },
 
                 success: function (res) {
 
                     resetSlotsPc();
 
-                    disableBookedSlots(res.blocked_for_user || []);
-                    disablePastSlots(date);
+                    disableBookedSlotsPc(res.blocked_for_user || []);
+                    disablePastSlotsPc(date);
 
-                    hideLoading();
+                    hideLoadingPc();
                 },
 
                 error: function (xhr) {
@@ -127,7 +127,7 @@ $(function () {
                     console.log(xhr.responseText);
                     logDebugPc("ERROR " + xhr.status);
 
-                    hideLoading();
+                    hideLoadingPc();
                 }
 
             });
@@ -156,7 +156,7 @@ $(function () {
 
     };
 
-    function checkFormReady() {
+    function checkFormReadyPc() {
 
         const date = window.pcState.date;
         const unit = window.pcState.unit;
@@ -166,7 +166,7 @@ $(function () {
         $("#saveUserPcBtn").prop("disabled", !ready);
     }
 
-    function disableBookedSlots(bookedSlots) {
+    function disableBookedSlotsPc(bookedSlots) {
 
         bookedSlots.forEach(slot => {
             const $radio = $('.pc-booking-slot[data-slot="' + slot + '"]');
@@ -182,7 +182,7 @@ $(function () {
         });
     }
 
-    function disablePastSlots(selectedDate) {
+    function disablePastSlotsPc(selectedDate) {
         const now = new Date();
         const selected = new Date(selectedDate);
         if (now.toDateString() !== selected.toDateString()) return;
@@ -217,12 +217,12 @@ $(function () {
         });
     }
 
-    function showLoading() {
-        $("#slotLoading").removeClass("d-none");
+    function showLoadingPc() {
+        $("#slotLoadingPc").removeClass("d-none");
     }
 
-    function hideLoading() {
-        $("#slotLoading").addClass("d-none");
+    function hideLoadingPc() {
+        $("#slotLoadingPc").addClass("d-none");
     }
 
 
@@ -280,7 +280,7 @@ $(function () {
                 .addClass('btn-secondary disabled')
                 .css('cursor', 'not-allowed');
         });
-        $('#slotLoading').addClass('d-none');
+        $('#slotLoadingPc').addClass('d-none');
 
         $('#saveUserPcBtn')
             .prop('disabled', true)
@@ -445,7 +445,7 @@ $(function () {
                             text: res.message
                         });
 
-                        updateSlots(selectedDate);
+                        updateSlotsPc(selectedDate);
                         return;
                     }
 

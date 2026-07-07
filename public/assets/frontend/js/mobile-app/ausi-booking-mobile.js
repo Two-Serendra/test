@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-037");
+    alert("🔥 JS VERSION 2026-06-15-038");
     const el = document.getElementById('resident_id_ausi');
 
     logDebug("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -222,10 +222,10 @@ $(function () {
     }
 
 
-    logDebug(
-        "SLOTS COUNT",
-        document.querySelectorAll(".ausi-booking-slot").length
-    );
+    // logDebug(
+    //     "SLOTS COUNT",
+    //     document.querySelectorAll(".ausi-booking-slot").length
+    // );
 
     $(document).ready(function () {
         logDebug("READY");

@@ -777,6 +777,19 @@
 
                 </div>
 
+                <div class="card border rounded p-3 mt-3">
+
+                    <h6 class="fw-bold text-primary mb-3">
+                        <i class="fa-solid fa-note-sticky me-2"></i>
+                        Inspection Remarks
+                    </h6>
+
+                    <textarea class="form-control" id="inspection_remarks" name="inspection_remarks"
+                        rows="4">
+                    </textarea>
+
+                </div>
+
 
             </div>
 

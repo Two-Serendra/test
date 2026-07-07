@@ -151,7 +151,7 @@
             </div>
         </div>
 
-        <!-- <div id="debugPanel" style="
+        <div id="debugPanel" style="
                                                                                 position: fixed;
                                                                                 bottom: 0;
                                                                                 left: 0;
@@ -164,7 +164,7 @@
                                                                                 z-index: 99999;
                                                                                 padding: 10px;
                                                                             ">
-            </div> -->
+            </div>
 
     </div>
 

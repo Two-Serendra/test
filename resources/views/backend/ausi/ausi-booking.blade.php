@@ -20,15 +20,15 @@
                 </div>
 
                 <div class="col-6 d-flex justify-content-end align-items-center">
-                    <form id="bookingImportFormPC" action="{{ route('ausi.booking.import') }}" method="POST"
+                    <form id="bookingImportFormAusi" action="{{ route('ausi.booking.import') }}" method="POST"
                         enctype="multipart/form-data">
                         @csrf
-                        <input type="file" id="PCbookingFileInput" name="file" accept=".csv,.xlsx" style="display:none;">
+                        <input type="file" id="AusibookingFileInput" name="file" accept=".csv,.xlsx" style="display:none;">
                     </form>
 
-                    <!-- <button type="button" class="btn btn-primary badge me-2" id="uploadBookingBtnPC">
-                                                                                                                <i class='bx bx-upload'></i> Upload Bookings
-                                                                                                            </button> -->
+                    <button type="button" class="btn btn-primary badge me-2" id="uploadBookingBtnAusi">
+                        <i class='bx bx-upload'></i> Upload Bookings
+                    </button>
 
 
                     <button type="button" class="btn btn-primary badge AddAusiBookingAdmin me-2">
@@ -36,8 +36,8 @@
                     </button>
 
                     <!-- <button type="button" class="btn btn-danger badge AddEmergencyAusiBooking me-2">
-                                                                            <i class='bx bx-plus'></i> Emergency Booking
-                                                                        </button> -->
+                                                                                <i class='bx bx-plus'></i> Emergency Booking
+                                                                            </button> -->
                 </div>
             </div>
             <div class="table-responsive">
@@ -66,7 +66,7 @@
 
 
                         </tr>
-                    </thead> 
+                    </thead>
                     <tbody>
                         @if($ausiBookings->isEmpty())
                             <tr>
@@ -99,12 +99,12 @@
 
 
                                     <!-- <td>
-                                        @if ($ausiBooking->emergency == 0)
-                                            <span class="badge bg-secondary badge-forge ">No</span>
-                                        @else
-                                            <span class="badge bg-danger badge-forge ">Yes</span>
-                                        @endif
-                                    </td> -->
+                                                    @if ($ausiBooking->emergency == 0)
+                                                        <span class="badge bg-secondary badge-forge ">No</span>
+                                                    @else
+                                                        <span class="badge bg-danger badge-forge ">Yes</span>
+                                                    @endif
+                                                </td> -->
 
                                     <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
                                         data-bs-toggle="tooltip" title="{{ $ausiBooking->remarks }}">

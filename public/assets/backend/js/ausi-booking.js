@@ -1149,7 +1149,7 @@ $(document).ready(function () {
                         value="1"
                         required>
 
-                    ${item.option_1}
+                    ${item.option_1} 
 
                 </label>
 
@@ -1198,6 +1198,7 @@ $(document).ready(function () {
         let bookingId = $('#inspection_booking_id').val();
         let valid = true;
         let inspections = [];
+        let remarks = $('#inspection_remarks').val();
         $('.inspection-row').removeClass('invalid');
         $('.inspection-row').each(function () {
 
@@ -1257,6 +1258,7 @@ $(document).ready(function () {
 
             data: {
                 ausi_booking_id: bookingId,
+                remarks: remarks,
                 inspections: inspections
             },
 
@@ -1293,5 +1295,22 @@ $(document).ready(function () {
         });
     });
 
+    $('#uploadBookingBtnAusi').on('click', function () {
+        $('#AusibookingFileInput').click();
+    });
+
+    $('#AusibookingFileInput').on('change', function () {
+
+        if (this.files.length === 0) return;
+
+        let fileName = this.files[0].name;
+
+        if (confirm("Upload file: " + fileName + "?")) {
+            $('#bookingImportFormAusi').submit();
+        } else {
+            $(this).val('');
+        }
+
+    });
 
 });

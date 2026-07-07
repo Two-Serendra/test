@@ -956,14 +956,14 @@ $(document).ready(function () {
     $('#PCbookingFileInput').on('change', function () {
 
         if (this.files.length === 0) return;
-
+ 
         let fileName = this.files[0].name;
 
         if (confirm("Upload file: " + fileName + " ?")) {
             $('#bookingImportFormPC').submit();
         } else {
             $(this).val('');
-        }
+        } 
 
     });
 

@@ -317,7 +317,83 @@ class AusiBookingController extends Controller
             ->orderBy('booking_date', 'desc')
             ->paginate(10);
         return view('backend.ausi.ausi-booking-report', compact('ausiBookings'));
+    }
 
+    public function importAusiBookings(Request $request)
+    {
+        Log::info('Import ausi booking route hit');
+
+        if (!$request->hasFile('file')) {
+            Log::error('No file uploaded');
+            return back()->with('error', 'No file uploaded');
+        }
+
+        $file = $request->file('file');
+        Log::info('File received', [
+            'filename' => $file->getClientOriginalName(),
+            'size' => $file->getSize(),
+            'mime' => $file->getMimeType(),
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+
+            $csvData = array_map('str_getcsv', file($file->getRealPath()));
+
+            if (count($csvData) <= 1) {
+                Log::warning('CSV file is empty or only has headers');
+                return back()->with('error', 'CSV file is empty');
+            }
+
+            $header = array_shift($csvData);
+
+            $lastTransaction = AusiBooking::lockForUpdate()->latest('id')->first();
+            $lastNumber = $lastTransaction
+                ? ((int) str_replace('2SAUSI-', '', $lastTransaction->transaction_no))
+                : 0;
+
+            foreach ($csvData as $index => $row) {
+
+                Log::info('Processing CSV row', ['index' => $index, 'row' => $row]);
+
+
+                $lastNumber++;
+                $transactionNo = '2SAUSI-' . str_pad($lastNumber, 5, '0', STR_PAD_LEFT);
+
+
+                try {
+                    AusiBooking::create([
+                        'transaction_no' => $transactionNo,
+                        'unit_no' => trim($row[0] ?? null),
+                        'unit_area' => preg_replace('/[^A-Z]/', '', trim($row[1] ?? null)),
+                        'booking_date' => !empty(trim($row[2] ?? ''))
+                            ? trim($row[2])
+                            : null,
+                        'booking_time_slot' => !empty(trim($row[3] ?? ''))
+                            ? trim($row[3])
+                            : null,
+                    ]);
+                    Log::info('Booking created', ['transaction_no' => $transactionNo]);
+
+                } catch (\Exception $e) {
+                    Log::error('Row insert failed', [
+                        'index' => $index,
+                        'row' => $row,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
+            DB::commit();
+            Log::info('CSV import completed successfully');
+            return back()->with('success', 'Bookings imported successfully');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('CSV import failed', ['error' => $e->getMessage()]);
+            return back()->with('error', $e->getMessage());
+        }
     }
 
     public function searchAusiReport(Request $request)
@@ -753,6 +829,7 @@ class AusiBookingController extends Controller
             $booking->booking_status = 2;
             $booking->completed_at = now();
             $booking->completed_by = auth()->id();
+            $booking->remarks = strtoupper(trim($request->remarks ?? ''));
             $booking->save();
             DB::commit();
             return response()->json([

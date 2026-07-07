@@ -21,7 +21,7 @@ $(function () {
         }
     }
 
-    logDebugGt("🚀 Mobile Booking JS Loaded");
+    // logDebugGt("🚀 Mobile Booking JS Loaded");
 
     window.gtState = {
         date: null,

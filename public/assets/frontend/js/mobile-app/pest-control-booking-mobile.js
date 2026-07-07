@@ -21,7 +21,7 @@ $(function () {
         }
     }
 
-    logDebugPc("🚀 Mobile Booking JS Loaded");
+    // logDebugPc("🚀 Mobile Booking JS Loaded");
 
     window.pcState = {
         date: null,

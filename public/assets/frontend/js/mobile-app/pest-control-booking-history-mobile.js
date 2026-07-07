@@ -229,7 +229,7 @@ $(function () {
                 <i class="bx bx-calendar-x fs-1 text-muted"></i>
 
                 <p class="text-muted mt-2 mb-0">
-                    No booking history found
+                    No booking found
                 </p>
             </div>
         `;

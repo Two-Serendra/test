@@ -87,7 +87,7 @@
                                     name="booking_date" required>
                             </div>
                         </div>
-                    </div>
+                    </div> 
                     <div class="mb-3">
                         <label class="form-label">
                             Select Time Slot <span class="required">*</span>
@@ -141,7 +141,7 @@
             </div>
         </div>
 
-        <!-- <div id="debugPanelPc" style="
+        <div id="debugPanelPc" style="
                                                                                             position: fixed;
                                                                                             bottom: 0;
                                                                                             left: 0;
@@ -154,7 +154,7 @@
                                                                                             z-index: 99999;
                                                                                             padding: 10px;
                                                                                         ">
-            </div> -->
+            </div>
 
     </div>
 

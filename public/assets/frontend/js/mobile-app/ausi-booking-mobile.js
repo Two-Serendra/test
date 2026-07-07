@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-043");
+    alert("🔥 JS VERSION 2026-06-15-044");
     const el = document.getElementById('resident_id_ausi_mobile');
 
     logDebug("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -95,7 +95,7 @@ $(function () {
 
             logDebug("STEP 2 OK");
             showLoadingAusi();
-            resetSlots();
+            resetSlotsAusiMobile();
 
             logDebug("STEP 3 OK - BEFORE AJAX");
 
@@ -111,7 +111,7 @@ $(function () {
 
                 success: function (res) {
 
-                    resetSlots();
+                    resetSlotsAusiMobile();
 
                     disableBookedSlots(res.blocked_for_user || []);
                     disablePastSlots(date);
@@ -137,7 +137,7 @@ $(function () {
         }
     }
 
-    window.resetSlots = function () {
+    window.resetSlotsAusiMobile = function () {
 
         $('.ausi-booking-slot').each(function () {
 
@@ -386,7 +386,7 @@ $(function () {
                         }
                     });
                     window.resetAusiBookingUI();
-                    window.resetSlots();
+                    window.resetSlotsAusiMobile();
                 },
 
                 error: function (xhr) {

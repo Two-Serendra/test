@@ -16,13 +16,13 @@ return new class extends Migration {
             $table->string('transaction_no')->unique();
             $table->unsignedBigInteger('user_id');
             $table->string('email')->nullable();
-            $table->string('unit_no');
-            $table->string('resident_type');
-            $table->string('name');
-            $table->date('booking_date');
-            $table->string('booking_time_slot');
+            $table->string('unit_no')->nullable();
+            $table->string('resident_type')->nullable();
+            $table->string('name')->nullable();
+            $table->date('booking_date')->nullable();
+            $table->string('booking_time_slot')->nullable();
             $table->string('srf_no')->nullable();
-            $table->string('unit_area');
+            $table->string('unit_area')->nullable();
             $table->text('remarks')->nullable();
             $table->tinyInteger('emergency')->default('0');
             $table->integer('booking_status')

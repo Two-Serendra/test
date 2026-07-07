@@ -18,7 +18,7 @@ return new class extends Migration {
                 ->constrained('ausi_inspection_items')
                 ->cascadeOnDelete();
             $table->string('status');
-            $table->timestamps();
+            $table->timestamps(); 
 
         });
     }

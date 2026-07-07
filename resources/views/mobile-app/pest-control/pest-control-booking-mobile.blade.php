@@ -110,7 +110,7 @@
                                 <div class="spinner-border text-primary" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
-                            </div>
+                            </div> 
 
                             <div class="row g-3">
                                 @foreach ($slots as $slot)
@@ -141,7 +141,7 @@
             </div>
         </div>
 
-        <div id="debugPanelPc" style="
+        <!-- <div id="debugPanelPc" style="
                                                                                             position: fixed;
                                                                                             bottom: 0;
                                                                                             left: 0;
@@ -154,7 +154,7 @@
                                                                                             z-index: 99999;
                                                                                             padding: 10px;
                                                                                         ">
-            </div>
+            </div> -->
 
     </div>
 

@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-039");
+    alert("🔥 JS VERSION 2026-06-15-040");
     const el = document.getElementById('resident_id_ausi_mobile');
 
     logDebug("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -30,19 +30,6 @@ $(function () {
 
     const $bookingSlots = $('.ausi-booking-slot');
 
-    flatpickr("#AusiBookingDate", {
-        dateFormat: "Y-m-d",
-        minDate: new Date().fp_incr(1),
-        disableMobile: true,
-        onChange: function (selectedDates, dateStr) {
-            window.ausiState.date = dateStr;
-            console.log("DATE:", dateStr);
-            logDebug("DATE CHANGED: " + dateStr);
-            triggerUpdate();
-        }
-
-    });
-
     document.addEventListener('change', function (e) {
         if (e.target && e.target.id === 'resident_id_ausi_mobile') {
             window.onResidentChange(e);
@@ -61,6 +48,20 @@ $(function () {
         logDebug("CHANGE FIRED");
         triggerUpdate();
     };
+
+
+    flatpickr("#AusiBookingDateMobile", {
+        dateFormat: "Y-m-d",
+        minDate: new Date().fp_incr(1),
+        disableMobile: true,
+        onChange: function (selectedDates, dateStr) {
+            window.ausiState.date = dateStr;
+            console.log("DATE:", dateStr);
+            logDebug("DATE CHANGED: " + dateStr);
+            triggerUpdate();
+        }
+
+    });
 
 
     function triggerUpdate() {
@@ -258,7 +259,7 @@ $(function () {
         $('#mobile_email').val('');
         $('#mobile_unit_name').val('');
         $('#mobile_unit_role').val('');
-        const fp = document.querySelector('#AusiBookingDate')?._flatpickr;
+        const fp = document.querySelector('#AusiBookingDateMobile')?._flatpickr;
 
         if (fp) {
             fp.clear();
@@ -292,7 +293,7 @@ $(function () {
         const form = this;
         logDebug("SUBMIT FIRED");
 
-        const selectedDate = $('#AusiBookingDate').val();
+        const selectedDate = $('#AusiBookingDateMobile').val();
         const selectedUnit = $('#resident_id_ausi_mobile').val();
         const selectedSlot = $('input[name="booking_time_slot"]:checked').val();
         const $submitBtn = $('#saveUserAusiBtn');
@@ -493,5 +494,5 @@ $(function () {
     });
 
 
-  
+
 });

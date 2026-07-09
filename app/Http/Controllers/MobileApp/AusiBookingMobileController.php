@@ -338,7 +338,7 @@ class AusiBookingMobileController extends Controller
 
         $bookings = AusiBooking::where('email', $email)
             ->where('unit_no', $unitNo)
-            ->orderBy('booking_date', 'desc')
+            ->orderBy('created_at', 'desc')
             ->get();
 
 

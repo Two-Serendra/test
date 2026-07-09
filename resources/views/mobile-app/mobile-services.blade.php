@@ -82,7 +82,7 @@
             </div>
 
 
-            <div class="col-12 col-lg-4">
+            <!-- <div class="col-12 col-lg-4">
                 <a href="{{ route('subway.faqs.mobile') }}" class="text-decoration-none service-link">
                     <div class="card service-card border-0 shadow-sm">
                         <div class="card-body d-flex align-items-center">
@@ -103,7 +103,7 @@
                         </div>
                     </div>
                 </a>
-            </div>
+            </div> -->
 
         </div>
 

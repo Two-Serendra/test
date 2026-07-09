@@ -2,7 +2,7 @@
 @section('title', 'Bridge Demo — Dashboard')
 @section('content')
 
-    <div class="container py-4">
+    <div class="container-fluid px-3 py-3">
         <div class="" x-data="mobileServicesBookingPage()">
 
             <!-- <div class="text-center mb-4">

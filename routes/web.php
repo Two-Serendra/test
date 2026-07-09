@@ -24,6 +24,7 @@ use App\Http\Controllers\Frontend\FitnessHubBookingController;
 use App\Http\Controllers\MobileApp\AusiBookingMobileController;
 use App\Http\Controllers\MobileApp\GreaseTrapBookingMobileController;
 use App\Http\Controllers\MobileApp\PestControlBookingMobileController;
+use App\Http\Controllers\MobileApp\FaqsMobileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -238,6 +239,9 @@ Route::middleware(['miniapp.webview'])->group(function () {
     Route::get('/get-grease-trap-booking-mobile/history', [GreaseTrapBookingMobileController::class, 'getGreaseTrapBookingMobileHistory'])->name('get.grease.trap.booking.mobile.history');
     Route::post('/grease-trap-booking-mobile/cancel/{booking}', [GreaseTrapBookingMobileController::class, 'CancelGreaseTrapBookingMobile'])
         ->name('grease.trap.cancel.booking.mobile')->middleware('throttle:5,1');
+
+    Route::get('/subway-faqs-mobile', [FaqsMobileController::class, 'SubwayFaqs'])->name('subway.faqs.mobile');
+
 });
 Route::middleware('web')
     ->prefix('admin')

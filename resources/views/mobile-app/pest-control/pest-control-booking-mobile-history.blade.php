@@ -15,7 +15,7 @@
     </div>
 
 
-    <div class="bg-light rounded-3 py-3 px-3 border">
+    <!-- <div class="bg-light rounded-3 py-3 px-3 border">
         <div class="d-flex align-items-center">
             <i class='bx bx-bug text-warning fs-1 me-3'></i>
             <div>
@@ -24,7 +24,7 @@
                 </h5>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <div class="container-fluid px-3 py-3">
         <div class="" x-data="pcBookingPageHistory">
@@ -107,7 +107,7 @@
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({
                         mode: 'sticky-no-back',
-                        title: 'Bridge Demo',
+                        title: 'Pest Control Booking History',
                         backgroundColor: '#fff',
                         textStyle: 'black',
                         showHome: false,

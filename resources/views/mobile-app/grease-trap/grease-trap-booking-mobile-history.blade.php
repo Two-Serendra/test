@@ -14,7 +14,7 @@
         </div>
     </div>
 
-    <div class="bg-light rounded-3 py-3 px-3 border">
+    <!-- <div class="bg-light rounded-3 py-3 px-3 border">
         <div class="d-flex align-items-center">
             <i class="bx bx-water text-primary fs-1 me-3"></i>
 
@@ -24,7 +24,7 @@
                 </h5>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <div class="container-fluid px-3 py-3">
         <div class="" x-data="gtBookingPageHistory">
@@ -109,7 +109,7 @@
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({
                         mode: 'sticky-no-back',
-                        title: 'Bridge Demo',
+                        title: 'Grease Trap Booking History',
                         backgroundColor: '#fff',
                         textStyle: 'black',
                         showHome: false,

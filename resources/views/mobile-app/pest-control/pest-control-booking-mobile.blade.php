@@ -11,7 +11,7 @@
                                     Running outside the shell — bridge data is unavailable.
                                     In production this page runs inside the shell iframe.
                                 </div> -->
-        <div class="bg-light rounded-3 py-3 px-3 border">
+        <!-- <div class="bg-light rounded-3 py-3 px-3 border">
             <div class="d-flex align-items-center">
                 <i class='bx bx-bug text-warning fs-1 me-3'></i>
                 <div>
@@ -20,7 +20,7 @@
                     </h5>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <div class="card shadow-sm">
             <div class="card-body">
@@ -180,7 +180,7 @@
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({
                         mode: 'sticky-no-back',
-                        title: 'Bridge Demo',
+                        title: 'Pest Control Booking',
                         backgroundColor: '#fff',
                         textStyle: 'black',
                         showHome: false,

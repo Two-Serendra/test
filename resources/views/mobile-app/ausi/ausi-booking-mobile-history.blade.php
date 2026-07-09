@@ -68,7 +68,7 @@
     </div>
 
     <!-- <div id="debugPanelBookingHistoryAusi">
-                                                                </div> -->
+                                                                    </div> -->
 
     </div>
     @include('mobile-app.ausi.ausi-mobile-modal')
@@ -100,8 +100,8 @@
                     Alpine.store('superapp')?.bridge?.setHeader({
                         mode: 'sticky-no-back',
                         title: 'Bridge Demo',
-                        backgroundColor: '#1e3a5f',
-                        textStyle: 'white',
+                        backgroundColor: '#fff',
+                        textStyle: 'black',
                         showHome: false,
                     });
                 },

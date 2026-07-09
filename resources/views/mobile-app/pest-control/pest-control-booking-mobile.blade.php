@@ -5,12 +5,12 @@
 @section('content')
     <div class="" x-data="pestControlBookingPage()">
         <!-- <div class="loading" x-show="$store.superapp.isLoading">
-                                <p>Waiting for shell context…</p>
-                            </div>
-                            <div class="warning-banner" x-show="!inShell && !$store.superapp.isLoading">
-                                Running outside the shell — bridge data is unavailable.
-                                In production this page runs inside the shell iframe.
-                            </div> -->
+                                    <p>Waiting for shell context…</p>
+                                </div>
+                                <div class="warning-banner" x-show="!inShell && !$store.superapp.isLoading">
+                                    Running outside the shell — bridge data is unavailable.
+                                    In production this page runs inside the shell iframe.
+                                </div> -->
         <div class="bg-light rounded-3 py-3 px-3 border">
             <div class="d-flex align-items-center">
                 <i class='bx bx-bug text-warning fs-1 me-3'></i>
@@ -56,9 +56,9 @@
                     <div class="row mb-3">
 
                         <!-- <div class="">
-                                                            <dt>Email</dt>
-                                                            <dd x-text="$store.superapp.user?.email ?? '—'"></dd>
-                                                        </div> -->
+                                                                <dt>Email</dt>
+                                                                <dd x-text="$store.superapp.user?.email ?? '—'"></dd>
+                                                            </div> -->
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label">Select Residence <span class="required">*</span></label>
                             <!-- <input type="text" name="email" id="mobile_email_pc"> -->
@@ -87,7 +87,7 @@
                                     name="booking_date" required>
                             </div>
                         </div>
-                    </div> 
+                    </div>
                     <div class="mb-3">
                         <label class="form-label">
                             Select Time Slot <span class="required">*</span>
@@ -110,7 +110,7 @@
                                 <div class="spinner-border text-primary" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
-                            </div> 
+                            </div>
 
                             <div class="row g-3">
                                 @foreach ($slots as $slot)
@@ -142,19 +142,19 @@
         </div>
 
         <!-- <div id="debugPanelPc" style="
-                                                                                            position: fixed;
-                                                                                            bottom: 0;
-                                                                                            left: 0;
-                                                                                            right: 0;
-                                                                                            height: 140px;
-                                                                                            overflow: auto;
-                                                                                            background: black;
-                                                                                            color: #00ff00;
-                                                                                            font-size: 11px;
-                                                                                            z-index: 99999;
-                                                                                            padding: 10px;
-                                                                                        ">
-            </div> -->
+                                                                                                position: fixed;
+                                                                                                bottom: 0;
+                                                                                                left: 0;
+                                                                                                right: 0;
+                                                                                                height: 140px;
+                                                                                                overflow: auto;
+                                                                                                background: black;
+                                                                                                color: #00ff00;
+                                                                                                font-size: 11px;
+                                                                                                z-index: 99999;
+                                                                                                padding: 10px;
+                                                                                            ">
+                </div> -->
 
     </div>
 
@@ -181,8 +181,8 @@
                     Alpine.store('superapp')?.bridge?.setHeader({
                         mode: 'sticky-no-back',
                         title: 'Bridge Demo',
-                        backgroundColor: '#1e3a5f',
-                        textStyle: 'white',
+                        backgroundColor: '#fff',
+                        textStyle: 'black',
                         showHome: false,
                     });
                 },

@@ -11,10 +11,10 @@
 
     .faq-accordion .accordion-item {
         border: none;
-        border-radius: 14px;
+  
         overflow: visible;
         margin-bottom: 12px;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, .05);
+       
     }
 
     .faq-accordion .accordion-button {

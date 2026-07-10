@@ -109,12 +109,6 @@
         color: #fff;
     }
 
-    .faq-accordion .accordion-body,
-    .faq-accordion .accordion-body * {
-        background-color: #fcfcfc !important;
-        color: #666 !important;
-        -webkit-text-fill-color: #666 !important;
-    }
 </style>
 @section('content')
 
@@ -176,7 +170,7 @@
                     </h2>
 
                     <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
+                        <div class="accordion-body text-dark">
                             The construction is part of the Metro Manila Subway Project,
                             which aims to improve public transportation by connecting key
                             areas of Metro Manila through an underground railway system.

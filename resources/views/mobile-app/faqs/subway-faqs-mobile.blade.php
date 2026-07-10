@@ -43,7 +43,7 @@
         color: #666;
     }
 
-    .accordion-button:not(.collapsed) {
+    .faq-accordion .accordion-button:not(.collapsed) {
         background: #008b26;
         color: #fff;
         box-shadow: none;
@@ -102,6 +102,7 @@
         color: #008b26;
         transition: color .25s ease;
     }
+
 </style>
 @section('content')
 
@@ -109,8 +110,8 @@
         <div class="" x-data="faqsMobile()">
             <div class="text-center mb-4">
                 <!-- <h3 class="fw-bold text-success mb-2">
-                            Metro Manila Subway FAQs
-                        </h3> -->
+                        Metro Manila Subway FAQs
+                    </h3> -->
 
                 <p class="text-success mb-0">
                     Information for Two Serendra Residents

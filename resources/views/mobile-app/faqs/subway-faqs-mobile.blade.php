@@ -5,102 +5,79 @@
         background: #f7f8fa;
     }
 
-    .accordion-button::after {
+    /* Accordion Container */
+    .faq-accordion .accordion-item {
+        border: 0;
+        border-radius: 14px;
+        margin-bottom: 12px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+    }
+
+    /* Remove Bootstrap arrow */
+    .faq-accordion .accordion-button::after {
         display: none;
     }
 
-    .faq-accordion .accordion-item {
-        border: none;
-
-        overflow: visible;
-        margin-bottom: 12px;
-
-    }
-
+    /* Accordion Header */
     .faq-accordion .accordion-button {
+        background: #fff;
+        color: #222;
         font-size: 15px;
         font-weight: 600;
         padding: 18px;
-    }
-
-    .faq-accordion .accordion-button::after {
-        transform: scale(.85);
-    }
-
-    .accordion-button {
-        transition: .2s;
-    }
-
-    .accordion-button:active {
-        transform: scale(.99);
-    }
-
-    .faq-accordion .accordion-body {
-        background: #fcfcfc;
-        padding: 18px;
-        font-size: 14px;
-        line-height: 1.7;
-        color: #666;
-    }
-
-    .faq-accordion .accordion-button:not(.collapsed) {
-        background: #008b26;
-        color: #fff;
+        border: 0;
         box-shadow: none;
     }
 
-    .faq-icon {
-        color: #008b26;
-        transition: .2s;
-    }
-
-    .accordion-button:not(.collapsed) .faq-icon {
+    /* Active Header */
+    .faq-accordion .accordion-button:not(.collapsed) {
+        background: #008b26;
         color: #fff;
     }
 
+    /* Focus */
     .faq-accordion .accordion-button:focus {
         box-shadow: none;
     }
 
-    .text-success {
-        color: #008b26 !important;
+    /* Body */
+    .faq-accordion .accordion-body {
+        background: #fff !important;
+        color: #555 !important;
+        font-size: 14px;
+        line-height: 1.7;
+        padding: 18px;
+
+        /* Force repaint */
+        opacity: 1 !important;
+        visibility: visible !important;
+        -webkit-text-fill-color: #555 !important;
+
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
     }
 
-    .card {
-        border-radius: 16px;
+    /* Icons */
+    .faq-icon,
+    .faq-chevron {
+        color: #008b26;
     }
 
-    .container {
-        max-width: 700px;
-    }
-
-    .advisory-card {
-        background: #f3fbf5;
-        border-left: 5px solid #008b26 !important;
-    }
-
-    .faq-accordion .accordion-item {
-        transition: .2s ease;
+    .faq-accordion .accordion-button:not(.collapsed) .faq-icon,
+    .faq-accordion .accordion-button:not(.collapsed) .faq-chevron {
+        color: #fff;
     }
 
     .faq-chevron {
         font-size: 22px;
-        color: #008b26;
-        transition: transform .25s ease, color .25s ease;
     }
 
-    .accordion-button:not(.collapsed) .faq-chevron {
+    .faq-accordion .accordion-button:not(.collapsed) .faq-chevron {
         transform: rotate(90deg);
-        color: #fff;
-    }
-
-    .faq-icon {
-        color: #008b26;
-        transition: color .25s ease;
-    }
-
-    html {
-        color-scheme: light;
     }
 </style>
 @section('content')
@@ -109,8 +86,8 @@
         <div class="" x-data="faqsMobile()">
             <div class="text-center mb-4">
                 <!-- <h3 class="fw-bold text-success mb-2">
-                            Metro Manila Subway FAQs
-                        </h3> -->
+                                Metro Manila Subway FAQs
+                            </h3> -->
 
                 <p class="text-success mb-0">
                     Information for Two Serendra Residents

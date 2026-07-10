@@ -109,7 +109,8 @@
         color: #fff;
     }
 
-    .faq-accordion .accordion-body {
+    .faq-accordion .accordion-body,
+    .faq-accordion .accordion-body * {
         background-color: #fcfcfc !important;
         color: #666 !important;
         -webkit-text-fill-color: #666 !important;

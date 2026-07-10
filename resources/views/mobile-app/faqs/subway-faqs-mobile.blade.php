@@ -109,12 +109,10 @@
         color: #fff;
     }
 
-    .accordion-button,
-    .accordion-button *,
-    .accordion-collapse,
-    .accordion-body,
-    .accordion-item {
-        transition: none !important;
+    .faq-accordion .accordion-body {
+        background-color: #fcfcfc !important;
+        color: #666 !important;
+        -webkit-text-fill-color: #666 !important;
     }
 </style>
 @section('content')

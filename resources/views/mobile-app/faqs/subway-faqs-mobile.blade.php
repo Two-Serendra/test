@@ -108,15 +108,23 @@
     .accordion-button:not(.collapsed) .faq-icon {
         color: #fff;
     }
+
+    .accordion-button,
+    .accordion-body,
+    .accordion-item,
+    .faq-icon,
+    .faq-chevron {
+        transition: none !important;
+    }
 </style>
 @section('content')
 
     <div class="container py-3">
         <div class="" x-data="faqsMobile()">
             <div class="text-center mb-4">
-                <h3 class="fw-bold text-success mb-2">
-                    Metro Manila Subway FAQs
-                </h3>
+                <!-- <h3 class="fw-bold text-success mb-2">
+                        Metro Manila Subway FAQs
+                    </h3> -->
 
                 <p class="text-muted mb-0">
                     Information for Two Serendra Residents
@@ -402,7 +410,7 @@
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({
                         mode: 'sticky-no-back',
-                        title: 'Grease Trap Booking',
+                        title: 'Subway FAQs',
                         backgroundColor: '#fff',
                         textStyle: 'black',
                         showHome: false,

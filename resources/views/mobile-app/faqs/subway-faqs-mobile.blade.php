@@ -11,10 +11,10 @@
 
     .faq-accordion .accordion-item {
         border: none;
-  
+
         overflow: visible;
         margin-bottom: 12px;
-       
+
     }
 
     .faq-accordion .accordion-button {
@@ -99,6 +99,9 @@
         transition: color .25s ease;
     }
 
+    html {
+        color-scheme: light;
+    }
 </style>
 @section('content')
 
@@ -106,8 +109,8 @@
         <div class="" x-data="faqsMobile()">
             <div class="text-center mb-4">
                 <!-- <h3 class="fw-bold text-success mb-2">
-                        Metro Manila Subway FAQs
-                    </h3> -->
+                            Metro Manila Subway FAQs
+                        </h3> -->
 
                 <p class="text-success mb-0">
                     Information for Two Serendra Residents

@@ -40,7 +40,7 @@
         padding: 18px;
         font-size: 14px;
         line-height: 1.7;
-        color: #666;
+        color: #666 !important;
     }
 
     .faq-accordion .accordion-button:not(.collapsed) {

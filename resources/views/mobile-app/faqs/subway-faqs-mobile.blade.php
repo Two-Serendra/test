@@ -108,6 +108,13 @@
     .accordion-button:not(.collapsed) .faq-icon {
         color: #fff;
     }
+
+    .faq-accordion .accordion-body,
+    .faq-accordion .accordion-body p,
+    .faq-accordion .accordion-body span,
+    .faq-accordion .accordion-body div {
+        color: #666 !important;
+    }
 </style>
 @section('content')
 

@@ -109,13 +109,6 @@
         color: #fff;
     }
 
-    .accordion-button,
-    .accordion-body,
-    .accordion-item,
-    .faq-icon,
-    .faq-chevron {
-        transition: none !important;
-    }
 </style>
 @section('content')
 
@@ -126,7 +119,7 @@
                         Metro Manila Subway FAQs
                     </h3> -->
 
-                <p class="text-muted mb-0">
+                <p class="text-success mb-0">
                     Information for Two Serendra Residents
                 </p>
 
@@ -177,7 +170,7 @@
                     </h2>
 
                     <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body text-dark">
+                        <div class="accordion-body" style="color: #666 !important;">
                             The construction is part of the Metro Manila Subway Project,
                             which aims to improve public transportation by connecting key
                             areas of Metro Manila through an underground railway system.

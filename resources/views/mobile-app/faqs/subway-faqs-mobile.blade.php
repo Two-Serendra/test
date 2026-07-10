@@ -108,12 +108,11 @@
     .accordion-button:not(.collapsed) .faq-icon {
         color: #fff;
     }
-
 </style>
 @section('content')
 
     <div class="container py-3">
-        <div class="" x-data="faqsMobile">
+        <div class="" x-data="faqsMobile()">
             <div class="text-center mb-4">
                 <h3 class="fw-bold text-success mb-2">
                     Metro Manila Subway FAQs
@@ -379,4 +378,38 @@
             </div>
         </div>
     </div>
+
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('faqsMobile', () => ({
+                residences: [],
+                selectedResidence: null,
+                debugLog: '',
+                debugEmail: null,
+
+                log(msg) {
+                    console.log(msg);
+                    this.debugLog += msg + "\n";
+                },
+                init() {
+                    this.log("🚀 INIT STARTED");
+                    this.setHeader();
+                    const store = Alpine.store('superapp');
+                    $('#mobile_email').val(store?.user?.email || '');
+                    $('#mobile_user_id').val(store?.user?.id || '');
+                },
+                setHeader() {
+                    Alpine.store('superapp')?.bridge?.setHeader({
+                        mode: 'sticky-no-back',
+                        title: 'Grease Trap Booking',
+                        backgroundColor: '#fff',
+                        textStyle: 'black',
+                        showHome: false,
+                    });
+                },
+
+            }));
+        });
+    </script>
 @endsection

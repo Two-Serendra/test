@@ -40,7 +40,7 @@
         padding: 18px;
         font-size: 14px;
         line-height: 1.7;
-        color: #666 !important;
+        color: #666;
     }
 
     .faq-accordion .accordion-button:not(.collapsed) {
@@ -109,11 +109,12 @@
         color: #fff;
     }
 
-    .faq-accordion .accordion-body,
-    .faq-accordion .accordion-body p,
-    .faq-accordion .accordion-body span,
-    .faq-accordion .accordion-body div {
-        color: #666 !important;
+    .accordion-button,
+    .accordion-button *,
+    .accordion-collapse,
+    .accordion-body,
+    .accordion-item {
+        transition: none !important;
     }
 </style>
 @section('content')
@@ -385,22 +386,4 @@
             </div>
         </div>
     </div>
-
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('faqsMobile', () => ({
-                setHeader() {
-                    Alpine.store('superapp')?.bridge?.setHeader({
-                        mode: 'sticky-no-back',
-                        title: 'Bridge Demo',
-                        backgroundColor: '#1e3a5f',
-                        textStyle: 'white',
-                        showHome: false,
-                    });
-                },
-
-            }));
-        });
-    </script>
-
 @endsection

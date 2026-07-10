@@ -43,7 +43,7 @@
         color: #666;
     }
 
-    .faq-accordion .accordion-button:not(.collapsed) {
+    .accordion-button:not(.collapsed) {
         background: #008b26;
         color: #fff;
         box-shadow: none;
@@ -61,8 +61,6 @@
     .faq-accordion .accordion-button:focus {
         box-shadow: none;
     }
-
-
 
     .text-success {
         color: #008b26 !important;
@@ -104,11 +102,6 @@
         color: #008b26;
         transition: color .25s ease;
     }
-
-    .accordion-button:not(.collapsed) .faq-icon {
-        color: #fff;
-    }
-
 </style>
 @section('content')
 
@@ -116,8 +109,8 @@
         <div class="" x-data="faqsMobile()">
             <div class="text-center mb-4">
                 <!-- <h3 class="fw-bold text-success mb-2">
-                        Metro Manila Subway FAQs
-                    </h3> -->
+                            Metro Manila Subway FAQs
+                        </h3> -->
 
                 <p class="text-success mb-0">
                     Information for Two Serendra Residents

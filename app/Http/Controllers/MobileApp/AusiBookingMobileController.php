@@ -226,7 +226,7 @@ class AusiBookingMobileController extends Controller
                 $bookingDate = Carbon::parse($request->booking_date)->toDateString();
                 $slotTaken = AusiBooking::whereDate('booking_date', $bookingDate)
                     ->where('booking_time_slot', $request->booking_time_slot)
-                    ->where('booking_status', 1)
+                    ->where('booking_status', '!=', 0)
                     ->whereIn('unit_area', $groupAreas)
                     ->lockForUpdate()
                     ->exists();
@@ -240,7 +240,7 @@ class AusiBookingMobileController extends Controller
                 }
 
                 $existingUnitBooking = AusiBooking::where('unit_no', strtoupper($resident->unit_no))
-                    ->where('booking_status', 1)
+                    ->where('booking_status', '!=', 0)
                     ->whereYear('booking_date', $bookingDate)
                     ->lockForUpdate()
                     ->exists();

@@ -287,7 +287,7 @@ $(function () {
 
                 if (Number(item.booking_status) === 1) {
 
-                    const startTime = convertTime(item.booking_time_slot); // e.g. "2:00PM"
+                    const startTime = convertTime(item.booking_time_slot);
 
                     const [year, month, day] = item.booking_date.split('-').map(Number);
 
@@ -304,10 +304,6 @@ $(function () {
 
                     const canCancel = now < bookingDateTime;
 
-                    console.log("Now:", now);
-                    console.log("Booking:", bookingDateTime);
-                    console.log("Can Cancel:", canCancel);
-
                     cancelButton = `
         <button
             class="btn btn-sm rounded-pill px-3 cancel-mobile-gt-booking-btn
@@ -318,6 +314,19 @@ $(function () {
             Cancel
         </button>
     `;
+
+                } else {
+
+                    // Booking already cancelled
+                    cancelButton = `
+        <button
+            class="btn btn-sm rounded-pill px-3 btn-secondary"
+            disabled>
+            <i class="bx bx-x-circle me-1"></i>
+            Cancel
+        </button>
+    `;
+
                 }
 
                 html += `

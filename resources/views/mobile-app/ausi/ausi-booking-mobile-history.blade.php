@@ -98,7 +98,7 @@
                 },
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({
-                        mode: 'sticky-no-back',
+                        mode: 'sticky',
                         title: 'AUSI Booking History',
                         backgroundColor: '#fff',
                         textStyle: 'black',

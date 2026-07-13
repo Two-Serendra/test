@@ -2,11 +2,6 @@
 @section('content')
     <div class="" x-data="mobileServicesPage()">
         <div class="container py-4">
-
-            <div class="text-center mb-4">
-                <h3 class="fw-bold">Service Requests</h3>
-            </div>
-
             <div class="row g-3">
 
                 <!-- AUSI -->
@@ -130,7 +125,7 @@
                 },
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({
-                        mode: 'sticky-no-back',
+                        mode: 'sticky',
                         title: 'Service Requests',
                         backgroundColor: '#fff',
                         textStyle: 'black',

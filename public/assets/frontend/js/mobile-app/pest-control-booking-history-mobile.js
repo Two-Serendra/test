@@ -288,7 +288,7 @@ $(function () {
 
                 if (Number(item.booking_status) === 1) {
 
-                    const startTime = convertTime(item.booking_time_slot); // e.g. "2:00PM"
+                    const startTime = convertTime(item.booking_time_slot);
 
                     const [year, month, day] = item.booking_date.split('-').map(Number);
 
@@ -296,34 +296,56 @@ $(function () {
 
                     if (!match) {
                         logDebugHistoryPc("Invalid booking time:", startTime);
-                        return;
+
+                        cancelButton = `
+            <button
+                class="btn btn-sm rounded-pill px-3 btn-secondary"
+                disabled>
+                <i class="bx bx-x-circle me-1"></i>
+                Cancel
+            </button>
+        `;
+                    } else {
+
+                        let hour = parseInt(match[1], 10);
+                        const minute = parseInt(match[2], 10);
+                        const period = match[3].toUpperCase();
+
+                        if (period === "PM" && hour !== 12) hour += 12;
+                        if (period === "AM" && hour === 12) hour = 0;
+
+                        const bookingDateTime = new Date(year, month - 1, day, hour, minute);
+
+                        const canCancel = now < bookingDateTime;
+
+                        logDebugHistoryPc("Now:", now);
+                        logDebugHistoryPc("Booking:", bookingDateTime);
+                        logDebugHistoryPc("Can Cancel:", canCancel);
+
+                        cancelButton = `
+            <button
+                class="btn btn-sm rounded-pill px-3 cancel-mobile-pc-booking-btn
+                    ${canCancel ? 'btn-danger' : 'btn-secondary'}"
+                ${canCancel ? '' : 'disabled'}
+                data-id="${item.id}">
+                <i class="bx bx-x-circle me-1"></i>
+                Cancel
+            </button>
+        `;
                     }
 
-                    let hour = parseInt(match[1], 10);
-                    const minute = parseInt(match[2], 10);
-                    const period = match[3].toUpperCase();
+                } else {
 
-                    if (period === "PM" && hour !== 12) hour += 12;
-                    if (period === "AM" && hour === 12) hour = 0;
-
-                    const bookingDateTime = new Date(year, month - 1, day, hour, minute);
-
-                    const canCancel = now < bookingDateTime;
-
-                    logDebugHistoryPc("Now:", now);
-                    logDebugHistoryPc("Booking:", bookingDateTime);
-                    logDebugHistoryPc("Can Cancel:", canCancel);
-
+                    // Already cancelled
                     cancelButton = `
         <button
-            class="btn btn-sm rounded-pill px-3 cancel-mobile-pc-booking-btn
-                ${canCancel ? 'btn-danger' : 'btn-secondary'}"
-            ${canCancel ? '' : 'disabled'}
-            data-id="${item.id}">
+            class="btn btn-sm rounded-pill px-3 btn-secondary"
+            disabled>
             <i class="bx bx-x-circle me-1"></i>
             Cancel
         </button>
     `;
+
                 }
 
                 html += `
@@ -440,7 +462,7 @@ $(function () {
                         title: res.message,
                         showConfirmButton: false,
                         timer: 3000,
-                        customClass: { 
+                        customClass: {
                             popup: 'swal2-success-toast'
                         }
                     });

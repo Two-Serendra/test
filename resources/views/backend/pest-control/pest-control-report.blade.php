@@ -95,9 +95,9 @@
 
                                     <td>
                                         @if ($pestControlBooking->booking_status == 1)
-                                            <span class="badge bg-primary custom-badge">Completed</span>
+                                            <span class="badge bg-primary custom-badge">COMPLETED</span>
                                         @else
-                                            <span class="badge bg-danger custom-badge">Cancelled</span>
+                                            <span class="badge bg-danger custom-badge">CANCELLED</span>
                                         @endif
                                     </td>
 

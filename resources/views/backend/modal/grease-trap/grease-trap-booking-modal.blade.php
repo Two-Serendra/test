@@ -225,41 +225,25 @@
         <div class="modal-content">
 
             <!-- HEADER -->
-            <div class="modal-header bg-primary text-white position-relative">
+            <div class="modal-header bg-primary text-white justify-content-center position-relative py-3">
 
-                <div class="w-100 d-flex align-items-center justify-content-center">
-                    <img src="{{ asset('assets/images/TWO SERENDRA LOGO PNG (White).png') }}"
-                        style="height: 60px; width: auto;" alt="logo" />
-                </div>
+                <img src="{{ asset('assets/images/TWO SERENDRA LOGO PNG (White).png') }}" alt="logo"
+                    style="height:60px; width:auto;">
 
-                <button type="button" class="btn-close position-absolute end-0 top-50 translate-middle-y me-2"
-                    data-bs-dismiss="modal">
+                <button type="button" class="btn-close position-absolute end-0 me-3"
+                    style="top:50%; transform:translateY(-50%);" data-bs-dismiss="modal">
                 </button>
 
             </div>
-
             <!-- BODY -->
             <div class="modal-body px-4 py-3">
 
                 <!-- TITLE -->
                 <div class="text-center mb-4">
                     <h5 class="fw-bold mb-1">Grease Trap Booking Details</h5>
-                    <small class="text-muted">
+                    <small class="">
                         Reference #: <span id="display_transaction_no"></span>
                     </small>
-                </div>
-
-                <!-- STATUS STRIP -->
-                <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded bg-light">
-                    <div>
-                        <small class="text-muted d-block">Charged Type</small>
-                        <span id="display_charged_type" class="fw-semibold"></span>
-                    </div>
-
-                    <div class="text-end">
-                        <small class="text-muted d-block">Time Slot</small>
-                        <span id="display_time_slot" class="fw-semibold"></span>
-                    </div>
                 </div>
 
                 <form action="{{ route('admin.grease.trap.booking.update') }}" id="updateGreaseTrapBookingFormAdmin"
@@ -272,9 +256,10 @@
 
                         <!-- LEFT CARD -->
                         <div class="col-md-6">
-                            <div class="border rounded p-3 h-100">
+                            <div class="card shadow-sm border-0 rounded-4 h-100 p-4">
 
                                 <h6 class="fw-semibold text-primary mb-3">
+                                    <i class="bx bx-user me-2"></i>
                                     Resident Information
                                 </h6>
 
@@ -293,19 +278,32 @@
                                     <span id="display_resident_type"></span>
                                 </div>
 
-                                <div class="d-flex justify-content-between">
+                                <div class="d-flex justify-content-between mb-2">
                                     <span class="text-muted">Booking Date</span>
                                     <span id="display_booking_date" class="fw-semibold"></span>
                                 </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted d-block">Time Slot</span>
+                                    <span id="display_time_slot" class="fw-semibold"></span>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted d-block">Charged Type</span>
+                                    <span id="display_charged_type" class="fw-semibold"></span>
+                                </div>
+
+
 
                             </div>
                         </div>
 
                         <!-- RIGHT CARD -->
                         <div class="col-md-6">
-                            <div class="border rounded p-3 h-100">
+                            <div class="card shadow-sm border-0 rounded-4 h-100 p-4">
 
                                 <h6 class="fw-semibold text-primary mb-3">
+                                    <i class="bx bx-edit me-2"></i>
                                     Update Information
                                 </h6>
 
@@ -332,7 +330,7 @@
             <!-- FOOTER -->
             <div class="modal-footer">
                 <button type="submit" form="updateGreaseTrapBookingFormAdmin" id="UpdateGreaseTrapBookingBtn"
-                    class="btn btn-primary btn-sm">
+                    class="btn btn-primary">
                     Update
                 </button>
             </div>
@@ -502,15 +500,13 @@
         <div class="modal-content">
 
             <!-- HEADER -->
-            <div class="modal-header bg-primary text-white position-relative">
+            <div class="modal-header bg-primary text-white justify-content-center position-relative py-3">
 
-                <div class="w-100 d-flex align-items-center justify-content-center">
-                    <img src="{{ asset('assets/images/TWO SERENDRA LOGO PNG (White).png') }}"
-                        style="height: 60px; width: auto;" alt="logo" />
-                </div>
+                <img src="{{ asset('assets/images/TWO SERENDRA LOGO PNG (White).png') }}" alt="logo"
+                    style="height:60px; width:auto;">
 
-                <button type="button" class="btn-close position-absolute end-0 top-50 translate-middle-y me-2"
-                    data-bs-dismiss="modal">
+                <button type="button" class="btn-close position-absolute end-0 me-3"
+                    style="top:50%; transform:translateY(-50%);" data-bs-dismiss="modal">
                 </button>
 
             </div>
@@ -521,22 +517,9 @@
                 <!-- TITLE -->
                 <div class="text-center mb-4">
                     <h5 class="fw-bold mb-1">Grease Trap Booking Details</h5>
-                    <small class="text-muted">
+                    <small class="">
                         Reference #: <span id="display_transaction_no_reports"></span>
                     </small>
-                </div>
-
-                <!-- STATUS STRIP -->
-                <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded bg-light">
-                    <div>
-                        <small class="text-muted d-block">Charged Type</small>
-                        <span id="display_charged_type_reports" class="fw-semibold"></span>
-                    </div>
-
-                    <div class="text-end">
-                        <small class="text-muted d-block">Time Slot</small>
-                        <span id="display_time_slot_reports" class="fw-semibold"></span>
-                    </div>
                 </div>
 
                 <form action="{{ route('admin.grease.trap.booking.update') }}" id="updateGreaseTrapReportFormAdmin"
@@ -549,9 +532,10 @@
 
                         <!-- LEFT CARD -->
                         <div class="col-md-6">
-                            <div class="border rounded p-3 h-100">
+                            <div class="card shadow-sm border-0 rounded-4 h-100 p-4">
 
                                 <h6 class="fw-semibold text-primary mb-3">
+                                    <i class="bx bx-user me-2"></i>
                                     Resident Information
                                 </h6>
 
@@ -570,19 +554,29 @@
                                     <span id="display_resident_type_reports" class="fw-semibold"></span>
                                 </div>
 
-                                <div class="d-flex justify-content-between">
+                                <div class="d-flex justify-content-between mb-2">
                                     <span class="text-muted">Booking Date</span>
                                     <span id="display_booking_date_reports" class="fw-semibold"></span>
                                 </div>
 
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Time Slot</span>
+                                    <span id="display_time_slot_reports" class="fw-semibold"></span>
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Charged Type</span>
+                                    <span id="display_charged_type_reports" class="fw-semibold"></span>
+                                </div>
                             </div>
                         </div>
 
                         <!-- RIGHT CARD -->
                         <div class="col-md-6">
-                            <div class="border rounded p-3 h-100">
+                            <div class="card shadow-sm border-0 rounded-4 h-100 p-4">
 
                                 <h6 class="fw-semibold text-primary mb-3">
+                                    <i class="bx bx-edit me-2"></i>
                                     Update Information
                                 </h6>
 
@@ -610,7 +604,7 @@
             <!-- FOOTER -->
             <div class="modal-footer">
                 <button type="submit" form="updateGreaseTrapReportFormAdmin" id="UpdateGreaseTrapReportBtn"
-                    class="btn btn-primary btn-sm">
+                    class="btn btn-primary">
                     Update
                 </button>
             </div>

@@ -927,32 +927,16 @@ $(document).ready(function () {
 
 
     $('.SlotCheckingModalUserbBtn').on('click', function () {
+
         $('#SlotCheckingModalUser').modal('show');
         $('#SearchSlotUser')[0].reset();
-        $('#activityDateFieldSearchUser').prop('disabled', true);
-        $('.searchBtn').prop('disabled', true);
+
         $('.all-slot-available-user').empty();
         $('#spinner').addClass('d-none');
-    });
 
-    $('#SlotCheckingModalUser').on('hidden.bs.modal', function () {
-        $('.modal-backdrop').remove();
-        $('#activityDateFieldSearchUser').prop('disabled', true);
-        $('.searchBtn').prop('disabled', true);
-        $('#SearchSlotUser')[0].reset();
-        $('.all-slot-available-user').empty();
-        $('#spinner').addClass('d-none');
-    });
-
-    $('#activitySelectBookingSearchUser').on('change', function () {
-        const activitySelect = $(this);
-        const selectedActivityId = activitySelect.val();
-        const selectedAmenityId = activitySelect.find(':selected').data('amenity-id');
+        const amenityId = $('input[name="amenity_id"]').val();
         const activityDateFieldSearchUser = $('#activityDateFieldSearchUser');
 
-        $('.all-slot-available-user').empty();
-        $('#amenityIdBooking').val(selectedAmenityId);
-        $('#unitStatus').text('0/0').attr('class', 'mt-1 text-muted');
         activityDateFieldSearchUser.val('').prop('disabled', false);
         $('.searchBtn').prop('disabled', true);
 
@@ -963,8 +947,10 @@ $(document).ready(function () {
         $.ajax({
             url: '/fetch-blocked-dates',
             method: 'GET',
-            data: { amenity_id: selectedAmenityId },
+            data: { amenity_id: amenityId },
+
             success: function (blockedDates) {
+
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
 
@@ -989,7 +975,8 @@ $(document).ready(function () {
                     disable: blockedDates,
                     disableMobile: true,
 
-                    onChange: function (selectedDates, dateStr, instance) {
+                    onChange: function (selectedDates, dateStr) {
+
                         if (dateStr) {
                             $('.searchBtn').prop('disabled', false);
                             $('.all-slot-available-user').empty();
@@ -1000,6 +987,7 @@ $(document).ready(function () {
                     }
                 });
             },
+
             error: function (xhr) {
                 console.error('Failed to fetch blocked dates:', xhr.responseText);
             }
@@ -1009,9 +997,8 @@ $(document).ready(function () {
 
     $('.SearchSlotUser').submit(function (event) {
         event.preventDefault();
-
-        let activityId = $('#activitySelectBookingSearchUser').val();
-        let amenityId = $('#activitySelectBookingSearchUser option:selected').data('amenity-id');
+        let activityId = $('input[name="activity_id"]').val();
+        let amenityId = $('input[name="amenity_id"]').val();
         let dateField = $('#activityDateFieldSearchUser').val();
         const $btn = $('.slot-checking-submit-btn');
         const originalWidth = $btn.outerWidth();

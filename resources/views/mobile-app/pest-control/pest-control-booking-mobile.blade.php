@@ -179,7 +179,7 @@
                 },
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({
-                        mode: 'sticky-no-back',
+                        mode: 'sticky',
                         title: 'Pest Control Booking',
                         backgroundColor: '#fff',
                         textStyle: 'black',

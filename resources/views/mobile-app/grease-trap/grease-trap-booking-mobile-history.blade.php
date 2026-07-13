@@ -108,7 +108,7 @@
                 },
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({
-                        mode: 'sticky-no-back',
+                        mode: 'sticky',
                         title: 'Grease Trap Booking History',
                         backgroundColor: '#fff',
                         textStyle: 'black',

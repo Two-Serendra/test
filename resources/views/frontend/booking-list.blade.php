@@ -8,7 +8,7 @@
                 <h5 class="mb-3">Filter By</h5>
 
                 <form method="GET" action="{{ route('booking.list') }}">
-                    <!-- <div class="form-check mb-2">
+                    <div class="form-check mb-2">
                         <input class="form-check-input" type="radio" name="category" id="category_function_room"
                             value="function_room" {{ $category == 'function_room' ? 'checked' : '' }}
                             onchange="this.form.submit()">
@@ -26,7 +26,7 @@
                             value="fitness_hub" {{ $category == 'fitness_hub' ? 'checked' : '' }}
                             onchange="this.form.submit()">
                         <label class="form-check-label" for="category_fitness_hub">Fitness Hubs</label>
-                    </div> -->
+                    </div>
 
                     <div class="form-check mb-2">
                         <input class="form-check-input" type="radio" name="category" id="category_grease_trap"

@@ -317,7 +317,7 @@ $(function () {
                     cancelButton = `
         <button
             class="btn btn-sm rounded-pill px-3 cancel-mobile-pc-booking-btn
-                ${canCancel ? 'btn-outline-danger' : 'btn-outline-secondary'}"
+                ${canCancel ? 'btn-danger' : 'btn-secondary'}"
             ${canCancel ? '' : 'disabled'}
             data-id="${item.id}">
             <i class="bx bx-x-circle me-1"></i>

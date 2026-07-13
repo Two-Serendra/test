@@ -213,7 +213,7 @@ $(function () {
 
                 let viewButton = `
                     <button
-                        class="btn btn-sm rounded-pill px-3 btn-outline-primary view-ausi-booking-btn"
+                        class="btn btn-sm rounded-pill px-3 btn-primary view-ausi-booking-btn"
                         data-id="${item.id}">
                         <i class="bx bx-show me-1"></i>
                         View
@@ -233,7 +233,7 @@ $(function () {
                     cancelButton = `
                         <button
                             class="btn btn-sm rounded-pill px-3 cancel-booking-btn
-                                ${canCancel ? 'btn-outline-danger' : 'btn-outline-secondary'}"
+                                ${canCancel ? 'btn-danger' : 'btn-secondary'}"
                             ${canCancel ? '' : 'disabled'}
                             data-id="${item.id}">
                             <i class="bx bx-x-circle me-1"></i>

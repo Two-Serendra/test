@@ -190,17 +190,18 @@ class PestControlBookingMobileController extends Controller
                 }
 
                 $unitNo = $number . $towerLetter;
+                $residentType = $request->mobile_unit_role;
 
-                $resident = ResidentDetails::where('email', $email)
-                    ->where('unit_no', strtoupper($unitNo))
-                    ->lockForUpdate()
-                    ->first();
+                // $resident = ResidentDetails::where('email', $email)
+                //     ->where('unit_no', strtoupper($unitNo))
+                //     ->lockForUpdate()
+                //     ->first();
 
-                if (!$resident) {
-                    return response()->json([
-                        'message' => 'Resident not found'
-                    ], 404);
-                }
+                // if (!$resident) {
+                //     return response()->json([
+                //         'message' => 'Resident not found'
+                //     ], 404);
+                // }
 
                 $bookingDate = Carbon::parse(
                     $request->booking_date
@@ -218,8 +219,7 @@ class PestControlBookingMobileController extends Controller
                     'I' => 'highrise',
                 ];
 
-                $areaLetter = preg_replace('/[^A-Z]/', '', strtoupper($resident->unit_no));
-
+                $areaLetter = strtoupper($towerLetter);
                 $towerGroup = $towerGroups[$areaLetter] ?? null;
 
                 if (!$towerGroup) {
@@ -239,7 +239,7 @@ class PestControlBookingMobileController extends Controller
 
                 $unitBookingsThisMonth = TestPestControlBooking::where(
                     'unit_no',
-                    strtoupper($resident->unit_no)
+                    strtoupper($unitNo)
                 )
                     ->where('booking_status', 1)
                     ->whereBetween('booking_date', [$monthStart, $monthEnd])
@@ -291,7 +291,7 @@ class PestControlBookingMobileController extends Controller
                 )
                     ->where(
                         'unit_no',
-                        strtoupper($resident->unit_no)
+                        strtoupper($unitNo)
                     )
                     ->where('booking_status', 1)
                     ->lockForUpdate()
@@ -308,10 +308,10 @@ class PestControlBookingMobileController extends Controller
                 }
 
                 $booking = TestPestControlBooking::create([
-                    'user_id' => $resident->user_id,
-                    'unit_no' => strtoupper($resident->unit_no),
+                    'user_id' => null,               
+                    'unit_no' => strtoupper($unitNo),
                     'unit_area' => $areaLetter,
-                    'resident_type' => $resident->resident_type,
+                    'resident_type' => $residentType,
                     'email' => $email,
                     'name' => strtoupper($resident->name ?? 'RESIDENT'),
                     'booking_date' => $bookingDate,

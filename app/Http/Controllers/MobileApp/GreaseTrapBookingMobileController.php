@@ -162,16 +162,8 @@ class GreaseTrapBookingMobileController extends Controller
                 }
 
                 $unitNo = $number . $towerLetter;
+                $residentType = $request->mobile_unit_role;
 
-                $resident = ResidentDetails::where('email', $email)
-                    ->where('unit_no', strtoupper($unitNo))
-                    ->first();
-
-                if (!$resident) {
-                    return response()->json([
-                        'message' => 'Resident not found'
-                    ], 404);
-                }
 
                 $bookingDate = Carbon::parse(
                     $request->booking_date
@@ -189,7 +181,7 @@ class GreaseTrapBookingMobileController extends Controller
 
                 $unitBookingsCount = TestGreaseTrapBooking::where(
                     'unit_no',
-                    strtoupper($resident->unit_no)
+                    $unitNo
                 )
                     ->whereBetween('booking_date', [$yearStart, $yearEnd])
                     ->where(function ($q) {
@@ -243,14 +235,8 @@ class GreaseTrapBookingMobileController extends Controller
                     ], 409);
                 }
 
-                $existingUnitBooking = TestGreaseTrapBooking::whereDate(
-                    'booking_date',
-                    $bookingDate
-                )
-                    ->where(
-                        'unit_no',
-                        strtoupper($resident->unit_no)
-                    )
+                $existingUnitBooking = TestGreaseTrapBooking::whereDate('booking_date', $bookingDate)
+                    ->where('unit_no', $unitNo)
                     ->where('booking_status', 1)
                     ->lockForUpdate()
                     ->exists();
@@ -266,11 +252,11 @@ class GreaseTrapBookingMobileController extends Controller
                 }
 
                 $booking = TestGreaseTrapBooking::create([
-                    'user_id' => $resident->user_id,
-                    'unit_no' => strtoupper($resident->unit_no),
-                    'resident_type' => $resident->resident_type,
+                    'user_id' => null,
+                    'unit_no' => strtoupper($unitNo),
+                    'resident_type' => $residentType,
                     'email' => $email,
-                    'name' => strtoupper($resident->name ?? 'RESIDENT'),
+                    'name' => strtoupper($request->name ?? 'RESIDENT'),
                     'booking_date' => $bookingDate,
                     'booking_time_slot' => $request->booking_time_slot,
                     'charged_type' => $chargedType,

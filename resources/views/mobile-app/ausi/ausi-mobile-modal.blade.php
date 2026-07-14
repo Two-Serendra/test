@@ -66,7 +66,7 @@
 
                     <div class="card-body">
 
-                        <div class="row">
+                        <div class="row8 g-3">
 
                             <div class="col-md-6">
                                 <small class="text-muted d-block">

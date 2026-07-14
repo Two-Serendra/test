@@ -204,24 +204,17 @@ class AusiBookingMobileController extends Controller
                 DB::beginTransaction();
 
                 $email = $request->email;
+                $residentType = $request->mobile_unit_role;
+                $unitNo = strtoupper($number . $areaLetter);
 
                 if (!$email) {
-                    return response()->json(['message' => 'Missing email'], 401);
-                }
-
-                $resident = ResidentDetails::where('email', $email)->first();
-
-                if (!$resident) {
                     return response()->json([
-                        'message' => 'Resident not found',
-                        'debug' => $email
-                    ], 404);
+                        'message' => 'Missing email'
+                    ], 401);
                 }
 
-                $userId = $resident->user_id;
-
-                $debug[] = "Resident found: YES";
-                $debug[] = "Unit No: " . $resident->unit_no;
+                $debug[] = "Unit No: " . $unitNo;
+                $debug[] = "Resident Type: " . $residentType;
 
                 $bookingDate = Carbon::parse($request->booking_date)->toDateString();
                 $slotTaken = AusiBooking::whereDate('booking_date', $bookingDate)
@@ -239,7 +232,7 @@ class AusiBookingMobileController extends Controller
                     ], 409);
                 }
 
-                $existingUnitBooking = AusiBooking::where('unit_no', strtoupper($resident->unit_no))
+                $existingUnitBooking = AusiBooking::where('unit_no', $unitNo)
                     ->where('booking_status', '!=', 0)
                     ->whereYear('booking_date', $bookingDate)
                     ->lockForUpdate()
@@ -253,19 +246,13 @@ class AusiBookingMobileController extends Controller
                     ], 409);
                 }
 
-                if (!$email) {
-                    return response()->json([
-                        'message' => 'Missing email from request'
-                    ], 401);
-                }
-
                 $booking = AusiBooking::create([
-                    'user_id' => $userId,
-                    'created_by' => $userId,
+                    'user_id' => null,        
+                    'created_by' => null,   
                     'email' => $email,
                     'transaction_no' => '',
-                    'unit_no' => strtoupper($resident->unit_no),
-                    'resident_type' => $resident->resident_type,
+                    'unit_no' => $unitNo,
+                    'resident_type' => $residentType,
                     'name' => strtoupper($request->name ?? 'Resident'),
                     'booking_date' => $bookingDate,
                     'booking_time_slot' => $request->booking_time_slot,

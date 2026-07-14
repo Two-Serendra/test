@@ -429,7 +429,7 @@ class FrontendAusiBookingController extends Controller
 
 
 
-                $booking->booking_status = 2;
+                $booking->booking_status = 0;
                 $booking->cancelled_at = now();
                 $booking->cancelled_by = auth()->id();
                 $booking->save();

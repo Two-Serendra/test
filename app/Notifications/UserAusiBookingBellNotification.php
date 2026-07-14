@@ -21,7 +21,7 @@ class UserAusiBookingBellNotification extends Notification implements ShouldQueu
 
     public function via($notifiable)
     {
-        return ['database', 'broadcast']; // Database + Pusher broadcast
+        return ['database', 'broadcast'];
     }
 
     public function toArray($notifiable)
@@ -32,7 +32,7 @@ class UserAusiBookingBellNotification extends Notification implements ShouldQueu
         };
 
         return [
-            'notification_id' => $this->id, // 👈 VERY IMPORTANT
+            'notification_id' => $this->id, 
             'message' => $statusMessage,
             'booking_id' => $this->booking->id,
             'status' => $this->booking->booking_status,

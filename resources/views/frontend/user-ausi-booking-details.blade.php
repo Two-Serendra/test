@@ -35,14 +35,14 @@
 
                         // Determine status dynamically
                         if ($booking->booking_status == 2) {
-                            $statusText = 'Cancelled';
-                            $statusClass = 'bg-danger';
-                        } elseif ($booking->booking_status == 1 && $bookingDateTime && $bookingDateTime->isPast()) {
                             $statusText = 'Completed';
                             $statusClass = 'bg-primary';
                         } elseif ($booking->booking_status == 1) {
-                            $statusText = 'Confirmed';
-                            $statusClass = 'bg-primary';
+                            $statusText = 'Scheduled';
+                            $statusClass = 'bg-warning';
+                        } elseif ($booking->booking_status == 0) {
+                            $statusText = 'Cancelled';
+                            $statusClass = 'bg-danger';
                         } else {
                             $statusText = 'N/A';
                             $statusClass = 'bg-secondary';

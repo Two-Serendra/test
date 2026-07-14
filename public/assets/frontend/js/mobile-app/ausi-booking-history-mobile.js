@@ -198,7 +198,7 @@ $(function () {
 
                     case 1:
                         statusText = "Scheduled";
-                        badgeClass = "bg-warning text-dark";
+                        badgeClass = "bg-warning";
                         break;
 
                     case 2:

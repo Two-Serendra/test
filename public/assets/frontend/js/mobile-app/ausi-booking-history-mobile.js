@@ -215,7 +215,6 @@ $(function () {
                     <button
                         class="btn btn-sm rounded-pill px-3 btn-primary view-ausi-booking-btn"
                         data-id="${item.id}">
-                        <i class="bx bx-show me-1"></i>
                         View
                     </button>
                 `;
@@ -236,7 +235,6 @@ $(function () {
                                 ${canCancel ? 'btn-danger' : 'btn-secondary'}"
                             ${canCancel ? '' : 'disabled'}
                             data-id="${item.id}">
-                            <i class="bx bx-x-circle me-1"></i>
                             Cancel
                         </button>
                     `;

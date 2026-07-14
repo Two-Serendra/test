@@ -238,6 +238,16 @@ $(function () {
                             Cancel
                         </button>
                     `;
+
+                                } else {
+
+                                    cancelButton = `
+                        <button
+                            class="btn btn-sm rounded-pill px-3 btn-secondary"
+                            disabled>
+                            Cancel
+                        </button>
+                    `;
                 }
 
                 html += `

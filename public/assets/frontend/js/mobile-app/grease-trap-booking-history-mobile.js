@@ -304,29 +304,24 @@ $(function () {
 
                     const canCancel = now < bookingDateTime;
 
-                    cancelButton = `
-        <button
-            class="btn btn-sm rounded-pill px-3 cancel-mobile-gt-booking-btn
-                ${canCancel ? 'btn-danger' : 'btn-secondary'}"
-            ${canCancel ? '' : 'disabled'}
-            data-id="${item.id}">
-            <i class="bx bx-x-circle me-1"></i>
-            Cancel
-        </button>
-    `;
-
-                } else {
-
-                    // Booking already cancelled
-                    cancelButton = `
-        <button
-            class="btn btn-sm rounded-pill px-3 btn-secondary"
-            disabled>
-            <i class="bx bx-x-circle me-1"></i>
-            Cancel
-        </button>
-    `;
-
+                cancelButton = `
+                        <button
+                            class="btn btn-sm rounded-pill px-3 cancel-mobile-gt-booking-btn
+                                ${canCancel ? 'btn-danger' : 'btn-secondary'}"
+                            ${canCancel ? '' : 'disabled'}
+                            data-id="${item.id}">
+                            Cancel
+                        </button>
+                    `;
+                    } else {
+                                       
+                cancelButton = `
+                        <button
+                            class="btn btn-sm rounded-pill px-3 btn-secondary"
+                            disabled>
+                            Cancel
+                        </button>
+                    `;
                 }
 
                 html += `

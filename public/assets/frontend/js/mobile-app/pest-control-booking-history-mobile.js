@@ -323,30 +323,26 @@ $(function () {
                         logDebugHistoryPc("Can Cancel:", canCancel);
 
                         cancelButton = `
-            <button
-                class="btn btn-sm rounded-pill px-3 cancel-mobile-pc-booking-btn
-                    ${canCancel ? 'btn-danger' : 'btn-secondary'}"
-                ${canCancel ? '' : 'disabled'}
-                data-id="${item.id}">
-                <i class="bx bx-x-circle me-1"></i>
-                Cancel
-            </button>
-        `;
-                    }
+                                <button
+                                    class="btn btn-sm rounded-pill px-3 cancel-mobile-pc-booking-btn
+                                        ${canCancel ? 'btn-danger' : 'btn-secondary'}"
+                                    ${canCancel ? '' : 'disabled'}
+                                    data-id="${item.id}">
+                                    Cancel
+                                </button>
+                            `;
+                                        }
 
-                } else {
+                                    } else {
 
-                    // Already cancelled
-                    cancelButton = `
-        <button
-            class="btn btn-sm rounded-pill px-3 btn-secondary"
-            disabled>
-            <i class="bx bx-x-circle me-1"></i>
-            Cancel
-        </button>
-    `;
-
-                }
+                        cancelButton = `
+                            <button
+                                class="btn btn-sm rounded-pill px-3 btn-secondary"
+                                disabled
+                                Cancel
+                            </button>
+                        `;
+                     }
 
                 html += `
                 <div class="booking-card shadow-sm">

@@ -75,14 +75,14 @@ class GreaseTrapBookingMobileController extends Controller
 
         $unitNo = $number . $towerLetter;
 
-        $resident = ResidentDetails::where('unit_no', $unitNo)->first();
+        // $resident = ResidentDetails::where('unit_no', $unitNo)->first();
 
-        if (!$resident) {
-            return response()->json([
-                'message' => 'Resident not found',
-                'unit_no' => $unitNo
-            ], 404);
-        }
+        // if (!$resident) {
+        //     return response()->json([
+        //         'message' => 'Resident not found',
+        //         'unit_no' => $unitNo
+        //     ], 404);
+        // }
 
         // One booking per slot regardless of tower
         $blockedSlots = TestGreaseTrapBooking::whereDate('booking_date', $request->date)
@@ -96,7 +96,7 @@ class GreaseTrapBookingMobileController extends Controller
         \Log::info('MOBILE GREASE TRAP SLOT REQUEST', [
             'unit_name' => $unitName,
             'unit_no' => $unitNo,
-            'resident_id' => $resident->id,
+            // 'resident_id' => $resident->id,
             'date' => $request->date,
             'blocked_slots' => $blockedSlots,
         ]);

@@ -77,16 +77,17 @@ class AusiBookingMobileController extends Controller
         }
         $unitNo = $number . $towerLetter;
 
-        $resident = ResidentDetails::where('unit_no', $unitNo)->first();
+        // $resident = ResidentDetails::where('unit_no', $unitNo)->first();
 
-        if (!$resident) {
-            return response()->json([
-                'message' => 'Resident not found',
-                'unit_no' => $unitNo
-            ], 404);
-        }
+        // if (!$resident) {
+        //     return response()->json([
+        //         'message' => 'Resident not found',
+        //         'unit_no' => $unitNo
+        //     ], 404);
+        // }
 
-        $areaLetter = preg_replace('/[^A-Z]/', '', $resident->unit_no);
+        // $areaLetter = preg_replace('/[^A-Z]/', '', $resident->unit_no);
+        $areaLetter = strtoupper($towerLetter);
 
         $lowrise = ['A', 'B', 'C', 'D', 'E'];
         $highrise = ['F', 'G', 'H', 'I'];
@@ -130,7 +131,7 @@ class AusiBookingMobileController extends Controller
         \Log::info('MOBILE AUSI SLOT REQUEST', [
             'unit_name' => $unitName,
             'unit_no' => $unitNo,
-            'resident_id' => $resident->id ?? null,
+            // 'resident_id' => $resident->id ?? null,
             'blocked_for_user' => $blockedForUser,
         ]);
 
@@ -247,8 +248,8 @@ class AusiBookingMobileController extends Controller
                 }
 
                 $booking = AusiBooking::create([
-                    'user_id' => null,        
-                    'created_by' => null,   
+                    'user_id' => null,
+                    'created_by' => null,
                     'email' => $email,
                     'transaction_no' => '',
                     'unit_no' => $unitNo,

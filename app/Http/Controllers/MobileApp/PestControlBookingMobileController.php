@@ -70,16 +70,18 @@ class PestControlBookingMobileController extends Controller
 
         $unitNo = $number . $towerLetter;
 
-        $resident = ResidentDetails::where('unit_no', $unitNo)->first();
+        // $resident = ResidentDetails::where('unit_no', $unitNo)->first();
 
-        if (!$resident) {
-            return response()->json([
-                'message' => 'Resident not found',
-                'unit_no' => $unitNo
-            ], 404);
-        }
+        // if (!$resident) {
+        //     return response()->json([
+        //         'message' => 'Resident not found',
+        //         'unit_no' => $unitNo
+        //     ], 404);
+        // }
 
-        $areaLetter = preg_replace('/[^A-Z]/', '', $resident->unit_no);
+        // $areaLetter = preg_replace('/[^A-Z]/', '', $resident->unit_no);
+
+        $areaLetter = strtoupper($towerLetter);
 
         $lowrise = ['A', 'B', 'C', 'D', 'E'];
         $highrise = ['F', 'G', 'H', 'I'];
@@ -123,7 +125,7 @@ class PestControlBookingMobileController extends Controller
         \Log::info('MOBILE PEST CONTROL SLOT REQUEST', [
             'unit_name' => $unitName,
             'unit_no' => $unitNo,
-            'resident_id' => $resident->id ?? null,
+            // 'resident_id' => $resident->id ?? null,
             'blocked_for_user' => $blockedForUser,
         ]);
 
@@ -308,7 +310,7 @@ class PestControlBookingMobileController extends Controller
                 }
 
                 $booking = TestPestControlBooking::create([
-                    'user_id' => null,               
+                    'user_id' => null,
                     'unit_no' => strtoupper($unitNo),
                     'unit_area' => $areaLetter,
                     'resident_type' => $residentType,

@@ -49,7 +49,7 @@ class GreaseTrapBookingMobileController extends Controller
             "Dolce" => "D",
             "Encino" => "E",
             "Aston" => "F",
-            "ReadOak" => "G",
+            "Red Oak" => "G",
             "Meranti" => "H",
             "Sequoia" => "I",
         ];
@@ -138,7 +138,7 @@ class GreaseTrapBookingMobileController extends Controller
                     "Dolce" => "D",
                     "Encino" => "E",
                     "Aston" => "F",
-                    "ReadOak" => "G",
+                    "Red Oak" => "G",
                     "Meranti" => "H",
                     "Sequoia" => "I",
                 ];
@@ -356,7 +356,7 @@ class GreaseTrapBookingMobileController extends Controller
             "Dolce" => "D",
             "Encino" => "E",
             "Aston" => "F",
-            "ReadOak" => "G",
+            "Red Oak" => "G",
             "Meranti" => "H",
             "Sequoia" => "I",
         ];

@@ -145,6 +145,13 @@ class AusiBookingMobileController extends Controller
     {
         \Log::info('AUSI MOBILE HIT', $request->all());
 
+        \Log::info('SESSION DEBUG', [
+            'session_id' => session()->getId(),
+            'csrf_session' => session()->token(),
+            'csrf_request' => request()->header('X-CSRF-TOKEN'),
+            'cookies' => request()->cookies->all(),
+        ]);
+
         $maxRetries = 3;
         $attempt = 0;
         $debug = [];

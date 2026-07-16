@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-046");
+    alert("🔥 JS VERSION 2026-06-15-047");
     const el = document.getElementById('resident_id_ausi_mobile');
 
     // logDebug("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -56,8 +56,8 @@ $(function () {
         disableMobile: true,
         onChange: function (selectedDates, dateStr) {
             window.ausiState.date = dateStr;
-            console.log("DATE:", dateStr);
-            logDebug("DATE CHANGED: " + dateStr);
+            // console.log("DATE:", dateStr);
+            // logDebug("DATE CHANGED: " + dateStr);
             triggerUpdate();
         }
 

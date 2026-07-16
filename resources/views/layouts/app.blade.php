@@ -62,7 +62,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body x-data style="padding-bottom:170px;">
+<body x-data>
     <div id="pageLoader" class="page-loader d-none">
         <div class="text-center">
             <div class="spinner-border text-primary mb-3" role="status"></div>

@@ -134,7 +134,7 @@
                                         {{ $fitnessHubBooking->penalty_applied_at ?? 'N/A' }}
                                     </td>
 
-                                    {{ strtoupper(optional($fitnessHubBooking->createdBy)->name ?? 'N/A') }}
+                                    <td>{{ strtoupper(optional($fitnessHubBooking->createdBy)->name ?? 'N/A') }}</td>
                                     <td>{{ strtoupper($fitnessHubBooking->created_at ?? 'N/A') }}</td>
                                     <td>{{ strtoupper($fitnessHubBooking->updated_at ?? 'N/A') }}</td>
 

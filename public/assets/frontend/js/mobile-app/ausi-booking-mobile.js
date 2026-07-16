@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-047");
+    // alert("🔥 JS VERSION 2026-06-15-047");
 
     fetch('/mobile-debug', {
         credentials: 'include'

@@ -62,14 +62,14 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body x-data>
+<body x-data style="margin-bottom:50px;">
     <div id="pageLoader" class="page-loader d-none">
         <div class="text-center">
             <div class="spinner-border text-primary mb-3" role="status"></div>
             <div>Loading...</div>
         </div>
     </div>
-
+    
     @yield('content')
 
     <script>

@@ -30,7 +30,8 @@ $(function () {
         }
     }
 
-    // logDebug("🚀 Mobile Booking JS Loaded");
+
+    logDebug("🚀 Mobile Booking JS Loaded");
 
     window.ausiState = {
         date: null,

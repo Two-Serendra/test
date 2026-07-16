@@ -1,5 +1,5 @@
 $(function () {
-    // alert("🔥 JS VERSION 2026-06-15-044");
+    alert("🔥 JS VERSION 2026-06-15-045");
     const el = document.getElementById('resident_id_ausi_mobile');
 
     logDebug("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -357,15 +357,33 @@ $(function () {
             //    logDebug(pair[0] + " = " + pair[1]);
             // }
 
+            logDebug("===== REQUEST DEBUG =====");
+            logDebug("CSRF Token:");
+            logDebug($('meta[name="csrf-token"]').attr('content'));
+
+            logDebug("Document Cookies:");
+            logDebug(document.cookie);
+
+            logDebug("Request URL:");
+            logDebug($(form).attr('action'));
+
+            logDebug("Method:");
+            logDebug($(form).attr('method'));
+
             $.ajax({
                 url: $(form).attr('action'),
                 type: $(form).attr('method'),
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true,
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 data: formData,
                 processData: false,
                 contentType: false,
+
                 success: function (res) {
 
                     logDebug("SUCCESS");
@@ -389,16 +407,43 @@ $(function () {
                     window.resetSlotsAusiMobile();
                 },
 
-                error: function (xhr) {
+                error: function (xhr, textStatus, errorThrown) {
+
+                    logDebug("========== AJAX ERROR ==========");
+                    logDebug("Status Code: " + xhr.status);
+                    logDebug("Status Text: " + xhr.statusText);
+                    logDebug("Text Status: " + textStatus);
+                    logDebug("Error Thrown: " + errorThrown);
+
+                    logDebug("Response Headers:");
+                    logDebug(xhr.getAllResponseHeaders());
+
+                    logDebug("Response Text:");
+                    logDebug(xhr.responseText);
+
+                    if (xhr.responseJSON) {
+                        logDebug("Response JSON:");
+                        logDebug(JSON.stringify(xhr.responseJSON, null, 2));
+                    }
+
                     const res = xhr.responseJSON || {};
-                    logDebug("ERROR", xhr.status);
-                    logDebug("RESPONSE", res);
+
+                    if (xhr.status === 419) {
+
+                        logDebug("❌ CSRF TOKEN MISMATCH DETECTED");
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Session Expired',
+                            text: 'CSRF Token Mismatch (419)'
+                        });
+
+                        return;
+                    }
 
                     if (xhr.status === 422) {
 
-                        const res = xhr.responseJSON || {};
                         const errors = res.errors || {};
-
                         let messages = [];
 
                         Object.keys(errors).forEach(field => {
@@ -407,18 +452,22 @@ $(function () {
                             });
                         });
 
+                        logDebug("Validation Errors:");
+                        logDebug(messages.join("\n"));
+
                         Swal.fire({
                             icon: 'error',
                             title: 'Validation Error',
                             html: messages.join('<br>')
                         });
 
-                        logDebug("VALIDATION ERRORS", messages);
-
                         return;
                     }
 
                     if (xhr.status === 409 && res.type === 'slot_taken') {
+
+                        logDebug("Slot Taken:");
+                        logDebug(res.message);
 
                         Swal.fire({
                             icon: 'error',
@@ -431,6 +480,9 @@ $(function () {
                     }
 
                     if (xhr.status === 409 && res.type === 'unit_already_booked') {
+
+                        logDebug("Already Booked:");
+                        logDebug(res.message);
 
                         Swal.fire({
                             icon: 'warning',

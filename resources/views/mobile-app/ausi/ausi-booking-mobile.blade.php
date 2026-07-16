@@ -163,6 +163,7 @@
                                                                                         font-size: 11px;
                                                                                         z-index: 99999;
                                                                                         padding: 10px;
+                                                                                        margin-top: 50px;
                                                                                     ">
                     </div>
 

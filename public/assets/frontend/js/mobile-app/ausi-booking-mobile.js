@@ -1,8 +1,8 @@
 $(function () {
-    alert("🔥 JS VERSION 2026-06-15-045");
+    alert("🔥 JS VERSION 2026-06-15-046");
     const el = document.getElementById('resident_id_ausi_mobile');
 
-    logDebug("SELECT EXISTS: " + (el ? "YES" : "NO"));
+    // logDebug("SELECT EXISTS: " + (el ? "YES" : "NO"));
     function logDebug(...args) {
 
         const msg = args.map(a =>
@@ -21,7 +21,7 @@ $(function () {
         }
     }
 
-    logDebug("🚀 Mobile Booking JS Loaded");
+    // logDebug("🚀 Mobile Booking JS Loaded");
 
     window.ausiState = {
         date: null,
@@ -44,8 +44,8 @@ $(function () {
         if (window.Alpine && Alpine.store('superapp')) {
             Alpine.store('superapp').selectedUnit = value;
         }
-        logDebug("UNIT CHANGED: " + value);
-        logDebug("CHANGE FIRED");
+        // logDebug("UNIT CHANGED: " + value);
+        // logDebug("CHANGE FIRED");
         triggerUpdate();
     };
 
@@ -67,8 +67,8 @@ $(function () {
     function triggerUpdate() {
         const date = window.ausiState.date;
         const unit = window.ausiState.unit;
-        logDebug("DATE=" + date);
-        logDebug("UNIT=" + unit);
+        // logDebug("DATE=" + date);
+        // logDebug("UNIT=" + unit);
 
         if (!date || !unit) {
             $(".ausi-booking-slot").prop("disabled", true);
@@ -229,11 +229,11 @@ $(function () {
     // );
 
     $(document).ready(function () {
-        logDebug("READY");
-        logDebug(
-            "SLOTS",
-            document.querySelectorAll(".ausi-booking-slot").length
-        );
+        // logDebug("READY");
+        // logDebug(
+        //     "SLOTS",
+        //     document.querySelectorAll(".ausi-booking-slot").length
+        // );
         $(".ausi-booking-slot").prop("disabled", true);
     });
 
@@ -291,7 +291,7 @@ $(function () {
     $(document).on('submit', '#userAusiNewBookingMobile', function (event) {
         event.preventDefault();
         const form = this;
-        logDebug("SUBMIT FIRED");
+        // logDebug("SUBMIT FIRED");
 
         const selectedDate = $('#AusiBookingDateMobile').val();
         const selectedUnit = $('#resident_id_ausi_mobile').val();

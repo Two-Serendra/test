@@ -47,7 +47,7 @@
         @endroles
 
 
-        <!-- @roles(1, 6, 7, 9)
+        @roles(1, 6, 7, 9)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-building"></i>
@@ -111,7 +111,7 @@
                 @endroles
 
             </ul>
-        </li> -->
+        </li>
 
         @roles(1, 6, 7, 9)
         <li class="menu-item">

@@ -242,6 +242,31 @@ Route::middleware(['miniapp.webview'])->group(function () {
 
     Route::get('/subway-faqs-mobile', [FaqsMobileController::class, 'SubwayFaqs'])->name('subway.faqs.mobile');
 
+    Route::match(['GET', 'POST'], '/mobile-debug', function (\Illuminate\Http\Request $request) {
+
+        return response()->json([
+            'session_name' => config('session.cookie'),
+            'session_id' => session()->getId(),
+            'session_token' => session()->token(),
+
+            'has_session_cookie' => $request->hasCookie(config('session.cookie')),
+
+            'cookies' => $request->cookies->all(),
+
+            'headers' => [
+                'cookie' => $request->header('Cookie'),
+                'origin' => $request->header('Origin'),
+                'referer' => $request->header('Referer'),
+                'host' => $request->header('Host'),
+                'user_agent' => $request->header('User-Agent'),
+                'x_csrf_token' => $request->header('X-CSRF-TOKEN'),
+            ],
+
+            'is_secure' => $request->isSecure(),
+            'url' => $request->fullUrl(),
+        ]);
+    });
+
 });
 Route::middleware('web')
     ->prefix('admin')

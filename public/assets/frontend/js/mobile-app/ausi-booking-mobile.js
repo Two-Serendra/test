@@ -1,5 +1,14 @@
 $(function () {
     alert("🔥 JS VERSION 2026-06-15-047");
+
+    fetch('/mobile-debug', {
+        credentials: 'include'
+    })
+        .then(res => res.json())
+        .then(data => {
+            logDebug("===== MOBILE DEBUG =====");
+            logDebug(JSON.stringify(data, null, 2));
+        });
     const el = document.getElementById('resident_id_ausi_mobile');
 
     // logDebug("SELECT EXISTS: " + (el ? "YES" : "NO"));

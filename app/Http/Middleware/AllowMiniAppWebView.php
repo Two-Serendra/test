@@ -13,19 +13,7 @@ class AllowMiniAppWebView
 {
     public function handle(Request $request, Closure $next)
     {
-        $proxySecret = config('app.miniapp_proxy_secret');
-        $forwardedHost = $request->header('x-forwarded-host');
 
-        if (
-            $proxySecret &&
-            $forwardedHost &&
-            hash_equals($proxySecret, (string) $request->header('x-miniapp-proxy-secret'))
-        ) {
-            URL::forceRootUrl('https://' . $forwardedHost);
-            URL::forceScheme('https');
-
-            config(['session.domain' => null]);
-        }
 
         Log::info('===== MINIAPP.WEBVIEW =====');
 
@@ -36,7 +24,7 @@ class AllowMiniAppWebView
             'headers' => $request->headers->all(),
         ]);
 
-        $proxySecret = config('app.miniapp_proxy_secret');
+        $proxySecret = '6657eac22b10df48a1511240d2ac24c45b738638d22b54a50ed610a1b5df9995';
         $forwardedHost = $request->header('x-forwarded-host');
 
         if (

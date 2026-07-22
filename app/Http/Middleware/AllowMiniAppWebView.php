@@ -8,11 +8,26 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 use App\Models\User;
+use Illuminate\Support\Facades\URL;
 
 class AllowMiniAppWebView
 {
     public function handle(Request $request, Closure $next)
     {
+        $proxySecret = config('app.miniapp_proxy_secret');
+        $forwardedHost = $request->header('x-forwarded-host');
+
+        if (
+            $proxySecret &&
+            $forwardedHost &&
+            hash_equals($proxySecret, (string) $request->header('x-miniapp-proxy-secret'))
+        ) {
+            URL::forceRootUrl('https://' . $forwardedHost);
+            URL::forceScheme('https');
+
+            config(['session.domain' => null]);
+        }
+
         Log::info('===== MINIAPP.WEBVIEW =====');
 
         Log::info([

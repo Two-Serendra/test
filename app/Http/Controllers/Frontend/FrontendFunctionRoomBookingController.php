@@ -298,30 +298,49 @@ class FrontendFunctionRoomBookingController extends Controller
 
     public function cancel($id)
     {
-        $booking = FunctionRoomBooking::with('user', 'functionRoom')->findOrFail($id);
+        $booking = FunctionRoomBooking::with('user', 'functionRoom')
+            ->where('user_id', auth()->id())
+            ->findOrFail($id);
 
-        if ($booking->booking_status == 0) {
-            $eventDateTime = Carbon::parse($booking->function_room_booking_date . ' ' . $booking->event_start_time);
-            $hoursDiff = now()->diffInHours($eventDateTime, false);
-            $penalty = 0;
-            if ($hoursDiff < 24) {
-                $penalty = 1000;
-                $booking->penalty_fee = $penalty;
-            }
-
-            $booking->booking_status = 2;
-            $booking->save();
-            Mail::to($booking->user->email)->queue(new UserFunctionRoomBookingCancelled($booking));
-            Mail::to('itdept@twoserendra.com')->queue(new FinanceFunctionRoomBookingCancellation($booking));
-
-            $booking->user->notify(new UserFunctionRoomBookingBellNotification($booking));
-
-            event(new FunctionRoomBookingCancellation($booking));
-
-            return response()->json(['success' => true, 'penalty' => $penalty]);
+        if ($booking->booking_status !== 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Booking cannot be cancelled.'
+            ], 422);
         }
 
-        return response()->json(['success' => false, 'message' => 'Booking cannot be cancelled']);
+        $eventDateTime = Carbon::parse(
+            $booking->function_room_booking_date . ' ' . $booking->event_start_time
+        );
+
+        $hoursDiff = now()->diffInHours($eventDateTime, false);
+
+        $penalty = 0;
+
+        if ($hoursDiff < 24) {
+            $penalty = 1000;
+            $booking->penalty_fee = $penalty;
+        }
+
+        $booking->booking_status = 2;
+        $booking->save();
+
+        Mail::to($booking->user->email)
+            ->queue(new UserFunctionRoomBookingCancelled($booking));
+
+        Mail::to('itdept@twoserendra.com')
+            ->queue(new FinanceFunctionRoomBookingCancellation($booking));
+
+        $booking->user->notify(
+            new UserFunctionRoomBookingBellNotification($booking)
+        );
+
+        event(new FunctionRoomBookingCancellation($booking));
+
+        return response()->json([
+            'success' => true,
+            'penalty' => $penalty
+        ]);
     }
 
 
@@ -369,6 +388,17 @@ class FrontendFunctionRoomBookingController extends Controller
         $maxRetries = 3;
         $attempt = 0;
 
+        $request->validate([
+            'authorization_file' => [
+                'nullable',
+                'file',
+                'mimes:pdf,jpg,jpeg,png',
+                'max:5120', // 5MB
+            ],
+
+            'suppliers.*.attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ]);
+
         while ($attempt < $maxRetries) {
             try {
                 DB::beginTransaction();
@@ -400,18 +430,15 @@ class FrontendFunctionRoomBookingController extends Controller
                     ? array_merge([$request->function_room_id], $linkedRooms[$request->function_room_id])
                     : [$request->function_room_id];
 
-                // Always include full shared room group for conflict checking
                 $fullSharedSet = isset($sharedRooms[$request->function_room_id])
                     ? $sharedRooms[$request->function_room_id]
                     : [];
 
-                // Final conflict group (complete group)
                 $conflictRoomIds = array_unique(array_merge($fullLinkedSet, $fullSharedSet));
-
 
                 $isAlreadyBooked = FunctionRoomBooking::whereIn('function_room_id', $conflictRoomIds)
                     ->where('function_room_booking_date', $request->function_room_booking_date)
-                    ->where('booking_status', '!=', 2) // only cancelled allowed
+                    ->where('booking_status', '!=', 2)
                     ->lockForUpdate()
                     ->exists();
 
@@ -443,7 +470,6 @@ class FrontendFunctionRoomBookingController extends Controller
                         'message' => 'Sorry, the selected function room has been blocked by admin for this date.'
                     ], 409);
                 }
-
 
                 $lastId = FunctionRoomBooking::max('id') + 1;
                 $transactionNo = '2SFR-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);

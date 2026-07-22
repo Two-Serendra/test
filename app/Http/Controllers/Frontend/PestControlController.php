@@ -322,7 +322,11 @@ class PestControlController extends Controller
     {
 
 
-        $resident = ResidentDetails::findOrFail($request->resident_id);
+        // $resident = ResidentDetails::findOrFail($request->resident_id);
+
+        $resident = ResidentDetails::where('id', $request->resident_id)
+            ->where('email', auth()->user()->email)
+            ->firstOrFail();
         $areaLetter = preg_replace('/[^A-Z]/', '', $resident->unit_no);
 
         $lowrise = ['A', 'B', 'C', 'D', 'E'];
@@ -371,7 +375,7 @@ class PestControlController extends Controller
             ->where('id', $id)
             ->where('user_id', auth()->id())
             ->firstOrFail();
-            
+
         return view('frontend.user-pest-control-booking-details', compact('booking'));
     }
 

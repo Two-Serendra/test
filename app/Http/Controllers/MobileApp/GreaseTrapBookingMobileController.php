@@ -409,20 +409,29 @@ class GreaseTrapBookingMobileController extends Controller
 
                 }
 
-                if ($booking->booking_status !== TestGreaseTrapBooking::STATUS_CONFIRMED) {
+                if ($booking->booking_status == TestGreaseTrapBooking::STATUS_CANCELLED) {
 
                     return response()->json([
                         'success' => false,
-                        'message' => 'Only active bookings can be cancelled.'
+                        'message' => 'Booking already cancelled.'
                     ], 400);
 
                 }
 
-                if ($booking->getBookingDateTime()->lt(now())) {
+                if ($booking->booking_status == TestGreaseTrapBooking::STATUS_COMPLETED) {
 
                     return response()->json([
                         'success' => false,
-                        'message' => 'Cannot cancel a completed booking.'
+                        'message' => 'Completed bookings cannot be cancelled.'
+                    ], 400);
+
+                }
+
+                if ($booking->getBookingDateTime()?->isPast()) {
+
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'This booking can no longer be cancelled because its scheduled date and time have already passed.'
                     ], 400);
 
                 }
@@ -464,11 +473,8 @@ class GreaseTrapBookingMobileController extends Controller
 
                 }
 
-                // Actual cancellation
                 $booking->booking_status = TestGreaseTrapBooking::STATUS_CANCELLED;
                 $booking->cancelled_at = now();
-
-                // Since mobile doesn't use auth(), remove this or set it to null
                 $booking->cancelled_by = null;
 
                 if ($within24Hours) {

@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use App\Models\ActivityBooking;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use App\Helpers\CsvHelper;
 
 
 class ActivitiesController extends Controller
@@ -38,7 +39,7 @@ class ActivitiesController extends Controller
             'amenity_id' => 'required',
             'activity_name' => 'required',
             'activity_description' => 'required',
-            'activity_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp',
+            'activity_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'space' => 'required',
             'timeOption' => 'required',
         ]);
@@ -197,6 +198,14 @@ class ActivitiesController extends Controller
 
     public function updateActivities(Request $request)
     {
+        $request->validate([
+            'activity_name' => 'required|string|max:255',
+            'activity_description' => 'required|string',
+            'activity_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'edit_activity_space' => 'required',
+            'edit_activity_max_booking' => 'required|integer|min:1',
+        ]);
+
         try {
             Log::info('Updating activity:', $request->all());
 
@@ -1710,7 +1719,7 @@ class ActivitiesController extends Controller
                 $end_time = Carbon::parse($row->booking_end_time)->format('h:i A');
                 $status = $row->booking_status == 1 ? 'Completed' : 'Cancelled';
 
-                fputcsv($handle, [
+                fputcsv($handle, CsvHelper::sanitizeRow([
                     $row->lobby,
                     $row->transaction_no,
                     $row->activity,
@@ -1723,9 +1732,9 @@ class ActivitiesController extends Controller
                     $booking_date,
                     $start_time,
                     $end_time,
-                    $row->booking_created_at,  // Keep original format from database
-                    $row->booking_updated_at
-                ]);
+                    $row->booking_created_at,
+                    $row->booking_updated_at,
+                ]));
 
                 ob_flush();
                 flush();

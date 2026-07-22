@@ -281,7 +281,9 @@ $(document).ready(function () {
 
                 bookings.forEach(function (booking) {
 
-                    var isCancelled = booking.booking_status == 2;
+                    var isCancelled = booking.booking_status == 0;
+                    var isScheduled = booking.booking_status == 1;
+                    var isCompleted = booking.booking_status == 2;
 
                     // NOTE: AJAX cannot call PHP method getBookingDateTime()
                     // so we approximate (safe fallback)
@@ -293,22 +295,50 @@ $(document).ready(function () {
                     var isPast = bookingDateTime ? bookingDateTime < now : false;
 
                     var actionButtons = `
-        <div class="d-flex gap-1 justify-content-center">
-            <button type="button" class="btn btn-primary edit_grease_trap_booking btn-sm btn-equal"
-                data-bs-toggle="tooltip" data-bs-placement="left" title="View"
-                data-id="${booking.id}">
-                <i class="fa-solid fa-eye"></i>
-            </button>
+                    <div class="d-flex gap-1 justify-content-center">
 
-            <button type="button"
-                class="btn btn-sm btn-equal ${(isCancelled || isPast) ? 'btn-secondary cancel-booking' : 'btn-danger admin-grease-trap-booking-cancel'}"
-                data-bs-toggle="tooltip" data-bs-placement="right"
-                title="${isCancelled ? 'Cancelled' : (isPast ? 'Past Booking' : 'Cancel')}"
-                data-id="${booking.id}" ${(isCancelled || isPast) ? 'disabled' : ''}>
-                <i class="fa-solid fa-ban"></i>
-            </button>
-        </div>
-    `;
+                        <button type="button"
+                            class="btn btn-primary edit_grease_trap_booking btn-sm btn-equal"
+                            data-bs-toggle="tooltip"
+                            title="View"
+                            data-id="${booking.id}">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+
+                        <button type="button"
+                            class="btn btn-success btn-sm btn-equal complete_grease_trap_booking"
+                            data-bs-toggle="tooltip"
+                            title="${isScheduled ? 'Complete Booking' : 'Already Completed'}"
+                            data-id="${booking.id}"
+                            ${!isScheduled ? 'disabled' : ''}>
+                            <i class="fa-solid fa-check"></i>
+                        </button>
+
+                        <button type="button"
+                            class="btn btn-sm btn-equal
+                                ${(isCancelled || isCompleted)
+                            ? 'btn-secondary cancel-booking'
+                            : 'btn-danger admin-grease-trap-booking-cancel'}"
+
+                            data-bs-toggle="tooltip"
+
+                            title="${isCancelled
+                            ? 'Cancelled'
+                            : isCompleted
+                                ? 'Completed'
+                                : 'Cancel Booking'
+                        }"
+
+                            data-id="${booking.id}"
+
+                            ${(isCancelled || isCompleted) ? 'disabled' : ''}>
+
+                            <i class="fa-solid fa-ban"></i>
+
+                        </button>
+
+                    </div>
+                    `;
 
                     // Resident type (MATCH BLADE)
                     var resType = booking.resident_type ? booking.resident_type.toLowerCase() : '';
@@ -332,32 +362,6 @@ $(document).ready(function () {
                         ? `<span class="badge bg-secondary badge-forge">No</span>`
                         : `<span class="badge bg-danger badge-forge">Yes</span>`;
 
-                    // Booking status
-                    var bookingDate = booking.booking_date
-                        ? new Date(booking.booking_date)
-                        : null;
-
-                    var today = new Date();
-                    today.setHours(0, 0, 0, 0);
-
-                    var isCompleted = booking.booking_status == 1 &&
-                        bookingDate &&
-                        bookingDate < today;
-
-                    var bookingStatus = '';
-
-                    if (booking.booking_status == 1) {
-
-                        if (isCompleted) {
-                            bookingStatus = `<span class="badge bg-primary custom-badge">COMPLETED</span>`;
-                        } else {
-                            bookingStatus = `<span class="badge bg-primary custom-badge">BOOKED</span>`;
-                        }
-
-                    } else {
-                        bookingStatus = `<span class="badge bg-danger custom-badge">CANCELLED</span>`;
-                    }
-
                     // Penalty
                     var penaltyHtml = booking.has_penalty
                         ? `<span class="text-warning fw-bold">₱${parseFloat(booking.penalty_amount).toFixed(2)}</span>`
@@ -375,6 +379,31 @@ $(document).ready(function () {
 
                     var cancelledAt = displayValue(booking.cancelled_at);
 
+                    var completedBy = booking.completedBy?.name
+                        ? booking.completedBy.name.toUpperCase()
+                        : 'N/A';
+
+                    var completedAt = displayValue(booking.completed_at);
+
+                    let bookingStatus = '';
+
+                    switch (parseInt(booking.booking_status)) {
+
+                        case 0:
+                            bookingStatus = `<span class="badge bg-danger custom-badge">CANCELLED</span>`;
+                            break;
+
+                        case 1:
+                            bookingStatus = `<span class="badge bg-warning text-dark custom-badge">SCHEDULED</span>`;
+                            break;
+
+                        case 2:
+                            bookingStatus = `<span class="badge bg-primary custom-badge">COMPLETED</span>`;
+                            break;
+
+                        default:
+                            bookingStatus = `<span class="badge bg-secondary custom-badge">UNKNOWN</span>`;
+                    }
 
                     var row = `
         <tr>
@@ -407,6 +436,9 @@ $(document).ready(function () {
 
             <td>${displayValue(cancelledBy)}</td>
             <td>${displayValue(cancelledAt)}</td>
+             <td>${displayValue(completedAt)}</td>
+             <td>${displayValue(completedBy)}</td>  
+           
 
             <td class="sticky-col sticky-col-color">${actionButtons}</td>
         </tr>
@@ -668,10 +700,12 @@ $(document).ready(function () {
 
             $('#display_time_slot').text(data.booking_time_slot);
             $('#display_transaction_no').text(data.transaction_no);
-
-
-            $('#grease_trap_srf_no').val(data.srf_no);
-            $('#remarks_grease_trap').val(data.remarks);
+            $('#display_status')
+                .removeClass()
+                .addClass('badge bg-' + data.status.badge)
+                .text(data.status.label);
+            $('#display_srf_no').text(data.srf_no ?? '-');
+            $('#display_remarks').text(data.remarks ?? '-');
             $('#info_id').val(info_id);
             hideLoading();
         })
@@ -679,6 +713,138 @@ $(document).ready(function () {
                 alert("Data not found");
             });
     });
+
+
+    $('#greaseTrapBookingTable').on('click', '.complete_grease_trap_booking', function () {
+
+        let info_id = $(this).data("id");
+
+        showLoading();
+
+        $.get('/admin/admin-fetch-grease-trap-booking/' + info_id, function (data) {
+
+            $('#complete_name').text(data.name);
+            $('#complete_unit').text(data.unit_no);
+            $('#complete_booking_date').text(data.booking_date);
+            $('#complete_time_slot').text(data.booking_time_slot);
+
+            $('#complete_srf_no').val(data.srf_no ?? '');
+            $('#complete_remarks').val(data.remarks ?? '');
+
+            $('#complete_info_id').val(info_id);
+
+            $('#greastrapComplete').modal('show');
+            $('#complete_transaction_no').text(data.transaction_no);
+            hideLoading();
+        });
+    });
+
+    $('#completeGreaseTrapBookingForm').on('submit', function (e) {
+
+        e.preventDefault();
+
+        let form = this;
+        let srf = $('#complete_srf_no').val().trim();
+
+        if (srf === '') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'SRF No Required',
+                text: 'Please enter the SRF No before completing the booking.'
+            });
+
+            $('#complete_srf_no').focus();
+            return;
+        }
+
+        Swal.fire({
+            title: 'Complete Booking?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Complete Booking',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#198754',
+            reverseButtons: true
+        }).then((result) => {
+
+            if (!result.isConfirmed) {
+                return;
+            }
+
+            $.ajax({
+
+                url: $(form).attr('action'),
+                type: 'POST',
+                data: $(form).serialize(),
+
+                beforeSend: function () {
+
+                    $('button[type=submit]', form)
+                        .prop('disabled', true)
+                        .html('<i class="fa fa-spinner fa-spin me-1"></i>Completing...');
+
+                },
+
+                success: function (response) {
+
+                    $('#greastrapComplete').modal('hide');
+
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true,
+                        customClass: {
+                            popup: 'colored-toast'
+                        }
+                    });
+
+                    Toast.fire({
+                        icon: 'success',
+                        title: response.message
+                    });
+
+                    form.reset();
+
+                    refreshGreaseTrapTableBookings();
+
+                },
+
+                error: function (xhr) {
+
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true,
+                        customClass: {
+                            popup: 'colored-toast-error'
+                        }
+                    });
+
+                    Toast.fire({
+                        icon: 'error',
+                        title: xhr.responseJSON?.message ?? 'Unable to complete booking.'
+                    });
+
+                },
+
+                complete: function () {
+
+                    $('button[type=submit]', form)
+                        .prop('disabled', false)
+                        .html('<i class="fa-solid fa-check me-1"></i>Complete Booking');
+
+                }
+
+            });
+
+        });
+
+    });
+
 
 
     $('#updateGreaseTrapBookingFormAdmin').submit(function (event) {

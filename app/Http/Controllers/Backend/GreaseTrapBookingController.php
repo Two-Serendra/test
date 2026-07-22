@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use App\Helpers\CsvHelper;
 
 class GreaseTrapBookingController extends Controller
 {
@@ -18,7 +19,8 @@ class GreaseTrapBookingController extends Controller
       $greaseTrapBookings = GreaseTrapBooking::with([
          'user',
          'createdBy',
-         'cancelledBy'
+         'cancelledBy',
+         'completedBy'
       ])->whereDate('booking_date', '>=', now()->toDateString())
          ->orderBy('created_at', 'DESC')
          ->paginate(10);
@@ -80,6 +82,14 @@ class GreaseTrapBookingController extends Controller
 
             'cancelledBy' => $b->cancelledBy ? [
                'name' => $b->cancelledBy->name
+            ] : null,
+
+            'completed_at' => $b->completed_at
+               ? Carbon::parse($b->completed_at)->format('Y-m-d H:i:s')
+               : null,
+
+            'completedBy' => $b->completedBy ? [
+               'name' => $b->completedBy->name
             ] : null,
          ];
       });
@@ -210,10 +220,10 @@ class GreaseTrapBookingController extends Controller
             ], 400);
          }
 
-         if ($booking->getBookingDateTime()->lt(now())) {
+         if ($booking->booking_status == GreaseTrapBooking::STATUS_COMPLETED) {
             return response()->json([
                'success' => false,
-               'message' => 'Cannot cancel a completed booking.'
+               'message' => 'Completed bookings cannot be cancelled.'
             ], 400);
          }
 
@@ -380,7 +390,9 @@ class GreaseTrapBookingController extends Controller
          'booking_date' => Carbon::parse($greaseTrapBooking->booking_date)->format('F d, Y'),
          'booking_time_slot' => $greaseTrapBooking->booking_time_slot,
          'srf_no' => $greaseTrapBooking->srf_no ?: null,
-         'charged_type' => $greaseTrapBooking->charged_type, // <-- add this
+         'charged_type' => $greaseTrapBooking->charged_type,
+         'booking_status' => $greaseTrapBooking->booking_status,
+         'status' => $greaseTrapBooking->g_t_status,
       ]);
    }
 
@@ -897,5 +909,37 @@ class GreaseTrapBookingController extends Controller
             'error' => $e->getMessage()
          ], 500);
       }
+   }
+
+   public function completeGreaseTrapBooking(Request $request)
+   {
+      $request->validate([
+         'id' => 'required|exists:grease_trap_bookings,id',
+         'srf_no' => 'required|string|max:255',
+         'remarks' => 'nullable|string|max:1000',
+      ]);
+
+      $booking = GreaseTrapBooking::findOrFail($request->id);
+
+      if ($booking->booking_status != GreaseTrapBooking::STATUS_SCHEDULED) {
+
+         return response()->json([
+            'success' => false,
+            'message' => 'Only scheduled bookings can be completed.'
+         ], 422);
+      }
+
+      $booking->update([
+         'srf_no' => $request->srf_no,
+         'remarks' => $request->remarks,
+         'booking_status' => GreaseTrapBooking::STATUS_COMPLETED,
+         'completed_at' => now(),
+         'completed_by' => auth()->id(),
+      ]);
+
+      return response()->json([
+         'success' => true,
+         'message' => 'Grease Trap booking marked as completed.'
+      ]);
    }
 }

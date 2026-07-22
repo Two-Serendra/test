@@ -31,10 +31,13 @@ class GreaseTrapBooking extends Model
         'has_penalty',
         'penalty_amount',
         'cancelled_within_24hrs',
+        'completed_at',
+        'completed_by',
     ];
-
-    const STATUS_CONFIRMED = 1;
-    const STATUS_CANCELLED = 2;
+    const STATUS_CANCELLED_OLD = 2;
+    const STATUS_CANCELLED = 0;
+    const STATUS_SCHEDULED = 1;
+    const STATUS_COMPLETED = 2;
     const CHARGE_FREE = 1;
     const CHARGE_BILLABLE = 2;
 
@@ -59,10 +62,20 @@ class GreaseTrapBooking extends Model
         return $this->belongsTo(User::class, 'cancelled_by');
     }
 
+    public function completedBy()
+    {
+        return $this->belongsTo(User::class, 'completed_by');
+    }
 
     public function isWithin24Hours()
     {
-        return now()->diffInHours($this->getBookingDateTime()) < 24;
+        $bookingDateTime = $this->getBookingDateTime();
+
+        if (!$bookingDateTime) {
+            return false;
+        }
+
+        return now()->gte($bookingDateTime->copy()->subHours(24));
     }
 
     public function applyCancellationPenalty()
@@ -101,16 +114,41 @@ class GreaseTrapBooking extends Model
         return self::where('unit_no', $unitNo)
             ->whereYear('booking_date', now()->year)
             ->where(function ($q) {
-                $q->where(function ($q2) {
-                    $q2->where('booking_status', self::STATUS_CONFIRMED)
-                        ->where('booking_date', '<', now()->toDateString());
-                })
-                    ->orWhere(function ($q3) {
-                        $q3->where('booking_status', self::STATUS_CANCELLED)
-                            ->where('cancelled_within_24hrs', 1);
-                    });
+                $q->whereIn('booking_status', [
+                    self::STATUS_SCHEDULED,
+                    self::STATUS_COMPLETED,
+                ])->orWhere(function ($q2) {
+                    $q2->where('booking_status', self::STATUS_CANCELLED)
+                        ->where('cancelled_within_24hrs', 1);
+                });
             })
             ->count();
+    }
+
+    public function getGTStatusAttribute()
+    {
+        return match ($this->booking_status) {
+
+            self::STATUS_CANCELLED => [
+                'label' => 'CANCELLED',
+                'badge' => 'danger',
+            ],
+
+            self::STATUS_SCHEDULED => [
+                'label' => 'SCHEDULED',
+                'badge' => 'warning',
+            ],
+
+            self::STATUS_COMPLETED => [
+                'label' => 'COMPLETED',
+                'badge' => 'primary',
+            ],
+
+            default => [
+                'label' => 'UNKNOWN',
+                'badge' => 'secondary',
+            ],
+        };
     }
 }
 

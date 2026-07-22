@@ -242,29 +242,26 @@ $(function () {
                 let statusText = "";
                 let badgeClass = "";
 
-                if (Number(item.booking_status) === 1) {
+                switch (Number(item.booking_status)) {
 
-                    const bookingDate = new Date(item.booking_date);
+                    case 0:
+                        statusText = "Cancelled";
+                        badgeClass = "bg-danger";
+                        break;
 
-                    // Ignore the time portion like Carbon::isPast() on booking_date
-                    bookingDate.setHours(0, 0, 0, 0);
+                    case 1:
+                        statusText = "Scheduled";
+                        badgeClass = "bg-warning";
+                        break;
 
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-
-                    if (bookingDate < today) {
+                    case 2:
                         statusText = "Completed";
                         badgeClass = "bg-primary";
-                    } else {
-                        statusText = "Booked";
-                        badgeClass = "bg-primary";
-                    }
+                        break;
 
-                } else {
-
-                    statusText = "Cancelled";
-                    badgeClass = "bg-danger";
-
+                    default:
+                        statusText = "Unknown";
+                        badgeClass = "bg-secondary";
                 }
 
                 switch (Number(item.charged_type)) {
@@ -283,7 +280,7 @@ $(function () {
                         badgeClassChargedType = "bg-secondary";
                 }
 
-                let cancelButton = "";
+                let canCancel = false;
 
                 if (Number(item.booking_status) === 1) {
 
@@ -302,27 +299,18 @@ $(function () {
 
                     const bookingDateTime = new Date(year, month - 1, day, hour, minute);
 
-                    const canCancel = now < bookingDateTime;
+                    canCancel = now < bookingDateTime;
+                }
 
                 cancelButton = `
-                        <button
-                            class="btn btn-sm rounded-pill px-3 cancel-mobile-gt-booking-btn
-                                ${canCancel ? 'btn-danger' : 'btn-secondary'}"
-                            ${canCancel ? '' : 'disabled'}
-                            data-id="${item.id}">
-                            Cancel
-                        </button>
-                    `;
-                    } else {
-                                       
-                cancelButton = `
-                        <button
-                            class="btn btn-sm rounded-pill px-3 btn-secondary"
-                            disabled>
-                            Cancel
-                        </button>
-                    `;
-                }
+                <button
+                    class="btn btn-sm rounded-pill px-3
+                        ${canCancel ? 'btn-danger cancel-mobile-gt-booking-btn' : 'btn-secondary'}"
+                    ${canCancel ? '' : 'disabled'}
+                    data-id="${item.id}">
+                    Cancel
+                </button>
+                `;
 
                 html += `
                 <div class="booking-card shadow-sm">

@@ -26,12 +26,16 @@ class FrontendAusiBookingController extends Controller
                 ->get()
             : collect();
         return view('frontend.ausi-booking', compact('residences'));
-    }    
+    }
 
     public function getBookedSlotsAusi(Request $request)
     {
 
-        $resident = ResidentDetails::findOrFail($request->resident_id);
+        // $resident = ResidentDetails::findOrFail($request->resident_id);
+
+        $resident = ResidentDetails::where('id', $request->resident_id)
+            ->where('email', auth()->user()->email)
+            ->firstOrFail();
 
         $areaLetter = preg_replace('/[^A-Z]/', '', $resident->unit_no);
 
@@ -63,7 +67,7 @@ class FrontendAusiBookingController extends Controller
         $blockedForUser = [];
 
         foreach ($slotStatus as $slot => $status) {
-            // If same tower already booked → block for user
+
             if ($status[$userGroup]) {
                 $blockedForUser[] = $slot;
             }

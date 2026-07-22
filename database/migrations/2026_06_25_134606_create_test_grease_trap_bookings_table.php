@@ -31,14 +31,25 @@ return new class extends Migration {
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('cancelled_by')->nullable();
             $table->boolean('cancelled_within_24hrs')->default(0);
+            $table->timestamp('completed_at')->nullable();
+            $table->unsignedBigInteger('completed_by')->nullable();
         });
     }
 
     /**
      * Reverse the migrations.
      */
-    public function down(): void
+    public function down()
     {
-        Schema::dropIfExists('test_grease_trap_bookings');
+        Schema::table('grease_trap_bookings', function (Blueprint $table) {
+
+            $table->dropForeign(['completed_by']);
+
+            $table->dropColumn([
+                'completed_at',
+                'completed_by',
+            ]);
+
+        });
     }
 };

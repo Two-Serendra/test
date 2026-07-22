@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use App\Helpers\CsvHelper;
+
 
 class PestControlController extends Controller
 {
@@ -551,7 +553,7 @@ class PestControlController extends Controller
                     default => 'Booked'
                 };
 
-                fputcsv($handle, [
+                fputcsv($handle, CsvHelper::sanitizeRow([
                     $row->transaction_no,
                     $row->resident_name,
                     $row->unit_no,
@@ -566,7 +568,7 @@ class PestControlController extends Controller
                     $row->created_by_name ?? null,
                     $row->created_at,
                     $row->updated_at
-                ]);
+                ]));
 
                 ob_flush();
                 flush();

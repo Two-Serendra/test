@@ -23,6 +23,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Mail\UserFunctionRoomBookingNotification;
 use App\Mail\FinanceFunctionRoomBookingNotification;
 use App\Events\FunctionRoomBookingCreated;
+use App\Helpers\CsvHelper;
+
 
 
 
@@ -1104,7 +1106,7 @@ class FunctionRoomBookingController extends Controller
             $handle = fopen('php://output', 'w');
 
             // CSV headers
-            fputcsv($handle, [
+            fputcsv($handle, CsvHelper::sanitizeRow([
                 'Transaction No',
                 'User Name',
                 'Unit No',
@@ -1128,7 +1130,7 @@ class FunctionRoomBookingController extends Controller
                 'Overall Total',
                 'Booking Status',
                 'Suppliers'
-            ]);
+            ]));
 
 
             foreach ($data as $row) {

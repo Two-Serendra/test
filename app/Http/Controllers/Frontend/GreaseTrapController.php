@@ -460,15 +460,52 @@ class GreaseTrapController extends Controller
     }
     public function GreaseTrapBookiingTableReload(Request $request)
     {
-        $selectedUnit = $request->unit_no;
+        $allResidences = DB::table('resident_details')
+            ->where('email', $request->user()->email)
+            ->select('unit_no')
+            ->get();
+
+        $allowedUnits = $allResidences->pluck('unit_no')
+            ->map(fn($u) => strtoupper($u))
+            ->toArray();
+
+        abort_unless(!empty($allowedUnits), 403, 'No residence assigned.');
+
+        $selectedUnit = $allowedUnits[0];
+
+        if ($request->filled('unit_no')) {
+
+            $requestedUnit = strtoupper($request->unit_no);
+
+            abort_unless(
+                in_array($requestedUnit, $allowedUnits, true),
+                403,
+                'Unauthorized unit access.'
+            );
+
+            $selectedUnit = $requestedUnit;
+        }
+
         $bookingType = $request->booking_type ?? 'function_room';
 
-        $bookings = collect();
+        $allowedTypes = [
+            'function_room',
+            'amenity',
+            'grease_trap',
+            'pest_control',
+        ];
+
+        abort_unless(
+            in_array($bookingType, $allowedTypes, true),
+            400,
+            'Invalid booking type.'
+        );
 
         switch ($bookingType) {
             case 'function_room':
                 $bookings = FunctionRoomBooking::with('functionRoom')
-                    ->when($selectedUnit, fn($q) => $q->where('unit_no', $selectedUnit))
+                    ->where('user_id', $request->user()->id)
+                    ->where('unit_no', $selectedUnit)
                     ->latest('function_room_booking_date')
                     ->paginate(5)
                     ->withQueryString();
@@ -476,21 +513,24 @@ class GreaseTrapController extends Controller
 
             case 'amenity':
                 $bookings = ActivityBooking::with('activity')
-                    ->when($selectedUnit, fn($q) => $q->where('unit', $selectedUnit))
+                    ->where('user_id', $request->user()->id)
+                    ->where('unit', $selectedUnit)
                     ->latest('booking_date')
                     ->paginate(5)
                     ->withQueryString();
                 break;
 
             case 'grease_trap':
-                $bookings = GreaseTrapBooking::when($selectedUnit, fn($q) => $q->where('unit_no', $selectedUnit))
+                $bookings = GreaseTrapBooking::where('user_id', $request->user()->id)
+                    ->where('unit_no', $selectedUnit)
                     ->latest('booking_date')
                     ->paginate(5)
                     ->withQueryString();
                 break;
 
             case 'pest_control':
-                $bookings = PestControlBooking::when($selectedUnit, fn($q) => $q->where('unit_no', $selectedUnit))
+                $bookings = PestControlBooking::where('user_id', $request->user()->id)
+                    ->where('unit_no', $selectedUnit)
                     ->latest('booking_date')
                     ->paginate(5)
                     ->withQueryString();

@@ -27,7 +27,7 @@ use App\Http\Controllers\Backend\AusiBookingController;
 
 Route::middleware('guest:admin')->group(function () {
     Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
-    Route::post('/login', [AdminAuthController::class, 'login']);
+    Route::post('/login', [AdminAuthController::class, 'login'])->middleware('throttle:5,1');
 });
 
 Route::middleware('auth:admin')->group(function () {
@@ -68,11 +68,11 @@ Route::middleware('auth:admin')->group(function () {
     //USERS
     Route::get('/admin-users', [UsersController::class, 'showUser'])->name('admin.show.user');
     Route::get('/admin-search-user', [UsersController::class, 'searchUser'])->name('admin.search.user');
-    Route::post('/admin-store-user', [UsersController::class, 'storeUser'])->name('admin.store.user');
-    Route::get('/admin-fetch-user/{id}', [UsersController::class, 'fetchUser'])->name('admin.fetch.user');
-    Route::post('/admin-update-user/{id}', [UsersController::class, 'updateUser'])->name('admin.update.user');
-    Route::delete('/admin-delete-user', [UsersController::class, 'deleteUser'])->name('delete.user');
-    Route::get('/get-updated-users-table', [UsersController::class, 'getUpdatedUserTable'])->name('admin.get.updated.usertable');
+    Route::post('/admin-store-user', [UsersController::class, 'storeUser'])->name('admin.store.user')->middleware('role:1');
+    Route::get('/admin-fetch-user/{id}', [UsersController::class, 'fetchUser'])->name('admin.fetch.user')->middleware('role:1');
+    Route::post('/admin-update-user/{id}', [UsersController::class, 'updateUser'])->name('admin.update.user')->middleware('role:1');
+    Route::delete('/admin-delete-user', [UsersController::class, 'deleteUser'])->name('delete.user')->middleware('role:1');
+    Route::get('/get-updated-users-table', [UsersController::class, 'getUpdatedUserTable'])->name('admin.get.updated.usertable')->middleware('role:1');
 
     //Resident Details
     Route::get('/admin-emails', [ResidentDetailsController::class, 'showResidentDetails'])->name('admin.show.resident.details');
@@ -288,7 +288,10 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/search-grease-trap-report', [GreaseTrapBookingController::class, 'searchGreaseTrapReports'])->name('admin.search.grease.trap.reports');
     Route::get('/admin-get-updated-grease-trap-report-table', [GreaseTrapBookingController::class, 'getUpdatedGreaseTrapReportTable']);
     Route::post('/admin/grease-trap/report/update', [GreaseTrapBookingController::class, 'AdminUpdateGreaseTrapReport'])->name('admin.grease.trap.report.update');
-
+    Route::post(
+        '/admin/grease-trap-booking/complete',
+        [GreaseTrapBookingController::class, 'completeGreaseTrapBooking']
+    )->name('admin.grease.trap.booking.complete');
     //Pest Control
     Route::get('/admin-booking-pest-control', [PestControlController::class, 'AdminBookingPestControl'])->name('admin.booking.pest.control');
     Route::post('/admin-pest-control-booking-store', [PestControlController::class, 'AdminStorePestControlBooking'])->name('admin.pest.control.booking.store');

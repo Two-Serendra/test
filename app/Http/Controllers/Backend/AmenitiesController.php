@@ -19,6 +19,12 @@ class AmenitiesController extends Controller
 
     public function addAmenities(Request $request)
     {
+        $request->validate([
+            'amenity_name' => 'required|string|max:255',
+            'amenity_description' => 'required|string',
+            'amenity_remarks' => 'nullable|string',
+            'amenity_image' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
 
         if ($request->hasFile('amenity_image')) {
             $file = $request->file('amenity_image');
@@ -58,10 +64,12 @@ class AmenitiesController extends Controller
 
     public function updateAmenities(Request $request)
     {
-        // $activityId = $request->input('id');
-        // if (is_null($activityId)) {
-        //     return response()->json(['error' => 'Activity ID is required.'], 400);
-        // }
+        $request->validate([
+            'amenity_name' => 'required|string|max:255',
+            'amenity_description' => 'required|string',
+            'amenity_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
         try {
             $amenity = Amenity::findOrFail($request->input('info_id'));
             $amenity->amenity_name = strtoupper($request->input('amenity_name'));

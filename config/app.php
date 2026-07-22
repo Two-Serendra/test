@@ -129,7 +129,8 @@ return [
 
 
     'miniapp_origin' => env('MINIAPP_ORIGIN'),
-    
+    'miniapp_proxy_secret' => env('MINIAPP_PROXY_SECRET'),
+
     /*
     |--------------------------------------------------------------------------
     | Maintenance Mode Driver

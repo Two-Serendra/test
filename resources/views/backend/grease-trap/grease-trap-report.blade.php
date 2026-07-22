@@ -32,7 +32,7 @@
                     <thead>
                         <tr>
                             <th class="text-dark">Transaction No</th>
-                            <th class="text-dark">SRF No</th>
+                            <th class="text-dark">SRF No</th> 
                             <th class="text-dark">Name</th>
                             <th class="text-dark">Resident Type</th>
                             <th class="text-dark">Unit</th>
@@ -45,8 +45,10 @@
                             <th class="text-dark">Penalty</th>
                             <th class="text-dark">Created by</th>
                             <th class="text-dark">Created at</th>
-                            <th class="text-dark">Cancelled_by</th>
-                            <th class="text-dark">Cancelled_at</th>
+                            <th class="text-dark">Cancelled by</th>
+                            <th class="text-dark">Cancelled at</th>
+                            <th class="text-dark">Completed at</th>
+                            <th class="text-dark">Completed by</th>
                             <th class="text-dark">Action</th>
                         </tr>
                     </thead>
@@ -102,17 +104,9 @@
                                     </td>
 
                                     <td>
-                                        @if ($greaseTrapBooking->booking_status == 1)
-
-                                            @if (\Carbon\Carbon::parse($greaseTrapBooking->booking_date)->isPast())
-                                                <span class="badge bg-primary custom-badge">COMPLETED</span>
-                                            @else
-                                                <span class="badge bg-primary custom-badge">BOOKED</span>
-                                            @endif
-
-                                        @else
-                                            <span class="badge bg-danger custom-badge">CANCELLED</span>
-                                        @endif
+                                        <span class="badge bg-{{ $greaseTrapBooking->g_t_status['badge'] }} custom-badge">
+                                            {{ $greaseTrapBooking->g_t_status['label'] }}
+                                        </span>
                                     </td>
                                     <td>
                                         @if ($greaseTrapBooking->has_penalty)
@@ -129,24 +123,44 @@
                                     <td>{{ isset($greaseTrapBooking->cancelledBy->name) ? strtoupper($greaseTrapBooking->cancelledBy->name) : 'N/A' }}
                                     </td>
                                     <td>{{ $greaseTrapBooking->cancelled_at ?? 'N/A' }}</td>
+                                    <td>{{ $greaseTrapBooking->completed_at ?? 'N/A' }}</td>
 
-
+                                    <td>{{ isset($greaseTrapBooking->completedBy->name) ? strtoupper($greaseTrapBooking->completedBy->name) : 'N/A' }}
+                                    </td>
 
 
                                     <td class="sticky-col sticky-col-color">
                                         <div class="d-flex gap-1 justify-content-center">
                                             @php
-                                                $isCancelled = $greaseTrapBooking->booking_status == 2;
-                                                $bookingDateTime = $greaseTrapBooking->getBookingDateTime();
-                                                $isPast = $bookingDateTime instanceof \Carbon\Carbon
-                                                    && $bookingDateTime->isValid()
-                                                    && $bookingDateTime->lt(now());
+                                                $isCancelled = $greaseTrapBooking->booking_status == \App\Models\GreaseTrapBooking::STATUS_CANCELLED;
+                                                $isScheduled = $greaseTrapBooking->booking_status == \App\Models\GreaseTrapBooking::STATUS_SCHEDULED;
+                                                $isCompleted = $greaseTrapBooking->booking_status == \App\Models\GreaseTrapBooking::STATUS_COMPLETED;
                                             @endphp
 
                                             <button type="button" class="btn btn-primary edit_grease_trap_report btn-sm btn-equal"
                                                 data-bs-toggle="tooltip" data-bs-placement="left" title="View"
                                                 data-id="{{ $greaseTrapBooking->id }}">
                                                 <i class="fa-solid fa-eye"></i>
+                                            </button>
+
+                                            <button type="button"
+                                                class="btn btn-success btn-sm btn-equal complete_grease_trap_booking_reports"
+                                                data-bs-toggle="tooltip"
+                                                title="{{ $isScheduled ? 'Complete Booking' : 'Already Completed' }}"
+                                                data-id="{{ $greaseTrapBooking->id }}" {{ !$isScheduled ? 'disabled' : '' }}>
+
+                                                <i class="fa-solid fa-check"></i>
+                                            </button>
+
+                                            {{-- Cancel --}}
+                                            <button type="button"
+                                                class="btn btn-sm btn-equal
+                                                                                {{ ($isCancelled || $isCompleted) ? 'btn-secondary cancel-booking' : 'btn-danger admin-grease-trap-booking-cancel-reports' }}"
+                                                data-bs-toggle="tooltip"
+                                                title="{{ $isCancelled ? 'Cancelled' : ($isCompleted ? 'Completed' : 'Cancel Booking') }}"
+                                                data-id="{{ $greaseTrapBooking->id }}" {{ ($isCancelled || $isCompleted) ? 'disabled' : '' }}>
+
+                                                <i class="fa-solid fa-ban"></i>
                                             </button>
                                         </div>
                                     </td>

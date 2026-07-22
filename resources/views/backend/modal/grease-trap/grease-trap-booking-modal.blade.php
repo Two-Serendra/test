@@ -240,7 +240,8 @@
 
                 <!-- TITLE -->
                 <div class="text-center mb-4">
-                    <h5 class="fw-bold mb-1">Grease Trap Booking <Details></Details></h5> <small class="">
+                    <h5 class="fw-bold mb-1">Grease Trap Booking <Details></Details>
+                    </h5> <small class="">
                         Reference #: <span id="display_transaction_no"></span>
                     </small>
                 </div>
@@ -428,6 +429,92 @@
                 </button>
 
                 <button type="submit" form="completeGreaseTrapBookingForm" class="btn btn-primary">
+                    Complete Booking
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="greasetrapCompleteReport" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <!-- HEADER -->
+            <div class="modal-header bg-primary text-white justify-content-center position-relative py-3">
+
+                <img src="{{ asset('assets/images/TWO SERENDRA LOGO PNG (White).png') }}" alt="logo"
+                    style="height:60px; width:auto;">
+
+                <button type="button" class="btn-close position-absolute end-0 me-3"
+                    style="top:50%; transform:translateY(-50%);" data-bs-dismiss="modal">
+                </button>
+
+            </div>
+            <!-- BODY -->
+            <div class="modal-body px-4 py-3">
+
+                <!-- TITLE -->
+                <div class="text-center mb-4">
+                    <h5 class="fw-bold mb-1">Complete Grease Trap Booking</h5> <small class="">
+                        Reference #: <span id="complete_transaction_no_reports"></span>
+                    </small>
+                </div>
+
+                <form action="{{ route('admin.grease.trap.booking.complete') }}" id="completeGreaseTrapBookingFormReports"
+                    method="POST" enctype="multipart/form-data" novalidate>
+                    @csrf
+                    <div class="row g-3">
+
+                        <!-- LEFT CARD -->
+                        <div class="col-md-12">
+                            <div class="card shadow-sm border-0 rounded-4 h-100 p-4">
+                                <input type="hidden" id="complete_info_id_reports" name="id">
+
+                                <h6 class="fw-semibold text-primary mb-3">
+                                    <i class="bx bx-check-circle me-2"></i>
+                                    Completion Details
+                                </h6>
+
+                                <div class="mb-3">
+                                    <label for="complete_srf_no" class="form-label">
+                                        SRF No <span class="text-danger">*</span>
+                                    </label>
+
+                                    <input type="text" class="form-control" id="complete_srf_no_reports" name="srf_no" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="complete_remarks" class="form-label">
+                                        Remarks
+                                    </label>
+
+                                    <textarea class="form-control" id="complete_remarks" name="remarks"
+                                        rows="5"></textarea>
+                                </div>
+
+                                <div class="alert alert-warning mb-0">
+                                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                                    This will mark the booking as <strong>Completed</strong>.
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+
+                <button type="submit" form="completeGreaseTrapBookingFormReports" class="btn btn-primary">
                     Complete Booking
                 </button>
             </div>

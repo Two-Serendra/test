@@ -877,9 +877,9 @@ class GreaseTrapBookingController extends Controller
 
    public function getUpdatedGreaseTrapReportTable()
    {
-      $bookings = GreaseTrapBooking::with(['user', 'cancelledBy', 'createdBy'])
+      $bookings = GreaseTrapBooking::with(['user', 'cancelledBy', 'createdBy', 'completedBy'])
          ->whereDate('booking_date', '<', now()->toDateString())
-         ->orderBy('created_at', 'DESC')
+         ->orderBy('booking_date', 'desc')
          ->paginate(10);
 
       $bookings->getCollection()->transform(function ($b) {
@@ -912,6 +912,9 @@ class GreaseTrapBookingController extends Controller
 
             'cancelledBy' => $b->cancelledBy ? [
                'name' => $b->cancelledBy->name
+            ] : null,
+            'completedBy' => $b->completedBy ? [
+               'name' => $b->completedBy->name
             ] : null,
          ];
       });

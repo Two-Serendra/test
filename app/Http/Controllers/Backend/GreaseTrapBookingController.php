@@ -533,10 +533,10 @@ class GreaseTrapBookingController extends Controller
       $formattedFromDate = Carbon::parse($fromDate)->format('m-d-Y');
       $formattedToDate = Carbon::parse($toDate)->format('m-d-Y');
 
-      // Fetch data (PAST BOOKINGS ONLY)
       $data = DB::table('grease_trap_bookings')
          ->leftJoin('users as u', 'grease_trap_bookings.user_id', '=', 'u.id')
          ->select(
+            'grease_trap_bookings.id',
             'grease_trap_bookings.transaction_no',
             'grease_trap_bookings.unit_no',
             'grease_trap_bookings.resident_type',
@@ -550,21 +550,37 @@ class GreaseTrapBookingController extends Controller
             'grease_trap_bookings.emergency',
             'grease_trap_bookings.booking_status',
             'grease_trap_bookings.created_at',
-            'grease_trap_bookings.updated_at'
+            'grease_trap_bookings.updated_at',
+            'grease_trap_bookings.completed_at',
+            'grease_trap_bookings.completed_by',
          )
          ->whereBetween('booking_date', [$fromDate, $toDate])
          ->orderBy('booking_date', 'desc')
          ->get();
 
       Log::info("Grease Trap Data fetched", [
-         'total_records' => count($data),
+         'total_records' => $data->count(),
       ]);
+
+      // Log every record returned from the database
+      foreach ($data as $row) {
+         Log::info('Grease Trap Query Result', [
+            'id' => $row->id,
+            'transaction_no' => $row->transaction_no,
+            'unit_no' => $row->unit_no,
+            'booking_date' => $row->booking_date,
+            'booking_time_slot' => $row->booking_time_slot,
+            'booking_status' => $row->booking_status,
+            'created_at' => $row->created_at,
+         ]);
+      }
 
       $fileName = "GreaseTrap_Booking_Report_{$formattedFromDate}_to_{$formattedToDate}.csv";
 
       $response = new StreamedResponse(function () use ($data) {
 
          $handle = fopen('php://output', 'w');
+
          fputcsv($handle, [
             'Transaction No',
             'Resident Name',
@@ -579,18 +595,30 @@ class GreaseTrapBookingController extends Controller
             'Status',
             'Created By',
             'Created At',
-            'Updated At'
+            'Updated At',
+            'Completed At',
+            'Completed By'
          ]);
 
          foreach ($data as $row) {
 
+            Log::info('Writing CSV Row', [
+               'id' => $row->id,
+               'transaction_no' => $row->transaction_no,
+               'unit_no' => $row->unit_no,
+               'booking_date' => $row->booking_date,
+               'booking_status' => $row->booking_status,
+            ]);
+
             $bookingDate = Carbon::parse($row->booking_date)->format('F j, Y');
             $chargeType = $row->charged_type == 1 ? 'Free' : 'Billable';
             $emergency = $row->emergency == 1 ? 'Yes' : 'No';
-            $status = match ($row->booking_status) {
-               1 => 'Completed',
-               2 => 'Cancelled',
-               default => 'Booked'
+
+            $status = match ((int) $row->booking_status) {
+               GreaseTrapBooking::STATUS_CANCELLED => 'Cancelled',
+               GreaseTrapBooking::STATUS_SCHEDULED => 'Scheduled',
+               GreaseTrapBooking::STATUS_COMPLETED => 'Completed',
+               default => 'Unknown',
             };
 
             fputcsv($handle, [
@@ -607,7 +635,9 @@ class GreaseTrapBookingController extends Controller
                $status,
                $row->created_by_name ?? null,
                $row->created_at,
-               $row->updated_at
+               $row->updated_at,
+               $row->completed_at,
+               $row->completed_by
             ]);
 
             ob_flush();
@@ -620,7 +650,9 @@ class GreaseTrapBookingController extends Controller
       $response->headers->set('Content-Type', 'text/csv');
       $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
 
-      Log::info("Grease Trap CSV Export Completed", ['filename' => $fileName]);
+      Log::info("Grease Trap CSV Export Completed", [
+         'filename' => $fileName
+      ]);
 
       return $response;
    }

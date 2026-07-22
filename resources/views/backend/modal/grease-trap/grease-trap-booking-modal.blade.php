@@ -240,7 +240,7 @@
 
                 <!-- TITLE -->
                 <div class="text-center mb-4">
-                    <h5 class="fw-bold mb-1">View Grease Trap Booking</h5> <small class="">
+                    <h5 class="fw-bold mb-1">Grease Trap Booking <Details></Details></h5> <small class="">
                         Reference #: <span id="display_transaction_no"></span>
                     </small>
                 </div>
@@ -672,20 +672,30 @@
                             <div class="card shadow-sm border-0 rounded-4 h-100 p-4">
 
                                 <h6 class="fw-semibold text-primary mb-3">
-                                    <i class="bx bx-edit me-2"></i>
-                                    Update Information
+                                    <i class="bx bx-info-circle me-2"></i>
+                                    Booking Information
                                 </h6>
 
-                                <div class="mb-3">
-                                    <label class="form-label">SRF No *</label>
-                                    <input type="text" class="form-control" id="grease_trap_srf_no_reports"
-                                        name="srf_no">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Status</span>
+
+                                    <span id="display_status_reports" class="badge bg-secondary">
+                                        -
+                                    </span>
                                 </div>
 
-                                <div class="mb-3">
-                                    <label class="form-label">Remarks</label>
-                                    <textarea class="form-control" id="remarks_grease_trap_reports" name="remarks">
-                                        rows="4"></textarea>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">SRF No</span>
+                                    <span id="display_srf_no_reports" class="fw-semibold text-end">-</span>
+                                </div>
+
+                                <div class="mb-2">
+                                    <span class="text-muted d-block mb-2">Remarks</span>
+
+                                    <div id="display_remarks_reports" class="border rounded p-2 bg-light"
+                                        style="min-height:120px;">
+                                        -
+                                    </div>
                                 </div>
 
                             </div>
@@ -699,9 +709,8 @@
 
             <!-- FOOTER -->
             <div class="modal-footer">
-                <button type="submit" form="updateGreaseTrapReportFormAdmin" id="UpdateGreaseTrapReportBtn"
-                    class="btn btn-primary">
-                    Update
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Close
                 </button>
             </div>
 

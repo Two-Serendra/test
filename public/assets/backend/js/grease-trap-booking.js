@@ -1039,7 +1039,7 @@ $(document).ready(function () {
 
 
             $('#display_resident_type_reports').html(residentBadge);
-
+            $('#display_transaction_no_reports').text(data.transaction_no);
             $('#display_booking_date_reports').text(data.booking_date);
 
 
@@ -1053,10 +1053,17 @@ $(document).ready(function () {
             $('#display_charged_type_reports').html(chargedBadge);
 
             $('#display_time_slot_reports').text(data.booking_time_slot);
-            $('#display_transaction_no_reports').text(data.transaction_no);
 
             $('#grease_trap_srf_no_reports').val(data.srf_no || 'N/A');
             $('#remarks_grease_trap_reports').val(data.remarks || 'N/A');
+
+            $('#display_status_reports')
+                .removeClass()
+                .addClass('badge bg-' + data.status.badge)
+                .text(data.status.label);
+            $('#display_srf_no_reports').text(data.srf_no ?? '-');
+            $('#display_remarks_reports').text(data.remarks ?? '-');
+
             $('#info_id_reports').val(info_id);
             hideLoading();
         })

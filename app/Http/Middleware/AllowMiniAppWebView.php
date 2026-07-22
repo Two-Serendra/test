@@ -32,9 +32,17 @@ class AllowMiniAppWebView
             $forwardedHost &&
             hash_equals($proxySecret, (string) $request->header('x-miniapp-proxy-secret'))
         ) {
-            URL::forceRootUrl('https://' . $forwardedHost);
-            URL::forceScheme('https');
-            
+            // Trust the proxy's X-Forwarded-Proto rather than assuming https
+            // — hardcoding https broke every asset()/route() link with
+            // ERR_SSL_PROTOCOL_ERROR when the proxy itself was being hit over
+            // plain http (local dev on localhost:3000 has no TLS). Only "http"
+            // downgrades; anything else (missing header, "https", garbage)
+            // stays https, since that's the correct/only scheme in production.
+            $forwardedProto = $request->header('x-forwarded-proto') === 'http' ? 'http' : 'https';
+
+            URL::forceRootUrl($forwardedProto . '://' . $forwardedHost);
+            URL::forceScheme($forwardedProto);
+
             config(['session.domain' => null]);
         }
 

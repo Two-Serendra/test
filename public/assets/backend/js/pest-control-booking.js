@@ -385,7 +385,9 @@ $(document).ready(function () {
         sendBooking();
     });
 
-
+    function displayValue(value) {
+        return value && value.toString().trim() !== '' ? value : 'N/A';
+    }
 
 
     function refreshPestControlTableBookings() {
@@ -402,7 +404,9 @@ $(document).ready(function () {
 
                 bookings.forEach(function (booking) {
 
-                    var isCancelled = booking.booking_status == 2;
+                    var isCancelled = booking.booking_status == 0;
+                    var isScheduled = booking.booking_status == 1;
+                    var isCompleted = booking.booking_status == 2;
 
                     var actionButtons = `
                     <div class="d-flex gap-1 justify-content-center">
@@ -413,11 +417,35 @@ $(document).ready(function () {
                         </button>
 
                         <button type="button"
-                            class="btn btn-sm btn-equal ${isCancelled ? 'btn-secondary cancel-booking' : 'btn-danger admin-pest-control-booking-cancel'}"
-                            data-bs-toggle="tooltip" data-bs-placement="right"
-                            title="${isCancelled ? 'Cancelled' : 'Cancel'}"
-                            data-id="${booking.id}" ${isCancelled ? 'disabled' : ''}>
+                            class="btn btn-success btn-sm btn-equal complete_pest_control_booking"
+                            data-bs-toggle="tooltip"
+                            title="${isScheduled ? 'Complete Booking' : 'Already Completed'}"
+                            data-id="${booking.id}"
+                            ${!isScheduled ? 'disabled' : ''}>
+                            <i class="fa-solid fa-check"></i>
+                        </button>
+
+                        <button type="button"
+                            class="btn btn-sm btn-equal
+                                ${(isCancelled || isCompleted)
+                            ? 'btn-secondary cancel-booking'
+                            : 'btn-danger admin-pest-control-booking-cancel'}"
+
+                            data-bs-toggle="tooltip"
+
+                            title="${isCancelled
+                            ? 'Cancelled'
+                            : isCompleted
+                                ? 'Completed'
+                                : 'Cancel Booking'
+                        }"
+
+                            data-id="${booking.id}"
+
+                            ${(isCancelled || isCompleted) ? 'disabled' : ''}>
+
                             <i class="fa-solid fa-ban"></i>
+
                         </button>
                     </div>
                 `;
@@ -447,22 +475,26 @@ $(document).ready(function () {
                     var today = new Date();
                     today.setHours(0, 0, 0, 0);
 
-                    var isCompleted = booking.booking_status == 1 &&
-                        bookingDate &&
-                        bookingDate < today;
+                    var completedAt = displayValue(booking.completed_at);
 
-                    var bookingStatus = '';
+                    let bookingStatus = '';
 
-                    if (booking.booking_status == 1) {
+                    switch (parseInt(booking.booking_status)) {
 
-                        if (isCompleted) {
+                        case 0:
+                            bookingStatus = `<span class="badge bg-danger custom-badge">CANCELLED</span>`;
+                            break;
+
+                        case 1:
+                            bookingStatus = `<span class="badge bg-warning custom-badge">SCHEDULED</span>`;
+                            break;
+
+                        case 2:
                             bookingStatus = `<span class="badge bg-primary custom-badge">COMPLETED</span>`;
-                        } else {
-                            bookingStatus = `<span class="badge bg-primary custom-badge">BOOKED</span>`;
-                        }
+                            break;
 
-                    } else {
-                        bookingStatus = `<span class="badge bg-danger custom-badge">CANCELLED</span>`;
+                        default:
+                            bookingStatus = `<span class="badge bg-secondary custom-badge">UNKNOWN</span>`;
                     }
 
 
@@ -732,9 +764,13 @@ $(document).ready(function () {
             $('#display_transaction_no').text(data.transaction_no);
 
             // Editable fields
-            $('#srf_no').val(data.srf_no);
-            $('#remarks_grease_trap').val(data.remarks);
             $('#info_id').val(info_id);
+            $('#display_status')
+                .removeClass()
+                .addClass('badge bg-' + data.status.badge)
+                .text(data.status.label);
+            $('#display_srf_no').text(data.srf_no ?? '-');
+            $('#display_remarks').text(data.remarks ?? '-');
             $('#pestcontrolEdit').modal('show');
 
             hideLoading();
@@ -782,9 +818,13 @@ $(document).ready(function () {
             $('#display_transaction_no_reports').text(data.transaction_no);
 
             // Editable fields
-            $('#srf_no_reports').text(data.srf_no ?? 'N/A');
-            $('#remarks_pest_control_reports').text(data.remarks ?? 'N/A');
             $('#info_id').val(info_id);
+            $('#display_status_reports')
+                .removeClass()
+                .addClass('badge bg-' + data.status.badge)
+                .text(data.status.label);
+            $('#display_srf_no_reports').text(data.srf_no ?? '-');
+            $('#display_remarks_reports').text(data.remarks ?? '-');
             $('#viewPestControlBooking').modal('show');
 
             hideLoading();
@@ -956,14 +996,142 @@ $(document).ready(function () {
     $('#PCbookingFileInput').on('change', function () {
 
         if (this.files.length === 0) return;
- 
+
         let fileName = this.files[0].name;
 
         if (confirm("Upload file: " + fileName + " ?")) {
             $('#bookingImportFormPC').submit();
         } else {
             $(this).val('');
-        } 
+        }
+
+    });
+
+    $('#pestControlBookingTable').on('click', '.complete_pest_control_booking', function () {
+
+        let info_id = $(this).data("id");
+
+        showLoading();
+
+        $.get('/admin/admin-fetch-pest-control-booking/' + info_id, function (data) {
+            $('#complete_info_id_pest_control').val(info_id);
+            $('#complete_transaction_no_pest_control').text(data.transaction_no);
+            $('#pestControlComplete').modal('show');
+            hideLoading();
+        });
+    });
+
+    const $btn = $('#completePestControlBtn');
+
+    function setLoading() {
+        const originalWidth = $btn.outerWidth();
+
+        $btn
+            .prop('disabled', true)
+            .html(`
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Completing...
+        `)
+            .css('width', originalWidth + 'px');
+    }
+
+    function resetButton() {
+        $btn
+            .prop('disabled', false)
+            .html('<span class="btn-text">Complete Booking</span>')
+            .css('width', '');
+    }
+
+    $('#completePestControlBookingFormReports').on('submit', function (e) {
+
+        e.preventDefault();
+        let form = this;
+        let srf = $('#complete_srf_no_pest_control').val().trim();
+
+        if (srf === '') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'SRF No Required',
+                text: 'Please enter the SRF No before completing the booking.'
+            });
+
+            $('#complete_srf_no_pest_control').focus();
+            return;
+        }
+
+        Swal.fire({
+            title: 'Complete Booking?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Complete Booking',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#198754',
+            reverseButtons: true
+        }).then((result) => {
+
+            if (!result.isConfirmed) {
+                return;
+            }
+
+            setLoading();
+
+            $.ajax({
+
+                url: $(form).attr('action'),
+                type: 'POST',
+                data: $(form).serialize(),
+                success: function (response) {
+
+                    $('#pestControlComplete').modal('hide');
+
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true,
+                        customClass: {
+                            popup: 'colored-toast'
+                        }
+                    });
+
+                    Toast.fire({
+                        icon: 'success',
+                        title: response.message
+                    });
+
+                    form.reset();
+
+                    refreshPestControlTableBookings();
+
+                },
+
+                error: function (xhr) {
+
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true,
+                        customClass: {
+                            popup: 'colored-toast-error'
+                        }
+                    });
+
+                    Toast.fire({
+                        icon: 'error',
+                        title: xhr.responseJSON?.message ?? 'Unable to complete booking.'
+                    });
+
+                },
+
+                complete: function () {
+                    resetButton();
+                }
+            });
+
+        });
 
     });
 

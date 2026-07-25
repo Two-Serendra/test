@@ -535,6 +535,7 @@ class GreaseTrapBookingController extends Controller
 
       $data = DB::table('grease_trap_bookings')
          ->leftJoin('users as u', 'grease_trap_bookings.user_id', '=', 'u.id')
+         ->leftJoin('users as completed_user', 'grease_trap_bookings.completed_by', '=', 'completed_user.id')
          ->select(
             'grease_trap_bookings.id',
             'grease_trap_bookings.transaction_no',
@@ -542,6 +543,7 @@ class GreaseTrapBookingController extends Controller
             'grease_trap_bookings.resident_type',
             'grease_trap_bookings.name as resident_name',
             'u.name as created_by_name',
+            'completed_user.name as completed_by_name', // <-- Add this
             'grease_trap_bookings.booking_date',
             'grease_trap_bookings.booking_time_slot',
             'grease_trap_bookings.srf_no',
@@ -552,7 +554,6 @@ class GreaseTrapBookingController extends Controller
             'grease_trap_bookings.created_at',
             'grease_trap_bookings.updated_at',
             'grease_trap_bookings.completed_at',
-            'grease_trap_bookings.completed_by',
          )
          ->whereBetween('booking_date', [$fromDate, $toDate])
          ->orderBy('booking_date', 'desc')
@@ -637,7 +638,7 @@ class GreaseTrapBookingController extends Controller
                $row->created_at,
                $row->updated_at,
                $row->completed_at,
-               $row->completed_by
+               $row->completed_by_name ?? null,
             ]);
 
             ob_flush();
@@ -974,7 +975,7 @@ class GreaseTrapBookingController extends Controller
 
       return response()->json([
          'success' => true,
-         'message' => 'Grease Trap booking marked as completed.'
+         'message' => 'Grease Trap booking completed.'
       ]);
    }
 }

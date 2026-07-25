@@ -242,7 +242,7 @@ Route::middleware(['miniapp.webview'])->group(function () {
 
     Route::get('/subway-faqs-mobile', [FaqsMobileController::class, 'SubwayFaqs'])->name('subway.faqs.mobile');
 
-    Route::match(['GET', 'POST'], '/mobile-debug', function (\Illuminate\Http\Request $request) {
+Route::match(['GET', 'POST'], '/mobile-debug', function (\Illuminate\Http\Request $request) {
 
         return response()->json([
             'session_name' => config('session.cookie'),

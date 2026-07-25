@@ -27,9 +27,9 @@
                     </form>
 
                     <!-- <button type="button" class="btn btn-primary badge me-2" id="uploadBookingBtnPC">
-                                                    <i class='bx bx-upload'></i> Upload Bookings
-                                                </button> -->
- 
+                                                                            <i class='bx bx-upload'></i> Upload Bookings
+                                                                        </button> -->
+
 
                     <button type="button" class="btn btn-primary badge AddPesControlBookingAdmin me-2">
                         <i class='bx bx-plus'></i> New Booking
@@ -60,9 +60,9 @@
                             <th class="text-dark">Created At</th>
                             <th class="text-dark">Cancelled By</th>
                             <th class="text-dark">Cancelled At</th>
+                            <th class="text-dark">Completed By</th>
+                            <th class="text-dark">Completed At</th>
                             <th class="text-dark">Action</th>
-
-
                         </tr>
                     </thead>
                     <tbody>
@@ -117,17 +117,9 @@
                                     </td>
 
                                     <td>
-                                        @if ($pestControlBooking->booking_status == 1)
-
-                                            @if (\Carbon\Carbon::parse($pestControlBooking->booking_date)->isPast())
-                                                <span class="badge bg-primary custom-badge">COMPLETED</span>
-                                            @else
-                                                <span class="badge bg-primary custom-badge">BOOKED</span>
-                                            @endif
-
-                                        @else
-                                            <span class="badge bg-danger custom-badge">CANCELLED</span>
-                                        @endif
+                                        <span class="badge bg-{{ $pestControlBooking->p_c_status['badge'] }} custom-badge">
+                                            {{ $pestControlBooking->p_c_status['label'] }}
+                                        </span>
                                     </td>
                                     <td>{{ isset($pestControlBooking->createdBy->name) ? strtoupper($pestControlBooking->createdBy->name) : 'N/A' }}
                                     </td>
@@ -135,18 +127,31 @@
                                     <td>{{ isset($pestControlBooking->cancelledBy->name) ? strtoupper($pestControlBooking->cancelledBy->name) : 'N/A' }}
                                     </td>
                                     <td>{{ $pestControlBooking->cancelled_at ?? 'N/A' }}</td>
+                                    <td>{{ isset($pestControlBooking->completedBy->name) ? strtoupper($pestControlBooking->completedBy->name) : 'N/A' }}
+                                    </td>
+                                    <td>{{ $pestControlBooking->completed_at ?? 'N/A' }}</td>
                                     <td class="sticky-col sticky-col-color">
                                         <div class="d-flex gap-1 justify-content-center">
                                             @php
-                                                $isCancelled = $pestControlBooking->booking_status == 2;
+                                                $isCancelled = $pestControlBooking->booking_status == \App\Models\PestControlBooking::STATUS_CANCELLED;
+                                                $isScheduled = $pestControlBooking->booking_status == \App\Models\PestControlBooking::STATUS_SCHEDULED;
+                                                $isCompleted = $pestControlBooking->booking_status == \App\Models\PestControlBooking::STATUS_COMPLETED;
                                             @endphp
 
                                             <button type="button" class="btn btn-primary edit_pest_control_booking btn-sm btn-equal"
-                                                data-bs-toggle="tooltip" data-bs-placement="left" title="View"
+                                                data-bs-toggle="tooltip" data-bs-placement="left" title="View" est
                                                 data-id="{{ $pestControlBooking->id }}">
                                                 <i class="fa-solid fa-eye"></i>
                                             </button>
 
+                                            <button type="button"
+                                                class="btn btn-success btn-sm btn-equal complete_pest_control_booking"
+                                                data-bs-toggle="tooltip"
+                                                title="{{ $isScheduled ? 'Complete Booking' : 'Already Completed' }}"
+                                                data-id="{{ $pestControlBooking->id }}" {{ !$isScheduled ? 'disabled' : '' }}>
+
+                                                <i class="fa-solid fa-check"></i>
+                                            </button>
 
                                             <button type="button"
                                                 class="btn btn-sm btn-equal {{ $isCancelled ? 'btn-secondary cancel-booking' : 'btn-danger admin-pest-control-booking-cancel' }}"

@@ -311,7 +311,10 @@ Route::middleware('auth:admin')->group(function () {
         ->name('download.pest.control.booking.reports');
     Route::post('/pest-control-import-booking', [PestControlController::class, 'importPestControlBookings'])->name('pest.control.booking.import');
     Route::get('/search-pest-control-report', [PestControlController::class, 'searchPestControlReport'])->name('admin.search.pest.control.report');
-
+    Route::post(
+        '/admin/pest-control-booking/complete',
+        [PestControlController::class, 'completePestControlBooking']
+    )->name('admin.pest.control.booking.complete');
 
     //AUSI
     Route::get('/admin-booking-ausi', [AusiBookingController::class, 'AdminBookingAusi'])->name('admin.booking.ausi');

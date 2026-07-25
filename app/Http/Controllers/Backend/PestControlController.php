@@ -21,7 +21,8 @@ class PestControlController extends Controller
         $pestControlBookings = PestControlBooking::with([
             'user',
             'createdBy',
-            'cancelledBy'
+            'cancelledBy',
+            'completedBy'
         ])->whereDate('booking_date', '>=', now()->toDateString())
             ->orderBy('created_at', 'DESC')
             ->paginate(10);
@@ -366,7 +367,9 @@ class PestControlController extends Controller
             'booking_date' => Carbon::parse($pestControlBooking->booking_date)->format('F d, Y'),
             'booking_time_slot' => $pestControlBooking->booking_time_slot,
             'srf_no' => $pestControlBooking->srf_no,
-            'charged_type' => $pestControlBooking->charged_type, // <-- add this
+            'charged_type' => $pestControlBooking->charged_type,
+            'booking_status' => $pestControlBooking->booking_status,
+            'status' => $pestControlBooking->p_c_status,
         ]);
     }
 
@@ -491,14 +494,14 @@ class PestControlController extends Controller
 
         $data = DB::table('pest_control_bookings')
             ->leftJoin('users as u', 'pest_control_bookings.user_id', '=', 'u.id')
+            ->leftJoin('users as completed_user', 'pest_control_bookings.completed_by', '=', 'completed_user.id')
             ->select(
                 'pest_control_bookings.transaction_no',
                 'pest_control_bookings.unit_no',
                 'pest_control_bookings.resident_type',
-
                 'pest_control_bookings.name as resident_name',
-                'u.name as created_by_name', // if you have created_by column, else remove this
-
+                'u.name as created_by_name',
+                'completed_user.name as completed_by_name',
                 'pest_control_bookings.booking_date',
                 'pest_control_bookings.booking_time_slot',
                 'pest_control_bookings.srf_no',
@@ -507,7 +510,8 @@ class PestControlController extends Controller
                 'pest_control_bookings.emergency',
                 'pest_control_bookings.booking_status',
                 'pest_control_bookings.created_at',
-                'pest_control_bookings.updated_at'
+                'pest_control_bookings.updated_at',
+                'pest_control_bookings.completed_at',
             )
             ->whereBetween('booking_date', [$fromDate, $toDate])
             ->orderBy('booking_date', 'desc')
@@ -537,7 +541,9 @@ class PestControlController extends Controller
                 'Status',
                 'Created By',
                 'Created At',
-                'Updated At'
+                'Updated At',
+                'Completed At',
+                'Completed By'
             ]);
 
             foreach ($data as $row) {
@@ -547,10 +553,11 @@ class PestControlController extends Controller
                 $chargeType = $row->charged_type == 1 ? 'Free' : 'Billable';
                 $emergency = $row->emergency == 1 ? 'Yes' : 'No';
 
-                $status = match ($row->booking_status) {
-                    1 => 'Completed',
-                    2 => 'Cancelled',
-                    default => 'Booked'
+                $status = match ((int) $row->booking_status) {
+                    PestControlBooking::STATUS_CANCELLED => 'Cancelled',
+                    PestControlBooking::STATUS_SCHEDULED => 'Scheduled',
+                    PestControlBooking::STATUS_COMPLETED => 'Completed',
+                    default => 'Unknown',
                 };
 
                 fputcsv($handle, CsvHelper::sanitizeRow([
@@ -567,7 +574,9 @@ class PestControlController extends Controller
                     $status,
                     $row->created_by_name ?? null,
                     $row->created_at,
-                    $row->updated_at
+                    $row->updated_at,
+                    $row->completed_at,
+                    $row->completed_by_name ?? null,
                 ]));
 
                 ob_flush();
@@ -702,5 +711,37 @@ class PestControlController extends Controller
                 'searchPestControlReport'
             )
         );
+    }
+
+    public function completePestControlBooking(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:pest_control_bookings,id',
+            'srf_no' => 'required|string|max:255',
+            'remarks' => 'nullable|string|max:1000',
+        ]);
+
+        $booking = PestControlBooking::findOrFail($request->id);
+
+        if ($booking->booking_status != PestControlBooking::STATUS_SCHEDULED) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Only scheduled bookings can be completed.'
+            ], 422);
+        }
+
+        $booking->update([
+            'srf_no' => $request->srf_no,
+            'remarks' => $request->remarks,
+            'booking_status' => PestControlBooking::STATUS_COMPLETED,
+            'completed_at' => now(),
+            'completed_by' => auth()->id(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pest Control booking completed.'
+        ]);
     }
 }

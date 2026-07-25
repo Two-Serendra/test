@@ -341,17 +341,14 @@
             <!-- FOOTER -->
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-
                     Close
-
                 </button>
             </div>
-
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="greastrapComplete" data-bs-backdrop="static" data-bs-keyboard="false">
+<div class="modal fade" id="greasetrapComplete" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
 
@@ -428,7 +425,9 @@
                     Cancel
                 </button>
 
-                <button type="submit" form="completeGreaseTrapBookingForm" class="btn btn-primary">
+                <button type="submit" form="completeGreaseTrapBookingForm"
+                    class="btn btn-primary d-flex align-items-center justify-content-center" id="completeGreaseTrapBtn"
+                    style="min-width: 100px; height: 38px;">
                     Complete Booking
                 </button>
             </div>
@@ -462,8 +461,8 @@
                     </small>
                 </div>
 
-                <form action="{{ route('admin.grease.trap.booking.complete') }}" id="completeGreaseTrapBookingFormReports"
-                    method="POST" enctype="multipart/form-data" novalidate>
+                <form action="{{ route('admin.grease.trap.booking.complete') }}"
+                    id="completeGreaseTrapBookingFormReports" method="POST" enctype="multipart/form-data" novalidate>
                     @csrf
                     <div class="row g-3">
 
@@ -482,7 +481,8 @@
                                         SRF No <span class="text-danger">*</span>
                                     </label>
 
-                                    <input type="text" class="form-control" id="complete_srf_no_reports" name="srf_no" required>
+                                    <input type="text" class="form-control" id="complete_srf_no_reports" name="srf_no"
+                                        required>
                                 </div>
 
                                 <div class="mb-3">
@@ -514,7 +514,9 @@
                     Cancel
                 </button>
 
-                <button type="submit" form="completeGreaseTrapBookingFormReports" class="btn btn-primary">
+                <button type="submit" form="completeGreaseTrapBookingFormReports"
+                    class="btn btn-primary d-flex align-items-center justify-content-center" id="completeGreaseTrapReportBtn"
+                    style="min-width: 100px; height: 38px;">
                     Complete Booking
                 </button>
             </div>

@@ -40,9 +40,13 @@
                             <th class="text-dark">Emergency</th>
                             <th class="text-dark">Remarks</th>
                             <th class="text-dark">Status</th>
+                            <th class="text-dark">Created By</th>
+                            <th class="text-dark">Created At</th>
+                            <th class="text-dark">Cancelled By</th>
+                            <th class="text-dark">Cancelled At</th>
+                            <th class="text-dark">Completed By</th>
+                            <th class="text-dark">Completed At</th>
                             <th class="text-dark">Action</th>
-
-
                         </tr>
                     </thead>
                     <tbody>
@@ -94,11 +98,19 @@
                                     <td>{{ $pestControlBooking->remarks ?? 'N/A' }}</td>
 
                                     <td>
-                                        @if ($pestControlBooking->booking_status == 1)
-                                            <span class="badge bg-primary custom-badge">COMPLETED</span>
-                                        @else
-                                            <span class="badge bg-danger custom-badge">CANCELLED</span>
-                                        @endif
+                                        <span class="badge bg-{{ $pestControlBooking->p_c_status['badge'] }} custom-badge">
+                                            {{ $pestControlBooking->p_c_status['label'] }}
+                                        </span>
+                                    </td>
+
+                                    <td>{{ isset($pestControlBooking->createdBy->name) ? strtoupper($pestControlBooking->createdBy->name) : 'N/A' }}
+                                    </td>
+                                    <td>{{ $pestControlBooking->created_at ?? 'N/A' }}</td>
+                                    <td>{{ isset($pestControlBooking->cancelledBy->name) ? strtoupper($pestControlBooking->cancelledBy->name) : 'N/A' }}
+                                    </td>
+                                    <td>{{ $pestControlBooking->cancelled_at ?? 'N/A' }}</td>
+                                    <td>{{ isset($pestControlBooking->completedBy->name) ? strtoupper($pestControlBooking->completedBy->name) : 'N/A' }}
+                                    <td>{{ $pestControlBooking->completed_at ?? 'N/A' }}</td>
                                     </td>
 
                                     <td class="sticky-col sticky-col-color">

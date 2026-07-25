@@ -31,6 +31,8 @@ return new class extends Migration {
             $table->decimal('penalty_amount', 10, 2)->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('cancelled_by')->nullable();
+            $table->timestamp('completed_at')->nullable();
+            $table->unsignedBigInteger('completed_by')->nullable();
         });
     }
 

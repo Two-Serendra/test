@@ -10,7 +10,7 @@ class PestControlBooking extends Model
 {
     use HasFactory;
     protected $table = 'pest_control_bookings';
-    protected $fillable = [ 
+    protected $fillable = [
         'transaction_no',
         'user_id',
         'unit_no',
@@ -29,10 +29,13 @@ class PestControlBooking extends Model
         'cancelled_by',
         'has_penalty',
         'penalty_amount',
+        'completed_at',
+        'completed_by',
     ];
 
-    const STATUS_CONFIRMED = 1;
-    const STATUS_CANCELLED = 2;
+    const STATUS_CANCELLED = 0;
+    const STATUS_SCHEDULED = 1;
+    const STATUS_COMPLETED = 2;
     const CHARGE_FREE = 1;
     const CHARGE_BILLABLE = 2;
 
@@ -56,6 +59,11 @@ class PestControlBooking extends Model
         return $this->belongsTo(User::class, 'cancelled_by');
     }
 
+    public function completedBy()
+    {
+        return $this->belongsTo(User::class, 'completed_by');
+    }
+
 
     public function isWithin24Hours()
     {
@@ -74,5 +82,31 @@ class PestControlBooking extends Model
     {
         $startTime = explode(' - ', $this->booking_time_slot)[0] ?? '00:00';
         return Carbon::parse($this->booking_date . ' ' . $startTime);
+    }
+
+    public function getPCStatusAttribute()
+    {
+        return match ($this->booking_status) {
+
+            self::STATUS_CANCELLED => [
+                'label' => 'CANCELLED',
+                'badge' => 'danger',
+            ],
+
+            self::STATUS_SCHEDULED => [
+                'label' => 'SCHEDULED',
+                'badge' => 'warning',
+            ],
+
+            self::STATUS_COMPLETED => [
+                'label' => 'COMPLETED',
+                'badge' => 'primary',
+            ],
+
+            default => [
+                'label' => 'UNKNOWN',
+                'badge' => 'secondary',
+            ],
+        };
     }
 }

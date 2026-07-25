@@ -388,7 +388,7 @@ $(document).ready(function () {
                             break;
 
                         case 1:
-                            bookingStatus = `<span class="badge bg-warning text-dark custom-badge">SCHEDULED</span>`;
+                            bookingStatus = `<span class="badge bg-warning custom-badge">SCHEDULED</span>`;
                             break;
 
                         case 2:
@@ -665,7 +665,7 @@ $(document).ready(function () {
 
         $.get('/admin/admin-fetch-grease-trap-booking/' + info_id, function (data) {
             console.log(data);
-            $('#greastrapEdit').modal('show');
+
 
             $('#display_name').text(data.name);
             $('#display_unit').text(data.unit_no);
@@ -701,6 +701,7 @@ $(document).ready(function () {
             $('#display_srf_no').text(data.srf_no ?? '-');
             $('#display_remarks').text(data.remarks ?? '-');
             $('#info_id').val(info_id);
+            $('#greastrapEdit').modal('show');
             hideLoading();
         })
             .fail(function () {
@@ -727,7 +728,7 @@ $(document).ready(function () {
 
             $('#complete_info_id').val(info_id);
 
-            $('#greastrapComplete').modal('show');
+            $('#greasetrapComplete').modal('show');
             $('#complete_transaction_no').text(data.transaction_no);
             hideLoading();
         });
@@ -754,6 +755,28 @@ $(document).ready(function () {
             hideLoading();
         });
     });
+
+
+    const $completeGreaseTrapBtn = $('#completeGreaseTrapBtn');
+
+    function setGreaseTrapLoading() {
+        const originalWidth = $completeGreaseTrapBtn.outerWidth();
+
+        $completeGreaseTrapBtn
+            .prop('disabled', true)
+            .css('width', originalWidth + 'px')
+            .html(`
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Completing...
+        `);
+    }
+
+    function resetGreaseTrapButton() {
+        $completeGreaseTrapBtn
+            .prop('disabled', false)
+            .css('width', '')
+            .html('<span class="btn-text">Complete Booking</span>');
+    }
 
     $('#completeGreaseTrapBookingForm').on('submit', function (e) {
 
@@ -787,23 +810,17 @@ $(document).ready(function () {
                 return;
             }
 
+            setGreaseTrapLoading();
+
             $.ajax({
 
                 url: $(form).attr('action'),
                 type: 'POST',
                 data: $(form).serialize(),
 
-                beforeSend: function () {
-
-                    $('button[type=submit]', form)
-                        .prop('disabled', true)
-                        .html('<i class="fa fa-spinner fa-spin me-1"></i>Completing...');
-
-                },
-
                 success: function (response) {
 
-                    $('#greasetrapCompleteReport').modal('hide');
+                    $('#greasetrapComplete').modal('hide');
 
                     const Toast = Swal.mixin({
                         toast: true,
@@ -824,7 +841,6 @@ $(document).ready(function () {
                     form.reset();
 
                     refreshGreaseTrapTableBookings();
-
                 },
 
                 error: function (xhr) {
@@ -848,11 +864,7 @@ $(document).ready(function () {
                 },
 
                 complete: function () {
-
-                    $('button[type=submit]', form)
-                        .prop('disabled', false)
-                        .html('<i class="fa-solid fa-check me-1"></i>Complete Booking');
-
+                    resetGreaseTrapButton();
                 }
 
             });
@@ -860,6 +872,28 @@ $(document).ready(function () {
         });
 
     });
+
+
+    const $completeGreaseTrapReportBtn = $('#completeGreaseTrapReportBtn');
+
+    function setGreaseTrapReportLoading() {
+        const originalWidth = $completeGreaseTrapReportBtn.outerWidth();
+
+        $completeGreaseTrapReportBtn
+            .prop('disabled', true)
+            .css('width', originalWidth + 'px')
+            .html(`
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Completing...
+        `);
+    }
+
+    function resetGreaseTrapReportButton() {
+        $completeGreaseTrapReportBtn
+            .prop('disabled', false)
+            .css('width', '')
+            .html('<span class="btn-text">Complete Booking</span>');
+    }
 
 
 
@@ -895,20 +929,13 @@ $(document).ready(function () {
                 return;
             }
 
+            setGreaseTrapReportLoading();
+
             $.ajax({
 
                 url: $(form).attr('action'),
                 type: 'POST',
                 data: $(form).serialize(),
-
-                beforeSend: function () {
-
-                    $('button[type=submit]', form)
-                        .prop('disabled', true)
-                        .html('<i class="fa fa-spinner fa-spin me-1"></i>Completing...');
-
-                },
-
                 success: function (response) {
 
                     $('#greasetrapCompleteReport').modal('hide');
@@ -956,13 +983,8 @@ $(document).ready(function () {
                 },
 
                 complete: function () {
-
-                    $('button[type=submit]', form)
-                        .prop('disabled', false)
-                        .html('<i class="fa-solid fa-check me-1"></i>Complete Booking');
-
+                    resetGreaseTrapReportButton();
                 }
-
             });
 
         });
@@ -1380,7 +1402,7 @@ $(document).ready(function () {
                             break;
 
                         case 1:
-                            bookingStatus = `<span class="badge bg-warning text-dark custom-badge">SCHEDULED</span>`;
+                            bookingStatus = `<span class="badge bg-warning custom-badge">SCHEDULED</span>`;
                             break;
 
                         case 2:

@@ -300,39 +300,42 @@
                         </div>
 
                         <!-- RIGHT CARD -->
-                        <div class="col-md-6">
-                            <div class="card shadow-sm border-0 rounded-4 h-100 p-4">
-                                <h6 class="fw-semibold text-primary mb-3">  <i class="bx bx-edit me-2"></i> Update Information</h6>
+                      <div class="col-md-6">
+                            <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+                                <h6 class="fw-semibold text-primary mb-3">
+                                    <i class="bx bx-info-circle me-2"></i>
+                                    Booking Information
+                                </h6>
+                                  <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Status</span>
 
-                                <div class="mb-3">
-                                    <label class="form-label">SRF No *</label>
-                                    <input type="text" class="form-control" id="srf_no" name="srf_no">
+                                    <span id="display_status" class="badge bg-secondary">
+                                        -
+                                    </span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">SRF No</span>
+                                    <span id="display_srf_no" class="fw-semibold text-end">-</span>
                                 </div>
 
-                                <div class="mb-3">
-                                    <label class="form-label">Remarks</label>
-                                    <textarea class="form-control" id="remarks_grease_trap"
-                                        name="remarks" rows="4"></textarea>
-                                </div>
+                                <div class="mb-2">
+                                    <span class="text-muted d-block mb-2">Remarks</span>
 
+                                    <div id="display_remarks" class="border rounded p-2 bg-light"
+                                        style="min-height:120px;">
+                                        -
+                                    </div>
+                                </div>
                             </div>
                         </div>
-
                     </div>
-
                 </form>
-
             </div>
-
             <div class="modal-footer">
-                <button type="submit"
-                    form="updatePestControlBookingFormAdmin"
-                    id="UpdatePestControlBookingBtn"
-                    class="btn btn-primary">
-                    Update
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Close
                 </button>
             </div>
-
         </div>
     </div>
 </div>
@@ -417,35 +420,43 @@
                         <!-- RIGHT CARD -->
                         <div class="col-md-6">
                             <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
-                                <h6 class="fw-semibold text-primary mb-3"><i class="bx bx-edit me-2"></i>Update Information</h6>
+                                <h6 class="fw-semibold text-primary mb-3">
+                                    <i class="bx bx-info-circle me-2"></i>
+                                    Booking Information
+                                </h6>
+                                  <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Status</span>
 
-                                <div class="d-flex justify-content-between mb-3">
-                                     <span class="text-muted">SRF No</span>
-                                     <span id="srf_no_reports" class="fw-semibold"></span>
+                                    <span id="display_status_reports" class="badge bg-secondary">
+                                        -
+                                    </span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">SRF No</span>
+                                    <span id="display_srf_no_reports" class="fw-semibold text-end">-</span>
                                 </div>
 
-                                <div class="mb-3">
-                                    <label class="form-label text-muted mb-1">
-                                        Remarks
-                                    </label>
+                                <div class="mb-2">
+                                    <span class="text-muted d-block mb-2">Remarks</span>
 
-                                    <div class="">
-                                        <span id="remarks_pest_control_reports" class="fw-semibold"></span>
+                                    <div id="display_remarks_reports" class="border rounded p-2 bg-light"
+                                        style="min-height:120px;">
+                                        -
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
                 </form>
 
             </div>
 
-              <div class="modal-footer">
-                <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">Close</button>
+             <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Close
+                </button>
             </div>
-
         </div>
     </div>
 </div>
@@ -603,6 +614,92 @@
                     class="btn btn-primary d-flex align-items-center justify-content-center"
                     style="min-width: 100px; height: 38px;">
                     <span class="btn-text">Download</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="pestControlComplete" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <!-- HEADER -->
+            <div class="modal-header bg-primary text-white justify-content-center position-relative py-3">
+
+                <img src="{{ asset('assets/images/TWO SERENDRA LOGO PNG (White).png') }}" alt="logo"
+                    style="height:60px; width:auto;">
+
+                <button type="button" class="btn-close position-absolute end-0 me-3"
+                    style="top:50%; transform:translateY(-50%);" data-bs-dismiss="modal">
+                </button>
+
+            </div>
+            <!-- BODY -->
+            <div class="modal-body px-4 py-3">
+
+                <!-- TITLE -->
+                <div class="text-center mb-4">
+                    <h5 class="fw-bold mb-1">Complete Pest Control Booking</h5> <small class="">
+                        Reference #: <span id="complete_transaction_no_pest_control"></span>
+                    </small>
+                </div>
+
+                <form action="{{ route('admin.pest.control.booking.complete') }}" id="completePestControlBookingFormReports"
+                    method="POST" enctype="multipart/form-data" novalidate>
+                    @csrf
+                    <div class="row g-3">
+
+                        <!-- LEFT CARD -->
+                        <div class="col-md-12">
+                            <div class="card shadow-sm border-0 rounded-4 h-100 p-4">
+                                <input type="hidden" id="complete_info_id_pest_control" name="id">
+
+                                <h6 class="fw-semibold text-primary mb-3">
+                                    <i class="bx bx-check-circle me-2"></i>
+                                    Completion Details
+                                </h6>
+
+                                <div class="mb-3">
+                                    <label for="complete_srf_no_pest_control" class="form-label">
+                                        SRF No <span class="text-danger">*</span>
+                                    </label>
+
+                                    <input type="text" class="form-control" id="complete_srf_no_pest_control" name="srf_no" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="complete_remarks" class="form-label">
+                                        Remarks
+                                    </label>
+
+                                    <textarea class="form-control" id="complete_remarks" name="remarks"
+                                        rows="5"></textarea>
+                                </div>
+
+                                <div class="alert alert-warning mb-0">
+                                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                                    This will mark the booking as <strong>Completed</strong>.
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+
+                <button type="submit" form="completePestControlBookingFormReports" class="btn btn-primary d-flex align-items-center justify-content-center" id="completePestControlBtn"
+                    style="min-width: 100px; height: 38px;">
+                     <span class="btn-text">Complete Booking </span>
                 </button>
             </div>
         </div>

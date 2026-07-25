@@ -42,8 +42,8 @@
                             <th class="text-dark">Created At</th>
                             <th class="text-dark">Cancelled By</th>
                             <th class="text-dark">Cancelled At</th>
-                            <th class="text-dark">Completed At</th>
                             <th class="text-dark">Completed By</th>
+                            <th class="text-dark">Completed At</th>
                             <th class="text-dark">Action</th>
                         </tr>
                     </thead>
@@ -79,12 +79,12 @@
 
 
                                     <!-- <td>
-                                                                @if ($ausiBooking->emergency == 0)
-                                                                    <span class="badge bg-secondary badge-forge ">No</span>
-                                                                @else
-                                                                    <span class="badge bg-danger badge-forge ">Yes</span>
-                                                                @endif
-                                                            </td> -->
+                                                                                        @if ($ausiBooking->emergency == 0)
+                                                                                            <span class="badge bg-secondary badge-forge ">No</span>
+                                                                                        @else
+                                                                                            <span class="badge bg-danger badge-forge ">Yes</span>
+                                                                                        @endif
+                                                                                    </td> -->
 
                                     <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
                                         data-bs-toggle="tooltip" title="{{ $ausiBooking->remarks }}">
@@ -102,8 +102,8 @@
                                     <td>{{ isset($ausiBooking->cancelledBy->name) ? strtoupper($ausiBooking->cancelledBy->name) : 'N/A' }}
                                     </td>
                                     <td>{{ $ausiBooking->cancelled_at ?? 'N/A' }}</td>
-                                    <td>{{ $ausiBooking->completed_at ?? 'N/A' }}</td>
                                     <td>{{ isset($ausiBooking->completedBy->name) ? strtoupper($ausiBooking->completedBy->name) : 'N/A' }}
+                                    <td>{{ $ausiBooking->completed_at ?? 'N/A' }}</td>
                                     <td class="sticky-col sticky-col-color">
                                         <div class="d-flex gap-1 justify-content-center">
 
@@ -111,8 +111,6 @@
                                                 $disableActions = in_array($ausiBooking->booking_status, [0, 2]);
                                                 $disableInspect = $disableActions;
                                             @endphp
-
-
 
                                             <button type="button" class="btn btn-primary report_ausi_booking btn-sm btn-equal"
                                                 data-bs-toggle="tooltip" data-bs-placement="left" title="View"

@@ -48,7 +48,7 @@
 
 
         @roles(1, 6, 7, 9)
-        <li class="menu-item">
+        <!-- <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-building"></i>
                 <div>Amenities</div>
@@ -111,9 +111,9 @@
                 @endroles
 
             </ul>
-        </li>
+        </li> -->
 
-        @roles(1, 6, 7, 9)
+        <!-- @roles(1, 6, 7, 9)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-dumbbell"></i>
@@ -172,9 +172,9 @@
 
             </ul>
         </li>
-        @endroles
+        @endroles -->
 
-        @roles(1, 2, 3, 5, 6, 7, 8)
+        <!-- @roles(1, 2, 3, 5, 6, 7, 8)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-home-alt"></i>
@@ -230,7 +230,7 @@
                 @endroles
             </ul>
         </li>
-        @endroles
+        @endroles -->
 
         @roles(1, 6, 9)
         <li class="menu-item">

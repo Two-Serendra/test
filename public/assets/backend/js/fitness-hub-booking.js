@@ -5,6 +5,14 @@ $(document).ready(function () {
         $('#NewFitnessHubBookingModal').modal('show');
     });
 
+    window.showLoading = function () {
+        $('#loadingOverlay').css('display', 'flex').hide().fadeIn(150);
+    }
+
+    window.hideLoading = function () {
+        $('#loadingOverlay').fadeOut(150);
+    }
+
     const adminModal = $('#NewFitnessHubBookingModal');
     const bookingTabs = adminModal.find('#bookingTabs');
     const bookingTypeInput = adminModal.find('#bookingType');

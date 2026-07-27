@@ -780,7 +780,13 @@ $(document).ready(function () {
             });
     });
 
+    window.showLoading = function () {
+        $('#loadingOverlay').css('display', 'flex').hide().fadeIn(150);
+    }
 
+    window.hideLoading = function () {
+        $('#loadingOverlay').fadeOut(150);
+    }
 
     $('#pestControlBookingTable').on('click', '.view_pest_control_booking', function () {
 

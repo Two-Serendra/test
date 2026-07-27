@@ -130,7 +130,14 @@ $(document).ready(function () {
 
     disableCreateBtn();
 
+    window.showLoading = function () {
+        $('#loadingOverlay').css('display', 'flex').hide().fadeIn(150);
+    }
 
+    window.hideLoading = function () {
+        $('#loadingOverlay').fadeOut(150);
+    }
+    
     flatpickr("#ausiBookingDateAdmin", {
         dateFormat: "Y-m-d",
         minDate: "today"

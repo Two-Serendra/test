@@ -1,5 +1,13 @@
 
 $(document).ready(function () {
+    window.showLoading = function () {
+        $('#loadingOverlay').css('display', 'flex').hide().fadeIn(150);
+    }
+
+    window.hideLoading = function () {
+        $('#loadingOverlay').fadeOut(150);
+    }
+    
     $('#DownloadHistory').on('hidden.bs.modal', function () {
         $('.modal-backdrop').remove();
     });

@@ -300,7 +300,7 @@
             </ul>
         </li>
 
-
+        @roles(1,3)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-shield-quarter"></i>
@@ -340,6 +340,7 @@
             </ul>
         </li>
         @endroles
+
 
         <!-- Manage -->
         @roles(1)

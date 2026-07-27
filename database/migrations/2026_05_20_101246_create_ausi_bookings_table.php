@@ -30,7 +30,7 @@ return new class extends Migration {
              ->comment('0 Cancelled, 1 Scheduled, 2 Completed');
             $table->timestamp('cancelled_at')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
-            $table->unsignedBigInteger('cancelled_by')->nullable();
+            $table->unsignedBigInteger('cancelled_by')->nullable(); 
             $table->timestamp('completed_at')->nullable();
             $table->unsignedBigInteger('completed_by')->nullable();
             $table->timestamps();

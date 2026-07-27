@@ -1,4 +1,13 @@
 $(document).ready(function () {
+
+
+     window.showLoading = function () {
+        $('#loadingOverlay').css('display', 'flex').hide().fadeIn(150);
+    }
+
+    window.hideLoading = function () {
+        $('#loadingOverlay').fadeOut(150);
+    }
     $('#ausiBookingReportTable').on('click', '.report_ausi_booking', function () {
         let report_info_id = $(this).data("id");
         showLoading();

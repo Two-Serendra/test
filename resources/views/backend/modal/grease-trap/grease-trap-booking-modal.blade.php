@@ -240,7 +240,7 @@
 
                 <!-- TITLE -->
                 <div class="text-center mb-4">
-                    <h5 class="fw-bold mb-1">Grease Trap Booking <Details></Details>
+                    <h5 class="fw-bold mb-1">Grease Trap Booking Details
                     </h5> <small class="">
                         Reference #: <span id="display_transaction_no"></span>
                     </small>

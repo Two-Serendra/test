@@ -26,7 +26,7 @@ class AdminAuthController extends Controller
             $roleRoutes = [
                 1 => 'admin.dashboard',
                 2 => 'admin.show.function.room.bookings',
-                3 => 'admin.show.function.room.bookings',
+                3 => 'admin.booking.ausi',
                 4 => 'engineering.dashboard',
                 5 => 'admin.show.function.room.bookings',
                 6 => 'admin.booking.activities',

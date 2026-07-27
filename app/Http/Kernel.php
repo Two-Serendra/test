@@ -67,5 +67,6 @@ class Kernel extends HttpKernel
         'miniapp.trust' => \App\Http\Middleware\MiniappTrust::class,
         'miniapp.webview' => \App\Http\Middleware\AllowMiniAppWebView::class,
         'no-cache' => \App\Http\Middleware\NoCacheMiddleware::class,
+        'role' => \App\Http\Middleware\RoleMiddleware::class,
     ];
 }

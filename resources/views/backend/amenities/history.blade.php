@@ -65,7 +65,7 @@
                                 <td colspan="11" class="text-center">No Records Found</td>
                             </tr>
                         @else
-                            @foreach ($activity_bookings as $activity_booking) 
+                            @foreach ($activity_bookings as $activity_booking)
                                 <tr>
                                     <td>{{ strtoupper($activity_booking->lobby ?? 'N/A') }}</td>
                                     <td>{{ strtoupper($activity_booking->transaction_no ?? 'N/A') }}</td>
@@ -109,4 +109,7 @@
         </div>
     </div>
     @include('backend.modal.downloadHistory-modal')
+    @push('scripts')
+        <script src="{{ asset('assets/backend/js/history.js') }}"></script>
+    @endpush
 @endsection

@@ -134,6 +134,9 @@
                     placeholder: 'Enter activity description here...'
                 });
             });
+
+            <script src="{{ asset('assets/backend/js/activities.js') }}"></script>
+
         </script>
     @endpush
 

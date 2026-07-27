@@ -32,7 +32,7 @@
                     <thead>
                         <tr>
                             <th class="text-dark">Transaction No</th>
-                            <th class="text-dark">SRF No</th> 
+                            <th class="text-dark">SRF No</th>
                             <th class="text-dark">Name</th>
                             <th class="text-dark">Resident Type</th>
                             <th class="text-dark">Unit</th>
@@ -155,7 +155,7 @@
                                             {{-- Cancel --}}
                                             <button type="button"
                                                 class="btn btn-sm btn-equal
-                                                                                {{ ($isCancelled || $isCompleted) ? 'btn-secondary cancel-booking' : 'btn-danger admin-grease-trap-booking-cancel-reports' }}"
+                                                                                            {{ ($isCancelled || $isCompleted) ? 'btn-secondary cancel-booking' : 'btn-danger admin-grease-trap-booking-cancel-reports' }}"
                                                 data-bs-toggle="tooltip"
                                                 title="{{ $isCancelled ? 'Cancelled' : ($isCompleted ? 'Completed' : 'Cancel Booking') }}"
                                                 data-id="{{ $greaseTrapBooking->id }}" {{ ($isCancelled || $isCompleted) ? 'disabled' : '' }}>
@@ -177,5 +177,7 @@
     </div>
 
     @include('backend.modal.grease-trap.grease-trap-booking-modal')
-
+    @push('scripts')
+        <script src="{{ asset('assets/backend/js/grease-trap-booking.js') }}"></script>
+    @endpush
 @endsection

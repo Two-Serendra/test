@@ -187,7 +187,8 @@
                                 <td>{{ $functionRoomBookingRecord->purpose_of_event }}</td>
                                 {{-- Schedule --}}
                                 <td>{{ $functionRoomBookingRecord->function_room_booking_date }}</td>
-                                <td>{{\Carbon\Carbon::parse($functionRoomBookingRecord->event_start_time)->format('h:i A') }}</td>
+                                <td>{{\Carbon\Carbon::parse($functionRoomBookingRecord->event_start_time)->format('h:i A') }}
+                                </td>
                                 <td>{{\Carbon\Carbon::parse($functionRoomBookingRecord->event_end_time)->format('h:i A') }}</td>
                                 {{-- Details --}}
                                 <td>{{ $functionRoomBookingRecord->contact_number }}</td>
@@ -206,10 +207,10 @@
                                 <td>{{ $functionRoomBookingRecord->final_rate }}</td>
                                 <td>{{ $functionRoomBookingRecord->payment_mode }}</td>
                                 <td>
-                                     @if ($functionRoomBookingRecord->booking_status == 0)
-                                    <span class="badge bg-warning">Incomplete</span>
+                                    @if ($functionRoomBookingRecord->booking_status == 0)
+                                        <span class="badge bg-warning">Incomplete</span>
                                     @elseif ($functionRoomBookingRecord->booking_status == 1)
-                                    <span class="badge bg-success">Completed</span>
+                                        <span class="badge bg-success">Completed</span>
                                     @elseif ($functionRoomBookingRecord->booking_status == 2)
                                         <span class="badge bg-danger">Cancelled</span>
                                     @else
@@ -544,17 +545,17 @@
                                 <td>{{ $functionRoomBookingRecord->created_at }}</td>
                                 <td>{{ $functionRoomBookingRecord->updated_at }}</td>
                                 <td class="sticky-action-col">
-                                    <button class="btn btn-sm btn-info view-records-booking-btn mb-2" data-id="{{ $functionRoomBookingRecord->id }}"
-                                        style="width: 60px;">
+                                    <button class="btn btn-sm btn-info view-records-booking-btn mb-2"
+                                        data-id="{{ $functionRoomBookingRecord->id }}" style="width: 60px;">
                                         View
                                     </button>
 
                                     <!-- @if(auth()->user()->role_id == 6)
-                                        <button class="btn btn-sm btn-warning edit-booking-btn" data-id="{{ $functionRoomBookingRecord->id }}"
-                                            style="width: 60px;">
-                                            Edit
-                                        </button>
-                                    @endif -->
+                                                        <button class="btn btn-sm btn-warning edit-booking-btn" data-id="{{ $functionRoomBookingRecord->id }}"
+                                                            style="width: 60px;">
+                                                            Edit
+                                                        </button>
+                                                    @endif -->
                                 </td>
 
 
@@ -585,5 +586,7 @@
 
     @include('backend.modal.admin-view-function-room-details-records-modal')
     @include('backend.modal.admin-download-function-room-booking-records-modal')
-
+    @push('scripts')
+        <script src="{{ asset('assets/backend/js/records.js')}}"></script>
+    @endpush
 @endsection

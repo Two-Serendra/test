@@ -86,5 +86,7 @@
         </div>
     </div>
     @include('backend.modal.admin-services-modal')
-
+    @push('scripts')
+        <script src="{{ asset('assets/backend/js/services.js')}}"></script>
+    @endpush
 @endsection

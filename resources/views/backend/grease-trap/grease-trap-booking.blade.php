@@ -28,13 +28,13 @@
                         <input type="file" id="GTbookingFileInput" name="file" accept=".csv,.xlsx" style="display:none;">
                     </form>
                     <!-- 
-                                        <button type="button" class="btn btn-primary badge me-2" id="uploadBookingBtnGT">
-                                            <i class='bx bx-upload'></i> Upload Bookings
-                                        </button> -->
+                                                <button type="button" class="btn btn-primary badge me-2" id="uploadBookingBtnGT">
+                                                    <i class='bx bx-upload'></i> Upload Bookings
+                                                </button> -->
 
                     <!-- <button type="button" class="btn btn-primary badge AddGreaseTrapBookingAdmin me-2">
-                                             <i class='bx bx-search-alt'></i> Check Unit
-                                        </button> -->
+                                                     <i class='bx bx-search-alt'></i> Check Unit
+                                                </button> -->
 
 
                     <button type="button" class="btn btn-primary badge AddGreaseTrapBookingAdmin me-2">
@@ -179,7 +179,7 @@
                                             {{-- Cancel --}}
                                             <button type="button"
                                                 class="btn btn-sm btn-equal
-                                                                    {{ ($isCancelled || $isCompleted) ? 'btn-secondary cancel-booking' : 'btn-danger admin-grease-trap-booking-cancel' }}"
+                                                                                            {{ ($isCancelled || $isCompleted) ? 'btn-secondary cancel-booking' : 'btn-danger admin-grease-trap-booking-cancel' }}"
                                                 data-bs-toggle="tooltip"
                                                 title="{{ $isCancelled ? 'Cancelled' : ($isCompleted ? 'Completed' : 'Cancel Booking') }}"
                                                 data-id="{{ $greaseTrapBooking->id }}" {{ ($isCancelled || $isCompleted) ? 'disabled' : '' }}>
@@ -191,7 +191,7 @@
                                     </td>
                                 </tr>
                             @endforeach
-                        @endif 
+                        @endif
                     </tbody>
                 </table>
             </div>
@@ -202,5 +202,7 @@
     </div>
 
     @include('backend.modal.grease-trap.grease-trap-booking-modal')
-
+    @push('scripts')
+        <script src="{{ asset('assets/backend/js/grease-trap-booking.js') }}"></script>
+    @endpush
 @endsection

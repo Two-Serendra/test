@@ -254,4 +254,9 @@
 
 
     </script>
+
+    @push('scripts')
+        <script src="{{ asset('assets/backend/js/calendar.js') }}"></script>
+
+    @endpush
 @endpush

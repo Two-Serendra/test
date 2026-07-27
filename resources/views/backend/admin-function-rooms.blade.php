@@ -178,6 +178,8 @@
                     placeholder: 'Enter function room description here...'
                 });
             });
+            <script src="{{ asset('assets/backend/js/function-rooms.js')}}"></script>
+
         </script>
     @endpush
 

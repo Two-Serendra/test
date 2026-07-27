@@ -100,4 +100,7 @@
     </div>
 
     @include('backend.modal.admin-work-permit-modal')
+    @push('scripts')
+        <script src="{{ asset('assets/backend/js/work-permit.js')}}"></script>
+    @endpush
 @endsection

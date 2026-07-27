@@ -139,5 +139,7 @@
     </div>
 
     @include('backend.modal.pest-control.pest-control-booking-modal')
-
+    @push('scripts')
+        <script src="{{ asset('assets/backend/js/pest-control-booking.js') }}"></script>
+    @endpush
 @endsection

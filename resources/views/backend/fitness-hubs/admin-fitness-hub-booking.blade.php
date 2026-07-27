@@ -243,10 +243,14 @@
         </div>
     </div> 
 
+   
+    @include('backend.modal.fitness-hubs.fitness-hubs-booking-modal')
+    @include('backend.modal.fitness-hubs.fitness-hub-slot-checking-modal')
+    @push('scripts')
     <script>
         const userRole = {{ auth()->user()->role_id }};
     </script>
-    @include('backend.modal.fitness-hubs.fitness-hubs-booking-modal')
-    @include('backend.modal.fitness-hubs.fitness-hub-slot-checking-modal')
-
+    
+    <script src="{{ asset('assets/backend/js/fitness-hub-booking.js') }}"></script>
+    @endpush
 @endsection

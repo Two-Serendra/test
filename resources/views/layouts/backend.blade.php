@@ -147,38 +147,10 @@
 
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <!-- Custom Js -->
-    <script src="{{ asset('assets/backend/js/services.js')}}"></script>
-    <script src="{{ asset('assets/backend/js/downloads.js')}}"></script>
-    <script src="{{ asset('assets/backend/js/user.js')}}"></script>
-    <script src="{{ asset('assets/backend/js/emails.js')}}"></script>
-    <script src="{{ asset('assets/backend/js/work-permit.js')}}"></script>
     <script src="{{ asset('assets/backend/js/amenities.js')}}"></script>
-    <script src="{{ asset('assets/backend/js/function-rooms.js')}}"></script>
-    <script src="{{ asset('assets/backend/js/gallery.js')}}"></script>
-    <script src="{{ asset('assets/backend/js/events.js')}}"></script>
-    <script src="{{ asset('assets/backend/js/residence.js')}}"></script>
-    <script src="{{ asset('assets/backend/js/function-room-booking.js')}}"></script>
-    <script src="{{ asset('assets/backend/js/date-blocking.js')}}"></script>
     <script src="{{ asset('assets/backend/js/dashboard.js')}}"></script>
-    <script src="{{ asset('assets/backend/js/addOns.js')}}"></script>
-    <script src="{{ asset('assets/backend/js/records.js')}}"></script>
-    <script src="{{ asset('assets/backend/js/function-room-discount.js')}}"></script>
     <!-- <script src="{{ asset('assets/backend/js/amenities.js') }}"></script> -->
-    <script src="{{ asset('assets/backend/js/activities.js') }}"></script>
     <!-- <script src="{{ asset('assets/backend/js/amenity-booking.js') }}"></script> -->
-    <script src="{{ asset('assets/backend/js/activity-schedule.js') }}"></script>
-    <script src="{{ asset('assets/backend/js/history.js') }}"></script>
-    <script src="{{ asset('assets/backend/js/calendar.js') }}"></script>
-    <script src="{{ asset('assets/backend/js/blocking.js') }}"></script>
-    <script src="{{ asset('assets/backend/js/activitiy-booking.js') }}"></script>
-    <script src="{{ asset('assets/backend/js/grease-trap-booking.js') }}"></script>
-    <script src="{{ asset('assets/backend/js/pest-control-booking.js') }}"></script>
-    <script src="{{ asset('assets/backend/js/fitness-hub.js') }}"></script>
-    <script src="{{ asset('assets/backend/js/fitness-hub-booking.js') }}"></script>
-    <script src="{{ asset('assets/backend/js/fitness-hub-records.js') }}"></script>
-    <script src="{{ asset('assets/backend/js/fitness-hub-schedule-blocking.js') }}"></script>
-    <script src="{{ asset('assets/backend/js/ausi-booking.js') }}"></script>
-    <script src="{{ asset('assets/backend/js/ausi-booking-report.js') }}"></script>
 
     @stack('scripts')
 

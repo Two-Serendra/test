@@ -91,4 +91,7 @@
         </div>
     </div>
     @include('backend.modal.fitness-hubs.fitness-hub-blocking-schedule-modal')
+    @push('scripts')
+        <script src="{{ asset('assets/backend/js/fitness-hub-schedule-blocking.js') }}"></script>
+    @endpush
 @endsection

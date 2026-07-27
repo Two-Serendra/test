@@ -162,4 +162,7 @@
         </div>
     </div>
     @include('backend.modal.fitness-hubs.booking-history-fitness-hub-modal')
+    @push('scripts')
+        <script src="{{ asset('assets/backend/js/fitness-hub-records.js') }}"></script>
+    @endpush
 @endsection

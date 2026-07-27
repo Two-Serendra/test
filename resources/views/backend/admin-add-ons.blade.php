@@ -11,7 +11,7 @@
                             <span class="input-group-text">
                                 <i class='bx bx-search-alt text-dark'></i>
                             </span>
-                        <input type="text" name="searchAddOns" id="searchInputAddOns" class="form-control"
+                            <input type="text" name="searchAddOns" id="searchInputAddOns" class="form-control"
                                 placeholder="Item" autocomplete="off">
                         </div>
                         <button type="submit" hidden></button>
@@ -102,5 +102,7 @@
     </div>
 
     @include('backend.modal.admin-addOns-modal')
-
+    @push('scripts')
+        <script src="{{ asset('assets/backend/js/addOns.js')}}"></script>
+    @endpush
 @endsection

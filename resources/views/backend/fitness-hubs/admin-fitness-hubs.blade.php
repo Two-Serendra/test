@@ -127,6 +127,9 @@
                 });
             });
         </script>
+
+        <script src="{{ asset('assets/backend/js/fitness-hub.js') }}"></script>
+
     @endpush
 
 @endsection

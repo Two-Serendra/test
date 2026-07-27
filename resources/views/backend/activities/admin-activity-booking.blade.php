@@ -34,8 +34,8 @@
                     </form>
 
                     <!-- <button type="button" class="btn btn-primary badge me-2" id="uploadBookingBtn">
-                            <i class='bx bx-upload'></i> Upload Bookings
-                        </button> -->
+                                    <i class='bx bx-upload'></i> Upload Bookings
+                                </button> -->
 
                     <button type="button" class="btn btn-primary badge AddBookingAdmin me-2">
                         <i class='bx bx-plus'></i> New Booking
@@ -223,11 +223,12 @@
         <div class="pagination-container">
             {{ $bookings->links('vendor.pagination.bootstrap-5') }}
         </div>
-    </div> 
+    </div>
 
     <script>
         const userRole = {{ auth()->user()->role_id }};
     </script>
     @include('backend.modal.activities.activities-booking-modal')
     @include('backend.modal.activities.slotChecking-modal')
+   
 @endsection

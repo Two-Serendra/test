@@ -90,5 +90,7 @@
     </div>
 
     @include('backend.modal.admin-function-room-discount-modal')
-
+    @push('scripts')
+        <script src="{{ asset('assets/backend/js/function-room-discount.js')}}"></script>
+    @endpush
 @endsection

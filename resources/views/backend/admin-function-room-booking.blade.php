@@ -585,13 +585,16 @@
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
-    <script>
-        const USER_ROLE = {{ auth()->user()->role_id }};
-    </script>
-
+    
     @include('backend.modal.admin-view-function-room-booking-details-modal')
     @include('backend.modal.admin-edit-function-room-booking-details-modal')
     @include('backend.modal.admin-new-function-room-booking-modal')
+     @push('scripts')
+        <script>
+        const USER_ROLE = {{ auth()->user()->role_id }};
+        </script>
+        <script src="{{ asset('assets/backend/js/function-room-booking.js')}}"></script>
 
+    @endpush
 
 @endsection

@@ -72,5 +72,7 @@
     </div>
 
     @include('backend.modal.admin-function-room-date-blocking-modal')
-
+    @push('scripts')
+        <script src="{{ asset('assets/backend/js/date-blocking.js')}}"></script>
+    @endpush
 @endsection

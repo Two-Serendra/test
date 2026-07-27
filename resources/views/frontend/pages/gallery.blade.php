@@ -27,25 +27,25 @@
     </div>
     <div class="container py-5">
         <!-- <div class="text-center mb-4">
-                    <h3 class="fw-bold" style="
-                            font-family: 'Poppins', sans-serif;
-                            font-size: 2rem;
-                            letter-spacing: 1px;
-                            color: #008b26;
-                            position: relative;
-                            display: inline-block;
-                        ">
-                        Inside Two Serendra
-                        <span style="
-                                display: block;
-                                width: 60px;
-                                height: 3px;
-                                background-color: #008b26;
-                                margin: 8px auto 0;
-                                border-radius: 5px;">
-                            </span>
-                    </h3>
-                </div> -->
+                        <h3 class="fw-bold" style="
+                                font-family: 'Poppins', sans-serif;
+                                font-size: 2rem;
+                                letter-spacing: 1px;
+                                color: #008b26;
+                                position: relative;
+                                display: inline-block;
+                            ">
+                            Inside Two Serendra
+                            <span style="
+                                    display: block;
+                                    width: 60px;
+                                    height: 3px;
+                                    background-color: #008b26;
+                                    margin: 8px auto 0;
+                                    border-radius: 5px;">
+                                </span>
+                        </h3>
+                    </div> -->
 
         <div class="row g-4" id="gallery">
             @foreach ($images as $index => $image)
@@ -74,5 +74,7 @@
         window.galleryImageList = @json($images->pluck('file_name'));
     </script>
 
-    
+    @push('scripts')
+        <script src="{{ asset('assets/backend/js/gallery.js') }}"></script>
+    @endpush
 @endsection

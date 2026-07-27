@@ -25,8 +25,8 @@
 
                             <!-- Progress Bar -->
                             <div class="progress" style="height: 30px; width: 150px; display: none;">
-                                <div class="progress-bar progress-bar-animated bg-info"
-                                    role="progressbar" style="width: 0%">0%</div>
+                                <div class="progress-bar progress-bar-animated bg-info" role="progressbar"
+                                    style="width: 0%">0%</div>
                             </div>
                         </div>
                     </form>
@@ -75,5 +75,7 @@
             {{ $downloads->links('vendor.pagination.bootstrap-5') }}
         </div>
     </div>
-  
+    @push('scripts')
+        <script src="{{ asset('assets/backend/js/downloads.js')}}"></script>
+    @endpush
 @endsection

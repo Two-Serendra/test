@@ -13,8 +13,7 @@
                                 <i class='bx bx-search-alt text-dark'></i>
                             </span>
                             <input type="text" name="searchResidenceRequest" value="{{ $searchResidenceRequest ?? '' }}"
-                                id="searchInputResidence" class="form-control" placeholder="Email/Unit"
-                                autocomplete="off">
+                                id="searchInputResidence" class="form-control" placeholder="Email/Unit" autocomplete="off">
 
 
                         </div>
@@ -22,9 +21,9 @@
 
                     <div class="mb-2 mb-md-0">
                         <!-- <button type="button" class="btn btn-secondary custom-dl-btn  badge DownloadWalkinPermit"
-                                        id="addResidence">
-                                        <i class='bx bx-download'></i> Download
-                                    </button> -->
+                                                id="addResidence">
+                                                <i class='bx bx-download'></i> Download
+                                            </button> -->
                         <button type="button" class="btn btn-primary badge AdminAddResidence" id="addResidence">
                             <i class='bx bx-plus'></i> Residence
                         </button>
@@ -92,7 +91,8 @@
                                     </td>
 
                                     <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                        {{ $residenceRequest->remarks ?? 'N/A'}}</td>
+                                        {{ $residenceRequest->remarks ?? 'N/A'}}
+                                    </td>
                                     <td>
                                         <button type="button" class="btn btn-sm btn-icon btn-secondary admin_edit_residence"
                                             data-bs-toggle="tooltip" data-bs-placement="left" title="Edit"
@@ -135,4 +135,7 @@
     </div>
 
     @include('backend.modal.admin-residence-modal')
+    @push('scripts')
+        <script src="{{ asset('assets/backend/js/residence.js')}}"></script>
+    @endpush
 @endsection

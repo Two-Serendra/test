@@ -100,5 +100,7 @@
     </div>
 
     @include('backend.modal.admin-user-creation-modal')
-
+    @push('scripts')
+        <script src="{{ asset('assets/backend/js/user.js')}}"></script>
+    @endpush
 @endsection

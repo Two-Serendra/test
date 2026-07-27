@@ -36,8 +36,8 @@
                     </button>
 
                     <!-- <button type="button" class="btn btn-danger badge AddEmergencyAusiBooking me-2">
-                                                                                        <i class='bx bx-plus'></i> Emergency Booking
-                                                                                    </button> -->
+                                                                                                <i class='bx bx-plus'></i> Emergency Booking
+                                                                                            </button> -->
                 </div>
             </div>
             <div class="table-responsive">
@@ -98,12 +98,12 @@
 
 
                                     <!-- <td>
-                                                                            @if ($ausiBooking->emergency == 0)
-                                                                                <span class="badge bg-secondary badge-forge ">No</span>
-                                                                            @else
-                                                                                <span class="badge bg-danger badge-forge ">Yes</span>
-                                                                            @endif
-                                                                        </td> -->
+                                                                                                    @if ($ausiBooking->emergency == 0)
+                                                                                                        <span class="badge bg-secondary badge-forge ">No</span>
+                                                                                                    @else
+                                                                                                        <span class="badge bg-danger badge-forge ">Yes</span>
+                                                                                                    @endif
+                                                                                                </td> -->
 
                                     <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
                                         data-bs-toggle="tooltip" title="{{ $ausiBooking->remarks }}">
@@ -172,4 +172,7 @@
 
     @include('backend.modal.ausi.ausi-booking-modal')
 
+    @push('scripts')
+        <script src="{{ asset('assets/backend/js/ausi-booking.js') }}"></script>
+    @endpush
 @endsection

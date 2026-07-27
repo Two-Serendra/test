@@ -104,4 +104,7 @@
     </div>
     </div>
     @include('backend.modal.admin-email-modal')
+    @push('scripts')
+        <script src="{{ asset('assets/backend/js/emails.js')}}"></script>
+    @endpush
 @endsection

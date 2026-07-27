@@ -79,12 +79,12 @@
 
 
                                     <!-- <td>
-                                                                                        @if ($ausiBooking->emergency == 0)
-                                                                                            <span class="badge bg-secondary badge-forge ">No</span>
-                                                                                        @else
-                                                                                            <span class="badge bg-danger badge-forge ">Yes</span>
-                                                                                        @endif
-                                                                                    </td> -->
+                                                                                                                @if ($ausiBooking->emergency == 0)
+                                                                                                                    <span class="badge bg-secondary badge-forge ">No</span>
+                                                                                                                @else
+                                                                                                                    <span class="badge bg-danger badge-forge ">Yes</span>
+                                                                                                                @endif
+                                                                                                            </td> -->
 
                                     <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
                                         data-bs-toggle="tooltip" title="{{ $ausiBooking->remarks }}">
@@ -151,4 +151,7 @@
 
     @include('backend.modal.ausi.ausi-booking-modal')
 
+    @push('scripts')
+        <script src="{{ asset('assets/backend/js/ausi-booking-report.js') }}"></script>
+    @endpush
 @endsection

@@ -110,5 +110,6 @@
                 });
             });
         </script>
+        <script src="{{ asset('assets/backend/js/events.js')}}"></script>
     @endpush
 @endsection

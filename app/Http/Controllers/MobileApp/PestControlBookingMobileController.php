@@ -5,7 +5,7 @@ namespace App\Http\Controllers\MobileApp;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ResidentDetails;
-use App\Models\TestPestControlBooking;
+use App\Models\PestControlBooking;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -88,7 +88,7 @@ class PestControlBookingMobileController extends Controller
 
         $userGroup = in_array($areaLetter, $lowrise) ? 'lowrise' : 'highrise';
 
-        $bookings = TestPestControlBooking::whereDate('booking_date', $request->date)
+        $bookings = PestControlBooking::whereDate('booking_date', $request->date)
             ->where('booking_status', 1)
             ->get(['booking_time_slot', 'unit_area']);
 
@@ -239,7 +239,7 @@ class PestControlBookingMobileController extends Controller
                 $monthStart = Carbon::parse($bookingDate)->startOfMonth()->toDateString();
                 $monthEnd = Carbon::parse($bookingDate)->endOfMonth()->toDateString();
 
-                $unitBookingsThisMonth = TestPestControlBooking::where(
+                $unitBookingsThisMonth = PestControlBooking::where(
                     'unit_no',
                     strtoupper($unitNo)
                 )
@@ -263,7 +263,7 @@ class PestControlBookingMobileController extends Controller
                     ], 409);
                 }
 
-                $existingBookings = TestPestControlBooking::whereDate(
+                $existingBookings = PestControlBooking::whereDate(
                     'booking_date',
                     $bookingDate
                 )
@@ -287,7 +287,7 @@ class PestControlBookingMobileController extends Controller
                     ], 409);
                 }
 
-                $existingUnitBooking = TestPestControlBooking::whereDate(
+                $existingUnitBooking = PestControlBooking::whereDate(
                     'booking_date',
                     $bookingDate
                 )
@@ -309,7 +309,7 @@ class PestControlBookingMobileController extends Controller
                     ], 409);
                 }
 
-                $booking = TestPestControlBooking::create([
+                $booking = PestControlBooking::create([
                     'user_id' => null,
                     'unit_no' => strtoupper($unitNo),
                     'unit_area' => $areaLetter,
@@ -395,7 +395,7 @@ class PestControlBookingMobileController extends Controller
 
         }
 
-        $bookings = TestPestControlBooking::where('email', $email)
+        $bookings = PestControlBooking::where('email', $email)
             ->where('unit_no', $unitNo)
             ->orderBy('created_at', 'desc')
             ->paginate(5);
@@ -444,7 +444,7 @@ class PestControlBookingMobileController extends Controller
         return $number . $towerLetter;
     }
 
-    public function CancelPestControlBookingMobile(TestPestControlBooking $booking, Request $request)
+    public function CancelPestControlBookingMobile(PestControlBooking $booking, Request $request)
     {
         try {
 
@@ -455,7 +455,7 @@ class PestControlBookingMobileController extends Controller
                 $units = ResidentDetails::where('email', $userEmail)
                     ->pluck('unit_no');
 
-                $booking = TestPestControlBooking::where('id', $booking->id)
+                $booking = PestControlBooking::where('id', $booking->id)
                     ->whereIn('unit_no', $units)
                     ->lockForUpdate()
                     ->firstOrFail();
@@ -467,7 +467,7 @@ class PestControlBookingMobileController extends Controller
                     ], 403);
                 }
 
-                if ($booking->booking_status !== TestPestControlBooking::STATUS_CONFIRMED) {
+                if ($booking->booking_status !== PestControlBooking::STATUS_CONFIRMED) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Only active bookings can be cancelled.'
@@ -482,7 +482,7 @@ class PestControlBookingMobileController extends Controller
                     ], 400);
                 }
 
-                $booking->booking_status = TestPestControlBooking::STATUS_CANCELLED;
+                $booking->booking_status = PestControlBooking::STATUS_CANCELLED;
                 $booking->cancelled_at = now();
                 $booking->cancelled_by = null;
 

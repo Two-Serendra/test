@@ -8,7 +8,7 @@ use App\Mail\TestUserGreaseTrapBookingCancellation;
 use App\Mail\ConciergeGreaseTrapBookingConfirmation;
 use App\Mail\UserGreaseTrapBookingCancellation;
 use App\Mail\ConciergeGreaseTrapBookingCancellation;
-use App\Models\TestGreaseTrapBooking;
+use App\Models\GreaseTrapBooking;
 use App\Models\ResidentDetails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -85,7 +85,7 @@ class GreaseTrapBookingMobileController extends Controller
         // }
 
         // One booking per slot regardless of tower
-        $blockedSlots = TestGreaseTrapBooking::whereDate('booking_date', $request->date)
+        $blockedSlots = GreaseTrapBooking::whereDate('booking_date', $request->date)
             ->where('booking_status', 1)
             ->pluck('booking_time_slot')
             ->filter()
@@ -179,7 +179,7 @@ class GreaseTrapBookingMobileController extends Controller
                     ->endOfYear()
                     ->toDateString();
 
-                $unitBookingsCount = TestGreaseTrapBooking::where(
+                $unitBookingsCount = GreaseTrapBooking::where(
                     'unit_no',
                     $unitNo
                 )
@@ -213,7 +213,7 @@ class GreaseTrapBookingMobileController extends Controller
                     ], 409);
                 }
 
-                $slotTaken = TestGreaseTrapBooking::whereDate(
+                $slotTaken = GreaseTrapBooking::whereDate(
                     'booking_date',
                     $bookingDate
                 )
@@ -235,7 +235,7 @@ class GreaseTrapBookingMobileController extends Controller
                     ], 409);
                 }
 
-                $existingUnitBooking = TestGreaseTrapBooking::whereDate('booking_date', $bookingDate)
+                $existingUnitBooking = GreaseTrapBooking::whereDate('booking_date', $bookingDate)
                     ->where('unit_no', $unitNo)
                     ->where('booking_status', 1)
                     ->lockForUpdate()
@@ -251,7 +251,7 @@ class GreaseTrapBookingMobileController extends Controller
                     ], 409);
                 }
 
-                $booking = TestGreaseTrapBooking::create([
+                $booking = GreaseTrapBooking::create([
                     'user_id' => null,
                     'unit_no' => strtoupper($unitNo),
                     'resident_type' => $residentType,
@@ -335,7 +335,7 @@ class GreaseTrapBookingMobileController extends Controller
 
         }
 
-        $bookings = TestGreaseTrapBooking::where('email', $email)
+        $bookings = GreaseTrapBooking::where('email', $email)
             ->where('unit_no', $unitNo)
             ->orderBy('created_at', 'desc')
             ->paginate(5);
@@ -384,7 +384,7 @@ class GreaseTrapBookingMobileController extends Controller
         return $number . $towerLetter;
     }
 
-    public function CancelGreaseTrapBookingMobile(TestGreaseTrapBooking $booking, Request $request)
+    public function CancelGreaseTrapBookingMobile(GreaseTrapBooking $booking, Request $request)
     {
         try {
 
@@ -395,7 +395,7 @@ class GreaseTrapBookingMobileController extends Controller
                 $units = ResidentDetails::where('email', $userEmail)
                     ->pluck('unit_no');
 
-                $booking = TestGreaseTrapBooking::where('id', $booking->id)
+                $booking = GreaseTrapBooking::where('id', $booking->id)
                     ->whereIn('unit_no', $units)
                     ->lockForUpdate()
                     ->firstOrFail();
@@ -409,7 +409,7 @@ class GreaseTrapBookingMobileController extends Controller
 
                 }
 
-                if ($booking->booking_status == TestGreaseTrapBooking::STATUS_CANCELLED) {
+                if ($booking->booking_status == GreaseTrapBooking::STATUS_CANCELLED) {
 
                     return response()->json([
                         'success' => false,
@@ -418,7 +418,7 @@ class GreaseTrapBookingMobileController extends Controller
 
                 }
 
-                if ($booking->booking_status == TestGreaseTrapBooking::STATUS_COMPLETED) {
+                if ($booking->booking_status == GreaseTrapBooking::STATUS_COMPLETED) {
 
                     return response()->json([
                         'success' => false,
@@ -438,7 +438,7 @@ class GreaseTrapBookingMobileController extends Controller
 
                 $within24Hours = $booking->isWithin24Hours();
 
-                $usedFree = TestGreaseTrapBooking::getUsedFreeBookings($booking->unit_no);
+                $usedFree = GreaseTrapBooking::getUsedFreeBookings($booking->unit_no);
 
                 $freeLimit = 2;
 
@@ -473,7 +473,7 @@ class GreaseTrapBookingMobileController extends Controller
 
                 }
 
-                $booking->booking_status = TestGreaseTrapBooking::STATUS_CANCELLED;
+                $booking->booking_status = GreaseTrapBooking::STATUS_CANCELLED;
                 $booking->cancelled_at = now();
                 $booking->cancelled_by = null;
 

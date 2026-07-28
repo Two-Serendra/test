@@ -165,7 +165,7 @@
                 </table>
             </div>
         </div>
-        <div class="pagination-container">
+        <div class="pagination-container"> 
             {{ $ausiBookings->links('vendor.pagination.bootstrap-5') }}
         </div>
     </div>

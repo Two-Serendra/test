@@ -223,8 +223,28 @@ $(function () {
 
                 if (Number(item.booking_status) === 1) {
 
+                    const [year, month, day] = item.booking_date.split('-').map(Number);
+
+                    const time = convertTime(item.booking_time_slot); // e.g. "8:00 AM"
+
+                    const [clock, period] = time.split(' ');
+                    let [hours, minutes] = clock.split(':').map(Number);
+
+                    if (period === 'PM' && hours !== 12) {
+                        hours += 12;
+                    }
+
+                    if (period === 'AM' && hours === 12) {
+                        hours = 0;
+                    }
+
                     const bookingDateTime = new Date(
-                        `${item.booking_date} ${convertTime(item.booking_time_slot)}`
+                        year,
+                        month - 1,
+                        day,
+                        hours,
+                        minutes,
+                        0
                     );
 
                     const canCancel = now < bookingDateTime;
@@ -239,9 +259,9 @@ $(function () {
                         </button>
                     `;
 
-                                } else {
+                } else {
 
-                                    cancelButton = `
+                    cancelButton = `
                         <button
                             class="btn btn-sm rounded-pill px-3 btn-secondary"
                             disabled>

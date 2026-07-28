@@ -37,7 +37,7 @@
                 <img src="{{ asset('assets/images/TWO SERENDRA LOGO PNG (White).png') }}" alt="Two Serendra Logo"
                     class="img-fluid w-100">
             </div>
-            <div class="col-lg-3 col-md-6">
+            <div class="col-lg-3 col-md-5">
                 <h5 class="text-uppercase text-light mb-4">Our Office</h5>
 
                 <div class="d-flex flex-column align-items-start text-start text-light mb-3">
@@ -65,25 +65,29 @@
                         <p class="mb-0">lowriseadmin@twoserendra.com</p>
                     </a>
                 </div>
-
-
-                <!-- Optional: Social Icons -->
-                <!--
-    <div class="d-flex justify-content-center pt-3 social-icons">
-        <a class="btn btn-square btn-light me-2" href="#"><i class="fab fa-twitter"></i></a>
-        <a class="btn btn-square btn-light me-2" href="#"><i class="fab fa-facebook-f"></i></a>
-        <a class="btn btn-square btn-light me-2" href="#"><i class="fab fa-youtube"></i></a>
-        <a class="btn btn-square btn-light me-2" href="#"><i class="fab fa-linkedin-in"></i></a>
-    </div>
-    -->
             </div>
 
-            <div class="col-lg-2 col-md-6">
+            <div class="col-lg-2 col-md-5">
                 <h5 class="text-uppercase text-light mb-4">Quick Links</h5>
                 <a class="btn btn-link text-light" href="{{ route('home') }}">Home</a>
                 <a class="btn btn-link text-light" href="{{ route('about') }}">About</a>
                 <a class="btn btn-link text-light" href="{{ route('services') }}">Services</a>
                 <a class="btn btn-link text-light" href="{{ route('contact') }}">Contact</a>
+
+                <div class="mt-4">
+                    <h6 class="text-uppercase text-light mb-3">Download App</h6>
+
+                    <a href="https://www.google.com/url?q=https://play.google.com/store/apps/details?id%3Dph.venyu.tickets.serendra&sa=D&source=editors&ust=1771989480358385&usg=AOvVaw1pxSubTZjy5yfap6gEJ1K1" target="_blank"
+                        class="d-block mb-2">
+                        <img src="{{ asset('assets/images/2SAndroidApp.png') }}" alt="Get it on Google Play"
+                            class="img-fluid" style="max-width: 170px;">
+                    </a>
+
+                    <a href="https://apps.apple.com/us/app/two-serendra-unit-care/id6757326723" target="_blank" class="d-block">
+                        <img src="{{ asset('assets/images/2SiOSApp.png') }}" alt="Download on the App Store"
+                            class="img-fluid" style="max-width: 170px;">
+                    </a>
+                </div>
             </div>
             <div class="col-lg-4 col-md-6">
                 <h5 class="text-uppercase text-light mb-4">Office Hours</h5>

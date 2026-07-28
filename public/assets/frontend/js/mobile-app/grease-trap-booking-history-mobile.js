@@ -284,22 +284,34 @@ $(function () {
 
                 if (Number(item.booking_status) === 1) {
 
-                    const startTime = convertTime(item.booking_time_slot);
+                    const startTime = convertTime(item.booking_time_slot).replace(/\s+/g, '');
 
                     const [year, month, day] = item.booking_date.split('-').map(Number);
 
-                    const match = startTime.match(/(\d+):(\d+)(AM|PM)/i);
+                    const match = startTime.match(/^(\d{1,2}):(\d{2})(AM|PM)$/i);
 
-                    let hour = parseInt(match[1], 10);
-                    const minute = parseInt(match[2], 10);
-                    const period = match[3].toUpperCase();
+                    if (match) {
+                        let hour = parseInt(match[1], 10);
+                        const minute = parseInt(match[2], 10);
+                        const period = match[3].toUpperCase();
 
-                    if (period === "PM" && hour !== 12) hour += 12;
-                    if (period === "AM" && hour === 12) hour = 0;
+                        if (period === "PM" && hour !== 12) hour += 12;
+                        if (period === "AM" && hour === 12) hour = 0;
 
-                    const bookingDateTime = new Date(year, month - 1, day, hour, minute);
+                        const bookingDateTime = new Date(
+                            year,
+                            month - 1,
+                            day,
+                            hour,
+                            minute,
+                            0
+                        );
 
-                    canCancel = now < bookingDateTime;
+                        canCancel = now < bookingDateTime;
+                    } else {
+                        console.error("Invalid booking_time_slot:", item.booking_time_slot);
+                        canCancel = false;
+                    }
                 }
 
                 cancelButton = `

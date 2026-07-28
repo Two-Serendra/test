@@ -288,23 +288,22 @@ $(function () {
 
                 if (Number(item.booking_status) === 1) {
 
-                    const startTime = convertTime(item.booking_time_slot);
+                    const startTime = convertTime(item.booking_time_slot).replace(/\s+/g, '');
 
                     const [year, month, day] = item.booking_date.split('-').map(Number);
 
-                    const match = startTime.match(/(\d+):(\d+)\s*(AM|PM)/i);
+                    const match = startTime.match(/^(\d{1,2}):(\d{2})(AM|PM)$/i);
 
                     if (!match) {
                         logDebugHistoryPc("Invalid booking time:", startTime);
 
                         cancelButton = `
-            <button
-                class="btn btn-sm rounded-pill px-3 btn-secondary"
-                disabled>
-                <i class="bx bx-x-circle me-1"></i>
-                Cancel
-            </button>
-        `;
+        <button
+            class="btn btn-sm rounded-pill px-3 btn-secondary"
+            disabled>
+            Cancel
+        </button>
+    `;
                     } else {
 
                         let hour = parseInt(match[1], 10);
@@ -314,7 +313,14 @@ $(function () {
                         if (period === "PM" && hour !== 12) hour += 12;
                         if (period === "AM" && hour === 12) hour = 0;
 
-                        const bookingDateTime = new Date(year, month - 1, day, hour, minute);
+                        const bookingDateTime = new Date(
+                            year,
+                            month - 1,
+                            day,
+                            hour,
+                            minute,
+                            0
+                        );
 
                         const canCancel = now < bookingDateTime;
 
@@ -323,26 +329,26 @@ $(function () {
                         logDebugHistoryPc("Can Cancel:", canCancel);
 
                         cancelButton = `
-                                <button
-                                    class="btn btn-sm rounded-pill px-3 cancel-mobile-pc-booking-btn
-                                        ${canCancel ? 'btn-danger' : 'btn-secondary'}"
-                                    ${canCancel ? '' : 'disabled'}
-                                    data-id="${item.id}">
-                                    Cancel
-                                </button>
-                            `;
-                                        }
+        <button
+            class="btn btn-sm rounded-pill px-3
+                ${canCancel ? 'btn-danger cancel-mobile-pc-booking-btn' : 'btn-secondary'}"
+            ${canCancel ? '' : 'disabled'}
+            data-id="${item.id}">
+            Cancel
+        </button>
+    `;
+                    }
 
-                                    } else {
+                } else {
 
-                        cancelButton = `
+                    cancelButton = `
                             <button
                                 class="btn btn-sm rounded-pill px-3 btn-secondary"
                                 disabled
                                 Cancel
                             </button>
                         `;
-                     }
+                }
 
                 html += `
                 <div class="booking-card shadow-sm">

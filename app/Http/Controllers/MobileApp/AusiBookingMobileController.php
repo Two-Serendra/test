@@ -128,15 +128,26 @@ class AusiBookingMobileController extends Controller
             }
         }
 
+        // Tuesday rule
+        if (Carbon::parse($request->date)->isTuesday()) {
+            $blockedForUser = array_merge($blockedForUser, [
+                '8:00 AM - 8:30 AM',
+                '8:30 AM - 9:00 AM',
+                '9:00 AM - 9:30 AM',
+                '9:30 AM - 10:00 AM',
+            ]);
+        }
+
+        $blockedForUser = array_unique($blockedForUser);
+
         \Log::info('MOBILE AUSI SLOT REQUEST', [
             'unit_name' => $unitName,
             'unit_no' => $unitNo,
-            // 'resident_id' => $resident->id ?? null,
             'blocked_for_user' => $blockedForUser,
         ]);
 
         return response()->json([
-            'blocked_for_user' => $blockedForUser,
+            'blocked_for_user' => array_values($blockedForUser),
             'raw_status' => $slotStatus
         ]);
     }
@@ -224,7 +235,30 @@ class AusiBookingMobileController extends Controller
                 $debug[] = "Unit No: " . $unitNo;
                 $debug[] = "Resident Type: " . $residentType;
 
-                $bookingDate = Carbon::parse($request->booking_date)->toDateString();
+                $bookingDateCarbon = Carbon::parse($request->booking_date);
+                $bookingDate = $bookingDateCarbon->toDateString();
+
+                // Tuesday rule
+                if ($bookingDateCarbon->isTuesday()) {
+
+                    $blockedTuesdaySlots = [
+                        '8:00 AM - 8:30 AM',
+                        '8:30 AM - 9:00 AM',
+                        '9:00 AM - 9:30 AM',
+                        '9:30 AM - 10:00 AM',
+                    ];
+
+                    if (in_array($request->booking_time_slot, $blockedTuesdaySlots)) {
+
+                        DB::rollBack();
+
+                        return response()->json([
+                            'message' => 'On Tuesdays, AUSI bookings start at 10:00 AM.',
+                            'type' => 'tuesday_restricted_slot'
+                        ], 422);
+                    }
+                }
+                
                 $slotTaken = AusiBooking::whereDate('booking_date', $bookingDate)
                     ->where('booking_time_slot', $request->booking_time_slot)
                     ->where('booking_status', '!=', 0)

@@ -49,7 +49,8 @@ class AusiBookingController extends Controller
         while ($attempt < $maxRetries) {
             try {
                 DB::beginTransaction();
-                $bookingDate = Carbon::parse($request->booking_date)->toDateString();
+                $bookingDateCarbon = Carbon::parse($request->booking_date);
+                $bookingDate = $bookingDateCarbon->toDateString();
                 $unit = strtoupper($request->unit);
                 $areaLetter = preg_replace('/[^A-Z]/', '', $unit);
                 $towerGroup = $towerGroups[$areaLetter] ?? null;
@@ -59,13 +60,34 @@ class AusiBookingController extends Controller
                     return response()->json(['message' => 'Invalid unit area letter.'], 422);
                 }
 
+                if ($bookingDateCarbon->isTuesday()) {
+
+                    $blockedTuesdaySlots = [
+                        '8:00 AM - 8:30 AM',
+                        '8:30 AM - 9:00 AM',
+                        '9:00 AM - 9:30 AM',
+                        '9:30 AM - 10:00 AM',
+                    ];
+
+                    if (in_array($request->booking_time_slot, $blockedTuesdaySlots)) {
+
+                        DB::rollBack();
+
+                        return response()->json([
+                            'message' => 'On Tuesdays, AUSI bookings start at 10:00 AM.'
+                        ], 422);
+                    }
+                }
+
+
+
                 $towerAreas = $towerGroup == 'lowrise'
                     ? ['A', 'B', 'C', 'D', 'E']
                     : ['F', 'G', 'H', 'I'];
 
 
                 $hasYearlyBooking = AusiBooking::where('unit_no', $unit)
-                    ->whereYear('booking_date', Carbon::parse($bookingDate)->year)
+                    ->whereYear('booking_date', $bookingDateCarbon->year)
                     ->where('booking_status', 1)
                     ->exists();
 
@@ -180,8 +202,20 @@ class AusiBookingController extends Controller
             }
         }
 
+        // Tuesday rule
+        if (Carbon::parse($request->date)->isTuesday()) {
+            $blockedForUser = array_merge($blockedForUser, [
+                '8:00 AM - 8:30 AM',
+                '8:30 AM - 9:00 AM',
+                '9:00 AM - 9:30 AM',
+                '9:30 AM - 10:00 AM',
+            ]);
+        }
+
+        $blockedForUser = array_unique($blockedForUser);
+
         return response()->json([
-            'booked_slots' => $blockedForUser
+            'booked_slots' => array_values($blockedForUser)
         ]);
     }
 

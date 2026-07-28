@@ -36,10 +36,11 @@ $(document).ready(function () {
             dateFormat: "Y-m-d",
             minDate: "today",
 
+           
             disable: [
                 function (date) {
 
-                    const unit = $('unitAusi').val();
+                    const unit = $('#unitAusi').val()
                     const category = getUnitCategory(unit);
 
                     const formattedDate = flatpickr.formatDate(date, "Y-m-d");
@@ -82,7 +83,6 @@ $(document).ready(function () {
 
         return null;
     }
-
 
     $('.AddAusiBookingAdmin').on('click', function () {
         $('#ausiAddBookingAdminModal').modal('show');
@@ -137,7 +137,7 @@ $(document).ready(function () {
     window.hideLoading = function () {
         $('#loadingOverlay').fadeOut(150);
     }
-    
+
     flatpickr("#ausiBookingDateAdmin", {
         dateFormat: "Y-m-d",
         minDate: "today"

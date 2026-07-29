@@ -124,12 +124,16 @@
 
                             <div class="row g-3">
                                 @foreach ($slots as $slot)
-                                    <div class="slot-card btn btn-outline-primary" data-radio="slot{{ $loop->index }}">
-                                        {{ $slot }}
-                                    </div>
+                                    <div class="col-6 col-md-4 col-lg-3">
+                                        <input type="radio" class="btn-check ausi-booking-slot" name="booking_time_slot"
+                                            id="slot{{ $loop->index }}" value="{{ $slot }}" data-slot="{{ $slot }}" disabled
+                                            required>
 
-                                    <input type="radio" class="ausi-booking-slot d-none" id="slot{{ $loop->index }}"
-                                        name="booking_time_slot" value="{{ $slot }}" data-slot="{{ $slot }}" disabled>
+                                        <label class="slot-card btn btn-outline-primary w-100 disabled"
+                                            data-radio="slot{{ $loop->index }}">
+                                            {{ $slot }}
+                                        </label>
+                                    </div>
                                 @endforeach
                             </div>
                         </div>

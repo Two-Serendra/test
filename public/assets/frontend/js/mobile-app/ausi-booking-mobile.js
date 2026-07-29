@@ -247,22 +247,17 @@ $(function () {
         $(".ausi-booking-slot").prop("disabled", true);
     });
 
-    $(document).on("click", ".slot-card", function () {
+    $(document).on("click", ".slot-card", function (e) {
 
-        const id = $(this).data("radio");
-        const radio = $("#" + id);
+        e.preventDefault();
+
+        const radio = $("#" + $(this).data("radio"));
 
         if (radio.prop("disabled")) {
             return;
         }
 
-        $(".slot-card")
-            .removeClass("btn-primary")
-            .addClass("btn-outline-primary");
-
-        $(this)
-            .removeClass("btn-outline-primary")
-            .addClass("btn-primary");
+        $(".ausi-booking-slot").prop("checked", false);
 
         radio.prop("checked", true).trigger("change");
 

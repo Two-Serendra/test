@@ -38,7 +38,7 @@ $(function () {
         unit: null
     };
 
-    const $bookingSlots = $('.ausi-booking-slot');
+    const $bookingSlots = $('.gt-booking-slot');
 
     document.addEventListener('change', function (e) {
         if (e.target && e.target.id === 'resident_id_ausi_mobile') {
@@ -81,7 +81,7 @@ $(function () {
         // logDebug("UNIT=" + unit);
 
         if (!date || !unit) {
-            $(".ausi-booking-slot").prop("disabled", true);
+            $(".gt-booking-slot").prop("disabled", true);
             hideLoadingAusi();
             return;
         }
@@ -149,7 +149,7 @@ $(function () {
 
     window.resetSlotsAusiMobile = function () {
 
-        $('.ausi-booking-slot').each(function () {
+        $('.gt-booking-slot').each(function () {
 
             $(this)
                 .prop('checked', false)
@@ -176,7 +176,7 @@ $(function () {
     function disableBookedSlots(bookedSlots) {
 
         bookedSlots.forEach(slot => {
-            const $radio = $('.ausi-booking-slot[data-slot="' + slot + '"]');
+            const $radio = $('.gt-booking-slot[data-slot="' + slot + '"]');
 
             if ($radio.length) {
                 $radio.prop('disabled', true);
@@ -189,12 +189,27 @@ $(function () {
         });
     }
 
+    document.addEventListener("change", function (e) {
+
+        if (!e.target.classList.contains("gt-booking-slot")) {
+            return;
+        }
+
+        document.querySelectorAll(".gt-booking-slot").forEach(function (radio) {
+            if (radio !== e.target) {
+                radio.checked = false;
+            }
+        });
+
+    });
+
+
     function disablePastSlots(selectedDate) {
         const now = new Date();
         const selected = new Date(selectedDate);
         if (now.toDateString() !== selected.toDateString()) return;
         const currentTime = now.getHours() * 60 + now.getMinutes();
-        $('.ausi-booking-slot').each(function () {
+        $('.gt-booking-slot').each(function () {
             const slotText = $(this).data('slot');
 
             if (!slotText) return;
@@ -235,16 +250,16 @@ $(function () {
 
     // logDebug(
     //     "SLOTS COUNT",
-    //     document.querySelectorAll(".ausi-booking-slot").length
+    //     document.querySelectorAll(".gt-booking-slot").length
     // );
 
     $(document).ready(function () {
         // logDebug("READY");
         // logDebug(
         //     "SLOTS",
-        //     document.querySelectorAll(".ausi-booking-slot").length
+        //     document.querySelectorAll(".gt-booking-slot").length
         // );
-        $(".ausi-booking-slot").prop("disabled", true);
+        $(".gt-booking-slot").prop("disabled", true);
     });
 
     window.resetAusiBookingUI = function () {
@@ -275,7 +290,7 @@ $(function () {
             fp.clear();
         }
 
-        $('.ausi-booking-slot').each(function () {
+        $('.gt-booking-slot').each(function () {
             $(this)
                 .prop('checked', false)
                 .prop('disabled', true);

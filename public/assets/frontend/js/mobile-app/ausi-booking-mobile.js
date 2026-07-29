@@ -247,24 +247,15 @@ $(function () {
         $(".ausi-booking-slot").prop("disabled", true);
     });
 
-    $(document).on("click touchend", ".slot-card", function (e) {
+    $(document).on("change", ".ausi-booking-slot", function () {
 
-        e.preventDefault();
+        const checked = $(".ausi-booking-slot:checked")
+            .map(function () {
+                return this.id + " = " + this.value;
+            })
+            .get();
 
-        const radio = $("#" + $(this).attr("for"));
-
-        if (!radio.length || radio.prop("disabled")) {
-            return;
-        }
-        $(".ausi-booking-slot").prop("checked", false);
-
-
-        $(".slot-card")
-            .removeClass("active");
-
-        radio.prop("checked", true).trigger("change");
-
-        $(this).addClass("active");
+        logDebug("CHECKED SLOTS:\n" + checked.join("\n"));
 
     });
 

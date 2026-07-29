@@ -247,6 +247,27 @@ $(function () {
         $(".ausi-booking-slot").prop("disabled", true);
     });
 
+    $(document).on("click touchend", ".slot-card", function (e) {
+
+        e.preventDefault();
+
+        const radio = $("#" + $(this).attr("for"));
+
+        if (!radio.length || radio.prop("disabled")) {
+            return;
+        }
+        $(".ausi-booking-slot").prop("checked", false);
+
+
+        $(".slot-card")
+            .removeClass("active");
+
+        radio.prop("checked", true).trigger("change");
+
+        $(this).addClass("active");
+
+    });
+
     window.resetAusiBookingUI = function () {
         logDebug("RESET CALLED");
         const form = document.getElementById('userAusiNewBookingMobile');

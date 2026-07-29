@@ -162,7 +162,29 @@ class AusiBookingController extends Controller
 
         return response()->json(['message' => 'Could not complete booking. Please retry.'], 500);
     }
+    public function searchAusiBooking(Request $request)
+    {
+        $searchBooking = $request->input('searchAusiBooking');
 
+        $ausiBookings = AusiBooking::when($searchBooking, function ($query) use ($searchBooking) {
+
+            $query->where('unit_no', 'LIKE', "%{$searchBooking}%")
+                ->orWhere('name', 'LIKE', "%{$searchBooking}%");
+
+        })
+            ->orderBy('booking_date', 'desc')
+            ->paginate(10);
+
+        $ausiBookings->appends([
+            'searchAusiBooking' => $searchBooking
+        ]);
+
+        return view(
+            'backend.ausi.ausi-booking',
+            compact('ausiBookings', 'searchBooking')
+        )->with('searchAusiBooking', $searchBooking);
+    }
+    
     public function getBookedSlotsAdminAusi(Request $request)
     {
         $unit = strtoupper($request->unit);

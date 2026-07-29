@@ -5,14 +5,14 @@
             <div class="row mb-3">
                 <div class="col-6  d-flex justify-content-between align-items-center flex-wrap">
 
-                    <form action="{{ route('admin.search.ausi.booking') }}" method="GET" id="searchPesControlBookingForm"
+                    <form action="{{ route('admin.search.ausi.booking') }}" method="GET" id="searchAusiBookingForm"
                         class="d-flex align-items-center" style="max-width: 250px;">
                         <div class="input-group text-dark w-100">
                             <span class="input-group-text">
                                 <i class='bx bx-search-alt text-dark'></i>
                             </span>
-                            <input type="text" name="searchPestControlBooking" value="{{ $searchBooking ?? '' }}"
-                                id="searchInputPesControlBooking" class="form-control" placeholder="Name/Unit"
+                            <input type="text" name="searchAusiBooking" value="{{ $searchAusiBooking ?? '' }}"
+                                id="searchInpuAusiBooking" class="form-control" placeholder="Name/Unit"
                                 autocomplete="off">
 
                         </div>

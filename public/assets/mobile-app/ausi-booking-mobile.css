@@ -120,6 +120,24 @@
     padding: 10px;
 }
 
+/* Prevent touch highlight on iOS/Android */
+.slot-card {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Remove Bootstrap pressed state */
+.slot-card:active,
+.slot-card.active {
+    background-color: inherit !important;
+    color: inherit !important;
+    border-color: inherit !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+
 
 @media(max-width:768px) {
 

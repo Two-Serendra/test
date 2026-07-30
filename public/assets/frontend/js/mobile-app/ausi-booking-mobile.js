@@ -155,11 +155,10 @@ $(function () {
                 .prop('checked', false)
                 .prop('disabled', false);
 
-            $('.slot-card')
-                .removeClass('btn-primary disabled btn-secondary')
+            $('label[for="' + this.id + '"]')
+                .removeClass('disabled btn-secondary')
                 .addClass('btn-outline-primary')
                 .css('cursor', 'pointer');
-
         });
 
     };
@@ -179,16 +178,14 @@ $(function () {
         bookedSlots.forEach(slot => {
             const $radio = $('.ausi-booking-slot[data-slot="' + slot + '"]');
 
-            const $radio = $('.ausi-booking-slot[data-slot="' + slot + '"]');
+            if ($radio.length) {
+                $radio.prop('disabled', true);
 
-            if (!$radio.length) return;
-
-            $radio.prop('disabled', true);
-
-            $('.slot-card[data-radio="' + $radio.attr('id') + '"]')
-                .removeClass('btn-outline-primary')
-                .addClass('btn-secondary disabled')
-                .css('cursor', 'not-allowed');
+                $('label[for="' + $radio.attr('id') + '"]')
+                    .removeClass('btn-outline-primary')
+                    .addClass('btn-secondary disabled')
+                    .css('cursor', 'not-allowed');
+            }
         });
     }
 
@@ -219,7 +216,7 @@ $(function () {
 
                 $(this).prop("disabled", true);
 
-                $('.slot-card[data-radio="' + this.id + '"]')
+                $('label[for="' + this.id + '"]')
                     .addClass("btn-secondary disabled")
                     .removeClass("btn-outline-primary")
                     .css("cursor", "not-allowed");
@@ -242,31 +239,8 @@ $(function () {
     // );
 
     $(document).ready(function () {
+      
         $(".ausi-booking-slot").prop("disabled", true);
-    });
-
-
-
-    $(document).on("click", ".slot-card", function () {
-
-        const radio = $("#" + $(this).data("radio"));
-
-        if (radio.prop("disabled")) {
-            return;
-        }
-
-        $(".ausi-booking-slot").prop("checked", false);
-
-        radio.prop("checked", true).trigger("change");
-
-        $(".slot-card")
-            .removeClass("btn-primary")
-            .addClass("btn-outline-primary");
-
-        $(this)
-            .removeClass("btn-outline-primary")
-            .addClass("btn-primary");
-
     });
 
 

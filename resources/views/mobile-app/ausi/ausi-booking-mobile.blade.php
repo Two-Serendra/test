@@ -129,7 +129,7 @@
                                             id="slot{{ $loop->index }}" value="{{ $slot }}" data-slot="{{ $slot }}" disabled
                                             required>
 
-                                        <label class="slot-card btn btn-primary w-100 disabled"
+                                        <label class="slot-card btn btn-outline-primary w-100 disabled"
                                             for="slot{{ $loop->index }}">
                                             {{ $slot }}
                                         </label>

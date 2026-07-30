@@ -66,31 +66,31 @@
     cursor: not-allowed;
 }
 
-.slot-card {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.slot-card{
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
-    min-height: 70px;
+    min-height:70px;
 
-    border: 1px solid var(--bs-primary);
-    border-radius: 12px;
+    border:1px solid var(--bs-primary);
+    border-radius:12px;
 
-    cursor: pointer;
+    cursor:pointer;
 
-    background: #fff;
-    color: var(--bs-primary);
+    background:#fff;
+    color:var(--bs-primary);
 }
 
-.ausi-booking-slot:checked+.slot-card {
-    background: var(--bs-primary);
-    color: #fff;
-    border-color: var(--bs-primary);
+.ausi-booking-slot:checked + .slot-card{
+    background:var(--bs-primary);
+    color:#fff;
+    border-color:var(--bs-primary);
 }
 
-.slot-card.disabled {
-    opacity: .5;
-    pointer-events: none;
+.slot-card.disabled{
+    opacity:.5;
+    pointer-events:none;
 }
 
 .history-shortcut {

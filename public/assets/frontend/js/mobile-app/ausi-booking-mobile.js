@@ -147,75 +147,46 @@ $(function () {
         }
     }
 
-    $(document).on("click", ".slot-card", function () {
-
-        const radio = $("#" + $(this).data("radio"));
-
-        if (radio.prop("disabled")) return;
-
-        $(".ausi-booking-slot").prop("checked", false);
-
-        radio.prop("checked", true);
-
-        updateSlotAppearance();
-
-    });
-
     window.resetSlotsAusiMobile = function () {
 
-        $(".ausi-booking-slot")
-            .prop("checked", false)
-            .prop("disabled", false);
+        $('.ausi-booking-slot').each(function () {
 
-        updateSlotAppearance();
+            $(this)
+                .prop('checked', false)
+                .prop('disabled', false);
+
+            $('label[for="' + this.id + '"]')
+                .removeClass('disabled btn-secondary')
+                .addClass('btn-outline-primary')
+                .css('cursor', 'pointer');
+        });
 
     };
+
+    function checkFormReady() {
+
+        const date = window.ausiState.date;
+        const unit = window.ausiState.unit;
+
+        const ready = !!(date && unit);
+
+        $("#saveUserAusiBtn").prop("disabled", !ready);
+    }
 
     function disableBookedSlots(bookedSlots) {
 
         bookedSlots.forEach(slot => {
+            const $radio = $('.ausi-booking-slot[data-slot="' + slot + '"]');
 
-            $('.ausi-booking-slot[data-slot="' + slot + '"]')
-                .prop("disabled", true);
+            if ($radio.length) {
+                $radio.prop('disabled', true);
 
-        });
-
-        updateSlotAppearance();
-
-    }
-
-
-    function updateSlotAppearance() {
-
-        $(".slot-card").each(function () {
-
-            const radio = $("#" + $(this).data("radio"));
-
-            $(this)
-                .removeClass("btn-primary btn-secondary btn-outline-primary disabled");
-
-            if (radio.prop("disabled")) {
-
-                $(this)
-                    .addClass("btn-secondary disabled")
-                    .css("cursor", "not-allowed");
-
-            } else if (radio.prop("checked")) {
-
-                $(this)
-                    .addClass("btn-primary")
-                    .css("cursor", "pointer");
-
-            } else {
-
-                $(this)
-                    .addClass("btn-outline-primary")
-                    .css("cursor", "pointer");
-
+                $('label[for="' + $radio.attr('id') + '"]')
+                    .removeClass('btn-outline-primary')
+                    .addClass('btn-secondary disabled')
+                    .css('cursor', 'not-allowed');
             }
-
         });
-
     }
 
     function disablePastSlots(selectedDate) {
@@ -245,25 +216,13 @@ $(function () {
 
                 $(this).prop("disabled", true);
 
-                updateSlotAppearance();
+                $('label[for="' + this.id + '"]')
+                    .addClass("btn-secondary disabled")
+                    .removeClass("btn-outline-primary")
+                    .css("cursor", "not-allowed");
             }
         });
     }
-
-
-    function checkFormReady() {
-
-        const date = window.ausiState.date;
-        const unit = window.ausiState.unit;
-
-        const ready = !!(date && unit);
-
-        $("#saveUserAusiBtn").prop("disabled", !ready);
-    }
-
-
-
-
 
     function showLoadingAusi() {
         $("#slotLoadingAusi").removeClass("d-none");
@@ -273,8 +232,13 @@ $(function () {
         $("#slotLoadingAusi").addClass("d-none");
     }
 
-    $(document).ready(function () {
 
+    // logDebug(
+    //     "SLOTS COUNT",
+    //     document.querySelectorAll(".ausi-booking-slot").length
+    // );
+
+    $(document).ready(function () {
         $(".ausi-booking-slot").prop("disabled", true);
     });
 

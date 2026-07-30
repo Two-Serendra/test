@@ -147,21 +147,7 @@ $(function () {
         }
     }
 
-    $(document).on("click", ".slot-card", function () {
-
-        if ($(this).hasClass("disabled")) return;
-
-        $(".slot-card")
-            .removeClass("btn-primary")
-            .addClass("btn-outline-primary");
-
-        $(this)
-            .removeClass("btn-outline-primary")
-            .addClass("btn-primary");
-
-        const radio = $("#" + $(this).data("radio"));
-        radio.prop("checked", true).trigger("change");
-    });
+    
 
     window.resetSlotsAusiMobile = function () {
 
@@ -171,7 +157,7 @@ $(function () {
                 .prop('checked', false)
                 .prop('disabled', false);
 
-            $('.slot-card[data-radio="' + this.id + '"]')
+            $('label[for="' + this.id + '"]')
                 .removeClass('disabled btn-secondary')
                 .addClass('btn-outline-primary')
                 .css('cursor', 'pointer');
@@ -197,7 +183,7 @@ $(function () {
             if ($radio.length) {
                 $radio.prop('disabled', true);
 
-                $('.slot-card[data-radio="' + this.id + '"]')
+                $('label[for="' + $radio.attr('id') + '"]')
                     .removeClass('btn-outline-primary')
                     .addClass('btn-secondary disabled')
                     .css('cursor', 'not-allowed');
@@ -232,7 +218,7 @@ $(function () {
 
                 $(this).prop("disabled", true);
 
-                $('.slot-card[data-radio="' + this.id + '"]')
+                $('label[for="' + this.id + '"]')
                     .addClass("btn-secondary disabled")
                     .removeClass("btn-outline-primary")
                     .css("cursor", "not-allowed");
@@ -255,7 +241,7 @@ $(function () {
     // );
 
     $(document).ready(function () {
-
+      
         $(".ausi-booking-slot").prop("disabled", true);
     });
 

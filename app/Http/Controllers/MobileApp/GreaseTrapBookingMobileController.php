@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\MobileApp;
 
 use App\Http\Controllers\Controller;
-use App\Mail\TestUserGreaseTrapBookingConfirmation;
-use App\Mail\TestUserGreaseTrapBookingCancellation;
-use App\Mail\ConciergeGreaseTrapBookingConfirmation;
+use App\Mail\UserGreaseTrapBookingConfirmation;
 use App\Mail\UserGreaseTrapBookingCancellation;
+use App\Mail\ConciergeGreaseTrapBookingConfirmation;
 use App\Mail\ConciergeGreaseTrapBookingCancellation;
 use App\Models\GreaseTrapBooking;
 use App\Models\ResidentDetails;
@@ -274,7 +273,7 @@ class GreaseTrapBookingMobileController extends Controller
 
                     Mail::to($email)
                         ->queue(
-                            new TestUserGreaseTrapBookingConfirmation($booking)
+                            new UserGreaseTrapBookingConfirmation($booking)
                         );
 
                     // Mail::to('concierge@twoserendra.com')
@@ -516,7 +515,7 @@ class GreaseTrapBookingMobileController extends Controller
                     if ($booking->email) {
 
                         Mail::to($booking->email)
-                            ->queue(new TestUserGreaseTrapBookingCancellation($booking));
+                            ->queue(new UserGreaseTrapBookingCancellation($booking));
 
                     }
 

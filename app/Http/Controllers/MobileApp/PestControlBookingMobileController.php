@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\TestUserPestControlBookingConfirmation;
-use App\Mail\TestUserPestControlBookingCancellation;
+use App\Mail\UserPestControlBookingConfirmation;
+use App\Mail\UserPestControlBookingCancellation;
 class PestControlBookingMobileController extends Controller
 {
     public function pestControlBookingUserMobile(Request $request)
@@ -332,7 +332,7 @@ class PestControlBookingMobileController extends Controller
 
                     Mail::to($email)
                         ->queue(
-                            new TestUserPestControlBookingConfirmation($booking)
+                            new UserPestControlBookingConfirmation($booking)
                         );
 
                     // Mail::to('concierge@twoserendra.com')
@@ -492,7 +492,7 @@ class PestControlBookingMobileController extends Controller
 
                     if ($booking->email) {
                         Mail::to($booking->email)
-                            ->queue(new TestUserPestControlBookingCancellation($booking));
+                            ->queue(new UserPestControlBookingCancellation($booking));
                     }
 
                     // Optional

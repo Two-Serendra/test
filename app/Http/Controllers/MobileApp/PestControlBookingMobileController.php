@@ -452,26 +452,33 @@ class PestControlBookingMobileController extends Controller
 
                 $userEmail = $request->email;
 
-                $units = ResidentDetails::where('email', $userEmail)
-                    ->pluck('unit_no');
-
                 $booking = PestControlBooking::where('id', $booking->id)
-                    ->whereIn('unit_no', $units)
                     ->lockForUpdate()
                     ->firstOrFail();
 
                 if ($booking->email !== $userEmail) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'This booking was created by another resident in your unit. Only the creator can cancel it.'
+                        'message' => 'You are not allowed to cancel this booking.'
                     ], 403);
                 }
 
-                if ($booking->booking_status !== PestControlBooking::STATUS_CONFIRMED) {
+                if ($booking->booking_status == PestControlBooking::STATUS_CANCELLED) {
+
                     return response()->json([
                         'success' => false,
-                        'message' => 'Only active bookings can be cancelled.'
+                        'message' => 'Booking already cancelled.'
                     ], 400);
+
+                }
+
+                if ($booking->booking_status == PestControlBooking::STATUS_COMPLETED) {
+
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Completed bookings cannot be cancelled.'
+                    ], 400);
+
                 }
 
 

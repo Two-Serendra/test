@@ -390,22 +390,15 @@ class GreaseTrapBookingMobileController extends Controller
             return DB::transaction(function () use ($booking, $request) {
 
                 $userEmail = $request->email;
-
-                $units = ResidentDetails::where('email', $userEmail)
-                    ->pluck('unit_no');
-
                 $booking = GreaseTrapBooking::where('id', $booking->id)
-                    ->whereIn('unit_no', $units)
                     ->lockForUpdate()
                     ->firstOrFail();
 
                 if ($booking->email !== $userEmail) {
-
                     return response()->json([
                         'success' => false,
-                        'message' => 'This booking was created by another resident in your unit. Only the creator can cancel it.'
+                        'message' => 'You are not allowed to cancel this booking.'
                     ], 403);
-
                 }
 
                 if ($booking->booking_status == GreaseTrapBooking::STATUS_CANCELLED) {

@@ -31,6 +31,7 @@ class PestControlBooking extends Model
         'penalty_amount',
         'completed_at',
         'completed_by',
+        'email',
     ];
 
     const STATUS_CANCELLED = 0;

@@ -33,6 +33,7 @@ class GreaseTrapBooking extends Model
         'cancelled_within_24hrs',
         'completed_at',
         'completed_by',
+        'email',
     ];
     const STATUS_CANCELLED_OLD = 2;
     const STATUS_CANCELLED = 0;

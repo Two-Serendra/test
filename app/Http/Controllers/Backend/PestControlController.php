@@ -426,15 +426,32 @@ class PestControlController extends Controller
             ->get()
             ->map(function ($schedule) {
 
+                // No time slot
+                if (
+                    empty($schedule->booking_time_slot) ||
+                    !str_contains($schedule->booking_time_slot, '-')
+                ) {
+                    return [
+                        'id' => $schedule->id,
+                        'title' => $schedule->unit_no . ' (No Time Slot)',
+                        'start' => $schedule->booking_date,
+                        'allDay' => true,
+                        'unit_area' => $schedule->unit_area,
+                        'emergency' => $schedule->emergency,
+                    ];
+                }
+
+                // Has a valid time slot
                 $timeSlot = str_replace([' NN', ' MN'], [' PM', ' AM'], $schedule->booking_time_slot);
-                [$start, $end] = explode('-', $timeSlot);
+
+                [$start, $end] = explode('-', $timeSlot, 2);
 
                 $startTime = Carbon::parse(trim($start))->format('g:i A');
                 $endTime = Carbon::parse(trim($end))->format('g:i A');
 
                 return [
                     'id' => $schedule->id,
-                    'title' => $schedule->unit_no . ' (' . $startTime . ' - ' . $endTime . ')',
+                    'title' => $schedule->unit_no . " ({$startTime} - {$endTime})",
                     'start' => $schedule->booking_date . ' ' . Carbon::parse(trim($start))->format('H:i:s'),
                     'end' => $schedule->booking_date . ' ' . Carbon::parse(trim($end))->format('H:i:s'),
                     'allDay' => false,

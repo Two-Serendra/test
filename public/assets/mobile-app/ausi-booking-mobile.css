@@ -71,18 +71,18 @@
 
     .slot-card:hover {
         background: #fff !important;
-        color: #0d6efd !important;
-        border-color: #0d6efd !important;
+        color: #008b26 !important;
+        border-color: #008b26 !important;
     }
 
     .slot-card:active {
         background: #fff !important;
-        color: #0d6efd !important;
-        border-color: #0d6efd !important;
+        color: #008b26 !important;
+        border-color: #008b26 !important;
     }
 
 }
-
+/* 
 .btn-check:checked+.slot-card {
     background: #0d6efd !important;
     color: #fff !important;
@@ -110,7 +110,7 @@
     color: var(--bs-primary) !important;
     border-color: var(--bs-primary) !important;
     box-shadow: none !important;
-}
+} */
 
 .history-shortcut {
     display: flex;

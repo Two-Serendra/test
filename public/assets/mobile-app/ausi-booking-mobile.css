@@ -61,8 +61,32 @@
         border-color .2s,
         color .2s;
 
-    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
     -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover:none) {
+
+    .slot-card:hover {
+        background: #fff !important;
+        color: #0d6efd !important;
+        border-color: #0d6efd !important;
+    }
+
+    .slot-card:active {
+        background: #fff !important;
+        color: #0d6efd !important;
+        border-color: #0d6efd !important;
+    }
+
+}
+
+.btn-check:checked+.slot-card {
+    background: #0d6efd !important;
+    color: #fff !important;
+    border-color: #0d6efd !important;
 }
 
 .btn-check:checked+.slot-card {

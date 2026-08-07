@@ -72,7 +72,7 @@ return [
     */
 
     'timezone' => 'Asia/Manila',
-
+    'version' => env('APP_VERSION', '1.0.0'),
 
     /*
     |--------------------------------------------------------------------------
@@ -131,6 +131,8 @@ return [
 
     'miniapp_origin' => env('MINIAPP_ORIGIN'),
     'miniapp_proxy_secret' => env('MINIAPP_PROXY_SECRET'),
+
+
 
     /*
     |--------------------------------------------------------------------------

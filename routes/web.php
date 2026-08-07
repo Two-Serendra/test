@@ -235,7 +235,7 @@ Route::middleware(['miniapp.webview'])->group(function () {
     Route::get('/grease-trap-booking-mobile', [GreaseTrapBookingMobileController::class, 'greasetrapBookingUserMobile'])->name('grease-trap.booking.mobile')->middleware('no-cache');
     Route::post('/grease-trap-booking-mobile/store', [GreaseTrapBookingMobileController::class, 'storeGreaseTrapBookingMobile'])->name('grease.trap.booking.mobile.store')->middleware('throttle:5,1');
     Route::get('/grease-trap-booked-slots-mobile', [GreaseTrapBookingMobileController::class, 'getBookedSlotsGreaseTrapMobile']);
-    Route::get('/grease-trap-disabled-dates-mobile', [GreaseTrapBookingMobileController::class, 'getDisabledGreaseTrapDatesMobile']); 
+    Route::get('/grease-trap-disabled-dates-mobile', [GreaseTrapBookingMobileController::class, 'getDisabledGreaseTrapDatesMobile'])->name('grease.trap.disabled.dates.mobile');
     Route::get('/grease-trap-booking-mobile/history', [GreaseTrapBookingMobileController::class, 'viewGreaseTrapBookingMobileHistory'])->name('grease.trap.booking.mobile.history');
     Route::get('/get-grease-trap-booking-mobile/history', [GreaseTrapBookingMobileController::class, 'getGreaseTrapBookingMobileHistory'])->name('get.grease.trap.booking.mobile.history');
     Route::post('/grease-trap-booking-mobile/cancel/{booking}', [GreaseTrapBookingMobileController::class, 'CancelGreaseTrapBookingMobile'])

@@ -213,31 +213,31 @@ Route::middleware(['miniapp.webview'])->group(function () {
     Route::get('/mobile-services-booking', [AusiBookingMobileController::class, 'MobileServices'])->middleware('no-cache');
     //AUSI
     Route::get('/ausi-booking-mobile', [AusiBookingMobileController::class, 'ausiBookingUserMobile'])->name('ausi.booking.mobile')->middleware('no-cache');
-    Route::get('/ausi-booked-slots-mobile', [AusiBookingMobileController::class, 'getBookedSlotsAusiMobile']);
+    Route::get('/ausi-booked-slots-mobile', [AusiBookingMobileController::class, 'getBookedSlotsAusiMobile'])->middleware('no-cache');
     Route::post('/ausi-booking-mobile/store', [AusiBookingMobileController::class, 'storeAusiBookingMobile'])->name('ausi.booking.mobile.store')->middleware('throttle:5,1');
-    Route::get('/ausi-booking-mobile/history', [AusiBookingMobileController::class, 'viewAusiBookingMobileHistory'])->name('ausi.booking.mobile.history');
-    Route::get('/get-ausi-booking-mobile/history', [AusiBookingMobileController::class, 'getAusiBookingMobileHistory'])->name('get.ausi.booking.mobile.history');
+    Route::get('/ausi-booking-mobile/history', [AusiBookingMobileController::class, 'viewAusiBookingMobileHistory'])->name('ausi.booking.mobile.history')->middleware('no-cache');
+    Route::get('/get-ausi-booking-mobile/history', [AusiBookingMobileController::class, 'getAusiBookingMobileHistory'])->name('get.ausi.booking.mobile.history')->middleware('no-cache');
     Route::post('/ausi-booking-mobile/cancel/{booking}', [AusiBookingMobileController::class, 'CancelAusiBookingMobile'])
         ->name('ausi.cancel.booking.mobile')->middleware('throttle:5,1');
-    Route::get('/ausi-booking-details/{id}', [AusiBookingMobileController::class, 'showAusiBookingDetails']);
+    Route::get('/ausi-booking-details/{id}', [AusiBookingMobileController::class, 'showAusiBookingDetails'])->middleware('no-cache');
     Route::get('/fetch-ausi-booking-mobile/{id}', [AusiBookingMobileController::class, 'fetchAusiBookingMobile'])->name('fetch.ausi.booking.mobile');
 
     //Pest Control
     Route::get('/pest-control-booking-mobile', [PestControlBookingMobileController::class, 'pestControlBookingUserMobile'])->name('pest.control.booking.mobile')->middleware('no-cache');
     Route::post('/pest-control-booking-mobile/store', [PestControlBookingMobileController::class, 'storePestControlBookingMobile'])->name('pest.control.booking.mobile.store')->middleware('throttle:5,1');
-    Route::get('/pest-control-booked-slots-mobile', [PestControlBookingMobileController::class, 'getBookedSlotsPestControlMobile']);
-    Route::get('/pest-control-booking-mobile/history', [PestControlBookingMobileController::class, 'viewPestControlBookingMobileHistory'])->name('pest.control.booking.mobile.history');
-    Route::get('/get-pest-control-booking-mobile/history', [PestControlBookingMobileController::class, 'getPestControlBookingMobileHistory'])->name('get.pest.control.booking.mobile.history');
+    Route::get('/pest-control-booked-slots-mobile', [PestControlBookingMobileController::class, 'getBookedSlotsPestControlMobile'])->middleware('no-cache');
+    Route::get('/pest-control-booking-mobile/history', [PestControlBookingMobileController::class, 'viewPestControlBookingMobileHistory'])->name('pest.control.booking.mobile.history')->middleware('no-cache');
+    Route::get('/get-pest-control-booking-mobile/history', [PestControlBookingMobileController::class, 'getPestControlBookingMobileHistory'])->name('get.pest.control.booking.mobile.history')->middleware('no-cache');
     Route::post('/pest-control-booking-mobile/cancel/{booking}', [PestControlBookingMobileController::class, 'CancelPestControlBookingMobile'])
         ->name('pest.control.cancel.booking.mobile')->middleware('throttle:5,1');
 
     //Greasetrap
     Route::get('/grease-trap-booking-mobile', [GreaseTrapBookingMobileController::class, 'greasetrapBookingUserMobile'])->name('grease-trap.booking.mobile')->middleware('no-cache');
     Route::post('/grease-trap-booking-mobile/store', [GreaseTrapBookingMobileController::class, 'storeGreaseTrapBookingMobile'])->name('grease.trap.booking.mobile.store')->middleware('throttle:5,1');
-    Route::get('/grease-trap-booked-slots-mobile', [GreaseTrapBookingMobileController::class, 'getBookedSlotsGreaseTrapMobile']);
-    Route::get('/grease-trap-disabled-dates-mobile', [GreaseTrapBookingMobileController::class, 'getDisabledGreaseTrapDatesMobile'])->name('grease.trap.disabled.dates.mobile');
-    Route::get('/grease-trap-booking-mobile/history', [GreaseTrapBookingMobileController::class, 'viewGreaseTrapBookingMobileHistory'])->name('grease.trap.booking.mobile.history');
-    Route::get('/get-grease-trap-booking-mobile/history', [GreaseTrapBookingMobileController::class, 'getGreaseTrapBookingMobileHistory'])->name('get.grease.trap.booking.mobile.history');
+    Route::get('/grease-trap-booked-slots-mobile', [GreaseTrapBookingMobileController::class, 'getBookedSlotsGreaseTrapMobile'])->middleware('no-cache');
+    Route::get('/grease-trap-disabled-dates-mobile', [GreaseTrapBookingMobileController::class, 'getDisabledGreaseTrapDatesMobile'])->name('grease.trap.disabled.dates.mobile')->middleware('no-cache');
+    Route::get('/grease-trap-booking-mobile/history', [GreaseTrapBookingMobileController::class, 'viewGreaseTrapBookingMobileHistory'])->name('grease.trap.booking.mobile.history')->middleware('no-cache');
+    Route::get('/get-grease-trap-booking-mobile/history', [GreaseTrapBookingMobileController::class, 'getGreaseTrapBookingMobileHistory'])->name('get.grease.trap.booking.mobile.history')->middleware('no-cache');
     Route::post('/grease-trap-booking-mobile/cancel/{booking}', [GreaseTrapBookingMobileController::class, 'CancelGreaseTrapBookingMobile'])
         ->name('grease.trap.cancel.booking.mobile')->middleware('throttle:5,1');
 

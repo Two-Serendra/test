@@ -53,36 +53,38 @@ class GreaseTrapBookingMobileController extends Controller
             "Sequoia" => "I",
         ];
 
-        $parts = explode(' ', $unitName);
+        // Parse tower and unit number using the last space
+        $lastSpace = strrpos($unitName, ' ');
 
-        if (count($parts) !== 2) {
+        if ($lastSpace === false) {
             return response()->json([
                 'message' => 'Invalid unit format',
                 'unit' => $unitName
             ], 422);
         }
 
-        [$tower, $number] = $parts;
+        $tower = trim(substr($unitName, 0, $lastSpace));
+        $number = trim(substr($unitName, $lastSpace + 1));
 
         $towerLetter = $map[$tower] ?? null;
 
         if (!$towerLetter) {
             return response()->json([
-                'message' => 'Unknown tower'
+                'message' => 'Unknown tower',
+                'tower' => $tower
             ], 422);
         }
 
         $unitNo = $number . $towerLetter;
 
-        // If no date yet, return fully booked dates only
         if (!$request->filled('date')) {
 
             $totalSlots = 7;
 
             $disabledDates = GreaseTrapBooking::selectRaw("
-        DATE(booking_date) as booking_date,
-        COUNT(DISTINCT booking_time_slot) as total
-    ")
+            DATE(booking_date) as booking_date,
+            COUNT(DISTINCT booking_time_slot) as total
+        ")
                 ->where('booking_status', '!=', 0)
                 ->groupBy('booking_date')
                 ->havingRaw('COUNT(DISTINCT booking_time_slot) >= ?', [$totalSlots])
@@ -92,6 +94,7 @@ class GreaseTrapBookingMobileController extends Controller
 
             \Log::info('MOBILE GREASE TRAP DISABLED DATES', [
                 'unit_name' => $unitName,
+                'tower' => $tower,
                 'unit_no' => $unitNo,
                 'disabled_dates' => $disabledDates,
             ]);
@@ -100,6 +103,7 @@ class GreaseTrapBookingMobileController extends Controller
                 'disabled_dates' => $disabledDates
             ]);
         }
+
         $blockedSlots = GreaseTrapBooking::whereDate('booking_date', $request->date)
             ->where('booking_status', '!=', 0)
             ->pluck('booking_time_slot')
@@ -110,8 +114,8 @@ class GreaseTrapBookingMobileController extends Controller
 
         \Log::info('MOBILE GREASE TRAP SLOT REQUEST', [
             'unit_name' => $unitName,
+            'tower' => $tower,
             'unit_no' => $unitNo,
-            // 'resident_id' => $resident->id,
             'date' => $request->date,
             'blocked_slots' => $blockedSlots,
         ]);

@@ -120,7 +120,7 @@ class GreaseTrapBookingMobileController extends Controller
             ->groupBy('booking_date')
             ->havingRaw('COUNT(DISTINCT booking_time_slot) >= ?', [$totalSlots])
             ->pluck('booking_date')
-            ->map(fn($date) => \Carbon\Carbon::parse($date)->format('Y-m-d'))
+            ->map(fn($date) => Carbon::parse($date)->format('Y-m-d'))
             ->values();
 
         \Log::info('Disabled dates', [

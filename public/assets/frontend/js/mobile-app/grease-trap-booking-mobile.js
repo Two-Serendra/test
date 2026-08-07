@@ -21,7 +21,7 @@ $(function () {
         }
     }
 
-    // logDebugGt("🚀 Mobile Booking JS Loaded");
+    logDebugGt("🚀 Mobile Booking JS Loaded 2026-06-15-022");
 
     window.gtState = {
         date: null,

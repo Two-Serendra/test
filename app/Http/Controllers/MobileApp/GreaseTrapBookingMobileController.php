@@ -74,18 +74,34 @@ class GreaseTrapBookingMobileController extends Controller
 
         $unitNo = $number . $towerLetter;
 
-        // $resident = ResidentDetails::where('unit_no', $unitNo)->first();
+        // If no date yet, return fully booked dates only
+        if (!$request->filled('date')) {
 
-        // if (!$resident) {
-        //     return response()->json([
-        //         'message' => 'Resident not found',
-        //         'unit_no' => $unitNo
-        //     ], 404);
-        // }
+            $totalSlots = 7;
 
-        // One booking per slot regardless of tower
+            $disabledDates = GreaseTrapBooking::selectRaw("
+        DATE(booking_date) as booking_date,
+        COUNT(DISTINCT booking_time_slot) as total
+    ")
+                ->where('booking_status', '!=', 0)
+                ->groupBy('booking_date')
+                ->havingRaw('COUNT(DISTINCT booking_time_slot) >= ?', [$totalSlots])
+                ->pluck('booking_date')
+                ->map(fn($date) => Carbon::parse($date)->format('Y-m-d'))
+                ->values();
+
+            \Log::info('MOBILE GREASE TRAP DISABLED DATES', [
+                'unit_name' => $unitName,
+                'unit_no' => $unitNo,
+                'disabled_dates' => $disabledDates,
+            ]);
+
+            return response()->json([
+                'disabled_dates' => $disabledDates
+            ]);
+        }
         $blockedSlots = GreaseTrapBooking::whereDate('booking_date', $request->date)
-            ->where('booking_status', 1)
+            ->where('booking_status', '!=', 0)
             ->pluck('booking_time_slot')
             ->filter()
             ->unique()
@@ -102,33 +118,6 @@ class GreaseTrapBookingMobileController extends Controller
 
         return response()->json([
             'blocked_slots' => $blockedSlots
-        ]);
-    }
-
-
-    public function getDisabledGreaseTrapDatesMobile()
-    {
-        \Log::info('Disabled dates endpoint hit');
-
-        $totalSlots = 7;
-
-        $disabledDates = GreaseTrapBooking::selectRaw("
-            DATE(booking_date) as booking_date,
-            COUNT(DISTINCT booking_time_slot) as total
-        ")
-            ->where('booking_status', 1)
-            ->groupBy('booking_date')
-            ->havingRaw('COUNT(DISTINCT booking_time_slot) >= ?', [$totalSlots])
-            ->pluck('booking_date')
-            ->map(fn($date) => Carbon::parse($date)->format('Y-m-d'))
-            ->values();
-
-        \Log::info('Disabled dates', [
-            'dates' => $disabledDates
-        ]);
-
-        return response()->json([
-            'disabled_dates' => $disabledDates
         ]);
     }
 
@@ -212,7 +201,7 @@ class GreaseTrapBookingMobileController extends Controller
                 )
                     ->whereBetween('booking_date', [$yearStart, $yearEnd])
                     ->where(function ($q) {
-                        $q->where('booking_status', 1)
+                        $q->where('booking_status', '!=', 0)
                             ->orWhere('cancelled_within_24hrs', 1);
                     })
                     ->count();
@@ -248,7 +237,7 @@ class GreaseTrapBookingMobileController extends Controller
                         'booking_time_slot',
                         $request->booking_time_slot
                     )
-                    ->where('booking_status', 1)
+                    ->where('booking_status', '!=', 0)
                     ->lockForUpdate()
                     ->exists();
 
@@ -264,7 +253,7 @@ class GreaseTrapBookingMobileController extends Controller
 
                 $existingUnitBooking = GreaseTrapBooking::whereDate('booking_date', $bookingDate)
                     ->where('unit_no', $unitNo)
-                    ->where('booking_status', 1)
+                    ->where('booking_status', '!=', 0)
                     ->lockForUpdate()
                     ->exists();
 

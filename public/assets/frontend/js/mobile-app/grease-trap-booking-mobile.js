@@ -1,5 +1,5 @@
 $(function () {
-    // alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-018");
+    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-019");
     const el = document.getElementById('resident_id_gt');
 
     logDebugGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -61,9 +61,11 @@ $(function () {
         console.log("UNIT:", value);
         logDebugGt("UNIT CHANGED: " + value);
         logDebugGt("CHANGE FIRED");
-
+        loadDisabledDates(value);
         triggerUpdateGt();
+
     };
+
 
 
     function triggerUpdateGt() {
@@ -90,6 +92,63 @@ $(function () {
             logDebugGt("TRIGGER ERROR");
             logDebugGt(e.message);
         }
+    }
+
+
+    function loadDisabledDates(unit) {
+
+        logDebugGt("==========================");
+        logDebugGt("LOAD DISABLED DATES");
+        logDebugGt("==========================");
+        logDebugGt("UNIT: " + unit);
+
+        $.ajax({
+
+            url: "/grease-trap-booked-slots-mobile",
+
+            type: "GET",
+
+            data: {
+                unit_name: unit
+            },
+
+            beforeSend: function () {
+
+                logDebugGt("Loading disabled dates...");
+
+            },
+
+            success: function (res) {
+
+                logDebugGt("Disabled dates loaded");
+                logDebugGt(res);
+
+                const fp = document.querySelector("#GtBookingDate")._flatpickr;
+
+                if (!fp) {
+
+                    logDebugGt("Flatpickr instance not found!");
+
+                    return;
+                }
+
+                fp.set("disable", res.disabled_dates || []);
+
+                logDebugGt("Disabled dates applied:");
+                logDebugGt(res.disabled_dates);
+
+            },
+
+            error: function (xhr) {
+
+                logDebugGt("Failed loading disabled dates");
+                logDebugGt(xhr.status);
+                logDebugGt(xhr.responseText);
+
+            }
+
+        });
+
     }
     function updateGtSlots(date, unit) {
 
@@ -493,8 +552,8 @@ $(function () {
             showCancelButton: true,
             confirmButtonText: 'Yes, Proceed',
             cancelButtonText: 'Cancel',
-            confirmButtonColor: '#0d6efd', 
-            cancelButtonColor: '#6c757d',   
+            confirmButtonColor: '#0d6efd',
+            cancelButtonColor: '#6c757d',
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {

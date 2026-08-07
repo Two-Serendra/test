@@ -75,9 +75,7 @@ class PestControlBookingMobileController extends Controller
 
         $userGroup = in_array($areaLetter, $lowrise) ? 'lowrise' : 'highrise';
 
-        $bookings = PestControlBooking::whereDate('booking_date', $request->date)
-            ->where('booking_status', '!=', 0)
-            ->get(['booking_time_slot', 'unit_area']);
+
 
         if (!$request->filled('date')) {
 
@@ -151,6 +149,10 @@ class PestControlBookingMobileController extends Controller
                 'disabled_dates' => $disabledDates
             ]);
         }
+
+        $bookings = PestControlBooking::whereDate('booking_date', $request->date)
+            ->where('booking_status', '!=', 0)
+            ->get(['booking_time_slot', 'unit_area']);
 
         $slotStatus = [];
 
@@ -253,18 +255,6 @@ class PestControlBookingMobileController extends Controller
 
                 $unitNo = $number . $towerLetter;
                 $residentType = $request->mobile_unit_role;
-
-                // $resident = ResidentDetails::where('email', $email)
-                //     ->where('unit_no', strtoupper($unitNo))
-                //     ->lockForUpdate()
-                //     ->first();
-
-                // if (!$resident) {
-                //     return response()->json([
-                //         'message' => 'Resident not found'
-                //     ], 404);
-                // }
-
                 $bookingDate = Carbon::parse(
                     $request->booking_date
                 )->toDateString();

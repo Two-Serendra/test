@@ -93,7 +93,7 @@ class MobileAppController extends Controller
         $userGroup = in_array($areaLetter, $lowrise) ? 'lowrise' : 'highrise';
 
         $bookings = AusiBooking::whereDate('booking_date', $request->date)
-            ->where('booking_status', 1)
+            ->where('booking_status', '!=', 0)
             ->get(['booking_time_slot', 'unit_area']);
 
         $slotStatus = [];
@@ -232,7 +232,7 @@ class MobileAppController extends Controller
                 // ===============================
                 $slotTaken = AusiBooking::whereDate('booking_date', $bookingDate)
                     ->where('booking_time_slot', $request->booking_time_slot)
-                    ->where('booking_status', 1)
+                    ->where('booking_status', '!=', 0)
                     ->whereIn('unit_area', $groupAreas)
                     ->lockForUpdate()
                     ->exists();
@@ -246,7 +246,7 @@ class MobileAppController extends Controller
                 }
 
                 $existingUnitBooking = AusiBooking::where('unit_no', strtoupper($resident->unit_no))
-                    ->where('booking_status', 1)
+                    ->where('booking_status', '!=', 0)
                     ->whereYear('booking_date', $bookingDate)
                     ->lockForUpdate()
                     ->exists();

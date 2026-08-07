@@ -76,24 +76,106 @@ class AusiBookingMobileController extends Controller
             ], 422);
         }
         $unitNo = $number . $towerLetter;
-
-        // $resident = ResidentDetails::where('unit_no', $unitNo)->first();
-
-        // if (!$resident) {
-        //     return response()->json([
-        //         'message' => 'Resident not found',
-        //         'unit_no' => $unitNo
-        //     ], 404);
-        // }
-
-        // $areaLetter = preg_replace('/[^A-Z]/', '', $resident->unit_no);
         $areaLetter = strtoupper($towerLetter);
-
         $lowrise = ['A', 'B', 'C', 'D', 'E'];
         $highrise = ['F', 'G', 'H', 'I'];
 
         $userGroup = in_array($areaLetter, $lowrise) ? 'lowrise' : 'highrise';
 
+        if (!$request->filled('date')) {
+
+            $slots = [
+                '8:00 AM - 8:30 AM',
+                '8:30 AM - 9:00 AM',
+                '9:00 AM - 9:30 AM',
+                '9:30 AM - 10:00 AM',
+                '10:00 AM - 10:30 AM',
+                '10:30 AM - 11:00 AM',
+                '11:00 AM - 11:30 AM',
+                '11:30 AM - 12:00 PM',
+                '1:00 PM - 1:30 PM',
+                '1:30 PM - 2:00 PM',
+                '2:00 PM - 2:30 PM',
+                '2:30 PM - 3:00 PM',
+                '3:00 PM - 3:30 PM',
+                '3:30 PM - 4:00 PM',
+                '4:00 PM - 4:30 PM',
+                '4:30 PM - 5:00 PM',
+            ];
+
+            $bookings = AusiBooking::where('booking_status', '!=', 0)
+                ->get([
+                    'booking_date',
+                    'booking_time_slot',
+                    'unit_area'
+                ]);
+
+            $dates = [];
+
+            foreach ($bookings as $booking) {
+
+                $date = Carbon::parse($booking->booking_date)->format('Y-m-d');
+
+                if (!isset($dates[$date])) {
+                    $dates[$date] = [];
+                }
+
+                if (!isset($dates[$date][$booking->booking_time_slot])) {
+
+                    $dates[$date][$booking->booking_time_slot] = [
+                        'lowrise' => false,
+                        'highrise' => false,
+                    ];
+                }
+
+                if (in_array($booking->unit_area, $lowrise)) {
+                    $dates[$date][$booking->booking_time_slot]['lowrise'] = true;
+                }
+
+                if (in_array($booking->unit_area, $highrise)) {
+                    $dates[$date][$booking->booking_time_slot]['highrise'] = true;
+                }
+            }
+
+            $disabledDates = [];
+
+            foreach ($dates as $date => $slotData) {
+
+                $requiredSlots = $slots;
+
+                // Tuesday morning slots are unavailable to everyone.
+                if (Carbon::parse($date)->isTuesday()) {
+                    $requiredSlots = array_diff($requiredSlots, [
+                        '8:00 AM - 8:30 AM',
+                        '8:30 AM - 9:00 AM',
+                        '9:00 AM - 9:30 AM',
+                        '9:30 AM - 10:00 AM',
+                    ]);
+                }
+
+                $full = true;
+
+                foreach ($requiredSlots as $slot) {
+
+                    if (
+                        empty($slotData[$slot]) ||
+                        !$slotData[$slot][$userGroup]
+                    ) {
+                        $full = false;
+                        break;
+                    }
+                }
+
+                if ($full) {
+                    $disabledDates[] = $date;
+                }
+            }
+
+            return response()->json([
+                'disabled_dates' => array_values($disabledDates)
+            ]);
+        }
+        
         $bookings = AusiBooking::whereDate('booking_date', $request->date)
             ->where('booking_status', '!=', 0)
             ->get(['booking_time_slot', 'unit_area']);
@@ -128,7 +210,6 @@ class AusiBookingMobileController extends Controller
             }
         }
 
-        // Tuesday rule
         if (Carbon::parse($request->date)->isTuesday()) {
             $blockedForUser = array_merge($blockedForUser, [
                 '8:00 AM - 8:30 AM',
@@ -258,7 +339,7 @@ class AusiBookingMobileController extends Controller
                         ], 422);
                     }
                 }
-                
+
                 $slotTaken = AusiBooking::whereDate('booking_date', $bookingDate)
                     ->where('booking_time_slot', $request->booking_time_slot)
                     ->where('booking_status', '!=', 0)

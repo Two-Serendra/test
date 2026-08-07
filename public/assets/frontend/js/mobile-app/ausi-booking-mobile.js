@@ -56,6 +56,7 @@ $(function () {
         }
         // logDebug("UNIT CHANGED: " + value);
         // logDebug("CHANGE FIRED");
+        loadDisabledDatesAusi(value);
         triggerUpdate();
     };
 
@@ -87,6 +88,69 @@ $(function () {
         }
 
         updateSlots(date, unit);
+    }
+
+    function loadDisabledDatesAusi(unitName) {
+
+        logDebug("==========================");
+        logDebug("LOAD DISABLED DATES");
+        logDebug("==========================");
+        logDebug("UNIT: " + unitName);
+
+        $.ajax({
+
+            url: "/ausi-booked-slots-mobile",
+            type: "GET",
+
+            data: {
+                unit_name: unitName
+            },
+
+            beforeSend: function () {
+                logDebug("Loading disabled dates...");
+            },
+
+            success: function (res) {
+
+                logDebug("AJAX SUCCESS");
+                logDebug(res);
+
+                const fp = document.querySelector("#AusiBookingDateMobile")._flatpickr;
+
+                if (!fp) {
+                    logDebug("Flatpickr instance not found!");
+                    return;
+                }
+
+                fp.clear();
+
+                window.ausiState.date = null;
+
+                fp.set("disable", res.disabled_dates || []);
+
+                fp.jumpToDate(fp.selectedDates[0] || new Date());
+
+                fp.redraw();
+
+                logDebug("Disabled dates applied:");
+                logDebug(res.disabled_dates);
+
+                logDebug("Flatpickr config:");
+                logDebug(fp.config.disable);
+
+                $("#AusiBookingDateMobile").prop("disabled", false);
+            },
+
+            error: function (xhr) {
+
+                logDebug("Failed loading disabled dates");
+                logDebug(xhr.status);
+                logDebug(xhr.responseText);
+
+            }
+
+        });
+
     }
 
     function updateSlots(date, unit) {

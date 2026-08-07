@@ -104,7 +104,7 @@ $(function () {
 
             success: function (res) {
 
-                logDebugPc("Disabled dates loaded");
+                logDebugPc("AJAX SUCCESS");
                 logDebugPc(res);
 
                 const fp = document.querySelector("#PestControlBookingDate")._flatpickr;
@@ -113,20 +113,21 @@ $(function () {
                     logDebugPc("Flatpickr instance not found!");
                     return;
                 }
+
                 fp.clear();
                 window.pcState.date = null;
 
-                fp.set("disable", res.disabled_dates || []);
-
-                fp.jumpToDate(fp.selectedDates[0] || new Date());
-                fp.redraw();
-                $("#PestControlBookingDate").prop("disabled", false);
-
-                logDebugPc("Disabled dates applied:");
+                logDebugPc("Applying disabled dates...");
                 logDebugPc(res.disabled_dates);
 
-                logDebugPc("Flatpickr config:");
+                fp.set("disable", res.disabled_dates || []);
+                fp.jumpToDate(fp.selectedDates[0] || new Date());
+                fp.redraw();
+
+                logDebugPc("Current Flatpickr disable config:");
                 logDebugPc(fp.config.disable);
+
+                $("#PestControlBookingDate").prop("disabled", false);
             },
 
             error: function (xhr) {

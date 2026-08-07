@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-024");
+    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-025");
     const el = document.getElementById('resident_id_gt');
 
     logDebugGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -45,7 +45,7 @@ $(function () {
 
         $.ajax({
 
-            url: '/grease-trap-disabled-dates-mobile',
+            url: "/grease-trap-disabled-dates-mobile",
             type: "GET",
 
             beforeSend: function () {
@@ -143,7 +143,7 @@ $(function () {
 
         $.ajax({
 
-            url: '/grease-trap-disabled-dates-mobile',
+            url: "/grease-trap-disabled-dates-mobile",
             type: "GET",
 
             beforeSend: function () {

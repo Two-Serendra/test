@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-021");
+    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-022");
     const el = document.getElementById('resident_id_gt');
 
     logDebugGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -131,6 +131,9 @@ $(function () {
                 }
 
                 fp.set("disable", res.disabled_dates || []);
+
+                fp.jumpToDate(fp.selectedDates[0] || new Date());
+
                 fp.redraw();
 
                 logDebugGt("Disabled dates applied:");

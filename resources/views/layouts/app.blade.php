@@ -101,22 +101,22 @@
         });
     </script>
     <script
-        src="{{ asset('assets/frontend/js/mobile-app/ausi-booking-mobile.js') }}?v={{ filemtime(public_path('assets/frontend/js/mobile-app/ausi-booking-mobile.js')) }}"></script>
+        src="{{ asset('assets/frontend/js/mobile-app/ausi-booking-mobile-v2.js') }}?v={{ filemtime(public_path('assets/frontend/js/mobile-app/ausi-booking-mobile.js')) }}"></script>
 
     <script
-        src="{{ asset('assets/frontend/js/mobile-app/ausi-booking-history-mobile.js') }}?v={{ filemtime(public_path('assets/frontend/js/mobile-app/ausi-booking-history-mobile.js')) }}"></script>
+        src="{{ asset('assets/frontend/js/mobile-app/ausi-booking-history-mobile-v2.js') }}?v={{ filemtime(public_path('assets/frontend/js/mobile-app/ausi-booking-history-mobile.js')) }}"></script>
 
     <script
-        src="{{ asset('assets/frontend/js/mobile-app/grease-trap-booking-mobile.js') }}?v={{ filemtime(public_path('assets/frontend/js/mobile-app/grease-trap-booking-mobile.js')) }}"></script>
+        src="{{ asset('assets/frontend/js/mobile-app/grease-trap-booking-mobile-v2.js') }}?v={{ filemtime(public_path('assets/frontend/js/mobile-app/grease-trap-booking-mobile.js')) }}"></script>
 
     <script
-        src="{{ asset('assets/frontend/js/mobile-app/grease-trap-booking-history-mobile.js') }}?v={{ filemtime(public_path('assets/frontend/js/mobile-app/grease-trap-booking-history-mobile.js')) }}"></script>
+        src="{{ asset('assets/frontend/js/mobile-app/grease-trap-booking-history-mobile-v2.js') }}?v={{ filemtime(public_path('assets/frontend/js/mobile-app/grease-trap-booking-history-mobile.js')) }}"></script>
 
     <script
-        src="{{ asset('assets/frontend/js/mobile-app/pest-control-booking-mobile.js') }}?v={{ filemtime(public_path('assets/frontend/js/mobile-app/pest-control-booking-mobile.js')) }}"></script>
+        src="{{ asset('assets/frontend/js/mobile-app/pest-control-booking-mobile-v2.js') }}?v={{ filemtime(public_path('assets/frontend/js/mobile-app/pest-control-booking-mobile.js')) }}"></script>
 
     <script
-        src="{{ asset('assets/frontend/js/mobile-app/pest-control-booking-history-mobile.js') }}?v={{ filemtime(public_path('assets/frontend/js/mobile-app/pest-control-booking-history-mobile.js')) }}"></script>
+        src="{{ asset('assets/frontend/js/mobile-app/pest-control-booking-history-mobile-v2.js') }}?v={{ filemtime(public_path('assets/frontend/js/mobile-app/pest-control-booking-history-mobile.js')) }}"></script>
 
 
 </body>

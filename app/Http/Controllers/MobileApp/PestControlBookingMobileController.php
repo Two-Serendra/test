@@ -49,26 +49,30 @@ class PestControlBookingMobileController extends Controller
             "Sequoia" => "I",
         ];
 
-        $parts = explode(' ', $unitName);
+        // Parse tower and unit number using the last space
+        $lastSpace = strrpos($unitName, ' ');
 
-        if (count($parts) !== 2) {
+        if ($lastSpace === false) {
             return response()->json([
                 'message' => 'Invalid unit format',
                 'unit' => $unitName
             ], 422);
         }
 
-        [$tower, $number] = $parts;
+        $tower = trim(substr($unitName, 0, $lastSpace));
+        $number = trim(substr($unitName, $lastSpace + 1));
 
         $towerLetter = $map[$tower] ?? null;
 
         if (!$towerLetter) {
             return response()->json([
-                'message' => 'Unknown tower'
+                'message' => 'Unknown tower',
+                'tower' => $tower
             ], 422);
         }
 
         $unitNo = $number . $towerLetter;
+
         $areaLetter = strtoupper($towerLetter);
         $lowrise = ['A', 'B', 'C', 'D', 'E'];
         $highrise = ['F', 'G', 'H', 'I'];
@@ -234,26 +238,30 @@ class PestControlBookingMobileController extends Controller
                     "Meranti" => "H",
                     "Sequoia" => "I",
                 ];
+                
+                $lastSpace = strrpos($unitName, ' ');
 
-                $parts = explode(' ', $unitName);
-
-                if (count($parts) !== 2) {
+                if ($lastSpace === false) {
                     return response()->json([
-                        'message' => 'Invalid unit format'
+                        'message' => 'Invalid unit format',
+                        'unit' => $unitName
                     ], 422);
                 }
 
-                [$tower, $number] = $parts;
+                $tower = trim(substr($unitName, 0, $lastSpace));
+                $number = trim(substr($unitName, $lastSpace + 1));
 
                 $towerLetter = $map[$tower] ?? null;
 
                 if (!$towerLetter) {
                     return response()->json([
-                        'message' => 'Unknown tower'
+                        'message' => 'Unknown tower',
+                        'tower' => $tower
                     ], 422);
                 }
 
                 $unitNo = $number . $towerLetter;
+
                 $residentType = $request->mobile_unit_role;
                 $bookingDate = Carbon::parse(
                     $request->booking_date

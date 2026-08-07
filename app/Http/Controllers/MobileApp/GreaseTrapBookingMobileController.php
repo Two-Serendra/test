@@ -163,15 +163,28 @@ class GreaseTrapBookingMobileController extends Controller
                     "Sequoia" => "I",
                 ];
 
-                $parts = explode(' ', $unitName);
+                $lastSpace = strrpos($unitName, ' ');
 
-                if (count($parts) !== 2) {
+                if ($lastSpace === false) {
                     return response()->json([
-                        'message' => 'Invalid unit format'
+                        'message' => 'Invalid unit format',
+                        'unit' => $unitName
                     ], 422);
                 }
 
-                [$tower, $number] = $parts;
+                $tower = trim(substr($unitName, 0, $lastSpace));
+                $number = trim(substr($unitName, $lastSpace + 1));
+
+                $towerLetter = $map[$tower] ?? null;
+
+                if (!$towerLetter) {
+                    return response()->json([
+                        'message' => 'Unknown tower',
+                        'tower' => $tower
+                    ], 422);
+                }
+
+                $unitNo = $number . $towerLetter;
 
                 $towerLetter = $map[$tower] ?? null;
 

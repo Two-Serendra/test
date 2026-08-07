@@ -57,25 +57,29 @@ class AusiBookingMobileController extends Controller
             "Sequoia" => "I",
         ];
 
-        $parts = explode(' ', $unitName);
+        $lastSpace = strrpos($unitName, ' ');
 
-        if (count($parts) !== 2) {
+        if ($lastSpace === false) {
             return response()->json([
                 'message' => 'Invalid unit format',
                 'unit' => $unitName
             ], 422);
         }
 
-        [$tower, $number] = $parts;
+        $tower = trim(substr($unitName, 0, $lastSpace));
+        $number = trim(substr($unitName, $lastSpace + 1));
 
         $towerLetter = $map[$tower] ?? null;
 
         if (!$towerLetter) {
             return response()->json([
                 'message' => 'Unknown tower',
+                'tower' => $tower,
             ], 422);
         }
+
         $unitNo = $number . $towerLetter;
+
         $areaLetter = strtoupper($towerLetter);
         $lowrise = ['A', 'B', 'C', 'D', 'E'];
         $highrise = ['F', 'G', 'H', 'I'];
@@ -175,7 +179,7 @@ class AusiBookingMobileController extends Controller
                 'disabled_dates' => array_values($disabledDates)
             ]);
         }
-        
+
         $bookings = AusiBooking::whereDate('booking_date', $request->date)
             ->where('booking_status', '!=', 0)
             ->get(['booking_time_slot', 'unit_area']);
@@ -268,16 +272,17 @@ class AusiBookingMobileController extends Controller
             "Sequoia" => "I",
         ];
 
-        $parts = explode(' ', $unitName);
+        $lastSpace = strrpos($unitName, ' ');
 
-        if (count($parts) !== 2) {
+        if ($lastSpace === false) {
             return response()->json([
                 'message' => 'Invalid unit format',
                 'unit' => $unitName
             ], 422);
         }
 
-        [$tower, $number] = $parts;
+        $tower = trim(substr($unitName, 0, $lastSpace));
+        $number = trim(substr($unitName, $lastSpace + 1));
 
         $towerLetter = $map[$tower] ?? null;
 

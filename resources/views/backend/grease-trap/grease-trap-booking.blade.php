@@ -19,7 +19,6 @@
                         </div>
                     </form>
                 </div>
-                Version: {{ config('app.version') }}
 
                 <div class="col-6 d-flex justify-content-end align-items-center">
 

@@ -108,6 +108,8 @@ class GreaseTrapBookingMobileController extends Controller
 
     public function getDisabledGreaseTrapDatesMobile()
     {
+        \Log::info('Disabled dates endpoint hit');
+
         $totalSlots = 7;
 
         $disabledDates = GreaseTrapBooking::selectRaw("
@@ -118,10 +120,12 @@ class GreaseTrapBookingMobileController extends Controller
             ->groupBy('booking_date')
             ->havingRaw('COUNT(DISTINCT booking_time_slot) >= ?', [$totalSlots])
             ->pluck('booking_date')
-            ->map(function ($date) {
-                return Carbon::parse($date)->format('Y-m-d');
-            })
+            ->map(fn($date) => \Carbon\Carbon::parse($date)->format('Y-m-d'))
             ->values();
+
+        \Log::info('Disabled dates', [
+            'dates' => $disabledDates
+        ]);
 
         return response()->json([
             'disabled_dates' => $disabledDates

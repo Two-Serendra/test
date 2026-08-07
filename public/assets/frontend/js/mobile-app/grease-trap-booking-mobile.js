@@ -1,5 +1,5 @@
 $(function () {
-    // alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-018");
+    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-019");
     const el = document.getElementById('resident_id_gt');
 
     logDebugGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -30,35 +30,90 @@ $(function () {
 
     const $bookingSlots = $('.gt-booking-slot');
     reloadDisabledGtDates();
-    
-    $.get('/grease-trap-disabled-dates-mobile', function (res) {
 
-        flatpickr("#GtBookingDate", {
-            dateFormat: "Y-m-d",
-            minDate: new Date().fp_incr(1),
-            disableMobile: true,
 
-            // Disable fully booked dates
-            disable: res.disabled_dates || [],
+    logDebugGt("Loading disabled dates...");
 
-            onChange: function (selectedDates, dateStr) {
-                window.gtState.date = dateStr;
-                console.log("DATE:", dateStr);
-                logDebugGt("DATE CHANGED: " + dateStr);
-                triggerUpdateGt();
+    $.get('/grease-trap-disabled-dates-mobile')
+
+        .done(function (res) {
+
+            logDebugGt("AJAX SUCCESS");
+            logDebugGt("Response:", res);
+
+            if (!res.disabled_dates) {
+                logDebugGt("disabled_dates missing!");
             }
+
+            logDebugGt("Initializing Flatpickr...");
+
+            flatpickr("#GtBookingDate", {
+                dateFormat: "Y-m-d",
+                minDate: new Date().fp_incr(1),
+                disableMobile: true,
+                disable: res.disabled_dates || [],
+
+                onReady: function () {
+                    logDebugGt("Flatpickr READY");
+                },
+
+                onOpen: function () {
+                    logDebugGt("Calendar OPENED");
+                },
+
+                onChange: function (selectedDates, dateStr) {
+
+                    logDebugGt("DATE SELECTED: " + dateStr);
+
+                    window.gtState.date = dateStr;
+
+                    triggerUpdateGt();
+                }
+
+            });
+
+            logDebugGt("Flatpickr initialized.");
+
+        })
+
+        .fail(function (xhr) {
+
+            logDebugGt("AJAX FAILED");
+            logDebugGt("Status: " + xhr.status);
+            logDebugGt("Response: " + xhr.responseText);
+
         });
-
-    });
-
     function reloadDisabledGtDates() {
 
-        $.get('/grease-trap-disabled-dates-mobile', function (res) {
+        logDebugGt("Reloading disabled dates...");
 
-            const fp = document.querySelector("#GtBookingDate")._flatpickr;
+        $.get('/grease-trap-disabled-dates-mobile')
 
-            fp.set('disable', res.disabled_dates || []);
-        });
+            .done(function (res) {
+
+                logDebugGt("Reload success");
+                logDebugGt(res);
+
+                const fp = document.querySelector("#GtBookingDate")._flatpickr;
+
+                if (!fp) {
+                    logDebugGt("Flatpickr instance NOT FOUND");
+                    return;
+                }
+
+                fp.set('disable', res.disabled_dates || []);
+
+                logDebugGt("Disabled dates updated");
+
+            })
+
+            .fail(function (xhr) {
+
+                logDebugGt("Reload failed");
+                logDebugGt(xhr.status);
+                logDebugGt(xhr.responseText);
+
+            });
 
     }
 

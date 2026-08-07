@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-023");
+    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-021");
     const el = document.getElementById('resident_id_gt');
 
     logDebugGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -30,22 +30,17 @@ $(function () {
 
     const $bookingSlots = $('.gt-booking-slot');
 
-    const input = document.querySelector("#GtBookingDate");
-
-    if (input._flatpickr) {
-        input._flatpickr.destroy();
-    }
-
-    flatpickr(input, {
+    flatpickr("#GtBookingDate", {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(1),
         disableMobile: true,
-        disable: res.disabled_dates || [],
-
         onChange: function (selectedDates, dateStr) {
             window.gtState.date = dateStr;
+            console.log("DATE:", dateStr);
+            logDebugGt("DATE CHANGED: " + dateStr);
             triggerUpdateGt();
         }
+
     });
 
     document.addEventListener('change', function (e) {

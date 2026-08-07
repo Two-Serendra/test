@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-023");
+    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-024");
     const el = document.getElementById('resident_id_gt');
 
     logDebugGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -34,9 +34,14 @@ $(function () {
 
     function initGtCalendar() {
 
-        logDebugGt("Loading disabled dates...");
-        logDebugGt("Current URL: " + window.location.href);
-        logDebugGt("Request URL: " + disabledDatesUrl);
+        logDebugGt("==========================");
+        logDebugGt("INIT GT CALENDAR");
+        logDebugGt("==========================");
+
+        logDebugGt("Current URL:");
+        logDebugGt(window.location.href);
+
+        logDebugGt("Input exists: " + !!document.querySelector("#GtBookingDate"));
 
         $.ajax({
 
@@ -44,47 +49,85 @@ $(function () {
             type: "GET",
 
             beforeSend: function () {
-                logDebugGt("Sending request...");
+
+                logDebugGt("AJAX START");
+
             },
 
             success: function (res) {
 
-                logDebugGt("Disabled dates loaded");
-                logDebugGt(res);
+                logDebugGt("AJAX SUCCESS");
 
-                flatpickr("#GtBookingDate", {
-                    dateFormat: "Y-m-d",
-                    minDate: new Date().fp_incr(1),
-                    disableMobile: true,
-                    disable: res.disabled_dates || [],
+                try {
 
-                    onReady: function () {
-                        logDebugGt("Flatpickr READY");
-                    },
+                    logDebugGt("Response:");
+                    logDebugGt(JSON.stringify(res));
 
-                    onOpen: function () {
-                        logDebugGt("Calendar OPEN");
-                    },
+                } catch (e) {
 
-                    onChange: function (selectedDates, dateStr) {
+                    logDebugGt("Could not stringify response");
 
-                        window.gtState.date = dateStr;
+                }
 
-                        logDebugGt("DATE=" + dateStr);
+                logDebugGt("disabled_dates exists: " + ('disabled_dates' in res));
 
-                        triggerUpdateGt();
-                    }
-                });
+                logDebugGt("disabled_dates length: " +
+                    ((res.disabled_dates || []).length));
 
-                logDebugGt("Flatpickr initialized");
+                logDebugGt("Creating Flatpickr...");
+
+                try {
+
+                    const fp = flatpickr("#GtBookingDate", {
+
+                        dateFormat: "Y-m-d",
+                        minDate: new Date().fp_incr(1),
+                        disableMobile: true,
+                        disable: res.disabled_dates || [],
+
+                        onReady: function () {
+
+                            logDebugGt("Flatpickr READY");
+
+                        },
+
+                        onOpen: function () {
+
+                            logDebugGt("Calendar OPEN");
+
+                        },
+
+                        onChange: function (selectedDates, dateStr) {
+
+                            logDebugGt("DATE SELECTED: " + dateStr);
+
+                            window.gtState.date = dateStr;
+
+                            triggerUpdateGt();
+
+                        }
+
+                    });
+
+                    logDebugGt("Flatpickr CREATED");
+                    logDebugGt(fp);
+
+                } catch (e) {
+
+                    logDebugGt("FLATPICKR ERROR");
+                    logDebugGt(e.message);
+                    console.error(e);
+
+                }
 
             },
 
             error: function (xhr) {
 
-                logDebugGt("FAILED");
+                logDebugGt("AJAX FAILED");
                 logDebugGt("Status: " + xhr.status);
-                logDebugGt("Response: " + xhr.responseText);
+                logDebugGt("Response:");
+                logDebugGt(xhr.responseText);
 
             }
 
@@ -94,37 +137,59 @@ $(function () {
 
     function reloadDisabledGtDates() {
 
-        logDebugGt("Reloading disabled dates...");
-        logDebugGt("Request URL: " + disabledDatesUrl);
+        logDebugGt("==========================");
+        logDebugGt("RELOAD DISABLED DATES");
+        logDebugGt("==========================");
 
         $.ajax({
 
             url: '/grease-trap-disabled-dates-mobile',
             type: "GET",
 
+            beforeSend: function () {
+
+                logDebugGt("Reload AJAX START");
+
+            },
+
             success: function (res) {
 
-                logDebugGt("Reload success");
-                logDebugGt(res);
+                logDebugGt("Reload AJAX SUCCESS");
 
-                const fp = document.querySelector("#GtBookingDate")._flatpickr;
+                const input = document.querySelector("#GtBookingDate");
 
-                if (!fp) {
-                    logDebugGt("Flatpickr instance NOT FOUND");
+                logDebugGt("Input exists: " + !!input);
+
+                if (!input) {
+                    logDebugGt("Input NOT FOUND");
                     return;
                 }
 
+                const fp = input._flatpickr;
+
+                logDebugGt("Flatpickr exists: " + !!fp);
+
+                if (!fp) {
+
+                    logDebugGt("Flatpickr instance NOT FOUND");
+
+                    return;
+
+                }
+
+                logDebugGt("Updating disabled dates");
+
                 fp.set('disable', res.disabled_dates || []);
 
-                logDebugGt("Disabled dates updated");
+                logDebugGt("Disabled dates UPDATED");
 
             },
 
             error: function (xhr) {
 
-                logDebugGt("Reload failed");
-                logDebugGt("Status: " + xhr.status);
-                logDebugGt("Response: " + xhr.responseText);
+                logDebugGt("Reload AJAX FAILED");
+                logDebugGt(xhr.status);
+                logDebugGt(xhr.responseText);
 
             }
 

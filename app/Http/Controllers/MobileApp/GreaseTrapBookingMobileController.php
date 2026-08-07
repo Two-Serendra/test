@@ -104,6 +104,30 @@ class GreaseTrapBookingMobileController extends Controller
             'blocked_slots' => $blockedSlots
         ]);
     }
+
+
+    public function getDisabledGreaseTrapDatesMobile()
+    {
+        $totalSlots = 7;
+
+        $disabledDates = GreaseTrapBooking::selectRaw("
+            DATE(booking_date) as booking_date,
+            COUNT(DISTINCT booking_time_slot) as total
+        ")
+            ->where('booking_status', 1)
+            ->groupBy('booking_date')
+            ->havingRaw('COUNT(DISTINCT booking_time_slot) >= ?', [$totalSlots])
+            ->pluck('booking_date')
+            ->map(function ($date) {
+                return Carbon::parse($date)->format('Y-m-d');
+            })
+            ->values();
+
+        return response()->json([
+            'disabled_dates' => $disabledDates
+        ]);
+    }
+
     public function storeGreaseTrapBookingMobile(Request $request)
     {
         $maxRetries = 3;

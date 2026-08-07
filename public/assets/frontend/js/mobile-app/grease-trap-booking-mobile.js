@@ -29,19 +29,38 @@ $(function () {
     };
 
     const $bookingSlots = $('.gt-booking-slot');
+    reloadDisabledGtDates();
+    
+    $.get('/grease-trap-disabled-dates-mobile', function (res) {
 
-    flatpickr("#GtBookingDate", {
-        dateFormat: "Y-m-d",
-        minDate: new Date().fp_incr(1),
-        disableMobile: true,
-        onChange: function (selectedDates, dateStr) {
-            window.gtState.date = dateStr;
-            console.log("DATE:", dateStr);
-            logDebugGt("DATE CHANGED: " + dateStr);
-            triggerUpdateGt();
-        }
+        flatpickr("#GtBookingDate", {
+            dateFormat: "Y-m-d",
+            minDate: new Date().fp_incr(1),
+            disableMobile: true,
+
+            // Disable fully booked dates
+            disable: res.disabled_dates || [],
+
+            onChange: function (selectedDates, dateStr) {
+                window.gtState.date = dateStr;
+                console.log("DATE:", dateStr);
+                logDebugGt("DATE CHANGED: " + dateStr);
+                triggerUpdateGt();
+            }
+        });
 
     });
+
+    function reloadDisabledGtDates() {
+
+        $.get('/grease-trap-disabled-dates-mobile', function (res) {
+
+            const fp = document.querySelector("#GtBookingDate")._flatpickr;
+
+            fp.set('disable', res.disabled_dates || []);
+        });
+
+    }
 
     document.addEventListener('change', function (e) {
         if (e.target && e.target.id === 'resident_id_gt') {
@@ -493,8 +512,8 @@ $(function () {
             showCancelButton: true,
             confirmButtonText: 'Yes, Proceed',
             cancelButtonText: 'Cancel',
-            confirmButtonColor: '#0d6efd', 
-            cancelButtonColor: '#6c757d',   
+            confirmButtonColor: '#0d6efd',
+            cancelButtonColor: '#6c757d',
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {

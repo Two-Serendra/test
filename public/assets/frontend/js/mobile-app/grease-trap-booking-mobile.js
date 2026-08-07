@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-021");
+    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-022");
     const el = document.getElementById('resident_id_gt');
 
     logDebugGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -29,14 +29,26 @@ $(function () {
     };
 
     const $bookingSlots = $('.gt-booking-slot');
+    const disabledDatesUrl = "{{ route('grease.trap.disabled.dates.mobile') }}";
+
     initGtCalendar();
+
     function initGtCalendar() {
 
         logDebugGt("Loading disabled dates...");
+        logDebugGt("Current URL: " + window.location.href);
+        logDebugGt("Request URL: " + disabledDatesUrl);
 
-        $.get('/grease-trap-disabled-dates-mobile')
+        $.ajax({
 
-            .done(function (res) {
+            url: disabledDatesUrl,
+            type: "GET",
+
+            beforeSend: function () {
+                logDebugGt("Sending request...");
+            },
+
+            success: function (res) {
 
                 logDebugGt("Disabled dates loaded");
                 logDebugGt(res);
@@ -51,6 +63,10 @@ $(function () {
                         logDebugGt("Flatpickr READY");
                     },
 
+                    onOpen: function () {
+                        logDebugGt("Calendar OPEN");
+                    },
+
                     onChange: function (selectedDates, dateStr) {
 
                         window.gtState.date = dateStr;
@@ -61,25 +77,33 @@ $(function () {
                     }
                 });
 
-            })
+                logDebugGt("Flatpickr initialized");
 
-            .fail(function (xhr) {
+            },
+
+            error: function (xhr) {
 
                 logDebugGt("FAILED");
-                logDebugGt(xhr.status);
-                logDebugGt(xhr.responseText);
+                logDebugGt("Status: " + xhr.status);
+                logDebugGt("Response: " + xhr.responseText);
 
-            });
+            }
+
+        });
 
     }
 
     function reloadDisabledGtDates() {
 
         logDebugGt("Reloading disabled dates...");
+        logDebugGt("Request URL: " + disabledDatesUrl);
 
-        $.get('/grease-trap-disabled-dates-mobile')
+        $.ajax({
 
-            .done(function (res) {
+            url: disabledDatesUrl,
+            type: "GET",
+
+            success: function (res) {
 
                 logDebugGt("Reload success");
                 logDebugGt(res);
@@ -95,15 +119,17 @@ $(function () {
 
                 logDebugGt("Disabled dates updated");
 
-            })
+            },
 
-            .fail(function (xhr) {
+            error: function (xhr) {
 
                 logDebugGt("Reload failed");
-                logDebugGt(xhr.status);
-                logDebugGt(xhr.responseText);
+                logDebugGt("Status: " + xhr.status);
+                logDebugGt("Response: " + xhr.responseText);
 
-            });
+            }
+
+        });
 
     }
 

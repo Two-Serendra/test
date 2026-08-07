@@ -1,5 +1,5 @@
 $(function () {
-    // alert("🔥 Pest Control JS VERSION 2026-06-15-0011");
+    alert("🔥 Pest Control JS VERSION 2026-06-15-0012");
     const el = document.getElementById('resident_id_pc');
 
     logDebugPc("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -61,7 +61,7 @@ $(function () {
         console.log("UNIT:", value);
         logDebugPc("UNIT CHANGED: " + value);
         logDebugPc("CHANGE FIRED");
-
+        loadDisabledDatesPc(value);
         triggerUpdatePc();
     };
 
@@ -78,7 +78,7 @@ $(function () {
             hideLoadingPc();
             return;
         }
-        loadDisabledDatesPc(value);
+
         updateSlotsPc(date, unit);
     }
 

@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-020");
+    alert("🔥GT BOOKING MOBILE JS VERSION 2026-06-15-021");
     const el = document.getElementById('resident_id_gt');
 
     logDebugGt("SELECT EXISTS: " + (el ? "YES" : "NO"));
@@ -127,19 +127,20 @@ $(function () {
                 logDebugGt(res);
 
                 const fp = document.querySelector("#GtBookingDate")._flatpickr;
-                logDebugPc(fp.config.disable);
+
                 if (!fp) {
-
                     logDebugGt("Flatpickr instance not found!");
-
                     return;
                 }
 
                 fp.set("disable", res.disabled_dates || []);
+                fp.redraw();
 
                 logDebugGt("Disabled dates applied:");
                 logDebugGt(res.disabled_dates);
 
+                logDebugGt("Flatpickr config:");
+                logDebugGt(fp.config.disable);
             },
 
             error: function (xhr) {

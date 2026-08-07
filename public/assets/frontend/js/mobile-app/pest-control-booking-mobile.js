@@ -78,8 +78,44 @@ $(function () {
             hideLoadingPc();
             return;
         }
-
+        loadDisabledDatesPc(value);
         updateSlotsPc(date, unit);
+    }
+
+    function loadDisabledDatesPc(unitName) {
+
+        logDebugPc("Loading disabled dates...");
+
+        $.ajax({
+
+            url: "/pest-control-booked-slots-mobile",
+            type: "GET",
+
+            data: {
+                unit_name: unitName
+            },
+
+            success: function (res) {
+
+                const fp = document.querySelector("#PestControlBookingDate")._flatpickr;
+
+                if (!fp) return;
+
+                fp.clear();
+
+                window.pcState.date = null;
+
+                fp.set("disable", res.disabled_dates || []);
+
+                $("#PestControlBookingDate").prop("disabled", false);
+
+                logDebugPc("Disabled dates loaded");
+                logDebugPc(res);
+
+            }
+
+        });
+
     }
 
     function updateSlotsPc(date, unitName) {
@@ -105,7 +141,7 @@ $(function () {
             $.ajax({
 
                 url: "/pest-control-booked-slots-mobile",
-                type: "GET", 
+                type: "GET",
                 data: { date, unit_name: unitName },
 
                 beforeSend: function () {

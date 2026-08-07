@@ -69,20 +69,7 @@ class PestControlBookingMobileController extends Controller
         }
 
         $unitNo = $number . $towerLetter;
-
-        // $resident = ResidentDetails::where('unit_no', $unitNo)->first();
-
-        // if (!$resident) {
-        //     return response()->json([
-        //         'message' => 'Resident not found',
-        //         'unit_no' => $unitNo
-        //     ], 404);
-        // }
-
-        // $areaLetter = preg_replace('/[^A-Z]/', '', $resident->unit_no);
-
         $areaLetter = strtoupper($towerLetter);
-
         $lowrise = ['A', 'B', 'C', 'D', 'E'];
         $highrise = ['F', 'G', 'H', 'I'];
 
@@ -91,6 +78,80 @@ class PestControlBookingMobileController extends Controller
         $bookings = PestControlBooking::whereDate('booking_date', $request->date)
             ->where('booking_status', 1)
             ->get(['booking_time_slot', 'unit_area']);
+
+        // No date yet? Return disabled dates
+        if (!$request->filled('date')) {
+
+            $slots = [
+                '9:00AM - 10:00AM',
+                '10:00AM - 11:00AM',
+                '11:00AM - 12:00PM',
+                '1:00PM - 2:00PM',
+                '2:00PM - 3:00PM',
+                '3:00PM - 4:00PM',
+                '4:00PM - 5:00PM',
+            ];
+
+            $bookings = PestControlBooking::where('booking_status', 1)
+                ->get([
+                    'booking_date',
+                    'booking_time_slot',
+                    'unit_area'
+                ]);
+
+            $dates = [];
+
+            foreach ($bookings as $booking) {
+
+                $date = Carbon::parse($booking->booking_date)->format('Y-m-d');
+
+                if (!isset($dates[$date])) {
+                    $dates[$date] = [];
+                }
+
+                if (!isset($dates[$date][$booking->booking_time_slot])) {
+
+                    $dates[$date][$booking->booking_time_slot] = [
+                        'lowrise' => false,
+                        'highrise' => false,
+                    ];
+                }
+
+                if (in_array($booking->unit_area, $lowrise)) {
+                    $dates[$date][$booking->booking_time_slot]['lowrise'] = true;
+                }
+
+                if (in_array($booking->unit_area, $highrise)) {
+                    $dates[$date][$booking->booking_time_slot]['highrise'] = true;
+                }
+            }
+
+            $disabledDates = [];
+
+            foreach ($dates as $date => $slotData) {
+
+                $full = true;
+
+                foreach ($slots as $slot) {
+
+                    if (
+                        empty($slotData[$slot]) ||
+                        !$slotData[$slot][$userGroup]
+                    ) {
+                        $full = false;
+                        break;
+                    }
+                }
+
+                if ($full) {
+                    $disabledDates[] = $date;
+                }
+            }
+
+            return response()->json([
+                'disabled_dates' => $disabledDates
+            ]);
+        }
 
         $slotStatus = [];
 

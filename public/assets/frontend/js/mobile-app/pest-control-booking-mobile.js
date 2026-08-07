@@ -1,5 +1,5 @@
 $(function () {
-    alert("🔥 Pest Control JS VERSION 2026-06-15-0012");
+    // alert("🔥 Pest Control JS VERSION 2026-06-15-0012");
     const el = document.getElementById('resident_id_pc');
 
     logDebugPc("SELECT EXISTS: " + (el ? "YES" : "NO"));

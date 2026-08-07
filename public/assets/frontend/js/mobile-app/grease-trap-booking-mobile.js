@@ -18,7 +18,7 @@ $(function () {
         if (el) {
             el.innerHTML += msg + "<br>";
             el.scrollTop = el.scrollHeight;
-        }
+        } 
     }
 
     logDebugGt("🚀 Mobile Booking JS Loaded 2026-06-15-022");

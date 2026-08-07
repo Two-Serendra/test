@@ -76,10 +76,9 @@ class PestControlBookingMobileController extends Controller
         $userGroup = in_array($areaLetter, $lowrise) ? 'lowrise' : 'highrise';
 
         $bookings = PestControlBooking::whereDate('booking_date', $request->date)
-            ->where('booking_status', 1)
+            ->where('booking_status', '!=', 0)
             ->get(['booking_time_slot', 'unit_area']);
 
-        // No date yet? Return disabled dates
         if (!$request->filled('date')) {
 
             $slots = [
@@ -92,7 +91,7 @@ class PestControlBookingMobileController extends Controller
                 '4:00PM - 5:00PM',
             ];
 
-            $bookings = PestControlBooking::where('booking_status', 1)
+            $bookings = PestControlBooking::where('booking_status', '!=', 0)
                 ->get([
                     'booking_date',
                     'booking_time_slot',
@@ -304,7 +303,7 @@ class PestControlBookingMobileController extends Controller
                     'unit_no',
                     strtoupper($unitNo)
                 )
-                    ->where('booking_status', 1)
+                    ->where('booking_status', '!=', 0)
                     ->whereBetween('booking_date', [$monthStart, $monthEnd])
                     ->lockForUpdate()
                     ->count();
@@ -329,7 +328,7 @@ class PestControlBookingMobileController extends Controller
                     $bookingDate
                 )
                     ->whereIn('unit_area', $towerAreas)
-                    ->where('booking_status', 1)
+                    ->where('booking_status', '!=', 0)
                     ->lockForUpdate()
                     ->get();
 
@@ -356,7 +355,7 @@ class PestControlBookingMobileController extends Controller
                         'unit_no',
                         strtoupper($unitNo)
                     )
-                    ->where('booking_status', 1)
+                    ->where('booking_status', '!=', 0)
                     ->lockForUpdate()
                     ->exists();
 

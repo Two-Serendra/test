@@ -84,7 +84,10 @@ $(function () {
 
     function loadDisabledDatesPc(unitName) {
 
-        logDebugPc("Loading disabled dates...");
+        logDebugPc("==========================");
+        logDebugPc("LOAD DISABLED DATES");
+        logDebugPc("==========================");
+        logDebugPc("UNIT: " + unitName);
 
         $.ajax({
 
@@ -95,29 +98,48 @@ $(function () {
                 unit_name: unitName
             },
 
+            beforeSend: function () {
+                logDebugPc("Loading disabled dates...");
+            },
+
             success: function (res) {
+
+                logDebugPc("Disabled dates loaded");
+                logDebugPc(res);
 
                 const fp = document.querySelector("#PestControlBookingDate")._flatpickr;
 
-                if (!fp) return;
-
+                if (!fp) {
+                    logDebugPc("Flatpickr instance not found!");
+                    return;
+                }
                 fp.clear();
-
                 window.pcState.date = null;
 
                 fp.set("disable", res.disabled_dates || []);
 
+                fp.jumpToDate(fp.selectedDates[0] || new Date());
+                fp.redraw();
                 $("#PestControlBookingDate").prop("disabled", false);
 
-                logDebugPc("Disabled dates loaded");
-                logDebugPc(res);
+                logDebugPc("Disabled dates applied:");
+                logDebugPc(res.disabled_dates);
+
+                logDebugPc("Flatpickr config:");
+                logDebugPc(fp.config.disable);
+            },
+
+            error: function (xhr) {
+
+                logDebugPc("Failed loading disabled dates");
+                logDebugPc(xhr.status);
+                logDebugPc(xhr.responseText);
 
             }
 
         });
 
     }
-
     function updateSlotsPc(date, unitName) {
 
         logDebugPc("ENTERED updateSlotsPc");

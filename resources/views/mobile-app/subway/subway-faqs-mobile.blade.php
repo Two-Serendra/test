@@ -94,7 +94,7 @@
                 </p>
 
                 <small class="text-muted">
-                    Last Updated: July 2026
+                    Last Updated: August 2026
                 </small>
 
             </div>

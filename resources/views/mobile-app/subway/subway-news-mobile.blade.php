@@ -48,7 +48,7 @@
     </div>
     @foreach($documents as $document)
 
-        <a href="{{ $document['url'] }}" class="text-decoration-none">
+        <a href="{{ $document['url'] }}" onclick="openDocument(event, this.href);" class="text-decoration-none">
 
             <div class="card border-0 shadow-sm mb-3 document-card">
 
@@ -84,6 +84,30 @@
         </a>
 
     @endforeach
+
+
+    <script>
+        function openDocument(event, url) {
+
+            event.preventDefault();
+
+            console.log('Opening document:', url);
+
+            // Try parent window first
+            if (window.parent && window.parent !== window) {
+
+                window.parent.postMessage({
+                    type: 'OPEN_EXTERNAL_URL',
+                    url: url
+                }, '*');
+
+            } else {
+
+                window.location.href = url;
+
+            }
+        }
+    </script>
 </div>
 
 <style>

@@ -86,8 +86,8 @@
         <div class="" x-data="faqsMobile()">
             <div class="text-center mb-4">
                 <!-- <h3 class="fw-bold text-success mb-2">
-                                Metro Manila Subway FAQs
-                            </h3> -->
+                                                            Metro Manila Subway FAQs
+                                                        </h3> -->
 
                 <p class="text-success mb-0">
                     Information for Two Serendra Residents
@@ -141,9 +141,11 @@
 
                     <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
                         <div class="accordion-body" style="color: #666 !important;">
-                            The construction is part of the Metro Manila Subway Project,
-                            which aims to improve public transportation by connecting key
-                            areas of Metro Manila through an underground railway system.
+                            The construction is part of the Metro Manila Subway Project, which aims to improve public
+                            transportation by connecting key areas of Metro Manila through an underground railway system.
+
+                            The Bonifacio Global City (BGC) Station will be constructed under Mckinley Parkway between
+                            Serendra and Market Market.
                         </div>
                     </div>
                 </div>
@@ -166,9 +168,11 @@
 
                     <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                         <div class="accordion-body">
-                            Temporary lane closures, traffic rerouting, and longer travel
-                            times may occur while construction is ongoing. Residents are
-                            encouraged to monitor official traffic advisories.
+                            During the initial Advanced Works stage of construction (involving tree cutting/relocation,
+                            utility relocation, etc) residents can expect temporary closures of vehicular lanes and sidewalk
+                            of Mckinley Parkway. Once the main construction works (excavation, diaphragm wall construction,
+                            etc) begin, Mckinley Parkway between 32nd and 26th streets will be closed to both vehicular and
+                            pedestrian traffic.
                         </div>
                     </div>
                 </div>
@@ -181,7 +185,7 @@
                             <i class='bx bx-help-circle me-2 faq-icon'></i>
 
                             <span class="flex-grow-1">
-                                Will residents still have access to Two Serendra?
+                                How will residents access Two Serendra?
                             </span>
 
                             <i class='bx bx-chevron-right faq-chevron'></i>
@@ -191,9 +195,16 @@
 
                     <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                         <div class="accordion-body">
-                            Yes. Access to residential buildings will remain available.
-                            However, some entry and exit routes may be adjusted from time
-                            to time to ensure safety during construction.
+                            Once Mckinley Parkway is fully closed, the Almond pedestrian gate and the Belize/Callery Gate
+                            will be closed until the street is reopened towards the end of construction works. During this
+                            time all pedestrian and vehicular ingress and egress to and from Two Serendra Low Rise will go
+                            through the Almond, Dolce/Encino Gates along 11th Avenue as well as the lobby at the retail
+                            area. The gate along 26th Street under the pedestrian footbridge will be opened for pedestrians
+                            only.
+
+                            The PMO is currently coordinating with BGCEA and the Contractor on their proposed Traffic
+                            Management Plan around Two Serendra. Details on this will be disseminated to the Community once
+                            they are available.
                         </div>
                     </div>
                 </div>
@@ -223,78 +234,78 @@
                     </div>
                 </div>
 
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#faq5">
+                <!-- <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#faq5">
 
-                            <i class='bx bx-help-circle me-2 faq-icon'></i>
+                                <i class='bx bx-help-circle me-2 faq-icon'></i>
 
-                            <span class="flex-grow-1">
-                                Will pedestrian access around the property change?
-                            </span>
+                                <span class="flex-grow-1">
+                                    Will pedestrian access around the property change?
+                                </span>
 
-                            <i class='bx bx-chevron-right faq-chevron'></i>
+                                <i class='bx bx-chevron-right faq-chevron'></i>
 
-                        </button>
-                    </h2>
+                            </button>
+                        </h2>
 
-                    <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            Pedestrian access will be maintained whenever possible. If a
-                            walkway needs to be temporarily closed, alternative routes will
-                            be clearly marked.
+                        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Pedestrian access will be maintained whenever possible. If a
+                                walkway needs to be temporarily closed, alternative routes will
+                                be clearly marked.
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#faq6">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#faq6">
 
-                            <i class='bx bx-help-circle me-2 faq-icon'></i>
+                                <i class='bx bx-help-circle me-2 faq-icon'></i>
 
-                            <span class="flex-grow-1">
-                                Will vehicle access, drop-off areas, or parking be affected?
-                            </span>
+                                <span class="flex-grow-1">
+                                    Will vehicle access, drop-off areas, or parking be affected?
+                                </span>
 
-                            <i class='bx bx-chevron-right faq-chevron'></i>
+                                <i class='bx bx-chevron-right faq-chevron'></i>
 
-                        </button>
-                    </h2>
+                            </button>
+                        </h2>
 
-                    <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            Some parking spaces, loading zones, or drop-off points near the
-                            construction area may be temporarily relocated.
+                        <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Some parking spaces, loading zones, or drop-off points near the
+                                construction area may be temporarily relocated.
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#faq7">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#faq7">
 
-                            <i class='bx bx-help-circle me-2 faq-icon'></i>
+                                <i class='bx bx-help-circle me-2 faq-icon'></i>
 
-                            <span class="flex-grow-1">
-                                Why is the Metro Manila Subway being built?
-                            </span>
+                                <span class="flex-grow-1">
+                                    Why is the Metro Manila Subway being built?
+                                </span>
 
-                            <i class='bx bx-chevron-right faq-chevron'></i>
+                                <i class='bx bx-chevron-right faq-chevron'></i>
 
-                        </button>
-                    </h2>
+                            </button>
+                        </h2>
 
-                    <div id="faq7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            Once completed, the Metro Manila Subway is expected to provide
-                            faster travel, improve connectivity, and reduce road congestion.
+                        <div id="faq7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Once completed, the Metro Manila Subway is expected to provide
+                                faster travel, improve connectivity, and reduce road congestion.
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </div> -->
 
                 <div class="accordion-item">
                     <h2 class="accordion-header">
@@ -314,9 +325,10 @@
 
                     <div id="faq8" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                         <div class="accordion-body">
-                            Please refer to announcements from the Property Management Office
-                            (PMO), official community notices, and DOTr advisories for the
-                            latest updates.
+                            The PMO is in regular coordination with the DOTR and its Contractor and will release updates via
+                            circular as they become available. Residents may also check this page for updates as well as to
+                            review previously released information. This FAQ will also be updated as more information
+                            becomes available.
                         </div>
                     </div>
                 </div>

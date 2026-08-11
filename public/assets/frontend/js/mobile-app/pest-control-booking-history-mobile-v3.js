@@ -243,29 +243,26 @@ $(function () {
                 let statusText = "";
                 let badgeClass = "";
 
-                if (Number(item.booking_status) === 1) {
+                switch (Number(item.booking_status)) {
 
-                    const bookingDate = new Date(item.booking_date);
+                    case 0:
+                        statusText = "Cancelled";
+                        badgeClass = "bg-danger";
+                        break;
 
-                    // Ignore the time portion like Carbon::isPast() on booking_date
-                    bookingDate.setHours(0, 0, 0, 0);
+                    case 1:
+                        statusText = "Scheduled";
+                        badgeClass = "bg-warning";
+                        break;
 
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-
-                    if (bookingDate < today) {
+                    case 2:
                         statusText = "Completed";
                         badgeClass = "bg-primary";
-                    } else {
-                        statusText = "Booked";
-                        badgeClass = "bg-primary";
-                    }
+                        break;
 
-                } else {
-
-                    statusText = "Cancelled";
-                    badgeClass = "bg-danger";
-
+                    default:
+                        statusText = "Unknown";
+                        badgeClass = "bg-secondary";
                 }
 
                 switch (Number(item.charged_type)) {

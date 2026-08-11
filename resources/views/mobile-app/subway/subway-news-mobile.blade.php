@@ -48,7 +48,7 @@
     </div>
     @foreach($documents as $document)
 
-        <a href="{{ $document['url'] }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+        <a href="{{ $document['url'] }}" class="text-decoration-none">
 
             <div class="card border-0 shadow-sm mb-3 document-card">
 

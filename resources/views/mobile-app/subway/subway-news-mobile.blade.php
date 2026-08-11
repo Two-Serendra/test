@@ -19,19 +19,19 @@
         $documents = [
             [
                 'title' => "Circular 2026-027\nMetro Manila Subway Project – BGC Station\nFebruary 19, 2026",
-                'url' => 'https://drive.google.com/file/d/1GPjfhRVQefWap9mVE1Bo0Fi88BYYpaH3/view?usp=drive_link',
+                'url' => 'https://twoserendraofficial-my.sharepoint.com/personal/itdept_twoserendra_com/Documents/Metro%20Manila%20Subway%20Project/Cir%202026-027%20Metro%20Manila%20Subway%20Project.pdf?CT=1786430060136&OR=ItemsView',
             ],
             [
                 'title' => "Circular 2026-075\nDOTR Subway Project Update\nMay 29, 2026",
-                'url' => 'https://drive.google.com/file/d/1TLuwTugjt0qRSlqLe7mrUawy0GEsGe6T/view?usp=drive_link',
+                'url' => 'https://twoserendraofficial-my.sharepoint.com/personal/itdept_twoserendra_com/Documents/Metro%20Manila%20Subway%20Project/Cir%202026-075%20DOTR%20Subway%20Project%20Update.pdf?CT=1786430013744&OR=ItemsView',
             ],
             [
                 'title' => "Circular 2026-085\nAdvisory on Tree Cutting and Earth Balling\nJune 19, 2026",
-                'url' => 'https://drive.google.com/file/d/10VAC9lYl41-76FEJNHRTX6I2RMlScvrL/view?usp=drive_link',
+                'url' => 'https://twoserendraofficial-my.sharepoint.com/personal/itdept_twoserendra_com/_layouts/15/onedrive.aspx?ga=1&id=%2Fpersonal%2Fitdept%5Ftwoserendra%5Fcom%2FDocuments%2FMetro%20Manila%20Subway%20Project%2FCir%202026%2D085%20Advisory%20on%20Tree%20Cutting%20and%5FEarth%20Balling%20%2D%20Metro%20Manila%20Subway%20Project%2Epdf&parent=%2Fpersonal%2Fitdept%5Ftwoserendra%5Fcom%2FDocuments%2FMetro%20Manila%20Subway%20Project',
             ],
             [
                 'title' => "Circular 2026-101\nTree Cutting Activities Along McKinley Parkway\nJuly 17, 2026",
-                'url' => 'https://drive.google.com/file/d/168k_qM8Syay3OjwKBrgWs5MzMKONdmbZ/view?usp=drive_link',
+                'url' => 'https://twoserendraofficial-my.sharepoint.com/personal/itdept_twoserendra_com/_layouts/15/onedrive.aspx?ga=1&id=%2Fpersonal%2Fitdept%5Ftwoserendra%5Fcom%2FDocuments%2FMetro%20Manila%20Subway%20Project%2FCirc%202026%2D101%20Tree%20Cutting%20Activities%20along%20McKinley%20Parkway%2Epdf&parent=%2Fpersonal%2Fitdept%5Ftwoserendra%5Fcom%2FDocuments%2FMetro%20Manila%20Subway%20Project',
             ],
         ];
     @endphp

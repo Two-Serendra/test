@@ -16,35 +16,24 @@
     </div>
 
     @php
-
         $documents = [
-
             [
                 'title' => "Circular 2026-027\nMetro Manila Subway Project – BGC Station\nFebruary 19, 2026",
-
-                'embed_url' => 'https://twoserendraofficial-my.sharepoint.com/personal/itdept_twoserendra_com/_layouts/15/embed.aspx?UniqueId=5dd81d0d-6b69-4d2c-a52e-b9cc034d1c3f',
+                'url' => 'https://drive.google.com/file/d/1GPjfhRVQefWap9mVE1Bo0Fi88BYYpaH3/view',
             ],
-
             [
                 'title' => "Circular 2026-075\nDOTR Subway Project Update\nMay 29, 2026",
-
-                'embed_url' => 'https://twoserendraofficial-my.sharepoint.com/personal/itdept_twoserendra_com/_layouts/15/embed.aspx?UniqueId=a1de55d9-30c8-4782-a659-e818648e40e9',
+                'url' => 'https://drive.google.com/file/d/1TLuwTugjt0qRSlqLe7mrUawy0GEsGe6T/view',
             ],
-
             [
                 'title' => "Circular 2026-085\nAdvisory on Tree Cutting and Earth Balling\nJune 19, 2026",
-
-                'embed_url' => 'https://twoserendraofficial-my.sharepoint.com/personal/itdept_twoserendra_com/_layouts/15/embed.aspx?UniqueId=0c3c9e2e-d4ee-4452-9f55-b932702226c5',
+                'url' => 'https://drive.google.com/file/d/10VAC9lYl41-76FEJNHRTX6I2RMlScvrL/view',
             ],
-
             [
                 'title' => "Circular 2026-101\nTree Cutting Activities Along McKinley Parkway\nJuly 17, 2026",
-
-                'embed_url' => 'https://twoserendraofficial-my.sharepoint.com/personal/itdept_twoserendra_com/_layouts/15/embed.aspx?UniqueId=dae50987-3e51-4950-9ab1-bc475ea91bd6',
+                'url' => 'https://drive.google.com/file/d/168k_qM8Syay3OjwKBrgWs5MzMKONdmbZ/view',
             ],
-
         ];
-
     @endphp
 
     <div class="my-2 mb-3">
@@ -59,7 +48,8 @@
     </div>
     @foreach($documents as $document)
 
-        <a href="{{ $document['embed_url'] }}" class="text-decoration-none">
+        <a href="{{ $document['url'] }}" onclick="window.parent.open(this.href, '_blank'); return false;"
+            class="text-decoration-none">
 
             <div class="card border-0 shadow-sm mb-3 document-card">
 
@@ -87,13 +77,9 @@
                         <i class="bx bx-chevron-right text-muted fs-4"></i>
 
                     </div>
-
                 </div>
-
             </div>
-
         </a>
-
     @endforeach
 </div>
 

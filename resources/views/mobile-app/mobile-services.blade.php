@@ -126,7 +126,7 @@
                 setHeader() {
                     Alpine.store('superapp')?.bridge?.setHeader({
                         mode: 'sticky',
-                        title: 'Service Requests',
+                        title: 'Unit Services',
                         backgroundColor: '#fff',
                         textStyle: 'black',
                         showHome: false,

@@ -7,7 +7,7 @@
             <i class="bx bx-folder-open text-success" style="font-size: 42px;"></i>
         </div>
         <h4 class="fw-bold text-success mb-1">
-            Official Circulars
+            Subway Project
         </h4>
 
         <small class="text-muted">
@@ -36,7 +36,16 @@
         ];
     @endphp
 
+    <div class="my-2 mb-3">
 
+        <a href="{{ route('subway.faqs.mobile') }}" class="btn btn-success w-100 py-3">
+
+            <i class="bx bx-help-circle me-1"></i>
+            Frequently Asked Questions
+
+        </a>
+
+    </div>
     @foreach($documents as $document)
 
         <a href="{{ $document['url'] }}" class="text-decoration-none">
@@ -76,16 +85,7 @@
 
     @endforeach
 
-    <div class="mt-4 mb-3">
 
-        <a href="{{ route('subway.faqs.mobile') }}" class="btn btn-success w-100 py-3">
-
-            <i class="bx bx-help-circle me-1"></i>
-            Frequently Asked Questions
-
-        </a>
-
-    </div>
 </div>
 
 <style>

@@ -394,27 +394,32 @@ class GreaseTrapBookingMobileController extends Controller
             "Sequoia" => "I",
         ];
 
+        $unitName = trim($unitName);
 
-        $parts = explode(' ', trim($unitName));
-
-
-        if (count($parts) !== 2) {
+        if (!$unitName) {
             return null;
         }
 
+        $lastSpace = strrpos($unitName, ' ');
 
-        [$tower, $number] = $parts;
+        if ($lastSpace === false) {
+            return null;
+        }
 
+        $tower = trim(substr($unitName, 0, $lastSpace));
+        $number = trim(substr($unitName, $lastSpace + 1));
+
+        if (!$tower || !$number) {
+            return null;
+        }
 
         $towerLetter = $map[$tower] ?? null;
-
 
         if (!$towerLetter) {
             return null;
         }
 
-
-        return $number . $towerLetter;
+        return strtoupper($number . $towerLetter);
     }
 
     public function CancelGreaseTrapBookingMobile(GreaseTrapBooking $booking, Request $request)

@@ -48,8 +48,7 @@
     </div>
     @foreach($documents as $document)
 
-        <a href="{{ $document['url'] }}" onclick="window.parent.open(this.href, '_blank'); return false;"
-            class="text-decoration-none">
+        <a href="{{ $document['url'] }}" class="text-decoration-none">
 
             <div class="card border-0 shadow-sm mb-3 document-card">
 
@@ -77,9 +76,13 @@
                         <i class="bx bx-chevron-right text-muted fs-4"></i>
 
                     </div>
+
                 </div>
+
             </div>
+
         </a>
+
     @endforeach
 </div>
 

@@ -68,31 +68,21 @@
                     <div class="d-flex align-items-center">
 
                         <div class="document-icon me-3">
-
                             <i class="bx bxs-file-pdf text-danger"></i>
-
                         </div>
-
 
                         <div class="flex-grow-1 pe-2">
 
                             <div class="fw-semibold text-dark document-title">
-
                                 {!! nl2br(e($document['title'])) !!}
-
                             </div>
 
-
                             <small class="text-muted d-block mt-2">
-
                                 <i class="bx bx-file me-1"></i>
-
                                 Tap to view document
-
                             </small>
 
                         </div>
-
 
                         <i class="bx bx-chevron-right text-muted fs-4"></i>
 

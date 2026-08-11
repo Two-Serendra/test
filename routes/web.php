@@ -241,9 +241,10 @@ Route::middleware(['miniapp.webview'])->group(function () {
     Route::post('/grease-trap-booking-mobile/cancel/{booking}', [GreaseTrapBookingMobileController::class, 'CancelGreaseTrapBookingMobile'])
         ->name('grease.trap.cancel.booking.mobile')->middleware('throttle:5,1');
 
+    Route::get('/subway-news-mobile', [FaqsMobileController::class, 'SubwayNews'])->name('subway.news.mobile');
     Route::get('/subway-faqs-mobile', [FaqsMobileController::class, 'SubwayFaqs'])->name('subway.faqs.mobile');
 
-Route::match(['GET', 'POST'], '/mobile-debug', function (\Illuminate\Http\Request $request) {
+    Route::match(['GET', 'POST'], '/mobile-debug', function (\Illuminate\Http\Request $request) {
 
         return response()->json([
             'session_name' => config('session.cookie'),

@@ -6,8 +6,12 @@ use Illuminate\Http\Request;
 
 class FaqsMobileController extends Controller
 {
+    public function SubwayNews()
+    {
+        return view('mobile-app.subway.subway-news-mobile');
+    }
     public function SubwayFaqs()
     {
-        return view('mobile-app.faqs.subway-faqs-mobile');
+        return view('mobile-app.subway.subway-faqs-mobile');
     }
 }

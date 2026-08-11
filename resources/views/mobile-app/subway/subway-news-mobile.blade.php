@@ -48,28 +48,32 @@
     </div>
     @foreach($documents as $document)
 
-        <div class="card border-0 shadow-sm mb-3 document-card">
+        <a href="{{ $document['url'] }}" class="text-decoration-none">
 
-            <div class="card-body py-3">
+            <div class="card border-0 shadow-sm mb-3 document-card">
 
-                <div class="d-flex align-items-center">
+                <div class="card-body py-3">
 
-                    <div class="document-icon me-3">
-                        <i class="bx bxs-file-pdf text-danger"></i>
-                    </div>
+                    <div class="d-flex align-items-center">
 
-                    <div class="flex-grow-1 pe-2">
-
-                        <div class="fw-semibold text-dark document-title">
-                            {!! nl2br(e($document['title'])) !!}
+                        <div class="document-icon me-3">
+                            <i class="bx bxs-file-pdf text-danger"></i>
                         </div>
 
-                        <a href="{{ $document['url'] }}" class="btn btn-sm btn-outline-success mt-3">
+                        <div class="flex-grow-1 pe-2">
 
-                            <i class="bx bx-link-external me-1"></i>
-                            Direktang buksan ang dokumento
+                            <div class="fw-semibold text-dark document-title">
+                                {!! nl2br(e($document['title'])) !!}
+                            </div>
 
-                        </a>
+                            <small class="text-muted d-block mt-2">
+                                <i class="bx bx-file me-1"></i>
+                                Tap to view document
+                            </small>
+
+                        </div>
+
+                        <i class="bx bx-chevron-right text-muted fs-4"></i>
 
                     </div>
 
@@ -77,7 +81,7 @@
 
             </div>
 
-        </div>
+        </a>
 
     @endforeach
 </div>

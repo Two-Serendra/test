@@ -19,19 +19,19 @@
         $documents = [
             [
                 'title' => "Circular 2026-027\nMetro Manila Subway Project – BGC Station\nFebruary 19, 2026",
-                'url' => 'https://drive.google.com/file/d/1GPjfhRVQefWap9mVE1Bo0Fi88BYYpaH3/view?usp=drive_link',
+                'url' => 'https://drive.google.com/file/d/1GPjfhRVQefWap9mVE1Bo0Fi88BYYpaH3/view',
             ],
             [
                 'title' => "Circular 2026-075\nDOTR Subway Project Update\nMay 29, 2026",
-                'url' => 'https://drive.google.com/file/d/1TLuwTugjt0qRSlqLe7mrUawy0GEsGe6T/view?usp=drive_link',
+                'url' => 'https://drive.google.com/file/d/1TLuwTugjt0qRSlqLe7mrUawy0GEsGe6T/view',
             ],
             [
                 'title' => "Circular 2026-085\nAdvisory on Tree Cutting and Earth Balling\nJune 19, 2026",
-                'url' => 'https://drive.google.com/file/d/10VAC9lYl41-76FEJNHRTX6I2RMlScvrL/view?usp=drive_link',
+                'url' => 'https://drive.google.com/file/d/10VAC9lYl41-76FEJNHRTX6I2RMlScvrL/view',
             ],
             [
                 'title' => "Circular 2026-101\nTree Cutting Activities Along McKinley Parkway\nJuly 17, 2026",
-                'url' => 'https://drive.google.com/file/d/168k_qM8Syay3OjwKBrgWs5MzMKONdmbZ/view?usp=drive_link',
+                'url' => 'https://drive.google.com/file/d/168k_qM8Syay3OjwKBrgWs5MzMKONdmbZ/view',
             ],
         ];
     @endphp
@@ -48,7 +48,7 @@
     </div>
     @foreach($documents as $document)
 
-        <a href="{{ $document['url'] }}" class="text-decoration-none">
+        <a href="{{ $document['url'] }}" target="_top" class="text-decoration-none">
 
             <div class="card border-0 shadow-sm mb-3 document-card">
 
@@ -68,7 +68,7 @@
 
                             <small class="text-muted d-block mt-2">
                                 <i class="bx bx-file me-1"></i>
-                                Tap to view documents
+                                Tap to view document
                             </small>
 
                         </div>

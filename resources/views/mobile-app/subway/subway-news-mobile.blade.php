@@ -38,9 +38,13 @@
 
 
     @foreach($documents as $document)
-        <a href="{{ $document['url'] }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+
+        <a href="{{ $document['url'] }}" class="text-decoration-none">
+
             <div class="card border-0 shadow-sm mb-3 document-card">
+
                 <div class="card-body py-3">
+
                     <div class="d-flex align-items-center">
 
                         <div class="document-icon me-3">
@@ -55,16 +59,21 @@
 
                             <small class="text-muted d-block mt-2">
                                 <i class="bx bx-file me-1"></i>
-                                Tap to view document
+                                Tap to view documents
                             </small>
 
                         </div>
 
                         <i class="bx bx-chevron-right text-muted fs-4"></i>
+
                     </div>
+
                 </div>
+
             </div>
+
         </a>
+
     @endforeach
 
     <div class="mt-4 mb-3">

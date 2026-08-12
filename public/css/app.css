@@ -70,7 +70,7 @@ dd {
 }
 
 /* ── Buttons ────────────────────────────────────────────────── */
-.btn {
+.pdf-btn {
     display: inline-block;
     padding: 9px 18px;
     background: #2563eb;
@@ -85,16 +85,16 @@ dd {
     transition: background 0.15s;
 }
 
-.btn:hover { background: #1d4ed8; }
-.btn:active { background: #1e40af; }
+.pdf-btn:hover { background: #1d4ed8; }
+.pdf-btn:active { background: #1e40af; }
 
-.btn-secondary {
+.pdf-btn-secondary {
     background: #f3f4f6;
     color: #374151;
     border: 1px solid #d1d5db;
 }
 
-.btn-secondary:hover { background: #e5e7eb; }
+.pdf-btn-secondary:hover { background: #e5e7eb; }
 
 /* ── Banners ────────────────────────────────────────────────── */
 .warning-banner {

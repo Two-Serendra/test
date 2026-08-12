@@ -8,15 +8,21 @@ class PdfController extends Controller
 {
     public function viewer($filename)
     {
-        return view('mobile.pdf-viewer', [
+        return view('mobile-app.pdf-viewer', [
             'filename' => $filename,
         ]);
     }
     public function file($filename)
     {
         $filename = basename($filename);
-        
-        $path = storage_path('app/public/storage/subway-pdf/' . $filename);
+
+        $path = public_path('storage/subway-pdf/' . $filename);
+
+        \Log::info('PDF request', [
+            'filename' => $filename,
+            'path' => $path,
+            'exists' => file_exists($path),
+        ]);
 
         if (!is_file($path)) {
             abort(404);

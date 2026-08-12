@@ -43,7 +43,7 @@
     min-height: 70px;
     padding: 12px;
     text-align: center;
-    font-size: .95rem;
+    font-size: 0.95rem;
     font-weight: 500;
     line-height: 1.3;
     white-space: normal;
@@ -57,14 +57,20 @@
     cursor: pointer;
 
     transition:
-        background-color .2s,
-        border-color .2s,
-        color .2s;
+        background-color 0.2s,
+        border-color 0.2s,
+        color 0.2s;
 
     user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
+}
+
+.btn-check:checked+.slot-card {
+    background: #008b26 !important;
+    color: #fff !important;
+    border-color: #008b26 !important;
 }
 
 @media (hover:none) {
@@ -82,14 +88,6 @@
     }
 
 }
-
-.btn-check:checked +.slot-card {
-    background: #008b26 !important;
-    color: #fff !important;
-    border-color: #008b26 !important;
-}
-
-
 
 .history-shortcut {
     display: flex;

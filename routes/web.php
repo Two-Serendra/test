@@ -26,7 +26,7 @@ use App\Http\Controllers\MobileApp\GreaseTrapBookingMobileController;
 use App\Http\Controllers\MobileApp\PestControlBookingMobileController;
 use App\Http\Controllers\MobileApp\FaqsMobileController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\PdfController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -244,6 +244,13 @@ Route::middleware(['miniapp.webview'])->group(function () {
     Route::get('/subway-news-mobile', [FaqsMobileController::class, 'SubwayNews'])->name('subway.news.mobile');
     Route::get('/subway-faqs-mobile', [FaqsMobileController::class, 'SubwayFaqs'])->name('subway.faqs.mobile');
 
+
+    Route::get('/mobile/pdf/{filename}', [PdfController::class, 'viewer'])
+        ->name('mobile.pdf.viewer');
+
+    Route::get('/mobile/pdf-file/{filename}', [PdfController::class, 'file'])
+        ->name('mobile.pdf.file');
+        
     Route::match(['GET', 'POST'], '/mobile-debug', function (\Illuminate\Http\Request $request) {
 
         return response()->json([

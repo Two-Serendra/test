@@ -83,7 +83,7 @@
 
 }
 
-.btn-check:checked+.slot-card {
+.btn-check:checked +.slot-card {
     background: #008b26 !important;
     color: #fff !important;
     border-color: #008b26 !important;

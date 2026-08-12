@@ -16,7 +16,7 @@ class PdfController extends Controller
     {
         $filename = basename($filename);
 
-        $path = public_path('storage/subway-pdf/' . $filename);
+        $path = public_path('subway-pdf/' . $filename);
 
         \Log::info('PDF request', [
             'filename' => $filename,

@@ -162,4 +162,9 @@
     </div>
     @include('backend.modal.downloadHistory-modal')
     @include('backend.modal.activities.activities-booking-modal')
+
+    @push('scripts')
+
+        <script src="{{ asset('assets/backend/js/history.js') }}"></script>
+    @endpush
 @endsection

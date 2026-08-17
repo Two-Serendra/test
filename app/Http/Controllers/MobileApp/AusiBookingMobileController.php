@@ -360,16 +360,19 @@ class AusiBookingMobileController extends Controller
                     ], 409);
                 }
 
+                $bookingYear = $bookingDateCarbon->year;
+
                 $existingUnitBooking = AusiBooking::where('unit_no', $unitNo)
                     ->where('booking_status', '!=', 0)
-                    ->whereYear('booking_date', $bookingDate)
+                    ->whereYear('booking_date', $bookingYear)
                     ->lockForUpdate()
                     ->exists();
 
-                if ($existingUnitBooking && !$request->boolean('force_override')) {
+                if ($existingUnitBooking) {
                     DB::rollBack();
+
                     return response()->json([
-                        'message' => 'Unit already has a booking this year.',
+                        'message' => "This unit has already used its AUSI booking for {$bookingYear}. If you wish to book again, please contact the Engineering Department for assistance.",
                         'type' => 'unit_already_booked'
                     ], 409);
                 }

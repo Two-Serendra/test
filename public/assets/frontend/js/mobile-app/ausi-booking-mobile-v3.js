@@ -402,11 +402,12 @@ $(function () {
                 .css('width', '');
         };
 
-        const sendBooking = (forceOverride = false) => {
+        const sendBooking = () => {
             const store = Alpine.store('superapp');
             const email = store?.user?.email || '';
             const unit = $('#resident_id_ausi_mobile').val();
             const role = $('#resident_id_ausi_mobile option:selected').data('role') || '';
+
             $('#mobile_email').val(email);
             $('#mobile_unit_name').val(unit);
             $('#mobile_unit_role').val(role);
@@ -418,27 +419,8 @@ $(function () {
             });
 
             const formData = new FormData(form);
-            if (forceOverride) {
-                formData.append('force_override', true);
-            }
 
             lockSubmitBtn();
-            // for (const pair of formData.entries()) {
-            //    logDebug(pair[0] + " = " + pair[1]);
-            // }
-
-            logDebug("===== REQUEST DEBUG =====");
-            logDebug("CSRF Token:");
-            logDebug($('meta[name="csrf-token"]').attr('content'));
-
-            logDebug("Document Cookies:");
-            logDebug(document.cookie);
-
-            logDebug("Request URL:");
-            logDebug($(form).attr('action'));
-
-            logDebug("Method:");
-            logDebug($(form).attr('method'));
 
             $.ajax({
                 url: $(form).attr('action'),
@@ -462,6 +444,7 @@ $(function () {
                     if (res.debug) {
                         res.debug.forEach(d => logDebug("🧠 " + d));
                     }
+
                     Swal.fire({
                         toast: true,
                         position: 'top-end',
@@ -473,6 +456,7 @@ $(function () {
                             popup: 'swal2-success-toast'
                         }
                     });
+
                     window.resetAusiBookingUI();
                     window.resetSlotsAusiMobile();
                 },
@@ -481,26 +465,12 @@ $(function () {
 
                     logDebug("========== AJAX ERROR ==========");
                     logDebug("Status Code: " + xhr.status);
-                    logDebug("Status Text: " + xhr.statusText);
-                    logDebug("Text Status: " + textStatus);
-                    logDebug("Error Thrown: " + errorThrown);
-
-                    logDebug("Response Headers:");
-                    logDebug(xhr.getAllResponseHeaders());
-
                     logDebug("Response Text:");
                     logDebug(xhr.responseText);
-
-                    if (xhr.responseJSON) {
-                        logDebug("Response JSON:");
-                        logDebug(JSON.stringify(xhr.responseJSON, null, 2));
-                    }
 
                     const res = xhr.responseJSON || {};
 
                     if (xhr.status === 419) {
-
-                        logDebug("❌ CSRF TOKEN MISMATCH DETECTED");
 
                         Swal.fire({
                             icon: 'error',
@@ -522,9 +492,6 @@ $(function () {
                             });
                         });
 
-                        logDebug("Validation Errors:");
-                        logDebug(messages.join("\n"));
-
                         Swal.fire({
                             icon: 'error',
                             title: 'Validation Error',
@@ -535,9 +502,6 @@ $(function () {
                     }
 
                     if (xhr.status === 409 && res.type === 'slot_taken') {
-
-                        logDebug("Slot Taken:");
-                        logDebug(res.message);
 
                         Swal.fire({
                             icon: 'error',
@@ -551,23 +515,11 @@ $(function () {
 
                     if (xhr.status === 409 && res.type === 'unit_already_booked') {
 
-                        logDebug("Already Booked:");
-                        logDebug(res.message);
-
                         Swal.fire({
                             icon: 'warning',
-                            title: 'Already Booked',
+                            title: 'Annual Booking Limit Reached',
                             text: res.message,
-                            showCancelButton: true,
-                            confirmButtonText: 'Book Anyway'
-                        }).then((result) => {
-
-                            if (result.isConfirmed) {
-                                sendBooking(true);
-                            } else {
-                                unlockSubmitBtn();
-                            }
-
+                            confirmButtonText: 'Okay'
                         });
 
                         return;
@@ -578,8 +530,8 @@ $(function () {
                         title: 'Error',
                         text: 'Something went wrong'
                     });
-
                 },
+
                 complete() {
                     unlockSubmitBtn();
                 }

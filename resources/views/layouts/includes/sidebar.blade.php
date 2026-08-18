@@ -47,7 +47,7 @@
         @endroles
 
 
-        @roles(1, 6, 7, 9)
+        @roles(1, 6, 7, 7)
         <!-- <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-building"></i>
@@ -77,7 +77,7 @@
                     </a>
                 </li>
                 @endroles
-                @roles(1, 7, 9)
+                @roles(1, 7, 7)
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link menu-toggle">
                         <div>Setup</div>
@@ -112,7 +112,7 @@
         </li> -->
         @endroles
 
-        <!-- @roles(1, 6, 7, 9)
+        <!-- @roles(1, 6, 7, 7)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-dumbbell"></i>
@@ -231,7 +231,7 @@
         </li>
         @endroles -->
 
-        @roles(1, 6, 9)
+        @roles(1, 6, 7)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-wrench"></i>
@@ -300,7 +300,7 @@
         </li>
         @endroles
 
-        @roles(1, 3, 9)
+        @roles(1, 3, 7)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-shield-quarter"></i>

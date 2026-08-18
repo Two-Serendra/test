@@ -48,7 +48,7 @@
 
 
         @roles(1, 6, 7, 9)
-        <li class="menu-item">
+        <!-- <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-building"></i>
                 <div>Amenities</div>
@@ -109,7 +109,7 @@
                     </ul>
                 </li>
             </ul>
-        </li>
+        </li> -->
         @endroles
 
         <!-- @roles(1, 6, 7, 9)
@@ -300,7 +300,7 @@
         </li>
         @endroles
 
-        @roles(1, 3)
+        @roles(1, 3, 9)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-shield-quarter"></i>

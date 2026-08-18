@@ -32,7 +32,7 @@ class AdminAuthController extends Controller
                 6 => 'admin.booking.activities',
                 7 => 'admin.booking.activities',
                 8 => 'admin.show.function.room.bookings',
-                9 => 'admin.booking.activities',
+                9 => 'admin.grease.trap.booking',
                 10 => 'admin.show.events',
             ];
 

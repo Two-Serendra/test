@@ -14,18 +14,18 @@
 
     <ul class="menu-inner py-1">
         <!-- Dashboard -->
-        @roles(1)
+        <!-- @roles(1)
         <li class="menu-item">
             <a href="{{ route('admin.dashboard') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div data-i18n="Analytics">Dashboard</div>
             </a>
         </li>
-        @endroles
+        @endroles -->
 
-        @roles(1)
+        <!-- @roles(1)
         <li class="menu-header small text-uppercase"><span class="menu-header-text">Booking</span></li>
-        <!-- <li class="menu-item">
+        <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-file"></i>
                 <div data-i18n="Form Elements">Work Permit</div>
@@ -43,12 +43,12 @@
                     </a>
                 </li>
             </ul>
-        </li> -->
-        @endroles
+        </li>
+        @endroles -->
 
 
-        @roles(1, 6, 7, 7)
-        <!-- <li class="menu-item">
+        <!-- @roles(1, 6, 7, 7)
+        <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-building"></i>
                 <div>Amenities</div>
@@ -109,8 +109,8 @@
                     </ul>
                 </li>
             </ul>
-        </li> -->
-        @endroles
+        </li>
+        @endroles -->
 
         <!-- @roles(1, 6, 7, 7)
         <li class="menu-item">
@@ -231,7 +231,7 @@
         </li>
         @endroles -->
 
-        @roles(1, 6, 7)
+        @roles(1, 6, 7, 9)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-wrench"></i>
@@ -265,6 +265,8 @@
             </ul>
         </li>
 
+        @endroles
+        @roles(1, 6, 7, 9)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-bug"></i>
@@ -300,7 +302,7 @@
         </li>
         @endroles
 
-        @roles(1, 3, 7)
+        @roles(1, 3, 7, 9)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-shield-quarter"></i>

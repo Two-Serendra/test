@@ -14,14 +14,14 @@
 
     <ul class="menu-inner py-1">
         <!-- Dashboard -->
-        <!-- @roles(1)
+        @roles(1)
         <li class="menu-item">
             <a href="{{ route('admin.dashboard') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                <i class="menu-icon tf-icons bx bx-grid-alt"></i>
                 <div data-i18n="Analytics">Dashboard</div>
             </a>
         </li>
-        @endroles -->
+        @endroles
 
         <!-- @roles(1)
         <li class="menu-header small text-uppercase"><span class="menu-header-text">Booking</span></li>

@@ -134,7 +134,6 @@ class GreaseTrapBookingMobileController extends Controller
 
             try {
 
-                DB::beginTransaction();
 
                 $email = $request->email;
                 $unitName = trim($request->mobile_unit_name);
@@ -185,43 +184,16 @@ class GreaseTrapBookingMobileController extends Controller
                 }
 
                 $unitNo = $number . $towerLetter;
-
-                $towerLetter = $map[$tower] ?? null;
-
-                if (!$towerLetter) {
-                    return response()->json([
-                        'message' => 'Unknown tower'
-                    ], 422);
-                }
-
-                $unitNo = $number . $towerLetter;
                 $residentType = $request->mobile_unit_role;
 
-
+                DB::beginTransaction();
                 $bookingDate = Carbon::parse(
                     $request->booking_date
                 )->toDateString();
 
                 $freeBookingLimit = 2;
 
-                $yearStart = Carbon::now()
-                    ->startOfYear()
-                    ->toDateString();
-
-                $yearEnd = Carbon::now()
-                    ->endOfYear()
-                    ->toDateString();
-
-                $unitBookingsCount = GreaseTrapBooking::where(
-                    'unit_no',
-                    $unitNo
-                )
-                    ->whereBetween('booking_date', [$yearStart, $yearEnd])
-                    ->where(function ($q) {
-                        $q->where('booking_status', '!=', 0)
-                            ->orWhere('cancelled_within_24hrs', 1);
-                    })
-                    ->count();
+                $unitBookingsCount = GreaseTrapBooking::getUsedFreeBookings($unitNo);
 
                 $remainingFreeBookings = max(
                     $freeBookingLimit - $unitBookingsCount,
@@ -229,14 +201,13 @@ class GreaseTrapBookingMobileController extends Controller
                 );
 
                 $chargedType = $unitBookingsCount < $freeBookingLimit
-                    ? 1
-                    : 2;
+                    ? GreaseTrapBooking::CHARGE_FREE
+                    : GreaseTrapBooking::CHARGE_BILLABLE;
 
                 if (
-                    $chargedType == 2 &&
+                    $chargedType == GreaseTrapBooking::CHARGE_BILLABLE &&
                     !$request->boolean('force_payment')
                 ) {
-
                     DB::rollBack();
 
                     return response()->json([
@@ -471,10 +442,10 @@ class GreaseTrapBookingMobileController extends Controller
 
                 $usedFree = GreaseTrapBooking::getUsedFreeBookings($booking->unit_no);
 
-                $freeLimit = 2;
-
+                $freeLimit = GreaseTrapBooking::FREE_BOOKING_LIMIT;
+                
                 // First request - confirmation only
-                if (!$request->has('confirm')) {
+                if (!$request->boolean('confirm')) {
 
                     if ($within24Hours) {
 

@@ -234,7 +234,7 @@
         @roles(1, 6, 7, 9)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bx-wrench"></i>
+                <i class="menu-icon tf-icons bx bx-water"></i>
                 <div data-i18n="Form Elements">
                     Grease Trap
                     <span id="grease-trap-booking-counter" class="badge bg-danger d-none"
@@ -305,7 +305,7 @@
         @roles(1, 3, 7, 9)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bx-shield-quarter"></i>
+                <i class="menu-icon tf-icons bx bx-building-house"></i>
                 <div data-i18n="Form Elements">
                     AUSI
                     <span id="ausi-booking-counter" class="badge bg-danger d-none"

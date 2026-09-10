@@ -5,9 +5,17 @@ $(document).ready(function () {
 
     });
 
-    $('#editAdminUserModal').on('hidden.bs.modal', function () {
-        $('.modal-backdrop').remove();
+    $('#AdminCreateUser').on('hidden.bs.modal', function () {
+        const form = $('#admin-new-user')[0];
+        form.reset();
+        $(form).removeClass('was-validated');
+        $(form).find('.is-invalid, .is-valid').removeClass('is-invalid is-valid');
+        $('#saveUserBtn')
+            .attr('disabled', false)
+            .html('<span class="btn-text">Create</span>')
+            .css('width', '');
     });
+
 
     $('#admin-new-user').submit(function (event) {
         event.preventDefault();
@@ -16,13 +24,19 @@ $(document).ready(function () {
             this.classList.add('was-validated');
             return;
         }
+
         this.classList.remove('was-validated');
 
         const $btn = $('#saveUserBtn');
         const originalWidth = $btn.outerWidth();
+
         $btn
             .attr('disabled', true)
-            .html(`<div class="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></div>`)
+            .html(`
+            <div class="spinner-border spinner-border-sm text-light"
+                 role="status"
+                 aria-hidden="true"></div>
+        `)
             .css('width', originalWidth + 'px');
 
         const formData = new FormData(this);
@@ -31,14 +45,19 @@ $(document).ready(function () {
         $.ajax({
             url: $(this).attr('action'),
             type: $(this).attr('method'),
+
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
+
             data: formData,
             processData: false,
             contentType: false,
+
             success: function (response) {
+
                 $('#AdminCreateUser').modal('hide');
+
                 const Toast = Swal.mixin({
                     toast: true,
                     position: "top-end",
@@ -59,11 +78,11 @@ $(document).ready(function () {
                     title: 'User Created Successfully'
                 });
 
-                form.reset();
-                $(form).removeClass('was-validated');
                 refreshTableUser();
             },
+
             error: function (xhr, status, error) {
+
                 const Toast = Swal.mixin({
                     toast: true,
                     position: "top-end",
@@ -78,50 +97,90 @@ $(document).ready(function () {
                         toast.onmouseleave = Swal.resumeTimer;
                     }
                 });
+
                 Toast.fire({
                     icon: 'error',
                     title: 'Failed to create user'
                 });
             },
+
             complete: function () {
+
                 $btn
                     .attr('disabled', false)
-                    .html(`<span class="btn-text">Create</span>`)
+                    .html('<span class="btn-text">Create</span>')
                     .css('width', '');
             }
         });
     });
 
     $('#userTable').on('click', '.edit_admin_user', function () {
+
         let userId = $(this).data('id');
 
         $.ajax({
             url: '/admin/admin-fetch-user/' + userId,
             type: 'GET',
+
             success: function (response) {
+
                 $('#editAdminUserModal #user_id').val(response.id);
                 $('#editAdminUserModal #name').val(response.name);
                 $('#editAdminUserModal #email').val(response.email);
+                $('#editAdminUserModal #password').val('');
+                $('#editAdminUserModal #password_confirmation').val('');
+
                 $('#editAdminUserModal').modal('show');
             }
         });
     });
 
+    $('#editAdminUserModal').on('hidden.bs.modal', function () {
+
+        const form = $('#admin-update-user')[0];
+
+        form.reset();
+
+        $(form).removeClass('was-validated');
+        $(form).find('.is-invalid, .is-valid').removeClass('is-invalid is-valid');
+        $('#editAdminUserModal #user_id').val('');
+        $('#editAdminUserModal #password').val('');
+        $('#editAdminUserModal #password_confirmation').val('');
+        $('#updateUserBtn')
+            .attr('disabled', false);
+
+        $('#updateUserBtn .spinner-border')
+            .addClass('d-none');
+
+        $('#updateUserBtn .btn-text')
+            .text('Update');
+    });
+
     $('#admin-update-user').submit(function (e) {
+
         e.preventDefault();
 
-        let formData = $(this).serialize(); // No need to spoof method
+        let formData = $(this).serialize();
         let userId = $('#user_id').val();
-        $('#updateUserBtn').attr('disabled', true);
-        $('#updateUserBtn .spinner-border').removeClass('d-none');
-        $('#updateUserBtn .btn-text').text('Updating...');
+
+        $('#updateUserBtn')
+            .attr('disabled', true);
+
+        $('#updateUserBtn .spinner-border')
+            .removeClass('d-none');
+
+        $('#updateUserBtn .btn-text')
+            .text('Updating...');
 
         $.ajax({
             url: '/admin/admin-update-user/' + userId,
             type: 'POST',
             data: formData,
+
             success: function (response) {
+
                 $('#editAdminUserModal').modal('hide');
+
                 const Toast = Swal.mixin({
                     toast: true,
                     position: "top-end",
@@ -144,7 +203,9 @@ $(document).ready(function () {
 
                 refreshTableUser();
             },
+
             error: function (xhr, status, error) {
+
                 const Toast = Swal.mixin({
                     toast: true,
                     position: "top-end",
@@ -164,6 +225,18 @@ $(document).ready(function () {
                     icon: 'error',
                     title: 'Update Failed'
                 });
+            },
+
+            complete: function () {
+
+                $('#updateUserBtn')
+                    .attr('disabled', false);
+
+                $('#updateUserBtn .spinner-border')
+                    .addClass('d-none');
+
+                $('#updateUserBtn .btn-text')
+                    .text('Update');
             }
         });
     });

@@ -109,19 +109,14 @@ class GreaseTrapBookingController extends Controller
             $bookingDate = Carbon::parse($request->booking_date)->toDateString();
             $unitNo = strtoupper(trim($request->unit));
             $freeBookingLimit = 2;
-            $yearStart = Carbon::now()->startOfYear()->toDateString();
-            $yearEnd = Carbon::now()->endOfYear()->toDateString();
 
-            $unitBookingsCount = GreaseTrapBooking::where('unit_no', $unitNo)
-               ->whereBetween('booking_date', [$yearStart, $yearEnd])
-               ->where(function ($q) {
-                  $q->where('booking_status', 1)
-                     ->orWhere('cancelled_within_24hrs', 1);
-               })
-               ->count();
+
+            $unitBookingsCount = GreaseTrapBooking::getUsedFreeBookings($unitNo);
 
             $remainingFreeBookings = max($freeBookingLimit - $unitBookingsCount, 0);
-            $chargedType = $unitBookingsCount < $freeBookingLimit ? 1 : 2;
+            $chargedType = $unitBookingsCount < $freeBookingLimit
+               ? GreaseTrapBooking::CHARGE_FREE
+               : GreaseTrapBooking::CHARGE_BILLABLE;
 
             if ($chargedType == 2 && !$request->force_payment) {
                DB::rollBack();
@@ -232,19 +227,26 @@ class GreaseTrapBookingController extends Controller
          $usedFree = GreaseTrapBooking::getUsedFreeBookings($booking->unit_no);
          $freeLimit = 2;
 
-         if (!$request->has('confirm')) {
+         if (!$request->boolean('confirm')) {
 
             $message = '';
 
             if ($within24Hours) {
+
                if ($usedFree >= $freeLimit) {
+
                   $message = 'Cancelling within 24 hours will incur a penalty of ₱448 because the unit has already used its 2 free bookings.';
+
                } else {
+
                   $remaining = $freeLimit - $usedFree;
+
                   $message = "Cancelling within 24 hours will forfeit one of the remaining {$remaining} free grease trap bookings for this year.";
                }
+
             } else {
-               $message = '<br>No penalty will be applied.';
+
+               $message = 'No penalty will be applied.';
             }
 
             return response()->json([
@@ -253,17 +255,16 @@ class GreaseTrapBookingController extends Controller
                'message' => $message
             ]);
          }
-
          $booking->booking_status = GreaseTrapBooking::STATUS_CANCELLED;
          $booking->cancelled_at = now();
          $booking->cancelled_by = auth()->id();
 
          if ($within24Hours) {
+
             if ($usedFree >= $freeLimit) {
-
                $booking->applyCancellationPenalty();
-            } else {
 
+            } else {
                $booking->cancelled_within_24hrs = 1;
             }
          }
@@ -300,22 +301,24 @@ class GreaseTrapBookingController extends Controller
             $unitNo = strtoupper(trim($request->unit));
 
             $freeBookingLimit = 2;
-            $yearStart = Carbon::now()->startOfYear()->toDateString();
-            $yearEnd = Carbon::now()->endOfYear()->toDateString();
 
-            $unitBookingsCount = GreaseTrapBooking::where('unit_no', $unitNo)
-               ->whereBetween('booking_date', [$yearStart, $yearEnd])
-               ->where(function ($q) {
-                  $q->where('booking_status', 1)
-                     ->orWhere('cancelled_within_24hrs', 1);
-               })
-               ->count();
+            $unitBookingsCount = GreaseTrapBooking::getUsedFreeBookings($unitNo);
 
-            $remainingFreeBookings = max($freeBookingLimit - $unitBookingsCount, 0);
-            $chargedType = $unitBookingsCount < $freeBookingLimit ? 1 : 2;
+            $remainingFreeBookings = max(
+               $freeBookingLimit - $unitBookingsCount,
+               0
+            );
 
-            if ($chargedType == 2 && !$request->force_payment) {
+            $chargedType = $unitBookingsCount < $freeBookingLimit
+               ? GreaseTrapBooking::CHARGE_FREE
+               : GreaseTrapBooking::CHARGE_BILLABLE;
+
+            if (
+               $chargedType === GreaseTrapBooking::CHARGE_BILLABLE
+               && !$request->force_payment
+            ) {
                DB::rollBack();
+
                return response()->json([
                   'message' => "This unit has reached the free grease trap booking limit for the year. This booking will cost ₱448.00. Do you want to continue?",
                   'requires_payment' => true,
@@ -338,7 +341,7 @@ class GreaseTrapBookingController extends Controller
                'charged_type' => $chargedType,
                'remarks' => $request->remarks,
                'emergency' => 1,
-               'booking_status' => 1,
+               'booking_status' => GreaseTrapBooking::STATUS_SCHEDULED,
             ]);
 
             DB::commit();
@@ -357,18 +360,30 @@ class GreaseTrapBookingController extends Controller
                continue;
             }
 
-            Log::error('Admin Emergency Grease Trap Booking Error', ['error' => $e->getMessage()]);
-            return response()->json(['message' => 'Something went wrong.'], 500);
+            Log::error('Admin Emergency Grease Trap Booking Error', [
+               'error' => $e->getMessage()
+            ]);
 
+            return response()->json([
+               'message' => 'Something went wrong.'
+            ], 500);
 
          } catch (\Throwable $e) {
             DB::rollBack();
-            Log::error('Admin Emergency Grease Trap Booking Fatal', ['error' => $e->getMessage()]);
-            return response()->json(['message' => 'Something went wrong.'], 500);
+
+            Log::error('Admin Emergency Grease Trap Booking Fatal', [
+               'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+               'message' => 'Something went wrong.'
+            ], 500);
          }
       }
 
-      return response()->json(['message' => 'Could not complete booking. Try again.'], 500);
+      return response()->json([
+         'message' => 'Could not complete booking. Try again.'
+      ], 500);
    }
 
 

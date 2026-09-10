@@ -41,6 +41,7 @@ class GreaseTrapBooking extends Model
     const STATUS_COMPLETED = 2;
     const CHARGE_FREE = 1;
     const CHARGE_BILLABLE = 2;
+    const FREE_BOOKING_LIMIT = 2;
 
 
     public function residentDetails()

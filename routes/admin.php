@@ -32,7 +32,7 @@ Route::middleware('guest:admin')->group(function () {
 
 Route::middleware('auth:admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-    Route::get('/admin-get-function-room-booking-stats', [DashboardController::class, 'getFunctionRoomBookingStats']);
+    Route::get('/admin-get-service-booking-stats', [DashboardController::class, 'getServiceBookingStats']);
     Route::get('/admin-services', [ServicesController::class, 'services'])->name('admin.services');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');

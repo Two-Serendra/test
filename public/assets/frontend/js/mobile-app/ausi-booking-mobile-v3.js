@@ -67,8 +67,6 @@ $(function () {
         disableMobile: true,
         onChange: function (selectedDates, dateStr) {
             window.ausiState.date = dateStr;
-            // console.log("DATE:", dateStr);
-            // logDebug("DATE CHANGED: " + dateStr);
             triggerUpdate();
         }
 
@@ -78,9 +76,6 @@ $(function () {
     function triggerUpdate() {
         const date = window.ausiState.date;
         const unit = window.ausiState.unit;
-        // logDebug("DATE=" + date);
-        // logDebug("UNIT=" + unit);
-
         if (!date || !unit) {
             $(".ausi-booking-slot").prop("disabled", true);
             hideLoadingAusi();
@@ -126,7 +121,14 @@ $(function () {
 
                 window.ausiState.date = null;
 
-                fp.set("disable", res.disabled_dates || []);
+                const disabledDates = res.disabled_dates || [];
+
+                fp.set("disable", [
+                    ...disabledDates,
+                    function (date) {
+                        return date.getDay() === 0; 
+                    }
+                ]);
 
                 fp.jumpToDate(fp.selectedDates[0] || new Date());
 

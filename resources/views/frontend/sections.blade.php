@@ -39,15 +39,15 @@
 
             <!-- Background Image -->
             <div style="
-                            background: url('{{ asset('assets/images/2S DAHON.png') }}') no-repeat center center;
-                            background-size: cover;
-                            opacity: 0.05;
-                            position: absolute;
-                            top: 0;
-                            left: 0;
-                            width: 100%;
-                            height: 100%;
-                            z-index: 0;">
+                                background: url('{{ asset('assets/images/2S DAHON.png') }}') no-repeat center center;
+                                background-size: cover;
+                                opacity: 0.05;
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 100%;
+                                z-index: 0;">
             </div>
 
             <!-- Foreground Content -->
@@ -92,20 +92,20 @@
                                 <table class="table table-borderless mb-0">
                                     <tbody class="text-dark">
                                         <tr>
-                                            <td class="text-start">Section Head</td>
-                                            <td class="fw-bold">Vencer Viray</td>
+                                            <td class="text-end">Section Head:</td>
+                                            <td class="text-start fw-bold">Vencer Viray</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-start">Asst. Section Head</td>
-                                            <td class="fw-bold">Marietta Pecson</td>
+                                            <td class="text-end">Asst. Section Head:</td>
+                                            <td class="text-start fw-bold">Marietta Pecson</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-start">Secretary</td>
-                                            <td class="fw-bold">Ma. Roberta Abad Estacion</td>
+                                            <td class="text-end">Secretary:</td>
+                                            <td class="text-start fw-bold">Ma. Cecila Magtuto</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-start">Member</td>
-                                            <td class="fw-bold">Ma. Cecila Magtuto</td>
+                                            <td class="text-end">Member:</td>
+                                            <td class="text-start fw-bold">Ma. Roberta Abad Estacion</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -124,15 +124,15 @@
             <!-- Background Image -->
             <div
                 style="
-                                                                                                                                                                                                                                background: url('{{ asset('assets/images/2S DAHON.png') }}') no-repeat center center;
-                                                                                                                                                                                                                                background-size: cover;
-                                                                                                                                                                                                                                opacity: 0.05;
-                                                                                                                                                                                                                                position: absolute;
-                                                                                                                                                                                                                                top: 0;
-                                                                                                                                                                                                                                left: 0;
-                                                                                                                                                                                                                                width: 100%;
-                                                                                                                                                                                                                                height: 100%;
-                                                                                                                                                                                                                                z-index: 0;">
+                                                                                                                                                                                                                                    background: url('{{ asset('assets/images/2S DAHON.png') }}') no-repeat center center;
+                                                                                                                                                                                                                                    background-size: cover;
+                                                                                                                                                                                                                                    opacity: 0.05;
+                                                                                                                                                                                                                                    position: absolute;
+                                                                                                                                                                                                                                    top: 0;
+                                                                                                                                                                                                                                    left: 0;
+                                                                                                                                                                                                                                    width: 100%;
+                                                                                                                                                                                                                                    height: 100%;
+                                                                                                                                                                                                                                    z-index: 0;">
             </div>
 
             <!-- Foreground Content -->
@@ -178,20 +178,20 @@
                                 <table class="table table-borderless mb-0">
                                     <tbody class="text-dark">
                                         <tr>
-                                            <td class="text-start">Section Head</td>
-                                            <td class="fw-bold">Marietta Pecson</td>
+                                            <td class="text-end">Section Head:</td>
+                                            <td class="text-start fw-bold">Rizalino Antonio Pulumbarit</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-start">Asst. Section Head</td>
-                                            <td class="fw-bold">Veronica Pulumbarit</td>
+                                            <td class="text-end">Asst. Section Head:</td>
+                                            <td class="text-start fw-bold">Marietta Pecson</td>
                                         </tr>
+                                        <!-- <tr>
+                                                <td class="text-start">Secretary:</td>
+                                                <td class="text-start fw-bold">Edward Estacion</td>
+                                            </tr> -->
                                         <tr>
-                                            <td class="text-start">Secretary</td>
-                                            <td class="fw-bold">Edward Estacion</td>
-                                        </tr>
-                                        <tr>
-                                            <!-- <td class="text-start">Member</td>
-                                                        <td class="fw-bold">Patrick Richiardone</td> -->
+                                            <!-- <td class="text-start">Member:</td>
+                                                            <td class="text-start fw-bold">Patrick Richiardone</td> -->
                                         </tr>
                                     </tbody>
                                 </table>
@@ -209,15 +209,15 @@
 
             <!-- Background Image -->
             <div style="
-                        background: url('{{ asset('assets/images/2S DAHON.png') }}') no-repeat center center;
-                        background-size: cover;
-                        opacity: 0.05;
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        z-index: 0;">
+                            background: url('{{ asset('assets/images/2S DAHON.png') }}') no-repeat center center;
+                            background-size: cover;
+                            opacity: 0.05;
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            z-index: 0;">
             </div>
 
             <!-- Foreground Content -->
@@ -263,20 +263,20 @@
                                 <table class="table table-borderless mb-0">
                                     <tbody class="text-dark">
                                         <tr>
-                                            <td class="text-start">Section Head</td>
-                                            <td class="fw-bold">Rene Janda</td>
+                                            <td class="text-end">Section Head:</td>
+                                            <td class="text-start fw-bold">Rene John Janda</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-start">Asst. Section Head</td>
-                                            <td class="fw-bold">Carlo Peterson</td>
+                                            <td class="text-end">Asst. Section Head:</td>
+                                            <td class="text-start fw-bold">Carlo Peterson</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-start">Secretary</td>
-                                            <td class="fw-bold">Ana May Chua</td>
+                                            <td class="text-end">Secretary:</td>
+                                            <td class="text-start fw-bold">Ana May Chua</td>
                                         </tr>
                                         <tr>
-                                            <!-- <td class="text-start">Member</td>
-                                                        <td class="fw-bold">Jerimeco Dulalia</td> -->
+                                            <!-- <td class="text-end">Member:</td>
+                                                            <td class="fw-bold">Jerimeco Dulalia</td> -->
                                         </tr>
                                     </tbody>
                                 </table>
@@ -294,15 +294,15 @@
 
             <!-- Background Image -->
             <div style="
-                            background: url('{{ asset('assets/images/2S DAHON.png') }}') no-repeat center center;
-                            background-size: cover;
-                            opacity: 0.05;
-                            position: absolute;
-                            top: 0;
-                            left: 0;
-                            width: 100%;
-                            height: 100%;
-                            z-index: 0;">
+                                background: url('{{ asset('assets/images/2S DAHON.png') }}') no-repeat center center;
+                                background-size: cover;
+                                opacity: 0.05;
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 100%;
+                                z-index: 0;">
             </div>
 
             <!-- Foreground Content -->
@@ -347,20 +347,20 @@
                                 <table class="table table-borderless mb-0">
                                     <tbody class="text-dark">
                                         <tr>
-                                            <td class="text-start">Section Head</td>
-                                            <td class="fw-bold">Patrick Richardone</td>
+                                            <td class="text-end">Section Head:</td>
+                                            <td class="text-start fw-bold">Ma. Angeline Bengzon-Magsanoc</td>
                                         </tr>
                                         <tr>
-                                            <!-- <td class="text-start">Asst. Section Head</td>
-                                                        <td class="fw-bold">N/A</td> -->
+                                            <td class="text-end">Asst. Section Head:</td>
+                                            <td class="text-start fw-bold">Jen Marcial Parma</td>
                                         </tr>
                                         <tr>
-                                            <!-- <td class="text-start">Secretary</td>
-                                                        <td class="fw-bold">N/A</td> -->
+                                            <td class="text-end">Secretary:</td>
+                                            <td class="text-start fw-bold">Patick Richiardone</td>
                                         </tr>
                                         <tr>
-                                            <!-- <td class="text-start">Member</td>
-                                                        <td class="fw-bold">N/A</td> -->
+                                            <!-- <td class="text-end">Member:</td>
+                                                            <td class="text-start fw-bold">N/A</td> -->
                                         </tr>
                                     </tbody>
                                 </table>
@@ -379,15 +379,15 @@
             <!-- Background Image -->
             <div
                 style="
-                                                                                                                                                                                                                                background: url('{{ asset('assets/images/2S DAHON.png') }}') no-repeat center center;
-                                                                                                                                                                                                                                background-size: cover;
-                                                                                                                                                                                                                                opacity: 0.05;
-                                                                                                                                                                                                                                position: absolute;
-                                                                                                                                                                                                                                top: 0;
-                                                                                                                                                                                                                                left: 0;
-                                                                                                                                                                                                                                width: 100%;
-                                                                                                                                                                                                                                height: 100%;
-                                                                                                                                                                                                                                z-index: 0;">
+                                                                                                                                                                                                                                    background: url('{{ asset('assets/images/2S DAHON.png') }}') no-repeat center center;
+                                                                                                                                                                                                                                    background-size: cover;
+                                                                                                                                                                                                                                    opacity: 0.05;
+                                                                                                                                                                                                                                    position: absolute;
+                                                                                                                                                                                                                                    top: 0;
+                                                                                                                                                                                                                                    left: 0;
+                                                                                                                                                                                                                                    width: 100%;
+                                                                                                                                                                                                                                    height: 100%;
+                                                                                                                                                                                                                                    z-index: 0;">
             </div>
 
             <!-- Foreground Content -->
@@ -433,24 +433,25 @@
                                 <table class="table table-borderless mb-0">
                                     <tbody class="text-dark">
                                         <tr>
-                                            <td class="text-start">Section Head</td>
-                                            <td class="fw-bold">Raul Dimayuga</td>
+                                            <td class="text-end">Section Head:</td>
+                                            <td class="text-start fw-bold">Raul Dimayuga</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-start">Asst. Section Head</td>
-                                            <td class="fw-bold">Eugenia Billones</td>
+                                            <td class="text-end">Asst. Section Head:</td>
+                                            <td class="text-start fw-bold">Reynaldo Armada Jr.</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-start">Secretary</td>
-                                            <td class="fw-bold">Reynaldo Armada</td>
+                                            <td class="text-end">Secretary:</td>
+                                            <td class="text-start fw-bold">Eugenia Billones</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-start">Member</td>
-                                            <td class="fw-bold">Nena Radoc</td>
+                                            <td class="text-end">Member:</td>
+                                            <td class="text-start fw-bold">Nena Radoc</td>
+                                            <!-- <td class="text-start fw-bold">Patrick Richiardone</td> -->
                                         </tr>
                                         <tr>
                                             <td class="text-start"></td>
-                                            <td class="fw-bold">Patrick Richardone</td>
+                                            <td class="text-start fw-bold">Patrick Richardone</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -468,15 +469,15 @@
             <!-- Background Image -->
             <div
                 style="
-                                                                                                                                                                                                                                background: url('{{ asset('assets/images/2S DAHON.png') }}') no-repeat center center;
-                                                                                                                                                                                                                                background-size: cover;
-                                                                                                                                                                                                                                opacity: 0.05;
-                                                                                                                                                                                                                                position: absolute;
-                                                                                                                                                                                                                                top: 0;
-                                                                                                                                                                                                                                left: 0;
-                                                                                                                                                                                                                                width: 100%;
-                                                                                                                                                                                                                                height: 100%;
-                                                                                                                                                                                                                                z-index: 0;">
+                                                                                                                                                                                                                                    background: url('{{ asset('assets/images/2S DAHON.png') }}') no-repeat center center;
+                                                                                                                                                                                                                                    background-size: cover;
+                                                                                                                                                                                                                                    opacity: 0.05;
+                                                                                                                                                                                                                                    position: absolute;
+                                                                                                                                                                                                                                    top: 0;
+                                                                                                                                                                                                                                    left: 0;
+                                                                                                                                                                                                                                    width: 100%;
+                                                                                                                                                                                                                                    height: 100%;
+                                                                                                                                                                                                                                    z-index: 0;">
             </div>
 
             <!-- Foreground Content -->
@@ -529,20 +530,20 @@
                                 <table class="table table-borderless mb-0">
                                     <tbody class="text-dark">
                                         <tr>
-                                            <td class="text-start">Section Head</td>
-                                            <td class="fw-bold">Jessica Chan</td>
+                                            <td class="text-end">Section Head:</td>
+                                            <td class="text-start fw-bold">Antontio Sanchez III</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-start">Asst. Section Head</td>
-                                            <td class="fw-bold">Rhett Pickering</td>
+                                            <td class="text-end">Asst. Section Head:</td>
+                                            <td class="text-start fw-bold">Rhett Pickering</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-start">Secretary</td>
-                                            <td class="fw-bold">Mary Joy Villanueva</td>
+                                            <td class="text-end">Secretary:</td>
+                                            <td class="text-start fw-bold">Jessica Chan</td>
                                         </tr>
                                         <tr>
-                                            <!-- <td class="text-start">Member</td>
-                                                        <td class="fw-bold">Jerimeco Dulalia</td> -->
+                                            <!-- <td class="text-start">Member:</td>
+                                                            <td class="text-start fw-bold">Jerimeco Dulalia</td> -->
                                         </tr>
                                     </tbody>
                                 </table>
@@ -561,15 +562,15 @@
             <!-- Background Image -->
             <div
                 style="
-                                                                                                                                                                                                                                background: url('{{ asset('assets/images/2S DAHON.png') }}') no-repeat center center;
-                                                                                                                                                                                                                                background-size: cover;
-                                                                                                                                                                                                                                opacity: 0.05;
-                                                                                                                                                                                                                                position: absolute;
-                                                                                                                                                                                                                                top: 0;
-                                                                                                                                                                                                                                left: 0;
-                                                                                                                                                                                                                                width: 100%;
-                                                                                                                                                                                                                                height: 100%;
-                                                                                                                                                                                                                                z-index: 0;">
+                                                                                                                                                                                                                                    background: url('{{ asset('assets/images/2S DAHON.png') }}') no-repeat center center;
+                                                                                                                                                                                                                                    background-size: cover;
+                                                                                                                                                                                                                                    opacity: 0.05;
+                                                                                                                                                                                                                                    position: absolute;
+                                                                                                                                                                                                                                    top: 0;
+                                                                                                                                                                                                                                    left: 0;
+                                                                                                                                                                                                                                    width: 100%;
+                                                                                                                                                                                                                                    height: 100%;
+                                                                                                                                                                                                                                    z-index: 0;">
             </div>
 
 
@@ -618,20 +619,25 @@
                                 <table class="table table-borderless mb-0">
                                     <tbody class="text-dark">
                                         <tr>
-                                            <td class="text-start">Section Head</td>
-                                            <td class="fw-bold">Paul McDonald</td>
+                                            <td class="text-end">Section Head:</td>
+                                            <td class="text-start fw-bold">Paul McDonald</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-start">Asst. Section Head</td>
-                                            <td class="fw-bold">Bowei Gai</td>
+                                            <td class="text-end">Asst. Section Head:</td>
+                                            <td class="text-start fw-bold">Bowei Gai</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-start">Secretary</td>
-                                            <td class="fw-bold">Mary Joy Villanueva</td>
+                                            <td class="text-end">Secretary:</td>
+                                            <td class="text-start fw-bold">Mary Joy Villanueva</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-start">Member</td>
-                                            <td class="fw-bold">Marton Erdos</td>
+                                            <td class="text-end">Member:</td>
+                                            <td class="text-start fw-bold">Angelo Soriano</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="text-end"></td>
+                                            <td class="text-start fw-bold">Augustus Stefanu Au</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -651,15 +657,15 @@
             <!-- Background Image -->
             <div
                 style="
-                                                                                                                                                                                                                                background: url('{{ asset('assets/images/2S DAHON.png') }}') no-repeat center center;
-                                                                                                                                                                                                                                background-size: cover;
-                                                                                                                                                                                                                                opacity: 0.05;
-                                                                                                                                                                                                                                position: absolute;
-                                                                                                                                                                                                                                top: 0;
-                                                                                                                                                                                                                                left: 0;
-                                                                                                                                                                                                                                width: 100%;
-                                                                                                                                                                                                                                height: 100%;
-                                                                                                                                                                                                                                z-index: 0;">
+                                                                                                                                                                                                                                    background: url('{{ asset('assets/images/2S DAHON.png') }}') no-repeat center center;
+                                                                                                                                                                                                                                    background-size: cover;
+                                                                                                                                                                                                                                    opacity: 0.05;
+                                                                                                                                                                                                                                    position: absolute;
+                                                                                                                                                                                                                                    top: 0;
+                                                                                                                                                                                                                                    left: 0;
+                                                                                                                                                                                                                                    width: 100%;
+                                                                                                                                                                                                                                    height: 100%;
+                                                                                                                                                                                                                                    z-index: 0;">
             </div>
 
 
@@ -708,20 +714,20 @@
                                 <table class="table table-borderless mb-0">
                                     <tbody class="text-dark">
                                         <tr>
-                                            <td class="text-start">Section Head</td>
-                                            <td class="fw-bold">Cristela Matteo</td>
+                                            <td class="text-end">Section Head:</td>
+                                            <td class="text-start fw-bold">Alexander Garcia</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-start">Asst. Section Head</td>
-                                            <td class="fw-bold">Eugenia Billones</td>
+                                            <td class="text-end">Asst. Section Head:</td>
+                                            <td class="text-start fw-bold">Ma. Cecilia Magtuto</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-start">Secretary</td>
-                                            <td class="fw-bold">Alexander Garcia</td>
+                                            <td class="text-end">Secretary:</td>
+                                            <td class="text-start fw-bold">Eugenia Billones</td>
                                         </tr>
                                         <tr>
-                                            <!-- <td class="text-start">Member</td>
-                                                        <td class="fw-bold">Nelia Sarcol</td> -->
+                                            <!-- <td class="text-start">Member:</td>
+                                                            <td class="fw-bold">Nelia Sarcol</td> -->
                                         </tr>
                                     </tbody>
                                 </table>
@@ -741,15 +747,15 @@
             <!-- Background Image -->
             <div
                 style="
-                                                                                                                                                                                                                                background: url('{{ asset('assets/images/2S DAHON.png') }}') no-repeat center center;
-                                                                                                                                                                                                                                background-size: cover;
-                                                                                                                                                                                                                                opacity: 0.05;
-                                                                                                                                                                                                                                position: absolute;
-                                                                                                                                                                                                                                top: 0;
-                                                                                                                                                                                                                                left: 0;
-                                                                                                                                                                                                                                width: 100%;
-                                                                                                                                                                                                                                height: 100%;
-                                                                                                                                                                                                                                z-index: 0;">
+                                                                                                                                                                                                                                    background: url('{{ asset('assets/images/2S DAHON.png') }}') no-repeat center center;
+                                                                                                                                                                                                                                    background-size: cover;
+                                                                                                                                                                                                                                    opacity: 0.05;
+                                                                                                                                                                                                                                    position: absolute;
+                                                                                                                                                                                                                                    top: 0;
+                                                                                                                                                                                                                                    left: 0;
+                                                                                                                                                                                                                                    width: 100%;
+                                                                                                                                                                                                                                    height: 100%;
+                                                                                                                                                                                                                                    z-index: 0;">
             </div>
 
 
@@ -798,24 +804,24 @@
                                 <table class="table table-borderless mb-0">
                                     <tbody class="text-dark">
                                         <tr>
-                                            <td class="text-start">Section Head</td>
-                                            <td class="fw-bold">Mary Rose Macapagal</td>
+                                            <td class="text-end">Section Head:</td>
+                                            <td class="text-start fw-bold">Mary Rose Macapagal</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-start">Asst. Section Head</td>
-                                            <td class="fw-bold">Eleanor Martha Buensuceso</td>
+                                            <td class="text-end">Asst. Section Head:</td>
+                                            <td class="text-start fw-bold">Eleanor Martha Buensuceso</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-start">Secretary</td>
-                                            <td class="fw-bold">Cherry Adelle Erdos</td>
+                                            <td class="text-end">Secretary:</td>
+                                            <td class="text-start fw-bold">David Matteo</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-start">Member</td>
-                                            <td class="fw-bold">Ma. Cecilia Magtuto</td>
+                                            <td class="text-end">Member:</td>
+                                            <td class="text-start fw-bold">Ma. Cecilia Magtuto</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-start"></td>
-                                            <td class="fw-bold">David Michael Matteo</td>
+                                            <td class="text-end"></td>
+                                            <td class="text-start fw-bold">Marton Erdos </td>
                                         </tr>
                                     </tbody>
                                 </table>

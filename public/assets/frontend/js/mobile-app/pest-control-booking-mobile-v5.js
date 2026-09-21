@@ -31,34 +31,33 @@ $(function () {
     const $bookingSlots = $('.pc-booking-slot');
 
     const philippineHolidays = [
-        "2026-01-01", // New Year's Day
-        "2026-04-02", // Maundy Thursday
-        "2026-04-03", // Good Friday
-        "2026-04-04", // Black Saturday
-        "2026-04-09", // Day of Valor
-        "2026-05-01", // Labor Day
-        "2026-06-12", // Independence Day
-        "2026-08-31", // National Heroes Day
-        "2026-11-30", // Bonifacio Day
-        "2026-12-08", // Feast of the Immaculate Conception
-        "2026-12-25", // Christmas Day
-        "2026-12-30", // Rizal Day
-        "2026-12-31"  // Last Day of the Year
+        "2026-01-01", 
+        "2026-04-02",
+        "2026-04-03", 
+        "2026-04-04",
+        "2026-04-09", 
+        "2026-05-01", 
+        "2026-06-12",
+        "2026-08-31", 
+        "2026-11-30", 
+        "2026-12-08", 
+        "2026-12-25", 
+        "2026-12-30", 
+        "2026-12-31" 
     ];
+
 
     flatpickr("#PestControlBookingDate", {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(1),
-
         disableMobile: true,
 
         disable: [
-  
+            ...philippineHolidays,
+
             function (date) {
                 return date.getDay() === 0;
-            },
-
-            ...philippineHolidays
+            }
         ],
 
         onChange: function (selectedDates, dateStr) {
@@ -71,11 +70,13 @@ $(function () {
         }
     });
 
+
     document.addEventListener('change', function (e) {
         if (e.target && e.target.id === 'resident_id_pc') {
             window.onResidentChangePc(e);
         }
     });
+
 
     window.onResidentChangePc = function (e) {
         const value = e.target.value;
@@ -89,17 +90,19 @@ $(function () {
         console.log("UNIT:", value);
         logDebugPc("UNIT CHANGED: " + value);
         logDebugPc("CHANGE FIRED");
+
         loadDisabledDatesPc(value);
         triggerUpdatePc();
     };
 
 
     function triggerUpdatePc() {
+
         const date = window.pcState.date;
         const unit = window.pcState.unit;
+
         logDebugPc("DATE=" + date);
         logDebugPc("UNIT=" + unit);
-
 
         if (!date || !unit) {
             $(".pc-booking-slot").prop("disabled", true);
@@ -109,6 +112,7 @@ $(function () {
 
         updateSlotsPc(date, unit);
     }
+
 
     function loadDisabledDatesPc(unitName) {
 
@@ -135,7 +139,9 @@ $(function () {
                 logDebugPc("AJAX SUCCESS");
                 logDebugPc(res);
 
-                const fp = document.querySelector("#PestControlBookingDate")._flatpickr;
+                const fp = document.querySelector(
+                    "#PestControlBookingDate"
+                )._flatpickr;
 
                 if (!fp) {
                     logDebugPc("Flatpickr instance not found!");
@@ -143,16 +149,40 @@ $(function () {
                 }
 
                 fp.clear();
+
                 window.pcState.date = null;
 
-                logDebugPc("Applying disabled dates...");
-                logDebugPc(res.disabled_dates);
+                const disabledDates = res.disabled_dates || [];
 
-                fp.set("disable", res.disabled_dates || []);
-                fp.jumpToDate(fp.selectedDates[0] || new Date());
+                logDebugPc("BOOKED DISABLED DATES:");
+                logDebugPc(disabledDates);
+                fp.set("disable", [
+
+                    ...disabledDates,
+
+                    ...philippineHolidays,
+
+                    function (date) {
+                        return date.getDay() === 0;
+                    }
+
+                ]);
+
+                fp.jumpToDate(
+                    fp.selectedDates[0] || new Date()
+                );
+
                 fp.redraw();
 
-                logDebugPc("Current Flatpickr disable config:");
+                logDebugPc("ALL DISABLED DATES APPLIED:");
+
+                logDebugPc({
+                    bookedDates: disabledDates,
+                    holidays: philippineHolidays,
+                    sunday: true
+                });
+
+                logDebugPc("Flatpickr disable config:");
                 logDebugPc(fp.config.disable);
 
                 $("#PestControlBookingDate").prop("disabled", false);

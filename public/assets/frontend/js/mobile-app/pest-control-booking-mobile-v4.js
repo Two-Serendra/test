@@ -49,13 +49,16 @@ $(function () {
     flatpickr("#PestControlBookingDate", {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(1),
+
         disableMobile: true,
 
         disable: [
+  
             function (date) {
                 return date.getDay() === 0;
             },
-            philippineHolidays
+
+            ...philippineHolidays
         ],
 
         onChange: function (selectedDates, dateStr) {

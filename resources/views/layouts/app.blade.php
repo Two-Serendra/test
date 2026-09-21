@@ -105,7 +105,7 @@
     <script src="{{ asset('assets/frontend/js/mobile-app/ausi-booking-history-mobile-v3.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/mobile-app/grease-trap-booking-mobile-v2.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/mobile-app/grease-trap-booking-history-mobile-v3.js') }}"></script>
-    <script src="{{ asset('assets/frontend/js/mobile-app/pest-control-booking-mobile-v2.js') }}"></script>
+    <script src="{{ asset('assets/frontend/js/mobile-app/pest-control-booking-mobile-v3.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/mobile-app/pest-control-booking-history-mobile-v3.js') }}"></script>
 
 

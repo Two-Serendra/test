@@ -30,17 +30,42 @@ $(function () {
 
     const $bookingSlots = $('.pc-booking-slot');
 
+    const philippineHolidays = [
+        "2026-01-01", // New Year's Day
+        "2026-04-02", // Maundy Thursday
+        "2026-04-03", // Good Friday
+        "2026-04-04", // Black Saturday
+        "2026-04-09", // Day of Valor
+        "2026-05-01", // Labor Day
+        "2026-06-12", // Independence Day
+        "2026-08-31", // National Heroes Day
+        "2026-11-30", // Bonifacio Day
+        "2026-12-08", // Feast of the Immaculate Conception
+        "2026-12-25", // Christmas Day
+        "2026-12-30", // Rizal Day
+        "2026-12-31"  // Last Day of the Year
+    ];
+
     flatpickr("#PestControlBookingDate", {
         dateFormat: "Y-m-d",
         minDate: new Date().fp_incr(1),
         disableMobile: true,
+
+        disable: [
+            function (date) {
+                return date.getDay() === 0;
+            },
+            philippineHolidays
+        ],
+
         onChange: function (selectedDates, dateStr) {
             window.pcState.date = dateStr;
+
             console.log("DATE:", dateStr);
             logDebugPc("DATE CHANGED: " + dateStr);
+
             triggerUpdatePc();
         }
-
     });
 
     document.addEventListener('change', function (e) {

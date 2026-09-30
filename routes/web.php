@@ -43,7 +43,7 @@ Route::get('/', function () {
 });
 
 
-Route::post('/register', [RegisteredUserController::class, 'storeUser'])->name('register.user')->middleware('guest');
+// Route::post('/register', [RegisteredUserController::class, 'storeUser'])->name('register.user')->middleware('guest');
 
 
 

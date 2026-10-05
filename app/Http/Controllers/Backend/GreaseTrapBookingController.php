@@ -557,8 +557,9 @@ class GreaseTrapBookingController extends Controller
             'grease_trap_bookings.unit_no',
             'grease_trap_bookings.resident_type',
             'grease_trap_bookings.name as resident_name',
+            'grease_trap_bookings.email as resident_email',
             'u.name as created_by_name',
-            'completed_user.name as completed_by_name', // <-- Add this
+            'completed_user.name as completed_by_name',
             'grease_trap_bookings.booking_date',
             'grease_trap_bookings.booking_time_slot',
             'grease_trap_bookings.srf_no',
@@ -600,6 +601,7 @@ class GreaseTrapBookingController extends Controller
          fputcsv($handle, [
             'Transaction No',
             'Resident Name',
+            'Email',
             'Unit No',
             'Resident Type',
             'Booking Date',
@@ -640,6 +642,7 @@ class GreaseTrapBookingController extends Controller
             fputcsv($handle, [
                $row->transaction_no,
                $row->resident_name,
+               $row->resident_email,
                $row->unit_no,
                $row->resident_type,
                $bookingDate,

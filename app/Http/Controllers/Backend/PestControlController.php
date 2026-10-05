@@ -517,6 +517,7 @@ class PestControlController extends Controller
                 'pest_control_bookings.unit_no',
                 'pest_control_bookings.resident_type',
                 'pest_control_bookings.name as resident_name',
+                'pest_control_bookings.email as resident_email',
                 'u.name as created_by_name',
                 'completed_user.name as completed_by_name',
                 'pest_control_bookings.booking_date',
@@ -547,6 +548,7 @@ class PestControlController extends Controller
             fputcsv($handle, [
                 'Transaction No',
                 'Resident Name',
+                'Email',
                 'Unit No',
                 'Resident Type',
                 'Booking Date',
@@ -580,6 +582,7 @@ class PestControlController extends Controller
                 fputcsv($handle, CsvHelper::sanitizeRow([
                     $row->transaction_no,
                     $row->resident_name,
+                    $row->resident_email,
                     $row->unit_no,
                     $row->resident_type,
                     $bookingDate,

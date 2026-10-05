@@ -184,7 +184,7 @@ class AusiBookingController extends Controller
             compact('ausiBookings', 'searchBooking')
         )->with('searchAusiBooking', $searchBooking);
     }
-    
+
     public function getBookedSlotsAdminAusi(Request $request)
     {
         $unit = strtoupper($request->unit);
@@ -588,9 +588,8 @@ class AusiBookingController extends Controller
                 'ausi_bookings.unit_no',
                 'ausi_bookings.resident_type',
                 'ausi_bookings.name as resident_name',
-
+                'ausi_bookings.email as resident_email',
                 'u.name as created_by_name',
-
                 'ausi_bookings.booking_date',
                 'ausi_bookings.booking_time_slot',
                 'ausi_bookings.srf_no',
@@ -640,6 +639,7 @@ class AusiBookingController extends Controller
                 'Booking ID',
                 'Transaction No',
                 'Resident Name',
+                'Email',
                 'Unit No',
                 'Resident Type',
                 'Booking Date',
@@ -682,6 +682,8 @@ class AusiBookingController extends Controller
 
                     $row->resident_name,
 
+                    $row->resident_email,
+
                     $row->unit_no,
 
                     $row->resident_type,
@@ -698,24 +700,16 @@ class AusiBookingController extends Controller
 
                     $status,
 
-
-                    // inspection
                     $row->inspection_results ?? 'Not Inspected',
 
-
-                    // completed
                     $row->completed_by_name,
 
                     $row->completed_at,
 
-
-                    // cancelled
                     $row->cancelled_by_name,
 
                     $row->cancelled_at,
 
-
-                    // created
                     $row->created_by_name,
 
                     $row->created_at,

@@ -400,7 +400,7 @@ class AusiBookingMobileController extends Controller
                     Mail::to($email)
                         ->queue(new UserAusiBookingConfirmation($booking));
 
-                    Mail::to('concierge@twoserendra.com')
+                    Mail::to(['lowrise.engineering@twoserendra.com', 'highrise.engineering@twoserendra.com'])
                         ->queue(new ConciergeAusiBookingConfirmation($booking));
 
                     event(new AusiBookingCreated($booking));
@@ -574,7 +574,7 @@ class AusiBookingMobileController extends Controller
                             );
 
                     }
-                    Mail::to('concierge@twoserendra.com')
+                    Mail::to(['lowrise.engineering@twoserendra.com', 'highrise.engineering@twoserendra.com'])
                         ->queue(
                             new ConciergeAusiBookingCancellation($booking)
                         );

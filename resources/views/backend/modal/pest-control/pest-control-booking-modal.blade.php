@@ -662,10 +662,10 @@
 
                                 <div class="mb-3">
                                     <label for="complete_srf_no_pest_control" class="form-label">
-                                        SRF No <span class="text-danger">*</span>
+                                        SRF No <span class="text-danger"></span>
                                     </label>
 
-                                    <input type="text" class="form-control" id="complete_srf_no_pest_control" name="srf_no" required>
+                                    <input type="text" class="form-control" id="complete_srf_no_pest_control" name="srf_no">
                                 </div>
 
                                 <div class="mb-3">

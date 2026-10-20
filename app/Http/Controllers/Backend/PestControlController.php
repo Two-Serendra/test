@@ -737,7 +737,7 @@ class PestControlController extends Controller
     {
         $request->validate([
             'id' => 'required|exists:pest_control_bookings,id',
-            'srf_no' => 'required|string|max:255',
+            // 'srf_no' => 'required|string|max:255',
             'remarks' => 'nullable|string|max:1000',
         ]);
 

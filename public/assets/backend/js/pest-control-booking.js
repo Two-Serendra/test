@@ -1048,22 +1048,11 @@ $(document).ready(function () {
             .css('width', '');
     }
 
+
     $('#completePestControlBookingFormReports').on('submit', function (e) {
 
         e.preventDefault();
         let form = this;
-        let srf = $('#complete_srf_no_pest_control').val().trim();
-
-        if (srf === '') {
-            Swal.fire({
-                icon: 'warning',
-                title: 'SRF No Required',
-                text: 'Please enter the SRF No before completing the booking.'
-            });
-
-            $('#complete_srf_no_pest_control').focus();
-            return;
-        }
 
         Swal.fire({
             title: 'Complete Booking?',
@@ -1086,6 +1075,7 @@ $(document).ready(function () {
                 url: $(form).attr('action'),
                 type: 'POST',
                 data: $(form).serialize(),
+
                 success: function (response) {
 
                     $('#pestControlComplete').modal('hide');
@@ -1109,7 +1099,6 @@ $(document).ready(function () {
                     form.reset();
 
                     refreshPestControlTableBookings();
-
                 },
 
                 error: function (xhr) {
@@ -1129,7 +1118,6 @@ $(document).ready(function () {
                         icon: 'error',
                         title: xhr.responseJSON?.message ?? 'Unable to complete booking.'
                     });
-
                 },
 
                 complete: function () {
@@ -1140,6 +1128,7 @@ $(document).ready(function () {
         });
 
     });
+
 
 
 });

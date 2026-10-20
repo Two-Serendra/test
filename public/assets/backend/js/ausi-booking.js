@@ -1,5 +1,6 @@
 $(document).ready(function () {
 
+
     const philippineHolidays = [
         "2026-01-01",
         "2026-02-25",
@@ -16,14 +17,23 @@ $(document).ready(function () {
         "2026-12-30"
     ];
 
-
     let ausiPickerAdmin = null;
     let ausiPickerEmergency = null;
+    let blockedAusiDates = [];
 
-    initAusiPicker();
+    // Fetch blocked dates from the database
+    function loadAusiBlockedDates() {
+        return $.getJSON(blockedDatesUrl)
+            .then(function (response) {
+                blockedAusiDates = response.disabled_dates || [];
+                initAusiPicker();
+            })
+            .fail(function () {
+                console.error('Unable to load AUSI blocked dates.');
+            });
+    }
 
     function initAusiPicker() {
-
         if (ausiPickerAdmin) {
             ausiPickerAdmin.destroy();
         }
@@ -35,12 +45,9 @@ $(document).ready(function () {
         const commonOptions = {
             dateFormat: "Y-m-d",
             minDate: "today",
-
-           
             disable: [
                 function (date) {
-
-                    const unit = $('#unitAusi').val()
+                    const unit = $('#unitAusi').val();
                     const category = getUnitCategory(unit);
 
                     const formattedDate = flatpickr.formatDate(date, "Y-m-d");
@@ -48,7 +55,14 @@ $(document).ready(function () {
                     const isSunday = date.getDay() === 0;
                     const isFriday = date.getDay() === 5;
                     const isHoliday = philippineHolidays.includes(formattedDate);
+                    const isBlocked = blockedAusiDates.includes(formattedDate);
 
+                    // Disable dates blocked in the database for all units
+                    if (isBlocked) {
+                        return true;
+                    }
+
+                    // Preserve existing booking restrictions
                     if (category === 'group1') {
                         return isFriday || isSunday || isHoliday;
                     }
@@ -62,9 +76,20 @@ $(document).ready(function () {
             ]
         };
 
-        ausiPickerAdmin = flatpickr("#ausiBookingDateAdmin", commonOptions);
-        ausiPickerEmergency = flatpickr("#ausiBookingDateAdminEmergency", commonOptions);
+        ausiPickerAdmin = flatpickr(
+            "#ausiBookingDateAdmin",
+            commonOptions
+        );
+
+        ausiPickerEmergency = flatpickr(
+            "#ausiBookingDateAdminEmergency",
+            commonOptions
+        );
     }
+
+    // Load database blocks before initializing the calendars
+    loadAusiBlockedDates();
+
 
     function getUnitCategory(unit) {
 

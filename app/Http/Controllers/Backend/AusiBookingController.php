@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Models\AusiDateBlocking;
 use App\Models\AusiInspectionItem;
 use Illuminate\Http\Request;
 use App\Models\AusiBooking;
@@ -51,6 +52,21 @@ class AusiBookingController extends Controller
                 DB::beginTransaction();
                 $bookingDateCarbon = Carbon::parse($request->booking_date);
                 $bookingDate = $bookingDateCarbon->toDateString();
+
+                $isDateBlocked = AusiDateBlocking::where('is_active', true)
+                    ->whereDate('start_date', '<=', $bookingDate)
+                    ->whereDate('end_date', '>=', $bookingDate)
+                    ->exists();
+
+                if ($isDateBlocked) {
+                    DB::rollBack();
+
+                    return response()->json([
+                        'message' => 'AUSI bookings are unavailable on this date. Please select another date.',
+                        'type' => 'date_blocked',
+                    ], 422);
+                }
+
                 $unit = strtoupper($request->unit);
                 $areaLetter = preg_replace('/[^A-Z]/', '', $unit);
                 $towerGroup = $towerGroups[$areaLetter] ?? null;
@@ -185,35 +201,75 @@ class AusiBookingController extends Controller
         )->with('searchAusiBooking', $searchBooking);
     }
 
+
     public function getBookedSlotsAdminAusi(Request $request)
     {
+        $request->validate([
+            'date' => ['required', 'date'],
+            'unit' => ['required', 'string'],
+        ]);
+
         $unit = strtoupper($request->unit);
         $areaLetter = preg_replace('/[^A-Z]/', '', $unit);
 
         $lowrise = ['A', 'B', 'C', 'D', 'E'];
         $highrise = ['F', 'G', 'H', 'I'];
 
-        $userGroup = in_array($areaLetter, $lowrise) ? 'lowrise' : 'highrise';
+        if (in_array($areaLetter, $lowrise)) {
+            $userGroup = 'lowrise';
+        } elseif (in_array($areaLetter, $highrise)) {
+            $userGroup = 'highrise';
+        } else {
+            return response()->json([
+                'message' => 'Invalid unit area letter.',
+            ], 422);
+        }
 
+        // Get active AUSI date blocks.
+        $blocks = AusiDateBlocking::where('is_active', true)
+            ->get(['start_date', 'end_date']);
+
+        $disabledDates = [];
+
+        foreach ($blocks as $block) {
+            $period = \Carbon\CarbonPeriod::create(
+                \Carbon\Carbon::parse($block->start_date)->toDateString(),
+                \Carbon\Carbon::parse($block->end_date)->toDateString()
+            );
+
+            foreach ($period as $date) {
+                $disabledDates[] = $date->toDateString();
+            }
+        }
+
+        $disabledDates = array_values(array_unique($disabledDates));
+
+        // Get existing bookings for the selected date.
         $bookings = AusiBooking::whereDate('booking_date', $request->date)
             ->where('booking_status', 1)
-            ->where('emergency', 0) // Exclude emergency bookings
+            ->where('emergency', 0)
             ->get(['booking_time_slot', 'unit_area']);
 
         $slotStatus = [];
 
-        foreach ($bookings as $b) {
-            $slot = $b->booking_time_slot;
-            $area = $b->unit_area;
+        foreach ($bookings as $booking) {
+            $slot = $booking->booking_time_slot;
+            $area = $booking->unit_area;
 
             if (!isset($slotStatus[$slot])) {
-                $slotStatus[$slot] = ['lowrise' => false, 'highrise' => false];
+                $slotStatus[$slot] = [
+                    'lowrise' => false,
+                    'highrise' => false,
+                ];
             }
 
-            if (in_array($area, $lowrise))
+            if (in_array($area, $lowrise)) {
                 $slotStatus[$slot]['lowrise'] = true;
-            if (in_array($area, $highrise))
+            }
+
+            if (in_array($area, $highrise)) {
                 $slotStatus[$slot]['highrise'] = true;
+            }
         }
 
         $blockedForUser = [];
@@ -224,7 +280,7 @@ class AusiBookingController extends Controller
             }
         }
 
-        // Tuesday rule
+        // Tuesday rule: AUSI bookings start at 10:00 AM.
         if (Carbon::parse($request->date)->isTuesday()) {
             $blockedForUser = array_merge($blockedForUser, [
                 '8:00 AM - 8:30 AM',
@@ -234,12 +290,12 @@ class AusiBookingController extends Controller
             ]);
         }
 
-        $blockedForUser = array_unique($blockedForUser);
-
         return response()->json([
-            'booked_slots' => array_values($blockedForUser)
+            'booked_slots' => array_values(array_unique($blockedForUser)),
+            'disabled_dates' => $disabledDates,
         ]);
     }
+
 
     public function getUpdatedAusiTable()
     {
@@ -1044,4 +1100,28 @@ class AusiBookingController extends Controller
             ], 500);
         }
     }
+
+
+    public function getAusiBlockedDates()
+    {
+        $blocks = AusiDateBlocking::get(['start_date', 'end_date']);
+
+        $disabledDates = [];
+
+        foreach ($blocks as $block) {
+            $period = \Carbon\CarbonPeriod::create(
+                Carbon::parse($block->start_date)->toDateString(),
+                Carbon::parse($block->end_date)->toDateString()
+            );
+
+            foreach ($period as $date) {
+                $disabledDates[] = $date->toDateString();
+            }
+        }
+
+        return response()->json([
+            'disabled_dates' => array_values(array_unique($disabledDates)),
+        ]);
+    }
+
 }

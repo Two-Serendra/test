@@ -50,6 +50,8 @@ return [
     'admin.search.ausi.booking' => ['AUSI', 'Booking'], // search page uses same breadcrumb
     'admin.report.ausi' => ['AUSI', 'Reports'],
     'admin.search.ausi.report' => ['AUSI', 'Reports'],
+
+    'admin.ausi-date-blocking.index' => ['AUSI', 'Date Blocking'], // search page uses same breadcrumb
     // Manage Section
     'admin.show.user' => ['Manage', 'User'],
     'admin.show.resident.details' => ['Manage', 'Resident Details'],

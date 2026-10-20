@@ -302,7 +302,7 @@
         </li>
         @endroles
 
-        @roles(1, 3, 7, 9)
+        @roles(1, 3, 7, 9, 6)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-building-house"></i>
@@ -327,18 +327,29 @@
                         <div data-i18n="Typography">Calendar</div>
                     </a>
                 </li>
+                @unless(auth()->user()->role_id == 6)
+                    <li class="menu-item {{ request()->routeIs('admin.ausi.inspection.item') ? 'active' : '' }}">
+                        <a href="{{ route('admin.ausi.inspection.item') }}" class="menu-link">
+                            <div data-i18n="Typography">Inspection Items</div>
+                        </a>
+                    </li>
 
-                <li class="menu-item {{ request()->routeIs('admin.ausi.inspection.item') ? 'active' : '' }}">
-                    <a href="{{ route('admin.ausi.inspection.item') }}" class="menu-link">
-                        <div data-i18n="Typography">Inspection Items</div>
-                    </a>
-                </li>
+                    <li class="menu-item {{ request()->routeIs('admin.report.ausi') ? 'active' : '' }}">
+                        <a href="{{ route('admin.report.ausi') }}" class="menu-link">
+                            <div data-i18n="Typography">Reports</div>
+                        </a>
+                    </li>
 
-                <li class="menu-item {{ request()->routeIs('admin.report.ausi') ? 'active' : '' }}">
-                    <a href="{{ route('admin.report.ausi') }}" class="menu-link">
-                        <div data-i18n="Typography">Reports</div>
-                    </a>
-                </li>
+
+
+                    <li class="menu-item {{ request()->routeIs('admin.ausi-date-blocking.*') ? 'active' : '' }}">
+                        <a href="{{ route('admin.ausi-date-blocking.index') }}" class="menu-link">
+                            <div data-i18n="Typography">
+                                Date Blocking
+                            </div>
+                        </a>
+                    </li>
+                @endunless
             </ul>
         </li>
         @endroles

@@ -24,6 +24,7 @@ use App\Http\Controllers\Frontend\FrontendFunctionRoomBookingController;
 use App\Http\Controllers\Backend\FitnessHubController;
 use App\Http\Controllers\Backend\FitnessHubBookingController;
 use App\Http\Controllers\Backend\AusiBookingController;
+use App\Http\Controllers\Backend\AusiDateBlockingController;
 
 Route::middleware('guest:admin')->group(function () {
     Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
@@ -325,6 +326,8 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/admin-report-ausi', [AusiBookingController::class, 'AdminReportAusi'])->name('admin.report.ausi');
     Route::post('/ausi-import-booking', [AusiBookingController::class, 'importAusiBookings'])->name('ausi.booking.import');
     Route::get('/admin-get-updated-ausi-table', [AusiBookingController::class, 'getUpdatedAusiTable'])->name('admin.get.updated.ausi.table');
+    Route::get('/admin-ausi/blocked-dates',[AusiBookingController::class, 'getAusiBlockedDates'])->name('admin.ausi.blocked-dates');
+
     Route::post('/admin-ausi-booking/cancel/{booking}', [AusiBookingController::class, 'CancelAusiBookingAdmin'])
         ->name('admin.ausi.booking.cancel');
     Route::get('/admin-ausi-calendar', [AusiBookingController::class, 'AdminBookingAusiCalendar'])->name('admin.booking.ausi.calendar');
@@ -363,7 +366,19 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/admin/gallery/upload', [GalleryController::class, 'uploadGalleryImages'])->name('admin.gallery.upload');
     Route::get('/get-updated-gallery-table', [GalleryController::class, 'getUpdatedGalleryTable'])->name('get.updated.gallery.table');
 
+    //AUSI Date Blocking
 
+    Route::get('/admin-ausi/date-blocking', [AusiDateBlockingController::class, 'index'])
+        ->name('admin.ausi-date-blocking.index');
+
+    Route::post('/admin-ausi/date-blocking', [AusiDateBlockingController::class, 'store'])
+        ->name('admin.ausi-date-blocking.store');
+
+    Route::put('/admin-ausi/date-blocking/{ausiDateBlocking}', [AusiDateBlockingController::class, 'update'])
+        ->name('admin.ausi-date-blocking.update');
+
+    Route::delete('/admin-ausi/date-blocking/{ausiDateBlocking}', [AusiDateBlockingController::class, 'destroy'])
+        ->name('admin.ausi-date-blocking.destroy');
 
     //Event
     Route::get('/admin-events', [EventsController::class, 'showEvents'])->name('admin.show.events');

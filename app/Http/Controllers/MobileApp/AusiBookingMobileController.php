@@ -17,6 +17,8 @@ use App\Mail\UserAusiBookingCancellation;
 use App\Mail\ConciergeAusiBookingCancellation;
 use App\Models\AusiInspectionResult;
 use App\Http\Controllers\Controller;
+use App\Models\AusiDateBlocking;
+use Carbon\CarbonPeriod;
 
 class AusiBookingMobileController extends Controller
 {
@@ -86,6 +88,39 @@ class AusiBookingMobileController extends Controller
 
         $userGroup = in_array($areaLetter, $lowrise) ? 'lowrise' : 'highrise';
 
+        $blocks = AusiDateBlocking::get(['start_date', 'end_date']);
+
+        $adminBlockedDates = [];
+
+        foreach ($blocks as $block) {
+            $period = CarbonPeriod::create(
+                Carbon::parse($block->start_date)->toDateString(),
+                Carbon::parse($block->end_date)->toDateString()
+            );
+
+            foreach ($period as $date) {
+                $adminBlockedDates[] = $date->toDateString();
+            }
+        }
+
+        $adminBlockedDates = array_values(array_unique($adminBlockedDates));
+
+        $philippineHolidays = [
+            '2026-01-01',
+            '2026-02-25',
+            '2026-04-09',
+            '2026-04-17',
+            '2026-04-18',
+            '2026-05-01',
+            '2026-06-12',
+            '2026-08-21',
+            '2026-08-31',
+            '2026-11-01',
+            '2026-11-30',
+            '2026-12-25',
+            '2026-12-30',
+        ];
+
         if (!$request->filled('date')) {
 
             $slots = [
@@ -141,13 +176,13 @@ class AusiBookingMobileController extends Controller
                 }
             }
 
-            $disabledDates = [];
-
+            $disabledDates = array_merge(
+                $adminBlockedDates,
+                $philippineHolidays
+            );
             foreach ($dates as $date => $slotData) {
 
                 $requiredSlots = $slots;
-
-                // Tuesday morning slots are unavailable to everyone.
                 if (Carbon::parse($date)->isTuesday()) {
                     $requiredSlots = array_diff($requiredSlots, [
                         '8:00 AM - 8:30 AM',
@@ -176,7 +211,8 @@ class AusiBookingMobileController extends Controller
             }
 
             return response()->json([
-                'disabled_dates' => array_values($disabledDates)
+                'disabled_dates' => array_values(array_unique($disabledDates)),
+                'blocked_dates' => $adminBlockedDates,
             ]);
         }
 
@@ -208,6 +244,37 @@ class AusiBookingMobileController extends Controller
 
         $blockedForUser = [];
 
+        $selectedDate = Carbon::parse($request->date)->toDateString();
+
+        $allSlots = [
+            '8:00 AM - 8:30 AM',
+            '8:30 AM - 9:00 AM',
+            '9:00 AM - 9:30 AM',
+            '9:30 AM - 10:00 AM',
+            '10:00 AM - 10:30 AM',
+            '10:30 AM - 11:00 AM',
+            '11:00 AM - 11:30 AM',
+            '11:30 AM - 12:00 PM',
+            '1:00 PM - 1:30 PM',
+            '1:30 PM - 2:00 PM',
+            '2:00 PM - 2:30 PM',
+            '2:30 PM - 3:00 PM',
+            '3:00 PM - 3:30 PM',
+            '3:30 PM - 4:00 PM',
+            '4:00 PM - 4:30 PM',
+            '4:30 PM - 5:00 PM',
+        ];
+
+        if (
+            in_array($selectedDate, $adminBlockedDates, true) ||
+            in_array($selectedDate, $philippineHolidays, true)
+        ) {
+            return response()->json([
+                'blocked_for_user' => $allSlots,
+                'raw_status' => [],
+                'date_blocked' => true,
+            ]);
+        }
         foreach ($slotStatus as $slot => $status) {
             if ($status[$userGroup]) {
                 $blockedForUser[] = $slot;

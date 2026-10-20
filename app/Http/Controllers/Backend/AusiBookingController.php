@@ -53,11 +53,9 @@ class AusiBookingController extends Controller
                 $bookingDateCarbon = Carbon::parse($request->booking_date);
                 $bookingDate = $bookingDateCarbon->toDateString();
 
-                $isDateBlocked = AusiDateBlocking::where('is_active', true)
-                    ->whereDate('start_date', '<=', $bookingDate)
+                $isDateBlocked = AusiDateBlocking::whereDate('start_date', '<=', $bookingDate)
                     ->whereDate('end_date', '>=', $bookingDate)
                     ->exists();
-
                 if ($isDateBlocked) {
                     DB::rollBack();
 

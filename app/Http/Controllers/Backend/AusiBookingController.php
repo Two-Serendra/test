@@ -226,8 +226,7 @@ class AusiBookingController extends Controller
         }
 
         // Get active AUSI date blocks.
-        $blocks = AusiDateBlocking::where('is_active', true)
-            ->get(['start_date', 'end_date']);
+        $blocks = AusiDateBlocking::get(['start_date', 'end_date']);
 
         $disabledDates = [];
 

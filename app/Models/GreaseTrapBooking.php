@@ -111,10 +111,12 @@ class GreaseTrapBooking extends Model
         }
     }
 
-    public static function getUsedFreeBookings($unitNo)
+    public static function getUsedFreeBookings($unitNo, $year = null)
     {
-        return self::where('unit_no', $unitNo)
-            ->whereYear('booking_date', now()->year)
+        $year = $year ?? now()->year;
+
+        return self::where('unit_no', strtoupper(trim($unitNo)))
+            ->whereYear('booking_date', $year)
             ->where(function ($q) {
                 $q->whereIn('booking_status', [
                     self::STATUS_SCHEDULED,

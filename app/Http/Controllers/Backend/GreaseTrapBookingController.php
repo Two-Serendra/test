@@ -111,7 +111,12 @@ class GreaseTrapBookingController extends Controller
             $freeBookingLimit = 2;
 
 
-            $unitBookingsCount = GreaseTrapBooking::getUsedFreeBookings($unitNo);
+            $bookingYear = Carbon::parse($request->booking_date)->year;
+
+            $unitBookingsCount = GreaseTrapBooking::getUsedFreeBookings(
+               $unitNo,
+               $bookingYear
+            );
 
             $remainingFreeBookings = max($freeBookingLimit - $unitBookingsCount, 0);
             $chargedType = $unitBookingsCount < $freeBookingLimit
@@ -300,10 +305,14 @@ class GreaseTrapBookingController extends Controller
             $bookingDate = Carbon::parse($request->booking_date)->toDateString();
             $unitNo = strtoupper(trim($request->unit));
 
+            $bookingYear = Carbon::parse($bookingDate)->year;
+
+            $unitBookingsCount = GreaseTrapBooking::getUsedFreeBookings(
+               $unitNo,
+               $bookingYear
+            );
+
             $freeBookingLimit = 2;
-
-            $unitBookingsCount = GreaseTrapBooking::getUsedFreeBookings($unitNo);
-
             $remainingFreeBookings = max(
                $freeBookingLimit - $unitBookingsCount,
                0
